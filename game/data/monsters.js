@@ -77,7 +77,7 @@ const monsters = {
       name: 'Goblin',
       stats: {
         str: 2,
-        dex: 2,
+        dex: 1,
         end: 2,
       },
       experience: 5,
@@ -88,7 +88,7 @@ const monsters = {
       stats: {
         str: 5,
         dex: 2,
-        end: 2,
+        end: 5,
       },
       experience: 10,
       gold: 3
@@ -97,7 +97,7 @@ const monsters = {
       name: 'Bat',
       stats: {
         str: 2,
-        dex: 2,
+        dex: 5,
         end: 1,
       },
       experience: 3,
@@ -118,7 +118,7 @@ const monsters = {
       stats: {
         str: 7,
         dex: 3,
-        end: 7,
+        end: 17,
       },
       experience: 25,
       gold: 6
@@ -126,7 +126,7 @@ const monsters = {
     necromancer = {
       name: 'Necromancer',
       stats: {
-        str: 9,
+        str: 19,
         dex: 2,
         end: 4,
       },
@@ -138,7 +138,7 @@ const monsters = {
       stats: {
         str: 4,
         dex: 1,
-        end: 7,
+        end: 12,
       },
       experience: 15,
       gold: 3
@@ -146,7 +146,7 @@ const monsters = {
     orc = {
       name: 'Orc',
       stats: {
-        str: 7,
+        str: 27,
         dex: 1,
         end: 7,
       },
@@ -157,7 +157,7 @@ const monsters = {
       name: 'Elf',
       stats: {
         str: 4,
-        dex: 9,
+        dex: 29,
         end: 3,
       },
       experience: 20,

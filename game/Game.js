@@ -43,16 +43,19 @@ class Game {
         selectedPlayer.events++;
         switch (randomEvent) {
           case 1:
-            logger.info(`${selectedPlayer.name} activated a move event.`);
+            console.log(`${selectedPlayer.name} activated a move event.`);
             this.moveEvent(selectedPlayer, hook);
+            LocalDatabase.write(selectedPlayer);
             break;
           case 2:
-            logger.info(`${selectedPlayer.name} activated an attack event.`);
+            console.log(`${selectedPlayer.name} activated an attack event.`);
             this.attackEvent(selectedPlayer, onlinePlayers, hook);
+            LocalDatabase.write(selectedPlayer);
             break;
           case 3:
-            logger.info(`${selectedPlayer.name} activated a luck event.`);
+            console.log(`${selectedPlayer.name} activated a luck event.`);
             this.luckEvent(selectedPlayer, hook);
+            LocalDatabase.write(selectedPlayer);
             break;
         }
       });
@@ -61,7 +64,9 @@ class Game {
   moveEvent(selectedPlayer, hook) {
     const map = ['Beach', 'Plains', 'Forest', 'Mountains', 'Town'];
     const randomMapIndex = Helper.randomInt(0, map.length - 1);
-    if (selectedPlayer.map === map[randomMapIndex]) {
+    const luckDice = Helper.randomInt(0, 100);
+    
+    if (selectedPlayer.map === map[randomMapIndex] && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
       const item = Item.generateItem();
       switch (item.position) {
         case 'helmet':
@@ -98,19 +103,17 @@ class Game {
           selectedPlayer.equipment.weapon.int = item.stats.int;
           break;
       }
-      LocalDatabase.write(selectedPlayer);
 
       return hook.send(Event.generateItemEventMessage(selectedPlayer, item));
     }
     selectedPlayer.map = map[randomMapIndex];
 
-    LocalDatabase.write(selectedPlayer);
-
     return hook.send(`**${selectedPlayer.name}** has moved to ${selectedPlayer.map}.`);
   }
 
   attackEvent(selectedPlayer, onlinePlayers, hook) {
-    if (selectedPlayer.map === 'Town') {
+    const luckDice = Helper.randomInt(0, 100);
+    if (selectedPlayer.map === 'Town' && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
       const item = Item.generateItem();
       switch (item.position) {
         case 'helmet':
@@ -152,7 +155,6 @@ class Game {
 
       if (selectedPlayer.gold >= item.gold) {
         selectedPlayer.gold -= item.gold;
-        LocalDatabase.write(selectedPlayer);
 
         return hook.send(`**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
       }
@@ -160,7 +162,6 @@ class Game {
       return hook.send(`**${selectedPlayer.name}** was going to purchase ${item.name} from Town for ${item.gold} Gold but did not have enough.`);
     }
 
-    const luckDice = Helper.randomInt(0, 100);
     if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
       if (selectedPlayer.map !== 'Town') {
         const sameMapPlayers = onlinePlayers.filter(player => player.map === selectedPlayer.map);
@@ -168,7 +169,6 @@ class Game {
           const randomPlayerIndex = Helper.randomInt(0, sameMapPlayers.size - 1);
           const randomPlayer = sameMapPlayers.array()[randomPlayerIndex];
           selectedPlayer.kills.player++;
-          LocalDatabase.write(selectedPlayer);
 
           return hook.send(`**${selectedPlayer.name}** just attacked **${randomPlayer.name}** with his/her ${selectedPlayer.equipment.weapon.name}!`);
         }
@@ -177,18 +177,17 @@ class Game {
 
     const mob = Monster.generateMonster();
     const { playerChance, mobChance } = Battle.simulateBattleWithMob(selectedPlayer, mob);
+
     if (playerChance >= mobChance) {
       selectedPlayer.experience += mob.experience;
       selectedPlayer.kills.mob++;
       checkExperience(selectedPlayer, hook);
-      LocalDatabase.write(selectedPlayer);
 
       return hook.send(`**${selectedPlayer.name}** just killed ${mob.name} with his/her ${selectedPlayer.equipment.weapon.name} gaining ${mob.experience} exp and ${mob.gold} Gold!`);
     }
 
-    selectedPlayer.health -= battleResult;
+    selectedPlayer.health -= mobChance;
     Helper.checkHealth(selectedPlayer, mob, hook);
-    LocalDatabase.write(selectedPlayer);
 
     return hook.send(`**${selectedPlayer.name}** just lost a battle to ${mob.name} losing ${mobChance} health and ${mob.gold} Gold!`);
   }
@@ -224,7 +223,6 @@ class Game {
               selectedPlayer.stats.luk += luckStatAmount;
               break;
           }
-          LocalDatabase.write(selectedPlayer);
 
           return hook.send(`Apollo has blessed **${selectedPlayer.name}** with his music raising his/her ${stat} by ${luckStatAmount}!`);
 
@@ -234,7 +232,6 @@ class Game {
           if (selectedPlayer.experience < 0) {
             selectedPlayer.experience = 0;
           }
-          LocalDatabase.write(selectedPlayer);
 
           return hook.send(`Hades unleashed his wrath upon **${selectedPlayer.name}** making him/her lose ${luckExpAmount} experience!`);
 
@@ -242,14 +239,12 @@ class Game {
           const luckHealthAmount = Helper.randomInt(5, 15);
           selectedPlayer.health -= luckHealthAmount;
           checkHealth(selectedPlayer, hook);
-          LocalDatabase.write(selectedPlayer);
 
           return hook.send(`**${selectedPlayer.name}** just lost ${luckHealthAmount} health by tripping and hitting his/her head!`);
       }
     } else if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
       const goldAmount = Number(((luckDice * selectedPlayer.stats.luk) / 2).toFixed());
       selectedPlayer.gold += goldAmount;
-      LocalDatabase.write(selectedPlayer);
 
       return hook.send(`**${selectedPlayer.name}** found ${goldAmount} Gold in ${selectedPlayer.map}.`);
     }

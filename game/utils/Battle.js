@@ -11,8 +11,8 @@ class Battle {
     const mobEvasive = mobObj.stats.dex;
     const mobDefense = mobObj.stats.end;
 
-    const playerChance = (playerDamage + playerEvasive) - (mobDefense + mobEvasive);
-    const mobChance = (mobDamage + mobEvasive) - (playerDefense + playerEvasive);
+    const playerChance = Math.floor((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
+    const mobChance = Math.floor((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
     console.log(`PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
 
     return { playerChance, mobChance };
