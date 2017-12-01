@@ -25,6 +25,8 @@ class Item {
       * (items.material[randomMaterialIndex].stats.int
         + items.type[randomEquipmentIndex][randomTypeIndex].stats.int)) / 4;
 
+    const itemRating = itemStr + itemDex + itemEnd + itemInt;
+
     const itemObj = {
       name: `${items.rarity[randomRarityIndex].name} ${items.material[randomMaterialIndex].name} ${items.type[randomEquipmentIndex][randomTypeIndex].name}`,
       position: items.type[randomEquipmentIndex][randomTypeIndex].position,
@@ -34,10 +36,10 @@ class Item {
         end: itemEnd,
         int: itemInt
       },
-      rating: itemStr + itemDex + itemEnd + itemInt,
+      rating: itemRating,
       gold: Number((items.rarity[randomRarityIndex].gold
         * items.material[randomMaterialIndex].gold
-        * items.type[randomEquipmentIndex][randomTypeIndex].gold).toFixed()) * rating
+        * items.type[randomEquipmentIndex][randomTypeIndex].gold).toFixed()) * itemRating
     };
     return itemObj;
   }
