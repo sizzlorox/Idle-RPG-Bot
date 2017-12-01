@@ -15,11 +15,7 @@ class Battle {
     const mobChance = (mobDamage + mobEvasive) - (playerDefense + playerEvasive);
     console.log(`PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
 
-    if (playerChance >= mobChance) {
-      return true;
-    }
-
-    return mobChance;
+    return { playerChance, mobChance };
   }
 }
 module.exports = new Battle();

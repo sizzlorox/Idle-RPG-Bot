@@ -64,7 +64,16 @@ class LocalDatabase {
           },
           isOnline: true,
           lastLogin: moment().toISOString(),
-          createdAt: moment().toISOString()
+          createdAt: moment().toISOString(),
+          events: 0,
+          kills: {
+            mob: 0,
+            player: 0
+          },
+          deaths: {
+            mob: 0,
+            player: 0
+          }
         };
         this.write(newPlayer);
         return newPlayer;

@@ -19,13 +19,6 @@ function checkExperience(selectedPlayer, hook) {
   }
 }
 
-function checkHealth(selectedPlayer, hook) {
-  if (selectedPlayer.health <= 0) {
-    // Permadeath
-    hook.send(`**${selectedPlayer.name}** died! Game over man... Game over.`);
-  }
-}
-
 class Game {
 
   selectEvent(onlinePlayers, hook) {
@@ -47,6 +40,7 @@ class Game {
 
     LocalDatabase.load(gamePlayer)
       .then((selectedPlayer) => {
+        selectedPlayer.events++;
         switch (randomEvent) {
           case 1:
             logger.info(`${selectedPlayer.name} activated a move event.`);
@@ -173,6 +167,8 @@ class Game {
         if (sameMapPlayers.size > 0) {
           const randomPlayerIndex = Helper.randomInt(0, sameMapPlayers.size - 1);
           const randomPlayer = sameMapPlayers.array()[randomPlayerIndex];
+          selectedPlayer.kills.player++;
+          LocalDatabase.write(selectedPlayer);
 
           return hook.send(`**${selectedPlayer.name}** just attacked **${randomPlayer.name}** with his/her ${selectedPlayer.equipment.weapon.name}!`);
         }
@@ -180,19 +176,21 @@ class Game {
     }
 
     const mob = Monster.generateMonster();
-    const battleResult = Battle.simulateBattleWithMob(selectedPlayer, mob);
-    if (battleResult) {
+    const { playerChance, mobChance } = Battle.simulateBattleWithMob(selectedPlayer, mob);
+    if (playerChance >= mobChance) {
       selectedPlayer.experience += mob.experience;
+      selectedPlayer.kills.mob++;
       checkExperience(selectedPlayer, hook);
       LocalDatabase.write(selectedPlayer);
 
       return hook.send(`**${selectedPlayer.name}** just killed ${mob.name} with his/her ${selectedPlayer.equipment.weapon.name} gaining ${mob.experience} exp and ${mob.gold} Gold!`);
     }
+
     selectedPlayer.health -= battleResult;
-    checkHealth(selectedPlayer, hook);
+    Helper.checkHealth(selectedPlayer, mob, hook);
     LocalDatabase.write(selectedPlayer);
 
-    return hook.send(`**${selectedPlayer.name}** just lost a battle to ${mob.name} losing ${battleResult} health and ${mob.gold} Gold!`);
+    return hook.send(`**${selectedPlayer.name}** just lost a battle to ${mob.name} losing ${mobChance} health and ${mob.gold} Gold!`);
   }
 
   luckEvent(selectedPlayer, hook) {

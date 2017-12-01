@@ -17,7 +17,7 @@ class Helper {
   }
 
   calculateItemRating(item) {
-    return item.stats.str + item.stats.dex + item.stats.end + item.stats.int;
+    return item.str + item.dex + item.end + item.int;
   }
 
   sumPlayerTotalStrength(player) {
@@ -55,6 +55,60 @@ class Helper {
   sumPlayerTotalLuck(player) {
     return player.stats.luk
       + player.equipment.relic.luk;
+  }
+
+  checkHealth(selectedPlayer, attackerObj, hook) {
+    if (selectedPlayer.health <= 0) {
+      selectedPlayer.health = 100;
+      selectedPlayer.experience = 0;
+      selectedPlayer.map = 'Town';
+      selectedPlayer.level = 1;
+      selectedPlayer.gold = 0;
+      selectedPlayer.equipment = {
+        helmet: {
+          name: 'Nothing',
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0
+        },
+        armor: {
+          name: 'Nothing',
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0
+        },
+        weapon: {
+          name: 'Fist',
+          str: 1,
+          dex: 1,
+          end: 1,
+          int: 0
+        },
+        relic: {
+          name: 'Nothing',
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0,
+          luk: 0
+        }
+      };
+      selectedPlayer.stats = {
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 1,
+        luk: 1
+      };
+      if (!attackerObj.name) {
+        selectedPlayer.deaths.mob++;
+      } else {
+        selectedPlayer.deaths.player++;
+      }
+      hook.send(`**${selectedPlayer.name}** died! Game over man... Game over.`);
+    }
   }
 
   generateStatsString(player) {
@@ -105,7 +159,14 @@ class Helper {
           Intelligence: ${player.equipment.relic.int}
           Luck: ${player.equipment.relic.luk}
 
-    Born: ${player.createdAt}\`\`\``;
+    Born: ${player.createdAt}
+    Events: ${player.events}
+    Kills:
+      Monsters: ${player.kills.mob}
+      Players: ${player.kills.player}
+    Deaths:
+      By Monsters: ${player.deaths.mob}
+      By Players: ${player.deaths.player}\`\`\``;
   }
 }
 module.exports = new Helper();
