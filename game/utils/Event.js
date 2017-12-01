@@ -1,9 +1,8 @@
-const helper = require('../../utils/helper');
+const Helper = require('../../utils/Helper');
 
 class Event {
-
   generateItemEventMessage(selectedPlayer, item) {
-    const randomEventMessage = helper.randomInt(0, 3);
+    const randomEventMessage = Helper.randomInt(0, 3);
     switch (randomEventMessage) {
       case 0:
         return `**${selectedPlayer.name}** found a chest containing ${item.name} in ${selectedPlayer.map}!`;
@@ -15,6 +14,5 @@ class Event {
         return `**${selectedPlayer.name}** a bird just dropped ${item.name} infront of him/her in ${selectedPlayer.map}!`;
     }
   }
-
 }
 module.exports = new Event();

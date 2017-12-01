@@ -1,6 +1,6 @@
 const fs = require('fs');
 const moment = require('moment');
-const helper = require('../helper');
+const Helper = require('../Helper');
 const logger = require('../logger');
 
 const playerDir = `${__dirname}/players`;
@@ -8,7 +8,7 @@ const playerDir = `${__dirname}/players`;
 class LocalDatabase {
 
   create(player) {
-    return helper.countDirectoryFiles(playerDir)
+    return Helper.countDirectoryFiles(playerDir)
       .then((id) => {
         if (!player.id) {
           player.id = player.discordId;
@@ -30,24 +30,21 @@ class LocalDatabase {
               str: 0,
               dex: 0,
               end: 0,
-              int: 0,
-              luk: 0
+              int: 0
             },
             armor: {
               name: 'Nothing',
               str: 0,
               dex: 0,
               end: 0,
-              int: 0,
-              luk: 0
+              int: 0
             },
             weapon: {
               name: 'Fist',
               str: 1,
               dex: 1,
               end: 1,
-              int: 0,
-              luk: 0
+              int: 0
             },
             relic: {
               name: 'Nothing',

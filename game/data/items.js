@@ -152,23 +152,23 @@ const items = {
         name: 'Horned Helmet',
         position: 'helmet',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 2,
+          dex: 2,
+          end: 2,
+          int: 2
         },
-        gold: 1
+        gold: 2
       },
       greatHelmet = {
         name: 'Great Helmet',
         position: 'helmet',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 3,
+          dex: 3,
+          end: 3,
+          int: 3
         },
-        gold: 1
+        gold: 3
       },
     ],
     weapon = [
@@ -187,144 +187,144 @@ const items = {
         name: 'Mace',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 2,
+          dex: 2,
+          end: 2,
+          int: 2
         },
-        gold: 1
+        gold: 2
       },
       staff = {
         name: 'Staff',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 3,
+          dex: 3,
+          end: 3,
+          int: 3
         },
-        gold: 1
+        gold: 3
       },
       sword = {
         name: 'Sword',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 4,
+          dex: 4,
+          end: 4,
+          int: 4
         },
-        gold: 1
+        gold: 4
       },
       claymore = {
         name: 'Claymore',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 5,
+          dex: 5,
+          end: 5,
+          int: 5
         },
-        gold: 1
+        gold: 5
       },
       flail = {
         name: 'Flail',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 6,
+          dex: 6,
+          end: 6,
+          int: 6
         },
-        gold: 1
+        gold: 6
       },
       wand = {
         name: 'Wand',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 7,
+          dex: 7,
+          end: 7,
+          int: 7
         },
-        gold: 1
+        gold: 7
       },
       bow = {
         name: 'Bow',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 8,
+          dex: 8,
+          end: 8,
+          int: 8
         },
-        gold: 1
+        gold: 8
       },
       crossbow = {
         name: 'Crossbow',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 9,
+          dex: 9,
+          end: 9,
+          int: 9
         },
-        gold: 1
+        gold: 9
       },
       pike = {
         name: 'Pike',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 10,
+          dex: 10,
+          end: 10,
+          int: 10
         },
-        gold: 1
+        gold: 10
       },
       halberd = {
         name: 'Halberd',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 11,
+          dex: 11,
+          end: 11,
+          int: 11
         },
-        gold: 1
+        gold: 11
       },
       axe = {
         name: 'Axe',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 12,
+          dex: 12,
+          end: 12,
+          int: 12
         },
-        gold: 1
+        gold: 12
       },
       maul = {
         name: 'Maul',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 13,
+          dex: 13,
+          end: 13,
+          int: 13
         },
-        gold: 1
+        gold: 13
       },
       scythe = {
         name: 'Scythe',
         position: 'weapon',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 14,
+          dex: 14,
+          end: 14,
+          int: 14
         },
-        gold: 1
+        gold: 14
       },
     ],
     armor = [
@@ -343,23 +343,23 @@ const items = {
         name: 'Full Body Armor',
         position: 'armor',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 3,
+          dex: 3,
+          end: 3,
+          int: 3
         },
-        gold: 1
+        gold: 3
       },
       thinBody = {
         name: 'Thin Body Armor',
         position: 'armor',
         stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 1
+          str: 2,
+          dex: 2,
+          end: 2,
+          int: 2
         },
-        gold: 1
+        gold: 2
       },
     ]
   ]

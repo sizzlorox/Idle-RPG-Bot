@@ -1,6 +1,6 @@
 .env
 .vscode
-./utils/local-database/players/
+utils/local-database/players/
 
 # Logs
 logs

@@ -4,7 +4,7 @@ const logger = require('./utils/logger');
 const Discord = require('discord.js');
 const { eventEmitter } = require('./utils/cron');
 const Game = require('./game/Game');
-const helper = require('./utils/helper');
+const Helper = require('./utils/Helper');
 const fs = require('fs');
 
 const bot = new Discord.Client();
@@ -48,7 +48,7 @@ bot.on('message', (message) => {
   if (message.content === '!me') {
     Game.playerStats(message.author)
       .then((playerStats) => {
-        const stats = helper.generateStatsString(playerStats);
+        const stats = Helper.generateStatsString(playerStats);
         message.author.send(stats);
       });
   }
@@ -63,7 +63,7 @@ bot.on('message', (message) => {
 
     Game.playerStats(playerObj.array()[0])
       .then((playerStats) => {
-        const stats = helper.generateStatsString(playerStats);
+        const stats = Helper.generateStatsString(playerStats);
         message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
       });
   }

@@ -1,12 +1,11 @@
 const fs = require('fs');
 
-const helper = {
-
-  randomInt: (min, max) => {
+class Helper {
+  randomInt(min, max) {
     return Math.floor(Math.random() * (((max - min) + 1) + min));
-  },
+  }
 
-  countDirectoryFiles: (directory) => {
+  countDirectoryFiles(directory) {
     return new Promise((resolve, reject) => {
       return fs.readdir(directory, (err, files) => {
         if (err) {
@@ -15,10 +14,51 @@ const helper = {
         return resolve(files.length);
       });
     });
-  },
+  }
 
-  generateStatsString: (player) => {
-    return `\nHere are your stats!
+  calculateItemRating(item) {
+    return item.stats.str + item.stats.dex + item.stats.end + item.stats.int;
+  }
+
+  sumPlayerTotalStrength(player) {
+    return player.stats.str
+      + player.equipment.helmet.str
+      + player.equipment.armor.str
+      + player.equipment.weapon.str
+      + player.equipment.relic.str;
+  }
+
+  sumPlayerTotalDexterity(player) {
+    return player.stats.dex
+      + player.equipment.helmet.dex
+      + player.equipment.armor.dex
+      + player.equipment.weapon.dex
+      + player.equipment.relic.dex;
+  }
+
+  sumPlayerTotalEndurance(player) {
+    return player.stats.end
+      + player.equipment.helmet.end
+      + player.equipment.armor.end
+      + player.equipment.weapon.end
+      + player.equipment.relic.end;
+  }
+
+  sumPlayerTotalIntelligence(player) {
+    return player.stats.int
+      + player.equipment.helmet.int
+      + player.equipment.armor.int
+      + player.equipment.weapon.int
+      + player.equipment.relic.int;
+  }
+
+  sumPlayerTotalLuck(player) {
+    return player.stats.luk
+      + player.equipment.relic.luk;
+  }
+
+  generateStatsString(player) {
+    return `\`\`\`Here are your stats!
     Health: ${player.health}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
@@ -26,11 +66,11 @@ const helper = {
     Map: ${player.map}
 
     Stats:
-    Strength: ${player.stats.str}
-    Dexterity: ${player.stats.dex}
-    Endurance: ${player.stats.end}
-    Intelligence: ${player.stats.int}
-    Luck: ${player.stats.luk}
+      Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})
+      Dexterity: ${player.stats.dex} (${this.sumPlayerTotalDexterity(player)})
+      Endurance: ${player.stats.end} (${this.sumPlayerTotalEndurance(player)})
+      Intelligence: ${player.stats.int} (${this.sumPlayerTotalIntelligence(player)})
+      Luck: ${player.stats.luk} (${this.sumPlayerTotalLuck(player)})
 
     Equipment:
       Helment: ${player.equipment.helmet.name}
@@ -65,8 +105,7 @@ const helper = {
           Intelligence: ${player.equipment.relic.int}
           Luck: ${player.equipment.relic.luk}
 
-    Born: ${player.createdAt}`;
-  },
-
-};
-module.exports = helper;
+    Born: ${player.createdAt}\`\`\``;
+  }
+}
+module.exports = new Helper();

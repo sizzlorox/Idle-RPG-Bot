@@ -6,6 +6,7 @@ module.exports = {
         "no-plusplus": 0,
         "class-methods-use-this": 0,
         "no-case-declarations": 0,
-        "comma-dangle": 0
+        "comma-dangle": 0,
+        "no-undef": 0
     }
 };
