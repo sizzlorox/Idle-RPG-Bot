@@ -1,12 +1,12 @@
-const fs = require("fs");
+const fs = require('fs');
 
-class CustomMethods {
+const helper = {
 
-  randomInt(min, max) {
-    return Math.floor(Math.random()*(max-min+1)+min);
-  }
+  randomInt: (min, max) => {
+    return Math.floor(Math.random() * (((max - min) + 1) + min));
+  },
 
-  countDirectoryFiles(directory) {
+  countDirectoryFiles: (directory) => {
     return new Promise((resolve, reject) => {
       return fs.readdir(directory, (err, files) => {
         if (err) {
@@ -15,9 +15,9 @@ class CustomMethods {
         return resolve(files.length);
       });
     });
-  }
+  },
 
-  generateStatsString(player) {
+  generateStatsString: (player) => {
     return `\nHere are your stats!
     Health: ${player.health}
     Level: ${player.level}
@@ -66,7 +66,7 @@ class CustomMethods {
           Luck: ${player.equipment.relic.luk}
 
     Born: ${player.createdAt}`;
-  }
+  },
 
-}
-module.exports.CustomMethods = new CustomMethods;
+};
+module.exports = helper;

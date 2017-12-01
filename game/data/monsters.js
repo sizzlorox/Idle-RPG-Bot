@@ -165,4 +165,4 @@ const monsters = {
     }
   ]
 };
-module.exports.monsters = monsters;
+module.exports = monsters;

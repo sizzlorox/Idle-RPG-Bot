@@ -1,9 +1,9 @@
-const customMethods = require('../../utils/CustomMethods').CustomMethods;
+const helper = require('../../utils/helper');
 
 class Event {
 
   generateItemEventMessage(selectedPlayer, item) {
-    const randomEventMessage = customMethods.randomInt(0, 3);
+    const randomEventMessage = helper.randomInt(0, 3);
     switch (randomEventMessage) {
       case 0:
         return `**${selectedPlayer.name}** found a chest containing ${item.name} in ${selectedPlayer.map}!`;
@@ -17,4 +17,4 @@ class Event {
   }
 
 }
-module.exports.Event = new Event;
+module.exports = new Event();

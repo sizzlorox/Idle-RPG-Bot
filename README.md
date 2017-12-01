@@ -1,5 +1,5 @@
 # Idle-RPG-Bot
-An Idle-RPG bot for Discord created using node.js.
+An Idle-RPG bot for Discord created using node.js with the discord.js framework.
 This is an open-source project and is currently still in development. A lot is still to be done.
 
 # Setup

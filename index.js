@@ -1,13 +1,17 @@
 require('dotenv').config();
 
+const logger = require('./utils/logger');
 const Discord = require('discord.js');
-const bot = new Discord.Client();
-const hook = new Discord.WebhookClient(process.env.DISCORD_WEBHOOK_ID, process.env.DISCORD_WEBHOOK_TOKEN);
-const cron = require('./utils/cron');
-const eventEmitter = cron.eventEmitter;
-const game = require('./game/Game').Game;
-const CustomMethods = require('./utils/CustomMethods').CustomMethods;
+const { eventEmitter } = require('./utils/cron');
+const Game = require('./game/Game');
+const helper = require('./utils/helper');
 const fs = require('fs');
+
+const bot = new Discord.Client();
+const hook = new Discord.WebhookClient(
+  process.env.DISCORD_WEBHOOK_ID,
+  process.env.DISCORD_WEBHOOK_TOKEN,
+);
 
 const botOperator = process.env.DISCORD_BOT_OPERATOR_ID;
 const rpgChannel = process.env.DISCORD_RPG_CHANNEL_ID;
@@ -18,18 +22,20 @@ bot.on('ready', () => {
   });
   bot.user.setGame('Idle-RPG Game Master');
   bot.user.setStatus('idle');
-  console.log(bot.user);
-  console.log('Idle RPG has been loaded!');
+  logger.info('Idle RPG has been loaded!');
 });
 
-bot.on('message', message => {
-  if (message.channel.id !== rpgChannel)
+bot.on('message', (message) => {
+  if (message.channel.id !== rpgChannel) {
     return;
+  }
 
   if (message.content === '!submode' && message.author.id === botOperator) {
-    //Under development, trying to get a list of subscribers
+    /*
+    Under development, trying to get a list of subscribers
     const onlineUsers = bot.users.filter(player => player.presence.status === 'online' && !player.bot);
     console.log(bot.users.array()[5].role);
+    */
   }
 
   if (message.content === '!help') {
@@ -40,9 +46,9 @@ bot.on('message', message => {
   }
 
   if (message.content === '!me') {
-    game.playerStats(message.author)
+    Game.playerStats(message.author)
       .then((playerStats) => {
-        const stats = CustomMethods.generateStatsString(playerStats);
+        const stats = helper.generateStatsString(playerStats);
         message.author.send(stats);
       });
   }
@@ -51,27 +57,30 @@ bot.on('message', message => {
     const checkPlayer = message.content.split(' ');
     const playerObj = bot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
     if (playerObj.size === 0) {
-      return message.author.send(`${checkPlayer[1]} was not found!`);
+      message.author.send(`${checkPlayer[1]} was not found!`);
+      return;
     }
 
-    game.playerStats(playerObj.array()[0])
+    Game.playerStats(playerObj.array()[0])
       .then((playerStats) => {
-        const stats = CustomMethods.generateStatsString(playerStats);
+        const stats = helper.generateStatsString(playerStats);
         message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
       });
   }
 
 });
 
-bot.on('guildMemberAdd', member => {
+bot.on('guildMemberAdd', (member) => {
   const channel = member.guild.channels.find('name', 'member-log');
-  if (!channel) return;
+  if (!channel) {
+    return;
+  }
   channel.send(`Welcome ${member}! This channel has an Idle-RPG bot! Please type into #idle-rpg channel !help for a list of commands or DM me!`);
 });
 
 eventEmitter.on('TICK', () => {
   const onlinePlayers = bot.users.filter(player => player.presence.status === 'online' && !player.bot || player.presence.status === 'idle' && !player.bot);
-  game.selectEvent(onlinePlayers, hook);
+  Game.selectEvent(onlinePlayers, hook);
 });
 
 bot.login(process.env.DISCORD_BOT_LOGIN_TOKEN);

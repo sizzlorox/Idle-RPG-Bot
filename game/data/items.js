@@ -364,4 +364,4 @@ const items = {
     ]
   ]
 };
-module.exports.items = items;
+module.exports = items;

@@ -1,12 +1,14 @@
-const fs = require("fs");
+const fs = require('fs');
 const moment = require('moment');
-const CustomMethods = require('../CustomMethods').CustomMethods;
+const helper = require('../helper');
+const logger = require('../logger');
+
 const playerDir = `${__dirname}/players`;
 
 class LocalDatabase {
 
   create(player) {
-    return CustomMethods.countDirectoryFiles(playerDir)
+    return helper.countDirectoryFiles(playerDir)
       .then((id) => {
         if (!player.id) {
           player.id = player.discordId;
@@ -70,7 +72,7 @@ class LocalDatabase {
         this.write(newPlayer);
         return newPlayer;
       })
-      .catch(error => console.log);
+      .catch(error => logger.error(error));
   }
 
   write(player) {
@@ -93,4 +95,4 @@ class LocalDatabase {
   }
 
 }
-module.exports.LocalDatabase = new LocalDatabase;
+module.exports = new LocalDatabase();

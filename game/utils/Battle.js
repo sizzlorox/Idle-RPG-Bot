@@ -2,8 +2,8 @@
 class Battle {
 
   simulateBattleWithMob(selectedPlayer, mobObj) {
-    
+
   }
 
 }
-module.exports.Battle = new Battle;
+module.exports = new Battle();
