@@ -5,6 +5,16 @@ class Helper {
     return Math.floor(Math.random() * (((max - min) + 1) + min));
   }
 
+  passiveHeal(player) {
+    if (player.health <= 100 + (player.level * 5)) {
+      player.health += 15;
+      if (player.health > 100 + (player.level * 5)) {
+        player.health = 100 + (player.level * 5);
+      }
+    }
+    return player;
+  }
+
   countDirectoryFiles(directory) {
     return new Promise((resolve, reject) => {
       return fs.readdir(directory, (err, files) => {
@@ -102,7 +112,7 @@ class Helper {
         int: 1,
         luk: 1
       };
-      if (!attackerObj.name) {
+      if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
       } else {
         selectedPlayer.deaths.player++;

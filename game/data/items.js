@@ -8,7 +8,8 @@ const items = {
         end: 1,
         int: 1
       },
-      gold: 1
+      gold: 1,
+      rarity: 100
     },
     uncommon = {
       name: 'Uncommon',
@@ -18,7 +19,8 @@ const items = {
         end: 2,
         int: 2
       },
-      gold: 2
+      gold: 2,
+      rarity: 50
     },
     unique = {
       name: 'Unique',
@@ -28,7 +30,8 @@ const items = {
         end: 3,
         int: 3
       },
-      gold: 3
+      gold: 3,
+      rarity: 25
     },
     rare = {
       name: 'Rare',
@@ -38,7 +41,8 @@ const items = {
         end: 4,
         int: 4
       },
-      gold: 4
+      gold: 4,
+      rarity: 15
     },
     magic = {
       name: 'Magic',
@@ -48,9 +52,10 @@ const items = {
         end: 5,
         int: 5
       },
-      gold: 5
+      gold: 5,
+      rarity: 10
     },
-    legendary ={
+    legendary = {
       name: 'Legendary',
       stats: {
         str: 6,
@@ -58,7 +63,8 @@ const items = {
         end: 6,
         int: 6
       },
-      gold: 6
+      gold: 6,
+      rarity: 5
     },
     mythical = {
       name: 'Mythical',
@@ -68,7 +74,8 @@ const items = {
         end: 7,
         int: 7
       },
-      gold: 7
+      gold: 7,
+      rarity: 3
     },
     ancient = {
       name: 'Ancient',
@@ -78,7 +85,8 @@ const items = {
         end: 8,
         int: 8
       },
-      gold: 8
+      gold: 8,
+      rarity: 2,
     },
     godly = {
       name: 'Godly',
@@ -88,7 +96,8 @@ const items = {
         end: 9,
         int: 9
       },
-      gold: 9
+      gold: 9,
+      rarity: 1
     }
   ],
 
@@ -101,7 +110,8 @@ const items = {
         end: 1,
         int: 1
       },
-      gold: 1
+      gold: 1,
+      rarity: 100
     },
     bronze = {
       name: 'Bronze',
@@ -111,7 +121,8 @@ const items = {
         end: 2,
         int: 2
       },
-      gold: 2
+      gold: 2,
+      rarity: 75
     },
     iron = {
       name: 'Iron',
@@ -121,7 +132,8 @@ const items = {
         end: 3,
         int: 3
       },
-      gold: 3
+      gold: 3,
+      rarity: 50
     },
     steel = {
       name: 'Steel',
@@ -131,7 +143,8 @@ const items = {
         end: 4,
         int: 4
       },
-      gold: 4
+      gold: 4,
+      rarity: 30
     }
   ],
 
@@ -327,6 +340,7 @@ const items = {
         gold: 14
       },
     ],
+
     armor = [
       chainMail = {
         name: 'Chain Mail',
@@ -337,18 +351,8 @@ const items = {
           end: 1,
           int: 1
         },
-        gold: 1
-      },
-      fullBody = {
-        name: 'Full Body Armor',
-        position: 'armor',
-        stats: {
-          str: 3,
-          dex: 3,
-          end: 3,
-          int: 3
-        },
-        gold: 3
+        gold: 1,
+        rarity: 80
       },
       thinBody = {
         name: 'Thin Body Armor',
@@ -359,7 +363,20 @@ const items = {
           end: 2,
           int: 2
         },
-        gold: 2
+        gold: 2,
+        rarity: 50
+      },
+      fullBody = {
+        name: 'Full Body Armor',
+        position: 'armor',
+        stats: {
+          str: 3,
+          dex: 3,
+          end: 3,
+          int: 3
+        },
+        gold: 3,
+        rarity: 25
       },
     ]
   ]

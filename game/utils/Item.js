@@ -2,33 +2,37 @@ const Helper = require('../../utils/Helper');
 const items = require('../data/items');
 
 class Item {
-
   generateItem() {
-    const randomRarityIndex = Helper.randomInt(0, items.rarity.length - 1);
-    const randomMaterialIndex = Helper.randomInt(0, items.material.length - 1);
+    const randomRarityChance = Helper.randomInt(0, 100);
+    const randomMaterialChance = Helper.randomInt(0, 100);
+    const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
+    const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
+
+    const randomRarityIndex = Helper.randomInt(0, itemRarityList.length - 1);
+    const randomMaterialIndex = Helper.randomInt(0, itemMaterialList.length - 1);
     const randomEquipmentIndex = Helper.randomInt(0, items.type.length - 1);
     const randomTypeIndex = Helper.randomInt(0, items.type[randomEquipmentIndex].length - 1);
 
-    const itemStr = (items.rarity[randomRarityIndex].stats.str
-      * (items.material[randomMaterialIndex].stats.str
+    const itemStr = (itemRarityList[randomRarityIndex].stats.str
+      * (itemMaterialList[randomMaterialIndex].stats.str
         + items.type[randomEquipmentIndex][randomTypeIndex].stats.str)) / 4;
 
-    const itemDex = (items.rarity[randomRarityIndex].stats.dex
-      * (items.material[randomMaterialIndex].stats.dex
+    const itemDex = (itemRarityList[randomRarityIndex].stats.dex
+      * (itemMaterialList[randomMaterialIndex].stats.dex
         + items.type[randomEquipmentIndex][randomTypeIndex].stats.dex)) / 4;
 
-    const itemEnd = (items.rarity[randomRarityIndex].stats.end
-      * (items.material[randomMaterialIndex].stats.end
+    const itemEnd = (itemRarityList[randomRarityIndex].stats.end
+      * (itemMaterialList[randomMaterialIndex].stats.end
         + items.type[randomEquipmentIndex][randomTypeIndex].stats.end)) / 4;
 
-    const itemInt = (items.rarity[randomRarityIndex].stats.int
-      * (items.material[randomMaterialIndex].stats.int
+    const itemInt = (itemRarityList[randomRarityIndex].stats.int
+      * (itemMaterialList[randomMaterialIndex].stats.int
         + items.type[randomEquipmentIndex][randomTypeIndex].stats.int)) / 4;
 
     const itemRating = itemStr + itemDex + itemEnd + itemInt;
 
     const itemObj = {
-      name: `${items.rarity[randomRarityIndex].name} ${items.material[randomMaterialIndex].name} ${items.type[randomEquipmentIndex][randomTypeIndex].name}`,
+      name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${items.type[randomEquipmentIndex][randomTypeIndex].name}`,
       position: items.type[randomEquipmentIndex][randomTypeIndex].position,
       stats: {
         str: itemStr,
@@ -37,12 +41,11 @@ class Item {
         int: itemInt
       },
       rating: itemRating,
-      gold: Number((items.rarity[randomRarityIndex].gold
-        * items.material[randomMaterialIndex].gold
+      gold: Number((itemRarityList[randomRarityIndex].gold
+        * itemMaterialList[randomMaterialIndex].gold
         * items.type[randomEquipmentIndex][randomTypeIndex].gold).toFixed()) * itemRating
     };
     return itemObj;
   }
-
 }
 module.exports = new Item();

@@ -8,7 +8,8 @@ const monsters = {
         end: 1
       },
       experience: 1,
-      gold: 1
+      gold: 1,
+      rarity: 100
     },
     veteran = {
       name: 'Veteran',
@@ -18,7 +19,8 @@ const monsters = {
         end: 2
       },
       experience: 2,
-      gold: 2
+      gold: 2,
+      rarity: 75
     },
     elite = {
       name: 'Elite',
@@ -28,7 +30,8 @@ const monsters = {
         end: 3
       },
       experience: 3,
-      gold: 3
+      gold: 3,
+      rarity: 50
     },
     champion = {
       name: 'Champion',
@@ -38,7 +41,8 @@ const monsters = {
         end: 4
       },
       experience: 4,
-      gold: 4
+      gold: 4,
+      rarity: 35
     },
     legendary = {
       name: 'Legendary',
@@ -48,7 +52,8 @@ const monsters = {
         end: 5
       },
       experience: 5,
-      gold: 5
+      gold: 5,
+      rarity: 15
     },
     omega = {
       name: 'Omega',
@@ -58,7 +63,8 @@ const monsters = {
         end: 6
       },
       experience: 6,
-      gold: 6
+      gold: 6,
+      rarity: 5
     }
   ],
 
@@ -71,7 +77,8 @@ const monsters = {
         end: 1,
       },
       experience: 1,
-      gold: 1
+      gold: 1,
+      rarity: 100
     },
     goblin = {
       name: 'Goblin',
@@ -81,7 +88,8 @@ const monsters = {
         end: 2,
       },
       experience: 5,
-      gold: 2
+      gold: 2,
+      rarity: 80
     },
     bandit = {
       name: 'Bandit',
@@ -91,7 +99,8 @@ const monsters = {
         end: 5,
       },
       experience: 10,
-      gold: 3
+      gold: 3,
+      rarity: 65
     },
     bat = {
       name: 'Bat',
@@ -101,7 +110,8 @@ const monsters = {
         end: 1,
       },
       experience: 3,
-      gold: 4
+      gold: 4,
+      rarity: 80
     },
     dragon = {
       name: 'Dragon',
@@ -111,7 +121,8 @@ const monsters = {
         end: 10,
       },
       experience: 35,
-      gold: 5
+      gold: 5,
+      rarity: 45
     },
     knight = {
       name: 'Knight',
@@ -121,7 +132,8 @@ const monsters = {
         end: 17,
       },
       experience: 25,
-      gold: 6
+      gold: 6,
+      rarity: 50
     },
     necromancer = {
       name: 'Necromancer',
@@ -131,7 +143,8 @@ const monsters = {
         end: 4,
       },
       experience: 30,
-      gold: 7
+      gold: 7,
+      rarity: 50
     },
     zombie = {
       name: 'Zombie',
@@ -141,17 +154,19 @@ const monsters = {
         end: 12,
       },
       experience: 15,
-      gold: 3
+      gold: 3,
+      rarity: 75
     },
     orc = {
       name: 'Orc',
       stats: {
-        str: 27,
+        str: 17,
         dex: 1,
         end: 7,
       },
       experience: 20,
-      gold: 8
+      gold: 8,
+      rarity: 30
     },
     elf = {
       name: 'Elf',
@@ -161,7 +176,8 @@ const monsters = {
         end: 3,
       },
       experience: 20,
-      gold: 9
+      gold: 9,
+      rarity: 45
     }
   ]
 };

@@ -22,7 +22,7 @@ bot.on('ready', () => {
   });
   bot.user.setGame('Idle-RPG Game Master');
   bot.user.setStatus('idle');
-  logger.info('Idle RPG has been loaded!');
+  console.log('Idle RPG has been loaded!');
 });
 
 bot.on('message', (message) => {

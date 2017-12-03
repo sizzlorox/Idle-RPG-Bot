@@ -15,6 +15,7 @@
     "dotenv": "^4.0.0",
     "moment": "^2.19.3",
     "mongoose": "^4.13.5",
+    "underscore": "^1.8.3",
     "winston": "^3.0.0-rc1"
   },
   "devDependencies": {

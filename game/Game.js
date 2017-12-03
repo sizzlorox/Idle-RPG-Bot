@@ -41,6 +41,8 @@ class Game {
     LocalDatabase.load(gamePlayer)
       .then((selectedPlayer) => {
         selectedPlayer.events++;
+        selectedPlayer = Helper.passiveHeal(selectedPlayer);
+
         switch (randomEvent) {
           case 1:
             console.log(`${selectedPlayer.name} activated a move event.`);
@@ -65,7 +67,7 @@ class Game {
     const map = ['Beach', 'Plains', 'Forest', 'Mountains', 'Town'];
     const randomMapIndex = Helper.randomInt(0, map.length - 1);
     const luckDice = Helper.randomInt(0, 100);
-    
+
     if (selectedPlayer.map === map[randomMapIndex] && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
       const item = Item.generateItem();
       switch (item.position) {

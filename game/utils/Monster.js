@@ -2,28 +2,31 @@ const Helper = require('../../utils/Helper');
 const monsters = require('../data/monsters');
 
 class Monster {
-
   generateMonster() {
-    const randomRarityIndex = Helper.randomInt(0, monsters.rarity.length - 1);
-    const randomTypeIndex = Helper.randomInt(0, monsters.type.length - 1);
+    const randomRarityChance = Helper.randomInt(0, 100);
+    const randomTypeChance = Helper.randomInt(0, 100);
+    const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
+    const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomTypeChance);
+    
+    const randomRarityIndex = Helper.randomInt(0, monsterRarityList.length - 1);
+    const randomTypeIndex = Helper.randomInt(0, monsterTypeList.length - 1);
 
     const monsterObj = {
-      name: `${monsters.rarity[randomRarityIndex].name} ${monsters.type[randomTypeIndex].name}`,
+      name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
       stats: {
-        str: (monsters.rarity[randomRarityIndex].stats.str
-          * monsters.type[randomTypeIndex].stats.str),
-        dex: (monsters.rarity[randomRarityIndex].stats.dex
-          * monsters.type[randomTypeIndex].stats.dex),
-        end: (monsters.rarity[randomRarityIndex].stats.end
-          * monsters.type[randomTypeIndex].stats.end)
+        str: (monsterRarityList[randomRarityIndex].stats.str
+          * monsterTypeList[randomTypeIndex].stats.str),
+        dex: (monsterRarityList[randomRarityIndex].stats.dex
+          * monsterTypeList[randomTypeIndex].stats.dex),
+        end: (monsterRarityList[randomRarityIndex].stats.end
+          * monsterTypeList[randomTypeIndex].stats.end)
       },
-      experience: (monsters.rarity[randomRarityIndex].experience
-        * monsters.type[randomTypeIndex].experience) / 2,
-      gold: Number((monsters.rarity[randomRarityIndex].gold
-        * monsters.type[randomTypeIndex].gold).toFixed())
+      experience: (monsterRarityList[randomRarityIndex].experience
+        * monsterTypeList[randomTypeIndex].experience) / 2,
+      gold: Number((monsterRarityList[randomRarityIndex].gold
+        * monsterTypeList[randomTypeIndex].gold).toFixed())
     };
     return monsterObj;
   }
-
 }
 module.exports = new Monster();
