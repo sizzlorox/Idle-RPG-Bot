@@ -3,11 +3,11 @@ const monsters = require('../data/monsters');
 
 class Monster {
   generateMonster(selectedPlayer) {
-    const randomRarityChance = Math.ceil(Helper.randomInt(0, 100) - (selectedPlayer.level / 8));
-    const randomTypeChance = Math.ceil(Helper.randomInt(0, 100) - (selectedPlayer.level / 8));
+    const randomRarityChance = Math.ceil(Helper.randomInt(0, 100));
+    const randomTypeChance = Math.ceil(Helper.randomInt(0, 100));
     const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
     const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomTypeChance);
-    
+
     const randomRarityIndex = Helper.randomInt(0, monsterRarityList.length - 1);
     const randomTypeIndex = Helper.randomInt(0, monsterTypeList.length - 1);
 

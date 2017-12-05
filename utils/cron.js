@@ -8,7 +8,7 @@ function onTick() {
 }
 
 new CronJob(
-  '00 */2 * * * *',
+  '00 */1 * * * *',
   onTick,
   null,
   true,

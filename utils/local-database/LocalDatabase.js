@@ -5,6 +5,7 @@ const Map = require('../../game/utils/Map');
 const logger = require('../logger');
 
 const playerDir = `${__dirname}/players`;
+const starterTown = 4;
 
 class LocalDatabase {
 
@@ -20,9 +21,9 @@ class LocalDatabase {
           id,
           discordId: player.id,
           name: player.username,
-          health: 100,
+          health: 105,
           experience: 0,
-          map: Map.getMapByIndex(4, true),
+          map: Map.getMapByIndex(starterTown),
           level: 1,
           gold: 0,
           equipment: {

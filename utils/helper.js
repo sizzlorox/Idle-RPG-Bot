@@ -76,7 +76,7 @@ class Helper {
 
   checkHealth(selectedPlayer, attackerObj, hook) {
     if (selectedPlayer.health <= 0) {
-      selectedPlayer.health = 100;
+      selectedPlayer.health = 105;
       selectedPlayer.experience = 0;
       selectedPlayer.map = 'Town';
       selectedPlayer.level = 1;
@@ -132,11 +132,11 @@ class Helper {
 
   generateStatsString(player) {
     return `\`\`\`Here are your stats!
-    Health: ${player.health}
+    Health: ${player.health} / ${100 + (player.level * 5)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
     Gold: ${player.gold}
-    Map: ${Map.getMapByName(player.map)}
+    Map: ${player.map.name}
 
     Stats:
       Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})

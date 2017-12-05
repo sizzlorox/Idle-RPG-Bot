@@ -26,6 +26,10 @@ discordBot.on('message', (message) => {
     return;
   }
 
+  if (message.author.id === botOperator && message.content.startsWith('!kill ')) {
+    hook.send(`Sizzlorr just rekted ${message.content.split(' ')[1]}`);
+  }
+
   if (message.content === '!submode' && message.author.id === botOperator) {
     /*
     Under development, trying to get a list of subscribers

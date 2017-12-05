@@ -6,6 +6,7 @@ const Event = require('./utils/Event');
 const Battle = require('./utils/Battle');
 const Map = require('./utils/Map');
 const logger = require('../utils/logger');
+const moment = require('moment');
 
 function checkExperience(selectedPlayer, discordHook, twitchBot) {
   if (selectedPlayer.experience >= selectedPlayer.level * 15) {
@@ -21,29 +22,18 @@ function checkExperience(selectedPlayer, discordHook, twitchBot) {
 }
 
 class Game {
-  selectEvent(onlinePlayers, discordHook, twitchBot) {
-    if (onlinePlayers.size === 0) {
-      return;
-    }
+  get onlinePlayerList() {
+    return onlinePlayerList;
+  }
 
-    let randomPlayerIndex = Helper.randomInt(0, onlinePlayers.size - 1);
-    console.log(`\nRandom Player Index: ${randomPlayerIndex}`);
-    if (onlinePlayers.size === 1) {
-      randomPlayerIndex = 0;
-    }
-
-    const randomPlayer = onlinePlayers.array()[randomPlayerIndex];
+  selectEvent(player, onlinePlayers, discordHook, twitchBot) {
     const randomEvent = Helper.randomInt(0, 2);
-    const gamePlayer = {
-      name: randomPlayer.username,
-      discordId: randomPlayer.id
-    };
 
-    LocalDatabase.load(gamePlayer)
+    LocalDatabase.load(player)
       .then((selectedPlayer) => {
         selectedPlayer.events++;
         selectedPlayer = Helper.passiveHeal(selectedPlayer);
-        console.log(`\nRandom Event ID: ${randomEvent}`);
+        console.log(`\nRandom Event ID: ${randomEvent} ${moment().utc('br')}`);
 
         switch (randomEvent) {
           case 0:
@@ -85,11 +75,15 @@ class Game {
             return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.helmet.name} is better.`);
           }
 
-          selectedPlayer.equipment.helmet.name = item.name;
-          selectedPlayer.equipment.helmet.str = item.stats.str;
-          selectedPlayer.equipment.helmet.dex = item.stats.dex;
-          selectedPlayer.equipment.helmet.end = item.stats.end;
-          selectedPlayer.equipment.helmet.int = item.stats.int;
+          if (selectedPlayer.gold >= item.gold) {
+            selectedPlayer.gold -= item.gold;
+            selectedPlayer.equipment.helmet.name = item.name;
+            selectedPlayer.equipment.helmet.str = item.stats.str;
+            selectedPlayer.equipment.helmet.dex = item.stats.dex;
+            selectedPlayer.equipment.helmet.end = item.stats.end;
+            selectedPlayer.equipment.helmet.int = item.stats.int;
+            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
+          }
           break;
 
         case 'armor':
@@ -97,11 +91,15 @@ class Game {
             return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.armor.name} is better.`);
           }
 
-          selectedPlayer.equipment.armor.name = item.name;
-          selectedPlayer.equipment.armor.str = item.stats.str;
-          selectedPlayer.equipment.armor.dex = item.stats.dex;
-          selectedPlayer.equipment.armor.end = item.stats.end;
-          selectedPlayer.equipment.armor.int = item.stats.int;
+          if (selectedPlayer.gold >= item.gold) {
+            selectedPlayer.gold -= item.gold;
+            selectedPlayer.equipment.armor.name = item.name;
+            selectedPlayer.equipment.armor.str = item.stats.str;
+            selectedPlayer.equipment.armor.dex = item.stats.dex;
+            selectedPlayer.equipment.armor.end = item.stats.end;
+            selectedPlayer.equipment.armor.int = item.stats.int;
+            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
+          }
           break;
 
         case 'weapon':
@@ -109,30 +107,24 @@ class Game {
             return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.weapon.name} is better.`);
           }
 
-          selectedPlayer.equipment.weapon.name = item.name;
-          selectedPlayer.equipment.weapon.str = item.stats.str;
-          selectedPlayer.equipment.weapon.dex = item.stats.dex;
-          selectedPlayer.equipment.weapon.end = item.stats.end;
-          selectedPlayer.equipment.weapon.int = item.stats.int;
+          if (selectedPlayer.gold >= item.gold) {
+            selectedPlayer.gold -= item.gold;
+            selectedPlayer.equipment.weapon.name = item.name;
+            selectedPlayer.equipment.weapon.str = item.stats.str;
+            selectedPlayer.equipment.weapon.dex = item.stats.dex;
+            selectedPlayer.equipment.weapon.end = item.stats.end;
+            selectedPlayer.equipment.weapon.int = item.stats.int;
+            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
+          }
           break;
       }
-
-      if (selectedPlayer.gold >= item.gold) {
-        selectedPlayer.gold -= item.gold;
-
-        return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
-      }
-
       return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was going to purchase ${item.name} from Town for ${item.gold} Gold but did not have enough.`);
     }
 
     if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
       if (selectedPlayer.map.type !== 'Town') {
         const mappedPromises = onlinePlayers.map((player) => {
-          return LocalDatabase.load({
-            name: player.username,
-            discordId: player.id
-          });
+          return LocalDatabase.load(player);
         });
 
         return Promise.all(mappedPromises)
