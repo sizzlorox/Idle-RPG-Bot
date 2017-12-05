@@ -39,7 +39,7 @@ eventEmitter.on('TICK', () => {
       player.timer = setTimeout(() => {
         Game.selectEvent(player, discordOnlinePlayers, hook, twitchBot);
         delete player.timer;
-      }, randomInt(60000, 300000));
+      }, randomInt(120000, 300000));
     }
   });
 
