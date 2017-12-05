@@ -1,6 +1,7 @@
 const fs = require('fs');
 const moment = require('moment');
 const Helper = require('../Helper');
+const Map = require('../../game/utils/Map');
 const logger = require('../logger');
 
 const playerDir = `${__dirname}/players`;
@@ -21,7 +22,7 @@ class LocalDatabase {
           name: player.username,
           health: 100,
           experience: 0,
-          map: 'Town',
+          map: Map.getMapByIndex(4, true),
           level: 1,
           gold: 0,
           equipment: {

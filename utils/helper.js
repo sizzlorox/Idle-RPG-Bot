@@ -1,4 +1,5 @@
 const fs = require('fs');
+const Map = require('../game/utils/Map');
 
 class Helper {
   randomInt(min, max) {
@@ -13,7 +14,7 @@ class Helper {
 
   passiveHeal(player) {
     if (player.health <= 100 + (player.level * 5)) {
-      player.health += 15;
+      player.health += 5;
       if (player.health > 100 + (player.level * 5)) {
         player.health = 100 + (player.level * 5);
       }
@@ -135,7 +136,7 @@ class Helper {
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
     Gold: ${player.gold}
-    Map: ${player.map}
+    Map: ${Map.getMapByName(player.map)}
 
     Stats:
       Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})

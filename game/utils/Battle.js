@@ -29,8 +29,8 @@ class Battle {
       + (Helper.sumPlayerTotalIntelligence(otherPlayer) / 2);
     const otherPlayerDefense = Helper.sumPlayerTotalEndurance(otherPlayer);
 
-    const playerChance = Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive));
-    const otherPlayerChance = Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive));
+    const playerChance = Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + Helper.randomInt(0, 5 + Helper.sumPlayerTotalLuck(selectedPlayer));
+    const otherPlayerChance = Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + Helper.randomInt(0, 5 + Helper.sumPlayerTotalLuck(otherPlayer));
     console.log(`PlayerChance: ${playerChance} - OtherPlayerChance: ${otherPlayerChance}`);
 
     return { playerChance, otherPlayerChance };

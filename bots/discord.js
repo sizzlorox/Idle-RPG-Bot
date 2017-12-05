@@ -3,6 +3,7 @@ const fs = require('fs');
 const Helper = require('../utils/Helper');
 const { botOperator, rpgChannel } = require('../settings');
 const Game = require('../game/Game');
+const maps = require('../game/data/maps');
 const logger = require('../utils/logger');
 
 const discordBot = new Discord.Client();
@@ -34,10 +35,17 @@ discordBot.on('message', (message) => {
   }
 
   if (message.content === '!help') {
-    const helpMsg = `!me - Sends a PM with your characters stats.
+    const helpMsg = `\`\`\`
+    !me - Sends a PM with your characters stats.
     !onlineUsers - Displays users that are currently in idle-rpg.
-    !check <Player Name> - Sends a PM with the players stats. (without < > and case-senstive).`;
+    !check <Player Name> - Sends a PM with the players stats. (without < > and case-senstive).
+    !map - Displays the worlds locations.\`\`\``;
     message.author.send(helpMsg);
+  }
+
+  if (message.content === '!map') {
+    const map = maps.map(area => `\n  ${area.name}(${area.type})`);
+    message.author.send(`\`\`\`Map of Idle-RPG:${map}\`\`\``);
   }
 
   if (message.content === '!me') {
