@@ -7,6 +7,8 @@ module.exports = {
         "class-methods-use-this": 0,
         "no-case-declarations": 0,
         "comma-dangle": 0,
-        "no-undef": 0
+        "no-undef": 0,
+        "no-console": 0,
+        "no-useless-escape": 0
     }
 };

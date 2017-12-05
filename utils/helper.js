@@ -5,6 +5,12 @@ class Helper {
     return Math.floor(Math.random() * (((max - min) + 1) + min));
   }
 
+  sendMessage(discordHook, twitchBot, msg) {
+    discordHook.send(msg);
+    // Add if to check if channel is streaming
+    // twitchBot.say(msg.replace('/\\*/g', ''));
+  }
+
   passiveHeal(player) {
     if (player.health <= 100 + (player.level * 5)) {
       player.health += 15;
@@ -116,6 +122,8 @@ class Helper {
         selectedPlayer.deaths.mob++;
       } else {
         selectedPlayer.deaths.player++;
+        attackerObj.kills.player++;
+        LocalDatabase.write(selectedPlayer);
       }
       hook.send(`**${selectedPlayer.name}** died! Game over man... Game over.`);
     }
@@ -143,7 +151,6 @@ class Helper {
           Dexterity: ${player.equipment.helmet.dex}
           Endurance: ${player.equipment.helmet.end}
           Intelligence: ${player.equipment.helmet.int}
-          Luck: ${player.equipment.helmet.luk}
 
       Armor: ${player.equipment.armor.name}
         Stats:
@@ -151,7 +158,6 @@ class Helper {
           Dexterity: ${player.equipment.armor.dex}
           Endurance: ${player.equipment.armor.end}
           Intelligence: ${player.equipment.armor.int}
-          Luck: ${player.equipment.armor.luk}
 
       Weapon: ${player.equipment.weapon.name}
         Stats:
@@ -159,7 +165,6 @@ class Helper {
           Dexterity: ${player.equipment.weapon.dex}
           Endurance: ${player.equipment.weapon.end}
           Intelligence: ${player.equipment.weapon.int}
-          Luck: ${player.equipment.weapon.luk}
 
       Relic: ${player.equipment.relic.name}
         Stats:

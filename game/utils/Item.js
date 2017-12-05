@@ -2,9 +2,9 @@ const Helper = require('../../utils/Helper');
 const items = require('../data/items');
 
 class Item {
-  generateItem() {
-    const randomRarityChance = Helper.randomInt(0, 100);
-    const randomMaterialChance = Helper.randomInt(0, 100);
+  generateItem(selectedPlayer) {
+    const randomRarityChance = Math.ceil(Helper.randomInt(0, 100) - (selectedPlayer.level / 6));
+    const randomMaterialChance = Math.ceil(Helper.randomInt(0, 100) - (selectedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
 
