@@ -5,13 +5,13 @@ class Event {
     const randomEventMessage = Helper.randomInt(0, 3);
     switch (randomEventMessage) {
       case 0:
-        return `**${selectedPlayer.name}** found a chest containing ${item.name} in ${selectedPlayer.map}!`;
+        return `**${selectedPlayer.name}** found a chest containing ${item.name} in ${selectedPlayer.map.name}!`;
       case 1:
-        return `**${selectedPlayer.name}** found ${item.name} on the ground in ${selectedPlayer.map}!`;
+        return `**${selectedPlayer.name}** found ${item.name} on the ground in ${selectedPlayer.map.name}!`;
       case 2:
-        return `**${selectedPlayer.name}** explored an abandoned hut in ${selectedPlayer.map} which had ${item.name} inside!`;
+        return `**${selectedPlayer.name}** explored an abandoned hut in ${selectedPlayer.map.name} which had ${item.name} inside!`;
       case 3:
-        return `**${selectedPlayer.name}** a bird just dropped ${item.name} infront of him/her in ${selectedPlayer.map}!`;
+        return `**${selectedPlayer.name}** a bird just dropped ${item.name} infront of him/her in ${selectedPlayer.map.name}!`;
     }
   }
 }

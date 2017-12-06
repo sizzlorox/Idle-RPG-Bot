@@ -78,7 +78,7 @@ class Helper {
     if (selectedPlayer.health <= 0) {
       selectedPlayer.health = 105;
       selectedPlayer.experience = 0;
-      selectedPlayer.map = 'Town';
+      selectedPlayer.map = Map.getMapByIndex(4);
       selectedPlayer.level = 1;
       selectedPlayer.gold = 0;
       selectedPlayer.equipment = {

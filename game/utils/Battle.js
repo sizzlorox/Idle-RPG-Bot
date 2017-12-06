@@ -11,8 +11,8 @@ class Battle {
     const mobEvasive = mobObj.stats.dex;
     const mobDefense = mobObj.stats.end;
 
-    const playerChance = Math.ceil((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
-    const mobChance = Math.ceil((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
+    const playerChance = Math.abs(Math.ceil((playerDamage + playerEvasive) - (mobDefense + mobEvasive)));
+    const mobChance = Math.abs(Math.ceil((mobDamage + mobEvasive) - (playerDefense + playerEvasive)));
     console.log(`PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
 
     return { playerChance, mobChance };
@@ -29,8 +29,8 @@ class Battle {
       + (Helper.sumPlayerTotalIntelligence(otherPlayer) / 2);
     const otherPlayerDefense = Helper.sumPlayerTotalEndurance(otherPlayer);
 
-    const playerChance = Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + Helper.randomInt(1, 5 + Helper.sumPlayerTotalLuck(selectedPlayer));
-    const otherPlayerChance = Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + Helper.randomInt(1, 5 + Helper.sumPlayerTotalLuck(otherPlayer));
+    const playerChance = Math.abs(Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + Helper.randomInt(1, 5 + Helper.sumPlayerTotalLuck(selectedPlayer)));
+    const otherPlayerChance = Math.abs(Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + Helper.randomInt(1, 5 + Helper.sumPlayerTotalLuck(otherPlayer)));
     console.log(`PlayerChance: ${playerChance} - OtherPlayerChance: ${otherPlayerChance}`);
 
     return { playerChance, otherPlayerChance };

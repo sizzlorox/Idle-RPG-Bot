@@ -253,7 +253,7 @@ class Game {
               selectedPlayer.stats.luk += luckStatAmount;
               break;
           }
-
+          console.log(stat);
           return Helper.sendMessage(discordHook, twitchBot, `Apollo has blessed **${selectedPlayer.name}** with his music raising his/her ${stat} by ${luckStatAmount}!`);
 
         case 1:
@@ -277,6 +277,49 @@ class Game {
       selectedPlayer.gold += goldAmount;
 
       return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found ${goldAmount} Gold in ${selectedPlayer.map.name}.`);
+    } else {
+      const luckItemDice = Helper.randomInt(0, 100);
+
+      if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
+        const item = Item.generateItem(selectedPlayer);
+        switch (item.position) {
+          case 'helmet':
+            if (Helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+              return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.helmet.name} is better.`);
+            }
+
+            selectedPlayer.equipment.helmet.name = item.name;
+            selectedPlayer.equipment.helmet.str = item.stats.str;
+            selectedPlayer.equipment.helmet.dex = item.stats.dex;
+            selectedPlayer.equipment.helmet.end = item.stats.end;
+            selectedPlayer.equipment.helmet.int = item.stats.int;
+            break;
+          case 'armor':
+            if (Helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+              return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.armor.name} is better.`);
+            }
+
+            selectedPlayer.equipment.armor.name = item.name;
+            selectedPlayer.equipment.armor.str = item.stats.str;
+            selectedPlayer.equipment.armor.dex = item.stats.dex;
+            selectedPlayer.equipment.armor.end = item.stats.end;
+            selectedPlayer.equipment.armor.int = item.stats.int;
+            break;
+          case 'weapon':
+            if (Helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+              return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.weapon.name} is better.`);
+            }
+
+            selectedPlayer.equipment.weapon.name = item.name;
+            selectedPlayer.equipment.weapon.str = item.stats.str;
+            selectedPlayer.equipment.weapon.dex = item.stats.dex;
+            selectedPlayer.equipment.weapon.end = item.stats.end;
+            selectedPlayer.equipment.weapon.int = item.stats.int;
+            break;
+        }
+
+        return Helper.sendMessage(discordHook, twitchBot, Event.generateItemEventMessage(selectedPlayer, item));
+      }
     }
   }
 
