@@ -61,6 +61,10 @@ discordBot.on('message', (message) => {
   if (message.content === '!me') {
     Game.playerStats(message.author)
       .then((playerStats) => {
+        if (!playerStats) {
+          return message.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+        }
+
         const stats = Helper.generateStatsString(playerStats);
         message.author.send(stats);
       });
@@ -76,6 +80,10 @@ discordBot.on('message', (message) => {
 
     Game.playerStats(playerObj.array()[0])
       .then((playerStats) => {
+        if (!playerStats) {
+          return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+        }
+
         const stats = Helper.generateStatsString(playerStats);
         message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
       });
