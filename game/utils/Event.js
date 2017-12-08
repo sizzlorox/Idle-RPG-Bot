@@ -2,9 +2,15 @@ const helper = require('../../utils/helper');
 const Battle = require('../utils/Battle');
 const Monster = require('../utils/Monster');
 const Item = require('../utils/Item');
+const Map = require('../utils/Map');
 const Database = require('../../database/Database');
 
 class Event {
+
+  moveEvent(selectedPlayer) {
+    selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
+    return selectedPlayer;
+  }
 
   // Attack Events
   attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers) {
@@ -30,20 +36,22 @@ class Event {
             Database.savePlayer(randomPlayer.discordId, randomPlayer);
             // Add chance to steal players item (before check health or else he will always try to steal fists)
 
-            return helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just attacked \`${randomPlayer.name}\` in ${selectedPlayer.map.name} with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${playerChance} damage!`);
+            helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just attacked \`${randomPlayer.name}\` in ${selectedPlayer.map.name} with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${playerChance} damage!`);
+            return selectedPlayer;
           }
 
           selectedPlayer.health -= otherPlayerChance;
           helper.checkHealth(selectedPlayer, randomPlayer, discordHook);
           // Add chance to steal players item (before check health or else he will always try to steal fists)
 
-          return helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just attacked \`${randomPlayer.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in ${selectedPlayer.map.name} but failed!
+          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just attacked \`${randomPlayer.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in ${selectedPlayer.map.name} but failed!
             \`${randomPlayer.name}\`s \`${randomPlayer.equipment.weapon.name}\` dealt ${otherPlayerChance} damage!`);
+          return selectedPlayer;
         }
         const luckItemDice = helper.randomInt(0, 100);
 
         if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
-          this.generateTownItemEvent(discordHook, twitchBot, selectedPlayer);
+          return this.generateTownItemEvent(discordHook, twitchBot, selectedPlayer);
         }
       });
   }
@@ -57,13 +65,15 @@ class Event {
       selectedPlayer.kills.mob++;
       helper.checkExperience(selectedPlayer, discordHook);
 
-      return helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` gaining ${mob.experience} exp and ${mob.gold} Gold!`);
+      helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` gaining ${mob.experience} exp and ${mob.gold} Gold!`);
+      return selectedPlayer;
     }
 
     selectedPlayer.health -= mobChance;
     helper.checkHealth(selectedPlayer, mob, discordHook);
 
-    return helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost a battle to \`${mob.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
+    helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost a battle to \`${mob.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
+    return selectedPlayer;
   }
 
   // Item Events
@@ -82,7 +92,8 @@ class Event {
           selectedPlayer.equipment.helmet.dex = item.stats.dex;
           selectedPlayer.equipment.helmet.end = item.stats.end;
           selectedPlayer.equipment.helmet.int = item.stats.int;
-          return helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+          return selectedPlayer;
         }
         break;
 
@@ -98,7 +109,8 @@ class Event {
           selectedPlayer.equipment.armor.dex = item.stats.dex;
           selectedPlayer.equipment.armor.end = item.stats.end;
           selectedPlayer.equipment.armor.int = item.stats.int;
-          return helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+          return selectedPlayer;
         }
         break;
 
@@ -114,7 +126,8 @@ class Event {
           selectedPlayer.equipment.weapon.dex = item.stats.dex;
           selectedPlayer.equipment.weapon.end = item.stats.end;
           selectedPlayer.equipment.weapon.int = item.stats.int;
-          return helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+          return selectedPlayer;
         }
         break;
     }
@@ -160,7 +173,8 @@ class Event {
             selectedPlayer.stats.int += luckStatAmount;
             break;
         }
-        return helper.sendMessage(discordHook, twitchBot, `Apollo has blessed \`${selectedPlayer.name}\` with his music raising his/her \`${stat}\` by ${luckStatAmount}!`);
+        helper.sendMessage(discordHook, twitchBot, `Apollo has blessed \`${selectedPlayer.name}\` with his music raising his/her \`${stat}\` by ${luckStatAmount}!`);
+        return selectedPlayer;
 
       case 1:
         const luckExpAmount = helper.randomInt(5, 15);
@@ -169,14 +183,16 @@ class Event {
           selectedPlayer.experience = 0;
         }
 
-        return helper.sendMessage(discordHook, twitchBot, `Hades unleashed his wrath upon \`${selectedPlayer.name}\` making him/her lose ${luckExpAmount} experience!`);
+        helper.sendMessage(discordHook, twitchBot, `Hades unleashed his wrath upon \`${selectedPlayer.name}\` making him/her lose ${luckExpAmount} experience!`);
+        return selectedPlayer;
 
       case 3:
         const luckHealthAmount = helper.randomInt(5, 15);
         selectedPlayer.health -= luckHealthAmount;
         helper.checkHealth(selectedPlayer, discordHook);
+        helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost ${luckHealthAmount} health by tripping and hitting his/her head!`);
 
-        return helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost ${luckHealthAmount} health by tripping and hitting his/her head!`);
+        return selectedPlayer;
     }
   }
 
@@ -184,6 +200,7 @@ class Event {
     const luckGoldDice = helper.randomInt(0, 100);
     const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed());
     selectedPlayer.gold += goldAmount;
+    return selectedPlayer;
   }
 
   generateLuckItemEvent(discordHook, twitchBot, selectedPlayer) {
@@ -227,8 +244,11 @@ class Event {
           break;
       }
 
-      return helper.sendMessage(discordHook, twitchBot, Event.generateItemEventMessage(selectedPlayer, item));
+      helper.sendMessage(discordHook, twitchBot, Event.generateItemEventMessage(selectedPlayer, item));
+      return selectedPlayer;
     }
+
+    return selectedPlayer;
   }
 
 }

@@ -68,15 +68,15 @@ class Database {
     });
   }
 
-  savePlayer(discordId, player) {
+  savePlayer(player) {
     connect();
     return new Promise((resolve, reject) => {
-      return Player.findOneAndUpdate({ discordId }, player, (err, result) => {
+      return Player.findOneAndUpdate({ discordId: player.discordId }, player, (err, result) => {
         if (err) {
           disconnect();
           return reject(err);
         }
-        console.log(`DATABASE: ${discordId} has been saved into the Database.`);
+        console.log(`DATABASE: ${player.discordId} has been saved into the Database.`);
         disconnect();
         return resolve(result);
       });

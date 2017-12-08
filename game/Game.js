@@ -1,9 +1,6 @@
 const helper = require('../utils/helper');
-const LocalDatabase = require('../utils/local-database/LocalDatabase');
 const Database = require('../database/Database');
 const Event = require('./utils/Event');
-const Map = require('./utils/Map');
-const logger = require('../utils/logger');
 const moment = require('moment');
 
 class Game {
@@ -20,25 +17,27 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
+        let updatedPlayer;
+
         selectedPlayer.events++;
-        selectedPlayer = helper.passiveHeal(selectedPlayer);
+        helper.passiveHeal(selectedPlayer);
         console.log(`\nGAME: Random Event ID: ${randomEvent} ${moment().utc('br')}`);
 
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
-            this.moveEvent(selectedPlayer, discordHook, twitchBot);
-            Database.savePlayer(selectedPlayer.discordId, selectedPlayer);
+            updatedPlayer = this.moveEvent(selectedPlayer);
+            Database.savePlayer(updatedPlayer);
             break;
           case 1:
             console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
-            this.attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot);
-            Database.savePlayer(selectedPlayer.discordId, selectedPlayer);
+            updatedPlayer = this.attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot);
+            Database.savePlayer(updatedPlayer);
             break;
           case 2:
             console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
-            this.luckEvent(selectedPlayer, discordHook, twitchBot);
-            Database.savePlayer(selectedPlayer.discordId, selectedPlayer);
+            updatedPlayer = this.luckEvent(selectedPlayer, discordHook, twitchBot);
+            Database.savePlayer(updatedPlayer);
             break;
         }
 
@@ -49,8 +48,8 @@ class Game {
       .catch(err => console.log(err));
   }
 
-  moveEvent(selectedPlayer, discordHook, twitchBot) {
-    return Map.moveToRandomMap(selectedPlayer);
+  moveEvent(selectedPlayer) {
+    return Event.moveEvent(selectedPlayer);
   }
 
   attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot) {
@@ -64,6 +63,7 @@ class Game {
         return Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
       }
     }
+
     return Event.attackEventMob(discordHook, twitchBot, selectedPlayer);
   }
 
@@ -86,5 +86,6 @@ class Game {
   deleteAllPlayers() {
     return Database.deleteAllPlayers();
   }
+
 }
 module.exports = new Game();
