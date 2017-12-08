@@ -9,6 +9,8 @@ module.exports = {
         "comma-dangle": 0,
         "no-undef": 0,
         "no-console": 0,
-        "no-useless-escape": 0
+        "no-useless-escape": 0,
+        "consistent-return": 0,
+        "padded-blocks": 0
     }
 };

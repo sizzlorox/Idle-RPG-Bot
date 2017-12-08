@@ -74,6 +74,19 @@ class helper {
       + player.equipment.relic.luk;
   }
 
+  checkExperience(selectedPlayer, discordHook, twitchBot) {
+    if (selectedPlayer.experience >= selectedPlayer.level * 15) {
+      selectedPlayer.level++;
+      selectedPlayer.experience = 0;
+      selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+      selectedPlayer.stats.str++;
+      selectedPlayer.stats.dex++;
+      selectedPlayer.stats.end++;
+      selectedPlayer.stats.int++;
+      helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name} is now level ${selectedPlayer.level}!\``);
+    }
+  }
+
   checkHealth(selectedPlayer, attackerObj, hook) {
     if (selectedPlayer.health <= 0) {
       selectedPlayer.health = 105;
@@ -126,7 +139,7 @@ class helper {
         attackerObj.kills.player++;
         LocalDatabase.write(selectedPlayer);
       }
-      hook.send(`**${selectedPlayer.name}** died! Game over man... Game over.`);
+      hook.send(`\`${selectedPlayer.name} died! Game over man... Game over.\``);
     }
   }
 

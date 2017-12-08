@@ -11,6 +11,7 @@ const app = express();
 const tickInMinutes = 2;
 let onlinePlayerList = [];
 
+// Preperation for the website that allows others to let this bot join their discord!
 app.get('/', (req, res) => res.send('Idle-RPG Bot!'));
 app.listen(process.env.PORT, () => console.log(`Example app listening on port ${process.env.PORT}!`));
 
@@ -37,31 +38,30 @@ const heartBeat = () => {
         discordId: player.id
       };
     });
-  /*
-    onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
-      .filter((player, index, array) =>
-        index === array.findIndex(p => (
-          p.discordId === player.discordId
-        )));
-  */
 
-  Game.selectEvent(discordOnlinePlayers[randomInt(0, discordOnlinePlayers.length - 1)], discordOnlinePlayers, hook, 'twitchBot');
+  // Game.selectEvent(discordOnlinePlayers[randomInt(0, discordOnlinePlayers.length - 1)], discordOnlinePlayers, hook, 'twitchBot');
 
-  /*
-  
+  onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
+    .filter((player, index, array) =>
+      index === array.findIndex(p => (
+        p.discordId === player.discordId
+      )))
+    .filter(player => !discordOfflinePlayers.includes(player.id));
+
   onlinePlayerList.forEach((player) => {
-  if (!player.timer) {
-  player.timer = setTimeout(() => {
-    Game.selectEvent(player, discordOnlinePlayers, hook, 'twitchBot');
-    delete player.timer;
-  }, randomInt(120000, 300000));
-  }
+    if (!player.timer) {
+      player.timer = setTimeout(() => {
+        Game.selectEvent(player, discordOnlinePlayers, hook, 'twitchBot');
+        delete player.timer;
+      }, randomInt(60000 * ((onlinePlayerList.length + 1) / 4), 300000 * ((onlinePlayerList.length + 1) / 4)));
+    }
   });
-  
+
+  /*
   const twitchOnlinePlayers = getViewerList()
   .then(viewers => console.log(viewers.chatters))
   .catch(err => console.log(err));
-  */
+*/
 };
 
 setInterval(heartBeat, 60000 * tickInMinutes);
