@@ -1,4 +1,5 @@
 const helper = require('../../utils/helper');
+const enumHelper = require('../../utils/enumHelper');
 const Battle = require('../utils/Battle');
 const Monster = require('../utils/Monster');
 const Item = require('../utils/Item');
@@ -80,7 +81,7 @@ class Event {
   generateTownItemEvent(discordHook, twitchBot, selectedPlayer) {
     const item = Item.generateItem(selectedPlayer);
     switch (item.position) {
-      case 'helmet':
+      case enumHelper.equipment.types.helmet.position:
         if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
           return;
         }
@@ -97,7 +98,7 @@ class Event {
         }
         break;
 
-      case 'armor':
+      case enumHelper.equipment.types.armor.position:
         if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
           return;
         }
@@ -114,7 +115,7 @@ class Event {
         }
         break;
 
-      case 'weapon':
+      case enumHelper.equipment.types.weapon.position:
         if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
           return;
         }
@@ -154,25 +155,25 @@ class Event {
       case 0:
         const luckStat = helper.randomInt(0, 4);
         const luckStatAmount = helper.randomInt(2, 10);
-        let stat;
         switch (luckStat) {
           case 0:
-            stat = 'Strength';
+            stat = enumHelper.stats.str;
             selectedPlayer.stats.str += luckStatAmount;
             break;
           case 1:
-            stat = 'Dexterity';
+            stat = enumHelper.stats.dex;
             selectedPlayer.stats.dex += luckStatAmount;
             break;
           case 2:
-            stat = 'Endurance';
+            stat = enumHelper.stats.end;
             selectedPlayer.stats.end += luckStatAmount;
             break;
           case 4:
-            stat = 'Intelligence';
+            stat = enumHelper.stats.int;
             selectedPlayer.stats.int += luckStatAmount;
             break;
         }
+
         helper.sendMessage(discordHook, twitchBot, `Apollo has blessed \`${selectedPlayer.name}\` with his music raising his/her \`${stat}\` by ${luckStatAmount}!`);
         return selectedPlayer;
 
@@ -209,7 +210,7 @@ class Event {
     if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
       const item = Item.generateItem(selectedPlayer);
       switch (item.position) {
-        case 'helmet':
+        case enumHelper.equipment.types.helmet.position:
           if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
             return;
           }
@@ -220,7 +221,7 @@ class Event {
           selectedPlayer.equipment.helmet.end = item.stats.end;
           selectedPlayer.equipment.helmet.int = item.stats.int;
           break;
-        case 'armor':
+        case enumHelper.equipment.types.armor.position:
           if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
             return;
           }
@@ -231,7 +232,7 @@ class Event {
           selectedPlayer.equipment.armor.end = item.stats.end;
           selectedPlayer.equipment.armor.int = item.stats.int;
           break;
-        case 'weapon':
+        case enumHelper.equipment.types.weapon.position:
           if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
             return;
           }

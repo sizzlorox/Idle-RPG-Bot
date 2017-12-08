@@ -1,4 +1,5 @@
 const helper = require('../utils/helper');
+const enumHelper = require('../utils/enumHelper');
 const Database = require('../database/Database');
 const Event = require('./utils/Event');
 const moment = require('moment');
@@ -54,12 +55,12 @@ class Game {
 
   attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot) {
     const luckDice = helper.randomInt(0, 100);
-    if (selectedPlayer.map.type === 'Town' && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
+    if (selectedPlayer.map.type === enumHelper.map.types.town && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(discordHook, twitchBot, selectedPlayer);
     }
 
     if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
-      if (selectedPlayer.map.type !== 'Town') {
+      if (selectedPlayer.map.type !== enumHelper.map.types.town) {
         return Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
       }
     }
@@ -72,10 +73,10 @@ class Game {
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(discordHook, twitchBot, selectedPlayer);
     } else if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
-      return Event.generateGoldEvent(selectedPlayer);
+      return Event.generateLuckItemEvent(discordHook, twitchBot, selectedPlayer);
     }
 
-    return Event.generateLuckItemEvent(discordHook, twitchBot, selectedPlayer);
+    return Event.generateGoldEvent(selectedPlayer);
   }
 
   // Commands
