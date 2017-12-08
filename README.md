@@ -13,7 +13,14 @@ DISCORD_WEBHOOK_TOKEN=<Your discord webhook token here>
 DISCORD_BOT_OPERATOR_ID=<Your bot operators discord ID here>
 DISCORD_RPG_CHANNEL_ID=<Your idle-rpg discord channel ID here>
 DISCORD_BOT_LOGIN_TOKEN=<Your bots discord login token here>
+
+DATABASE=<Type of database to use>
+MONGODB_URI=<mongodb connection URI>
 ```
+
+Database type:
+local = Local database that saves players into json files.
+mongo = Mongodb
 
 # Requirements
 ```

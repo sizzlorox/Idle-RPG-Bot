@@ -1,5 +1,6 @@
 const Helper = require('../utils/Helper');
 const LocalDatabase = require('../utils/local-database/LocalDatabase');
+const Database = require('../database/Database');
 const Monster = require('./utils/Monster');
 const Item = require('./utils/Item');
 const Event = require('./utils/Event');
@@ -29,34 +30,73 @@ class Game {
   selectEvent(player, onlinePlayers, discordHook, twitchBot) {
     const randomEvent = Helper.randomInt(0, 2);
 
-    LocalDatabase.load(player)
-      .then((selectedPlayer) => {
-        selectedPlayer.events++;
-        selectedPlayer = Helper.passiveHeal(selectedPlayer);
-        console.log(`\nRandom Event ID: ${randomEvent} ${moment().utc('br')}`);
+    if (process.env.DATABASE === 'local') {
+      LocalDatabase.load(player)
+        .then((selectedPlayer) => {
+          selectedPlayer.events++;
+          selectedPlayer = Helper.passiveHeal(selectedPlayer);
+          console.log(`\nRandom Event ID: ${randomEvent} ${moment().utc('br')}`);
 
-        switch (randomEvent) {
-          case 0:
-            console.log(`${selectedPlayer.name} activated a move event.`);
-            this.moveEvent(selectedPlayer, discordHook, twitchBot);
-            LocalDatabase.write(selectedPlayer);
-            break;
-          case 1:
-            console.log(`${selectedPlayer.name} activated an attack event.`);
-            this.attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot);
-            LocalDatabase.write(selectedPlayer);
-            break;
-          case 2:
-            console.log(`${selectedPlayer.name} activated a luck event.`);
-            this.luckEvent(selectedPlayer, discordHook, twitchBot);
-            LocalDatabase.write(selectedPlayer);
-            break;
-        }
+          switch (randomEvent) {
+            case 0:
+              console.log(`${selectedPlayer.name} activated a move event.`);
+              this.moveEvent(selectedPlayer, discordHook, twitchBot);
+              LocalDatabase.write(selectedPlayer);
+              break;
+            case 1:
+              console.log(`${selectedPlayer.name} activated an attack event.`);
+              this.attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot);
+              LocalDatabase.write(selectedPlayer);
+              break;
+            case 2:
+              console.log(`${selectedPlayer.name} activated a luck event.`);
+              this.luckEvent(selectedPlayer, discordHook, twitchBot);
+              LocalDatabase.write(selectedPlayer);
+              break;
+          }
 
-        if (selectedPlayer.events % 100 === 0) {
-          Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has encountered ${selectedPlayer.events} events!`);
-        }
-      });
+          if (selectedPlayer.events % 100 === 0) {
+            Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has encountered ${selectedPlayer.events} events!`);
+          }
+        });
+    } else if (process.env.DATABASE === 'mongo') {
+      Database.loadPlayer(player.discordId)
+        .then((selectedPlayer) => {
+          if (!selectedPlayer) {
+            return Database.createNewPlayer(player.discordId, player.name);
+          }
+
+          return selectedPlayer;
+        })
+        .then((selectedPlayer) => {
+          selectedPlayer.events++;
+          selectedPlayer = Helper.passiveHeal(selectedPlayer);
+          console.log(`\nGAME: Random Event ID: ${randomEvent} ${moment().utc('br')}`);
+
+          switch (randomEvent) {
+            case 0:
+              console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
+              this.moveEvent(selectedPlayer, discordHook, twitchBot);
+              Database.savePlayer(selectedPlayer.discordId, selectedPlayer);
+              break;
+            case 1:
+              console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
+              this.attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot);
+              Database.savePlayer(selectedPlayer.discordId, selectedPlayer);
+              break;
+            case 2:
+              console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
+              this.luckEvent(selectedPlayer, discordHook, twitchBot);
+              Database.savePlayer(selectedPlayer.discordId, selectedPlayer);
+              break;
+          }
+
+          if (selectedPlayer.events % 100 === 0) {
+            Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has encountered ${selectedPlayer.events} events!`);
+          }
+        })
+        .catch(err => console.log(err));
+    }
   }
 
   moveEvent(selectedPlayer, discordHook, twitchBot) {
@@ -123,9 +163,14 @@ class Game {
 
     if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
       if (selectedPlayer.map.type !== 'Town') {
-        const mappedPromises = onlinePlayers.map((player) => {
-          return LocalDatabase.load(player);
-        });
+        let mappedPromises;
+        if (process.env.DATABASE === 'local') {
+          mappedPromises = onlinePlayers.map((player) => {
+            return LocalDatabase.load(player);
+          });
+        } else if (process.env.DATABASE === 'mongo') {
+          mappedPromises = [Database.getSameMapPlayers(selectedPlayer.map.name)];
+        }
 
         return Promise.all(mappedPromises)
           .then((mappedPlayers) => {
@@ -146,7 +191,11 @@ class Game {
               if (playerChance >= otherPlayerChance) {
                 Helper.checkHealth(randomPlayer, selectedPlayer, discordHook);
                 randomPlayer.health -= playerChance;
-                LocalDatabase.write(randomPlayer);
+                if (process.env.DATABASE === 'local') {
+                  LocalDatabase.write(randomPlayer);
+                } else if (process.env.DATABASE === 'mongo') {
+                  Database.savePlayer(randomPlayer.discordId, randomPlayer);
+                }
                 // Add chance to steal players item (before check health or else he will always try to steal fists)
 
                 return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just attacked **${randomPlayer.name}** in ${selectedPlayer.map.name} with his/her ${selectedPlayer.equipment.weapon.name} dealing ${playerChance} damage!`);
@@ -228,7 +277,7 @@ class Game {
       const luckEvent = Helper.randomInt(0, 3);
       switch (luckEvent) {
         case 0:
-          const luckStat = Helper.randomInt(0, 5);
+          const luckStat = Helper.randomInt(0, 4);
           const luckStatAmount = Helper.randomInt(2, 10);
           let stat;
           switch (luckStat) {
@@ -247,10 +296,6 @@ class Game {
             case 4:
               stat = 'Intelligence';
               selectedPlayer.stats.int += luckStatAmount;
-              break;
-            case 5:
-              stat = 'Luck';
-              selectedPlayer.stats.luk += luckStatAmount;
               break;
           }
           console.log(stat);
@@ -331,11 +376,19 @@ class Game {
         discordId: commandAuthor.id
       };
 
-      return LocalDatabase.load(player);
+      if (process.env.DATABASE === 'local') {
+        return LocalDatabase.load(player);
+      } else if (process.env.DATABASE === 'mongo') {
+        return Database.loadPlayer(player.discordId);
+      }
     } catch (error) {
       logger.error(error);
       return 'Not Found!';
     }
+  }
+
+  deleteAllPlayers() {
+    return Database.deleteAllPlayers();
   }
 }
 module.exports = new Game();

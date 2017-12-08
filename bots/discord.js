@@ -26,16 +26,22 @@ discordBot.on('message', (message) => {
     return;
   }
 
-  if (message.author.id === botOperator && message.content.startsWith('!kill ')) {
-    hook.send(`Sizzlorr just rekted ${message.content.split(' ')[1]}`);
-  }
+  //BOT OPERATOR COMMANDS
+  if (message.author.id === botOperator) {
+    if (message.content === '!submode') {
+      /*
+      Under development, trying to get a list of subscribers
+      const onlineUsers = discordBot.users.filter(player => player.presence.status === 'online' && !player.bot);
+      console.log(discordBot.users.array()[5].role);
+      */
+    }
 
-  if (message.content === '!submode' && message.author.id === botOperator) {
-    /*
-    Under development, trying to get a list of subscribers
-    const onlineUsers = discordBot.users.filter(player => player.presence.status === 'online' && !player.bot);
-    console.log(discordBot.users.array()[5].role);
-    */
+    if (message.content === '!resetAll') {
+      Game.deleteAllPlayers()
+        .then(() => {
+          message.author('Done.');
+        });
+    }
   }
 
   if (message.content === '!help') {
