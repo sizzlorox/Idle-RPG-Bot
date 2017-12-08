@@ -1,6 +1,6 @@
 const fs = require('fs');
 const moment = require('moment');
-const Helper = require('../Helper');
+const helper = require('../helper');
 const Map = require('../../game/utils/Map');
 const logger = require('../logger');
 
@@ -10,7 +10,7 @@ const starterTown = 4;
 class LocalDatabase {
 
   create(player) {
-    return Helper.countDirectoryFiles(playerDir)
+    return helper.countDirectoryFiles(playerDir)
       .then((id) => {
         if (!player.id) {
           player.id = player.discordId;

@@ -1,4 +1,4 @@
-const Helper = require('../utils/Helper');
+const helper = require('../utils/helper');
 const LocalDatabase = require('../utils/local-database/LocalDatabase');
 const Database = require('../database/Database');
 const Monster = require('./utils/Monster');
@@ -18,7 +18,7 @@ function checkExperience(selectedPlayer, discordHook, twitchBot) {
     selectedPlayer.stats.dex++;
     selectedPlayer.stats.end++;
     selectedPlayer.stats.int++;
-    Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** is now level ${selectedPlayer.level}!`);
+    helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** is now level ${selectedPlayer.level}!`);
   }
 }
 
@@ -28,13 +28,13 @@ class Game {
   }
 
   selectEvent(player, onlinePlayers, discordHook, twitchBot) {
-    const randomEvent = Helper.randomInt(0, 2);
+    const randomEvent = helper.randomInt(0, 2);
 
     if (process.env.DATABASE === 'local') {
       LocalDatabase.load(player)
         .then((selectedPlayer) => {
           selectedPlayer.events++;
-          selectedPlayer = Helper.passiveHeal(selectedPlayer);
+          selectedPlayer = helper.passiveHeal(selectedPlayer);
           console.log(`\nRandom Event ID: ${randomEvent} ${moment().utc('br')}`);
 
           switch (randomEvent) {
@@ -56,7 +56,7 @@ class Game {
           }
 
           if (selectedPlayer.events % 100 === 0) {
-            Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has encountered ${selectedPlayer.events} events!`);
+            helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has encountered ${selectedPlayer.events} events!`);
           }
         });
     } else if (process.env.DATABASE === 'mongo') {
@@ -70,7 +70,7 @@ class Game {
         })
         .then((selectedPlayer) => {
           selectedPlayer.events++;
-          selectedPlayer = Helper.passiveHeal(selectedPlayer);
+          selectedPlayer = helper.passiveHeal(selectedPlayer);
           console.log(`\nGAME: Random Event ID: ${randomEvent} ${moment().utc('br')}`);
 
           switch (randomEvent) {
@@ -92,7 +92,7 @@ class Game {
           }
 
           if (selectedPlayer.events % 100 === 0) {
-            Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has encountered ${selectedPlayer.events} events!`);
+            helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has encountered ${selectedPlayer.events} events!`);
           }
         })
         .catch(err => console.log(err));
@@ -102,17 +102,17 @@ class Game {
   moveEvent(selectedPlayer, discordHook, twitchBot) {
     selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
 
-    return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has moved to ${selectedPlayer.map.name}.`);
+    return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** has moved to ${selectedPlayer.map.name}.`);
   }
 
   attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot) {
-    const luckDice = Helper.randomInt(0, 100);
+    const luckDice = helper.randomInt(0, 100);
     if (selectedPlayer.map.type === 'Town' && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
       const item = Item.generateItem(selectedPlayer);
       switch (item.position) {
         case 'helmet':
-          if (Helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
-            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.helmet.name} is better.`);
+          if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+            return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.helmet.name} is better.`);
           }
 
           if (selectedPlayer.gold >= item.gold) {
@@ -122,13 +122,13 @@ class Game {
             selectedPlayer.equipment.helmet.dex = item.stats.dex;
             selectedPlayer.equipment.helmet.end = item.stats.end;
             selectedPlayer.equipment.helmet.int = item.stats.int;
-            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
+            return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
           }
           break;
 
         case 'armor':
-          if (Helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
-            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.armor.name} is better.`);
+          if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+            return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.armor.name} is better.`);
           }
 
           if (selectedPlayer.gold >= item.gold) {
@@ -138,13 +138,13 @@ class Game {
             selectedPlayer.equipment.armor.dex = item.stats.dex;
             selectedPlayer.equipment.armor.end = item.stats.end;
             selectedPlayer.equipment.armor.int = item.stats.int;
-            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
+            return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
           }
           break;
 
         case 'weapon':
-          if (Helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
-            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.weapon.name} is better.`);
+          if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+            return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was about to purchase ${item.name} from Town but his/her ${selectedPlayer.equipment.weapon.name} is better.`);
           }
 
           if (selectedPlayer.gold >= item.gold) {
@@ -154,11 +154,11 @@ class Game {
             selectedPlayer.equipment.weapon.dex = item.stats.dex;
             selectedPlayer.equipment.weapon.end = item.stats.end;
             selectedPlayer.equipment.weapon.int = item.stats.int;
-            return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
+            return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just purchased ${item.name} from Town for ${item.gold} Gold!`);
           }
           break;
       }
-      return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was going to purchase ${item.name} from Town for ${item.gold} Gold but did not have enough.`);
+      return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** was going to purchase ${item.name} from Town for ${item.gold} Gold but did not have enough.`);
     }
 
     if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
@@ -178,7 +178,7 @@ class Game {
             console.log(`${selectedPlayer.map.name} - ${sameMapPlayers.length}`);
 
             if (sameMapPlayers.length > 0) {
-              const randomPlayerIndex = Helper.randomInt(0, sameMapPlayers.length - 1);
+              const randomPlayerIndex = helper.randomInt(0, sameMapPlayers.length - 1);
               const randomPlayer = sameMapPlayers[randomPlayerIndex];
 
               const { playerChance, otherPlayerChance } = Battle.simulateBattleWithPlayer(
@@ -189,7 +189,7 @@ class Game {
               console.log(`Attacking Player: ${playerChance} - Random Defending Player: ${otherPlayerChance}`);
 
               if (playerChance >= otherPlayerChance) {
-                Helper.checkHealth(randomPlayer, selectedPlayer, discordHook);
+                helper.checkHealth(randomPlayer, selectedPlayer, discordHook);
                 randomPlayer.health -= playerChance;
                 if (process.env.DATABASE === 'local') {
                   LocalDatabase.write(randomPlayer);
@@ -198,24 +198,24 @@ class Game {
                 }
                 // Add chance to steal players item (before check health or else he will always try to steal fists)
 
-                return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just attacked **${randomPlayer.name}** in ${selectedPlayer.map.name} with his/her ${selectedPlayer.equipment.weapon.name} dealing ${playerChance} damage!`);
+                return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just attacked **${randomPlayer.name}** in ${selectedPlayer.map.name} with his/her ${selectedPlayer.equipment.weapon.name} dealing ${playerChance} damage!`);
               }
 
               selectedPlayer.health -= otherPlayerChance;
-              Helper.checkHealth(selectedPlayer, randomPlayer, discordHook);
+              helper.checkHealth(selectedPlayer, randomPlayer, discordHook);
               // Add chance to steal players item (before check health or else he will always try to steal fists)
 
-              return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just attacked **${randomPlayer.name}** with his/her ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} but failed!
+              return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just attacked **${randomPlayer.name}** with his/her ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} but failed!
                 **${randomPlayer.name}**s ${randomPlayer.equipment.weapon.name} dealt ${otherPlayerChance} damage!`);
             }
-            const luckItemDice = Helper.randomInt(0, 100);
+            const luckItemDice = helper.randomInt(0, 100);
 
             if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
               const item = Item.generateItem(selectedPlayer);
               switch (item.position) {
                 case 'helmet':
-                  if (Helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
-                    return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.helmet.name} is better.`);
+                  if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+                    return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.helmet.name} is better.`);
                   }
 
                   selectedPlayer.equipment.helmet.name = item.name;
@@ -225,8 +225,8 @@ class Game {
                   selectedPlayer.equipment.helmet.int = item.stats.int;
                   break;
                 case 'armor':
-                  if (Helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
-                    return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.armor.name} is better.`);
+                  if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+                    return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.armor.name} is better.`);
                   }
 
                   selectedPlayer.equipment.armor.name = item.name;
@@ -236,8 +236,8 @@ class Game {
                   selectedPlayer.equipment.armor.int = item.stats.int;
                   break;
                 case 'weapon':
-                  if (Helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
-                    return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.weapon.name} is better.`);
+                  if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+                    return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.weapon.name} is better.`);
                   }
 
                   selectedPlayer.equipment.weapon.name = item.name;
@@ -248,7 +248,7 @@ class Game {
                   break;
               }
 
-              return Helper.sendMessage(discordHook, twitchBot, Event.generateItemEventMessage(selectedPlayer, item));
+              return helper.sendMessage(discordHook, twitchBot, Event.generateItemEventMessage(selectedPlayer, item));
             }
           });
       }
@@ -262,23 +262,23 @@ class Game {
       selectedPlayer.kills.mob++;
       checkExperience(selectedPlayer, discordHook);
 
-      return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just killed ${mob.name} with his/her ${selectedPlayer.equipment.weapon.name} gaining ${mob.experience} exp and ${mob.gold} Gold!`);
+      return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just killed ${mob.name} with his/her ${selectedPlayer.equipment.weapon.name} gaining ${mob.experience} exp and ${mob.gold} Gold!`);
     }
 
     selectedPlayer.health -= mobChance;
-    Helper.checkHealth(selectedPlayer, mob, discordHook);
+    helper.checkHealth(selectedPlayer, mob, discordHook);
 
-    return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just lost a battle to ${mob.name} losing ${mobChance} health and ${mob.gold} Gold!`);
+    return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just lost a battle to ${mob.name} losing ${mobChance} health and ${mob.gold} Gold!`);
   }
 
   luckEvent(selectedPlayer, discordHook, twitchBot) {
-    const luckDice = Helper.randomInt(0, 100);
+    const luckDice = helper.randomInt(0, 100);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
-      const luckEvent = Helper.randomInt(0, 3);
+      const luckEvent = helper.randomInt(0, 3);
       switch (luckEvent) {
         case 0:
-          const luckStat = Helper.randomInt(0, 4);
-          const luckStatAmount = Helper.randomInt(2, 10);
+          const luckStat = helper.randomInt(0, 4);
+          const luckStatAmount = helper.randomInt(2, 10);
           let stat;
           switch (luckStat) {
             case 0:
@@ -299,38 +299,38 @@ class Game {
               break;
           }
           console.log(stat);
-          return Helper.sendMessage(discordHook, twitchBot, `Apollo has blessed **${selectedPlayer.name}** with his music raising his/her ${stat} by ${luckStatAmount}!`);
+          return helper.sendMessage(discordHook, twitchBot, `Apollo has blessed **${selectedPlayer.name}** with his music raising his/her ${stat} by ${luckStatAmount}!`);
 
         case 1:
-          const luckExpAmount = Helper.randomInt(5, 15);
+          const luckExpAmount = helper.randomInt(5, 15);
           selectedPlayer.experience -= luckExpAmount;
           if (selectedPlayer.experience < 0) {
             selectedPlayer.experience = 0;
           }
 
-          return Helper.sendMessage(discordHook, twitchBot, `Hades unleashed his wrath upon **${selectedPlayer.name}** making him/her lose ${luckExpAmount} experience!`);
+          return helper.sendMessage(discordHook, twitchBot, `Hades unleashed his wrath upon **${selectedPlayer.name}** making him/her lose ${luckExpAmount} experience!`);
 
         case 3:
-          const luckHealthAmount = Helper.randomInt(5, 15);
+          const luckHealthAmount = helper.randomInt(5, 15);
           selectedPlayer.health -= luckHealthAmount;
-          Helper.checkHealth(selectedPlayer, discordHook);
+          helper.checkHealth(selectedPlayer, discordHook);
 
-          return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just lost ${luckHealthAmount} health by tripping and hitting his/her head!`);
+          return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** just lost ${luckHealthAmount} health by tripping and hitting his/her head!`);
       }
     } else if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
       const goldAmount = Number(((luckDice * selectedPlayer.stats.luk) / 2).toFixed());
       selectedPlayer.gold += goldAmount;
 
-      return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found ${goldAmount} Gold in ${selectedPlayer.map.name}.`);
+      return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found ${goldAmount} Gold in ${selectedPlayer.map.name}.`);
     } else {
-      const luckItemDice = Helper.randomInt(0, 100);
+      const luckItemDice = helper.randomInt(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
         const item = Item.generateItem(selectedPlayer);
         switch (item.position) {
           case 'helmet':
-            if (Helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
-              return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.helmet.name} is better.`);
+            if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+              return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.helmet.name} is better.`);
             }
 
             selectedPlayer.equipment.helmet.name = item.name;
@@ -340,8 +340,8 @@ class Game {
             selectedPlayer.equipment.helmet.int = item.stats.int;
             break;
           case 'armor':
-            if (Helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
-              return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.armor.name} is better.`);
+            if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+              return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.armor.name} is better.`);
             }
 
             selectedPlayer.equipment.armor.name = item.name;
@@ -351,8 +351,8 @@ class Game {
             selectedPlayer.equipment.armor.int = item.stats.int;
             break;
           case 'weapon':
-            if (Helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
-              return Helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.weapon.name} is better.`);
+            if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+              return helper.sendMessage(discordHook, twitchBot, `**${selectedPlayer.name}** found a ${item.name} but his/her ${selectedPlayer.equipment.weapon.name} is better.`);
             }
 
             selectedPlayer.equipment.weapon.name = item.name;
@@ -363,7 +363,7 @@ class Game {
             break;
         }
 
-        return Helper.sendMessage(discordHook, twitchBot, Event.generateItemEventMessage(selectedPlayer, item));
+        return helper.sendMessage(discordHook, twitchBot, Event.generateItemEventMessage(selectedPlayer, item));
       }
     }
   }

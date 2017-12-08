@@ -1,11 +1,11 @@
-const Helper = require('../../utils/Helper');
+const helper = require('../../utils/helper');
 
 class Battle {
   simulateBattleWithMob(selectedPlayer, mobObj) {
-    const playerDamage = Helper.sumPlayerTotalStrength(selectedPlayer);
-    const playerEvasive = Helper.sumPlayerTotalDexterity(selectedPlayer)
-      + (Helper.sumPlayerTotalIntelligence(selectedPlayer) / 2);
-    const playerDefense = Helper.sumPlayerTotalEndurance(selectedPlayer);
+    const playerDamage = helper.sumPlayerTotalStrength(selectedPlayer);
+    const playerEvasive = helper.sumPlayerTotalDexterity(selectedPlayer)
+      + (helper.sumPlayerTotalIntelligence(selectedPlayer) / 2);
+    const playerDefense = helper.sumPlayerTotalEndurance(selectedPlayer);
 
     const mobDamage = mobObj.stats.str;
     const mobEvasive = mobObj.stats.dex;
@@ -19,18 +19,18 @@ class Battle {
   }
 
   simulateBattleWithPlayer(selectedPlayer, otherPlayer) {
-    const playerDamage = Helper.sumPlayerTotalStrength(selectedPlayer);
-    const playerEvasive = Helper.sumPlayerTotalDexterity(selectedPlayer)
-      + (Helper.sumPlayerTotalIntelligence(selectedPlayer) / 2);
-    const playerDefense = Helper.sumPlayerTotalEndurance(selectedPlayer);
+    const playerDamage = helper.sumPlayerTotalStrength(selectedPlayer);
+    const playerEvasive = helper.sumPlayerTotalDexterity(selectedPlayer)
+      + (helper.sumPlayerTotalIntelligence(selectedPlayer) / 2);
+    const playerDefense = helper.sumPlayerTotalEndurance(selectedPlayer);
 
-    const otherPlayerDamage = Helper.sumPlayerTotalStrength(otherPlayer);
-    const otherPlayerEvasive = Helper.sumPlayerTotalDexterity(otherPlayer)
-      + (Helper.sumPlayerTotalIntelligence(otherPlayer) / 2);
-    const otherPlayerDefense = Helper.sumPlayerTotalEndurance(otherPlayer);
+    const otherPlayerDamage = helper.sumPlayerTotalStrength(otherPlayer);
+    const otherPlayerEvasive = helper.sumPlayerTotalDexterity(otherPlayer)
+      + (helper.sumPlayerTotalIntelligence(otherPlayer) / 2);
+    const otherPlayerDefense = helper.sumPlayerTotalEndurance(otherPlayer);
 
-    const playerChance = Math.abs(Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + Helper.randomInt(1, 5 + Helper.sumPlayerTotalLuck(selectedPlayer)));
-    const otherPlayerChance = Math.abs(Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + Helper.randomInt(1, 5 + Helper.sumPlayerTotalLuck(otherPlayer)));
+    const playerChance = Math.abs(Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + helper.randomInt(1, 5 + helper.sumPlayerTotalLuck(selectedPlayer)));
+    const otherPlayerChance = Math.abs(Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + helper.randomInt(1, 5 + helper.sumPlayerTotalLuck(otherPlayer)));
     console.log(`PlayerChance: ${playerChance} - OtherPlayerChance: ${otherPlayerChance}`);
 
     return { playerChance, otherPlayerChance };

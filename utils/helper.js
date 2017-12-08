@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Map = require('../game/utils/Map');
 
-class Helper {
+class helper {
   randomInt(min, max) {
     return Math.floor(Math.random() * (((max - min) + 1) + min));
   }
@@ -185,4 +185,4 @@ class Helper {
       By Players: ${player.deaths.player}\`\`\``;
   }
 }
-module.exports = new Helper();
+module.exports = new helper();

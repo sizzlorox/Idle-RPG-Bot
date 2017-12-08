@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const fs = require('fs');
-const Helper = require('../utils/Helper');
+const helper = require('../utils/helper');
 const { botOperator, rpgChannel } = require('../settings');
 const Game = require('../game/Game');
 const maps = require('../game/data/maps');
@@ -65,7 +65,7 @@ discordBot.on('message', (message) => {
           return message.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
         }
 
-        const stats = Helper.generateStatsString(playerStats);
+        const stats = helper.generateStatsString(playerStats);
         message.author.send(stats);
       });
   }
@@ -84,7 +84,7 @@ discordBot.on('message', (message) => {
           return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
         }
 
-        const stats = Helper.generateStatsString(playerStats);
+        const stats = helper.generateStatsString(playerStats);
         message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
       });
   }

@@ -1,8 +1,8 @@
-const Helper = require('../../utils/Helper');
+const helper = require('../../utils/helper');
 
 class Event {
   generateItemEventMessage(selectedPlayer, item) {
-    const randomEventMessage = Helper.randomInt(0, 3);
+    const randomEventMessage = helper.randomInt(0, 3);
     switch (randomEventMessage) {
       case 0:
         return `**${selectedPlayer.name}** found a chest containing ${item.name} in ${selectedPlayer.map.name}!`;

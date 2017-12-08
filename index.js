@@ -3,7 +3,7 @@ require('dotenv').config();
 const { discordBot, hook } = require('./bots/discord');
 // const { twitchBot } = require('./bots/twitch');
 const Game = require('./game/Game');
-const { randomInt } = require('./utils/Helper');
+const { randomInt } = require('./utils/helper');
 
 const tickInMinutes = 2;
 let onlinePlayerList = [];

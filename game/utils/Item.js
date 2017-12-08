@@ -1,17 +1,17 @@
-const Helper = require('../../utils/Helper');
+const helper = require('../../utils/helper');
 const items = require('../data/items');
 
 class Item {
   generateItem(selectedPlayer) {
-    const randomRarityChance = Math.ceil(Helper.randomInt(0, 100) - (selectedPlayer.level / 6));
-    const randomMaterialChance = Math.ceil(Helper.randomInt(0, 100) - (selectedPlayer.level / 6));
+    const randomRarityChance = Math.ceil(helper.randomInt(0, 100) - (selectedPlayer.level / 6));
+    const randomMaterialChance = Math.ceil(helper.randomInt(0, 100) - (selectedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
 
-    const randomRarityIndex = Helper.randomInt(0, itemRarityList.length - 1);
-    const randomMaterialIndex = Helper.randomInt(0, itemMaterialList.length - 1);
-    const randomEquipmentIndex = Helper.randomInt(0, items.type.length - 1);
-    const randomTypeIndex = Helper.randomInt(0, items.type[randomEquipmentIndex].length - 1);
+    const randomRarityIndex = helper.randomInt(0, itemRarityList.length - 1);
+    const randomMaterialIndex = helper.randomInt(0, itemMaterialList.length - 1);
+    const randomEquipmentIndex = helper.randomInt(0, items.type.length - 1);
+    const randomTypeIndex = helper.randomInt(0, items.type[randomEquipmentIndex].length - 1);
 
     const itemStr = (itemRarityList[randomRarityIndex].stats.str
       * (itemMaterialList[randomMaterialIndex].stats.str
