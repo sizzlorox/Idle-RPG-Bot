@@ -1,10 +1,13 @@
 require('dotenv').config();
 
+const express = require('express');
+
 const { discordBot, hook } = require('./bots/discord');
 // const { twitchBot } = require('./bots/twitch');
 const Game = require('./game/Game');
 const { randomInt } = require('./utils/helper');
 
+const app = express();
 const tickInMinutes = 2;
 let onlinePlayerList = [];
 
@@ -59,3 +62,7 @@ const heartBeat = () => {
 };
 
 setInterval(heartBeat, 60000 * tickInMinutes);
+
+app.get('/', (req, res) => res.send('Idle-RPG Bot!'))
+
+app.listen(process.env.PORT, () => console.log(`Example app listening on port ${process.env.PORT}!`));
