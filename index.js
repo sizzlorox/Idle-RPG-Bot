@@ -11,6 +11,9 @@ const app = express();
 const tickInMinutes = 2;
 let onlinePlayerList = [];
 
+app.get('/', (req, res) => res.send('Idle-RPG Bot!'));
+app.listen(process.env.PORT, () => console.log(`Example app listening on port ${process.env.PORT}!`));
+
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
@@ -62,7 +65,3 @@ const heartBeat = () => {
 };
 
 setInterval(heartBeat, 60000 * tickInMinutes);
-
-app.get('/', (req, res) => res.send('Idle-RPG Bot!'))
-
-app.listen(process.env.PORT, () => console.log(`Example app listening on port ${process.env.PORT}!`));
