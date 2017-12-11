@@ -87,6 +87,15 @@ class helper {
     }
   }
 
+  setPlayerEquipment(selectedPlayer, equipment, item) {
+    selectedPlayer.equipment[equipment].name = item.name;
+    selectedPlayer.equipment[equipment].str = item.stats.str;
+    selectedPlayer.equipment[equipment].dex = item.stats.dex;
+    selectedPlayer.equipment[equipment].end = item.stats.end;
+    selectedPlayer.equipment[equipment].int = item.stats.int;
+    return selectedPlayer;
+  }
+
   checkHealth(selectedPlayer, attackerObj, hook) {
     if (selectedPlayer.health <= 0) {
       selectedPlayer.health = 105;

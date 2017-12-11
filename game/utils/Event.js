@@ -37,11 +37,13 @@ class Event {
           if (playerChance >= otherPlayerChance) {
             helper.checkHealth(randomPlayer, selectedPlayer, discordHook);
             randomPlayer.health -= playerChance;
-            Database.savePlayer(randomPlayer.discordId, randomPlayer);
             // Add chance to steal players item (before check health or else he will always try to steal fists)
 
             helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just attacked \`${randomPlayer.name}\` in ${selectedPlayer.map.name} with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${playerChance} damage!`);
-            return selectedPlayer;
+            const { updatedPlayer, updatedRandomPlayer } = this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer);
+            Database.savePlayer(randomPlayer.discordId, updatedRandomPlayer);
+
+            return updatedPlayer;
           }
 
           selectedPlayer.health -= otherPlayerChance;
@@ -50,7 +52,11 @@ class Event {
 
           helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just attacked \`${randomPlayer.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in ${selectedPlayer.map.name} but failed!
             \`${randomPlayer.name}\`s \`${randomPlayer.equipment.weapon.name}\` dealt ${otherPlayerChance} damage!`);
-          return selectedPlayer;
+
+          const { updatedRandomPlayer, updatedPlayer } = this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer);
+
+          Database.savePlayer(randomPlayer.discordId, updatedRandomPlayer);
+          return updatedPlayer;
         }
         const luckItemDice = helper.randomInt(0, 100);
 
@@ -96,11 +102,7 @@ class Event {
 
           if (selectedPlayer.gold >= item.gold) {
             selectedPlayer.gold -= item.gold;
-            selectedPlayer.equipment.helmet.name = item.name;
-            selectedPlayer.equipment.helmet.str = item.stats.str;
-            selectedPlayer.equipment.helmet.dex = item.stats.dex;
-            selectedPlayer.equipment.helmet.end = item.stats.end;
-            selectedPlayer.equipment.helmet.int = item.stats.int;
+            helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
             helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
             return resolve(selectedPlayer);
           }
@@ -113,11 +115,7 @@ class Event {
 
           if (selectedPlayer.gold >= item.gold) {
             selectedPlayer.gold -= item.gold;
-            selectedPlayer.equipment.armor.name = item.name;
-            selectedPlayer.equipment.armor.str = item.stats.str;
-            selectedPlayer.equipment.armor.dex = item.stats.dex;
-            selectedPlayer.equipment.armor.end = item.stats.end;
-            selectedPlayer.equipment.armor.int = item.stats.int;
+            helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
             helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
             return resolve(selectedPlayer);
           }
@@ -130,11 +128,7 @@ class Event {
 
           if (selectedPlayer.gold >= item.gold) {
             selectedPlayer.gold -= item.gold;
-            selectedPlayer.equipment.weapon.name = item.name;
-            selectedPlayer.equipment.weapon.str = item.stats.str;
-            selectedPlayer.equipment.weapon.dex = item.stats.dex;
-            selectedPlayer.equipment.weapon.end = item.stats.end;
-            selectedPlayer.equipment.weapon.int = item.stats.int;
+            helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
             helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
             return resolve(selectedPlayer);
           }
@@ -157,6 +151,47 @@ class Event {
       case 3:
         return `\`${selectedPlayer.name}\` a bird just dropped \`${item.name}\` infront of him/her in ${selectedPlayer.map.name}!`;
     }
+  }
+
+  stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer) {
+    return new Promise((resolve) => {
+      const luckStealChance = helper.randomInt(0, 100);
+      if (luckStealChance > 50) {
+        const luckItem = helper.randomInt(0, 3);
+        switch (luckItem) {
+          case 0:
+            if (helper.calculateItemRating(selectedPlayer.equipment.helmet) < helper.calculateItemRating(randomPlayer.equipment.helmet)) {
+              selectedPlayer.equipment.helmet = randomPlayer.equipment.helmet;
+              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet}!\`\`\``);
+              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.equip);
+            }
+            break;
+          case 1:
+            if (helper.calculateItemRating(selectedPlayer.equipment.armor) < helper.calculateItemRating(randomPlayer.equipment.armor)) {
+              selectedPlayer.equipment.armor = randomPlayer.equipment.armor;
+              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.armor}!\`\`\``);
+              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.equip);
+            }
+            break;
+          case 2:
+            if (helper.calculateItemRating(selectedPlayer.equipment.weapon) < helper.calculateItemRating(randomPlayer.equipment.weapon)) {
+              selectedPlayer.equipment.weapon = randomPlayer.equipment.weapon;
+              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon}!\`\`\``);
+              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.equip);
+            }
+            break;
+          case 3:
+            if (helper.calculateItemRating(selectedPlayer.equipment.relic) < helper.calculateItemRating(randomPlayer.equipment.relic)) {
+              selectedPlayer.equipment.relic = randomPlayer.equipment.relic;
+              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.relic}!\`\`\``);
+              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.relic.position, enumHelper.equipment.empty.equip);
+            }
+            break;
+        }
+      }
+
+      return resolve({ selectedPlayer, randomPlayer });
+    });
   }
 
   // Luck Events
@@ -232,33 +267,22 @@ class Event {
               return resolve(selectedPlayer);
             }
 
-            selectedPlayer.equipment.helmet.name = item.name;
-            selectedPlayer.equipment.helmet.str = item.stats.str;
-            selectedPlayer.equipment.helmet.dex = item.stats.dex;
-            selectedPlayer.equipment.helmet.end = item.stats.end;
-            selectedPlayer.equipment.helmet.int = item.stats.int;
+            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
             break;
           case enumHelper.equipment.types.armor.position:
             if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
               return resolve(selectedPlayer);
             }
 
-            selectedPlayer.equipment.armor.name = item.name;
-            selectedPlayer.equipment.armor.str = item.stats.str;
-            selectedPlayer.equipment.armor.dex = item.stats.dex;
-            selectedPlayer.equipment.armor.end = item.stats.end;
-            selectedPlayer.equipment.armor.int = item.stats.int;
+
+            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
             break;
           case enumHelper.equipment.types.weapon.position:
             if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
               return resolve(selectedPlayer);
             }
 
-            selectedPlayer.equipment.weapon.name = item.name;
-            selectedPlayer.equipment.weapon.str = item.stats.str;
-            selectedPlayer.equipment.weapon.dex = item.stats.dex;
-            selectedPlayer.equipment.weapon.end = item.stats.end;
-            selectedPlayer.equipment.weapon.int = item.stats.int;
+            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
             break;
         }
 

@@ -71,7 +71,7 @@ class Game {
     const luckDice = helper.randomInt(0, 100);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(discordHook, twitchBot, selectedPlayer);
-    } else if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
+    } else if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {
       return Event.generateLuckItemEvent(discordHook, twitchBot, selectedPlayer);
     }
 
