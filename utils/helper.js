@@ -83,7 +83,7 @@ class helper {
       selectedPlayer.stats.dex++;
       selectedPlayer.stats.end++;
       selectedPlayer.stats.int++;
-      helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name} is now level ${selectedPlayer.level}!\``);
+      discordHook.send(`\`\`\`css\n${selectedPlayer.name} is now level ${selectedPlayer.level}!\n\`\`\``);
     }
   }
 
@@ -139,7 +139,7 @@ class helper {
         attackerObj.kills.player++;
         LocalDatabase.write(selectedPlayer);
       }
-      hook.send(`\`${selectedPlayer.name} died! Game over man... Game over.\``);
+      hook.send(`\`\`\`css\n${selectedPlayer.name} died! Game over man... Game over.\n\`\`\``);
     }
   }
 

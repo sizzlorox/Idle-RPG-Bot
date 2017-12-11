@@ -8,9 +8,12 @@ const Database = require('../../database/Database');
 
 class Event {
 
+  // Move Events
   moveEvent(selectedPlayer) {
-    selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
-    return selectedPlayer;
+    return new Promise((resolve) => {
+      selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
+      return resolve(selectedPlayer);
+    });
   }
 
   // Attack Events
@@ -54,84 +57,92 @@ class Event {
         if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
           return this.generateTownItemEvent(discordHook, twitchBot, selectedPlayer);
         }
+
+        return selectedPlayer;
       });
   }
 
   attackEventMob(discordHook, twitchBot, selectedPlayer) {
-    const mob = Monster.generateMonster(selectedPlayer);
-    const { playerChance, mobChance } = Battle.simulateBattleWithMob(selectedPlayer, mob);
+    return new Promise((resolve) => {
+      const mob = Monster.generateMonster(selectedPlayer);
+      const { playerChance, mobChance } = Battle.simulateBattleWithMob(selectedPlayer, mob);
 
-    if (playerChance >= mobChance) {
-      selectedPlayer.experience += mob.experience;
-      selectedPlayer.kills.mob++;
-      helper.checkExperience(selectedPlayer, discordHook);
+      if (playerChance >= mobChance) {
+        selectedPlayer.experience += mob.experience;
+        selectedPlayer.kills.mob++;
+        helper.checkExperience(selectedPlayer, discordHook);
 
-      helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` gaining ${mob.experience} exp and ${mob.gold} Gold!`);
-      return selectedPlayer;
-    }
+        helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience} exp and ${mob.gold} Gold!`);
+        return resolve(selectedPlayer);
+      }
 
-    selectedPlayer.health -= mobChance;
-    helper.checkHealth(selectedPlayer, mob, discordHook);
+      selectedPlayer.health -= mobChance;
+      helper.checkHealth(selectedPlayer, mob, discordHook);
 
-    helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost a battle to \`${mob.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
-    return selectedPlayer;
+      helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
+      return resolve(selectedPlayer);
+    });
   }
 
   // Item Events
   generateTownItemEvent(discordHook, twitchBot, selectedPlayer) {
-    const item = Item.generateItem(selectedPlayer);
-    switch (item.position) {
-      case enumHelper.equipment.types.helmet.position:
-        if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
-          return;
-        }
+    return new Promise((resolve) => {
+      const item = Item.generateItem(selectedPlayer);
+      switch (item.position) {
+        case enumHelper.equipment.types.helmet.position:
+          if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+            return resolve(selectedPlayer);
+          }
 
-        if (selectedPlayer.gold >= item.gold) {
-          selectedPlayer.gold -= item.gold;
-          selectedPlayer.equipment.helmet.name = item.name;
-          selectedPlayer.equipment.helmet.str = item.stats.str;
-          selectedPlayer.equipment.helmet.dex = item.stats.dex;
-          selectedPlayer.equipment.helmet.end = item.stats.end;
-          selectedPlayer.equipment.helmet.int = item.stats.int;
-          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
-          return selectedPlayer;
-        }
-        break;
+          if (selectedPlayer.gold >= item.gold) {
+            selectedPlayer.gold -= item.gold;
+            selectedPlayer.equipment.helmet.name = item.name;
+            selectedPlayer.equipment.helmet.str = item.stats.str;
+            selectedPlayer.equipment.helmet.dex = item.stats.dex;
+            selectedPlayer.equipment.helmet.end = item.stats.end;
+            selectedPlayer.equipment.helmet.int = item.stats.int;
+            helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+            return resolve(selectedPlayer);
+          }
+          break;
 
-      case enumHelper.equipment.types.armor.position:
-        if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
-          return;
-        }
+        case enumHelper.equipment.types.armor.position:
+          if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+            return resolve(selectedPlayer);
+          }
 
-        if (selectedPlayer.gold >= item.gold) {
-          selectedPlayer.gold -= item.gold;
-          selectedPlayer.equipment.armor.name = item.name;
-          selectedPlayer.equipment.armor.str = item.stats.str;
-          selectedPlayer.equipment.armor.dex = item.stats.dex;
-          selectedPlayer.equipment.armor.end = item.stats.end;
-          selectedPlayer.equipment.armor.int = item.stats.int;
-          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
-          return selectedPlayer;
-        }
-        break;
+          if (selectedPlayer.gold >= item.gold) {
+            selectedPlayer.gold -= item.gold;
+            selectedPlayer.equipment.armor.name = item.name;
+            selectedPlayer.equipment.armor.str = item.stats.str;
+            selectedPlayer.equipment.armor.dex = item.stats.dex;
+            selectedPlayer.equipment.armor.end = item.stats.end;
+            selectedPlayer.equipment.armor.int = item.stats.int;
+            helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+            return resolve(selectedPlayer);
+          }
+          break;
 
-      case enumHelper.equipment.types.weapon.position:
-        if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
-          return;
-        }
+        case enumHelper.equipment.types.weapon.position:
+          if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+            return resolve(selectedPlayer);
+          }
 
-        if (selectedPlayer.gold >= item.gold) {
-          selectedPlayer.gold -= item.gold;
-          selectedPlayer.equipment.weapon.name = item.name;
-          selectedPlayer.equipment.weapon.str = item.stats.str;
-          selectedPlayer.equipment.weapon.dex = item.stats.dex;
-          selectedPlayer.equipment.weapon.end = item.stats.end;
-          selectedPlayer.equipment.weapon.int = item.stats.int;
-          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
-          return selectedPlayer;
-        }
-        break;
-    }
+          if (selectedPlayer.gold >= item.gold) {
+            selectedPlayer.gold -= item.gold;
+            selectedPlayer.equipment.weapon.name = item.name;
+            selectedPlayer.equipment.weapon.str = item.stats.str;
+            selectedPlayer.equipment.weapon.dex = item.stats.dex;
+            selectedPlayer.equipment.weapon.end = item.stats.end;
+            selectedPlayer.equipment.weapon.int = item.stats.int;
+            helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just purchased \`${item.name}\` from Town for ${item.gold} Gold!`);
+            return resolve(selectedPlayer);
+          }
+          break;
+      }
+
+      return resolve(selectedPlayer);
+    });
   }
 
   generateItemEventMessage(selectedPlayer, item) {
@@ -150,106 +161,113 @@ class Event {
 
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
-    const luckEvent = helper.randomInt(0, 3);
-    switch (luckEvent) {
-      case 0:
-        const luckStat = helper.randomInt(0, 4);
-        const luckStatAmount = helper.randomInt(2, 10);
-        switch (luckStat) {
-          case 0:
-            stat = enumHelper.stats.str;
-            selectedPlayer.stats.str += luckStatAmount;
-            break;
-          case 1:
-            stat = enumHelper.stats.dex;
-            selectedPlayer.stats.dex += luckStatAmount;
-            break;
-          case 2:
-            stat = enumHelper.stats.end;
-            selectedPlayer.stats.end += luckStatAmount;
-            break;
-          case 4:
-            stat = enumHelper.stats.int;
-            selectedPlayer.stats.int += luckStatAmount;
-            break;
-        }
+    return new Promise((resolve) => {
+      const luckEvent = helper.randomInt(0, 3);
+      switch (luckEvent) {
+        case 0:
+          const luckStat = helper.randomInt(0, 4);
+          const luckStatAmount = helper.randomInt(2, 10);
+          let stat;
+          switch (luckStat) {
+            case 0:
+              stat = enumHelper.stats.str;
+              selectedPlayer.stats.str += luckStatAmount;
+              break;
+            case 1:
+              stat = enumHelper.stats.dex;
+              selectedPlayer.stats.dex += luckStatAmount;
+              break;
+            case 2:
+              stat = enumHelper.stats.end;
+              selectedPlayer.stats.end += luckStatAmount;
+              break;
+            case 4:
+              stat = enumHelper.stats.int;
+              selectedPlayer.stats.int += luckStatAmount;
+              break;
+          }
 
-        helper.sendMessage(discordHook, twitchBot, `Apollo has blessed \`${selectedPlayer.name}\` with his music raising his/her \`${stat}\` by ${luckStatAmount}!`);
-        return selectedPlayer;
+          helper.sendMessage(discordHook, twitchBot, `Apollo has blessed \`${selectedPlayer.name}\` with his music raising his/her \`${stat}\` by ${luckStatAmount}!`);
+          return resolve(selectedPlayer);
 
-      case 1:
-        const luckExpAmount = helper.randomInt(5, 15);
-        selectedPlayer.experience -= luckExpAmount;
-        if (selectedPlayer.experience < 0) {
-          selectedPlayer.experience = 0;
-        }
+        case 1:
+          const luckExpAmount = helper.randomInt(5, 15);
+          selectedPlayer.experience -= luckExpAmount;
+          if (selectedPlayer.experience < 0) {
+            selectedPlayer.experience = 0;
+          }
 
-        helper.sendMessage(discordHook, twitchBot, `Hades unleashed his wrath upon \`${selectedPlayer.name}\` making him/her lose ${luckExpAmount} experience!`);
-        return selectedPlayer;
+          helper.sendMessage(discordHook, twitchBot, `Hades unleashed his wrath upon \`${selectedPlayer.name}\` making him/her lose ${luckExpAmount} experience!`);
+          return resolve(selectedPlayer);
 
-      case 3:
-        const luckHealthAmount = helper.randomInt(5, 15);
-        selectedPlayer.health -= luckHealthAmount;
-        helper.checkHealth(selectedPlayer, discordHook);
-        helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost ${luckHealthAmount} health by tripping and hitting his/her head!`);
+        case 3:
+          const luckHealthAmount = helper.randomInt(5, 15);
+          selectedPlayer.health -= luckHealthAmount;
+          helper.checkHealth(selectedPlayer, discordHook);
+          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost ${luckHealthAmount} health by tripping and hitting his/her head!`);
 
-        return selectedPlayer;
-    }
+          return resolve(selectedPlayer);
+      }
+    });
   }
 
   generateGoldEvent(selectedPlayer) {
-    const luckGoldDice = helper.randomInt(0, 100);
-    const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed());
-    selectedPlayer.gold += goldAmount;
-    return selectedPlayer;
+    return new Promise((resolve) => {
+      const luckGoldDice = helper.randomInt(0, 100);
+      const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed());
+      selectedPlayer.gold += goldAmount;
+      return resolve(selectedPlayer);
+    });
   }
 
   generateLuckItemEvent(discordHook, twitchBot, selectedPlayer) {
-    const luckItemDice = helper.randomInt(0, 100);
+    return new Promise((resolve) => {
+      const luckItemDice = helper.randomInt(0, 100);
 
-    if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
-      const item = Item.generateItem(selectedPlayer);
-      switch (item.position) {
-        case enumHelper.equipment.types.helmet.position:
-          if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
-            return;
-          }
+      if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
+        const item = Item.generateItem(selectedPlayer);
+        switch (item.position) {
+          case enumHelper.equipment.types.helmet.position:
+            if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+              return resolve(selectedPlayer);
+            }
 
-          selectedPlayer.equipment.helmet.name = item.name;
-          selectedPlayer.equipment.helmet.str = item.stats.str;
-          selectedPlayer.equipment.helmet.dex = item.stats.dex;
-          selectedPlayer.equipment.helmet.end = item.stats.end;
-          selectedPlayer.equipment.helmet.int = item.stats.int;
-          break;
-        case enumHelper.equipment.types.armor.position:
-          if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
-            return;
-          }
+            selectedPlayer.equipment.helmet.name = item.name;
+            selectedPlayer.equipment.helmet.str = item.stats.str;
+            selectedPlayer.equipment.helmet.dex = item.stats.dex;
+            selectedPlayer.equipment.helmet.end = item.stats.end;
+            selectedPlayer.equipment.helmet.int = item.stats.int;
+            break;
+          case enumHelper.equipment.types.armor.position:
+            if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+              return resolve(selectedPlayer);
+            }
 
-          selectedPlayer.equipment.armor.name = item.name;
-          selectedPlayer.equipment.armor.str = item.stats.str;
-          selectedPlayer.equipment.armor.dex = item.stats.dex;
-          selectedPlayer.equipment.armor.end = item.stats.end;
-          selectedPlayer.equipment.armor.int = item.stats.int;
-          break;
-        case enumHelper.equipment.types.weapon.position:
-          if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
-            return;
-          }
+            selectedPlayer.equipment.armor.name = item.name;
+            selectedPlayer.equipment.armor.str = item.stats.str;
+            selectedPlayer.equipment.armor.dex = item.stats.dex;
+            selectedPlayer.equipment.armor.end = item.stats.end;
+            selectedPlayer.equipment.armor.int = item.stats.int;
+            break;
+          case enumHelper.equipment.types.weapon.position:
+            if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+              return resolve(selectedPlayer);
+            }
 
-          selectedPlayer.equipment.weapon.name = item.name;
-          selectedPlayer.equipment.weapon.str = item.stats.str;
-          selectedPlayer.equipment.weapon.dex = item.stats.dex;
-          selectedPlayer.equipment.weapon.end = item.stats.end;
-          selectedPlayer.equipment.weapon.int = item.stats.int;
-          break;
+            selectedPlayer.equipment.weapon.name = item.name;
+            selectedPlayer.equipment.weapon.str = item.stats.str;
+            selectedPlayer.equipment.weapon.dex = item.stats.dex;
+            selectedPlayer.equipment.weapon.end = item.stats.end;
+            selectedPlayer.equipment.weapon.int = item.stats.int;
+            break;
+        }
+
+        helper.sendMessage(discordHook, twitchBot, this.generateItemEventMessage(selectedPlayer, item));
+        return resolve(selectedPlayer);
       }
 
-      helper.sendMessage(discordHook, twitchBot, Event.generateItemEventMessage(selectedPlayer, item));
-      return selectedPlayer;
-    }
-
-    return selectedPlayer;
+      return resolve(selectedPlayer);
+    });
   }
 
 }

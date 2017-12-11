@@ -3,8 +3,11 @@ const fs = require('fs');
 const helper = require('../utils/helper');
 const { botOperator, rpgChannel } = require('../settings');
 const Game = require('../game/Game');
+const Space = require('./modules/Space');
+const Crypto = require('./modules/Crypto');
 const maps = require('../game/data/maps');
 const logger = require('../utils/logger');
+const moment = require('moment');
 
 const discordBot = new Discord.Client();
 const hook = new Discord.WebhookClient(
@@ -22,13 +25,80 @@ discordBot.on('ready', () => {
 });
 
 discordBot.on('message', (message) => {
+  const messageContent = message.content.toLocaleLowerCase();
+  if (messageContent.startsWith('!crypto')) {
+    let currency = 'BRL';
+    if (messageContent.includes(' ')) {
+      currency = messageContent.split(' ')[1];
+    }
+
+    Crypto.top5(currency)
+      .then((cyrptoInfo) => {
+        const codeBlock = '\`\`\`';
+        const currencyVar = `price_${currency.toLocaleLowerCase()}`;
+        let info = codeBlock;
+        cyrptoInfo.forEach((c) => {
+          info = info.concat(`${c.name} (${c.symbol})`);
+          info = info.concat(`\nRank: ${c.rank}`);
+          info = info.concat(`\nUSD: ${c.price_usd}`);
+          info = info.concat(`\n${currency.toUpperCase()}: ${c[currencyVar]}`);
+          info = info.concat(`\nPercent Change 1h: ${c.percent_change_1h}%`);
+          info = info.concat(`\nPercent Change 24h: ${c.percent_change_24h}%`);
+          info = info.concat(`\nPercent Change 7d: ${c.percent_change_7d}%\n\n`);
+        });
+        info = info.concat(codeBlock);
+        message.reply(info);
+      });
+  }
+
+  if (messageContent === '!nextlaunch') {
+    Space.nextLaunch()
+      .then((spaceInfo) => {
+        const nextLaunch = spaceInfo.launches[0];
+        const codeBlock = '\`\`\`';
+        let info = codeBlock;
+        info = info.concat(`${nextLaunch.provider}s ${nextLaunch.vehicle}`);
+        info = info.concat(`\nPayLoad: ${nextLaunch.payload}`);
+        info = info.concat(`\nLocation: ${nextLaunch.location}`);
+        info = info.concat(`\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`);
+        info = info.concat(`\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`);
+        info = info.concat(`\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`);
+        info = info.concat(codeBlock);
+        message.reply(info);
+      });
+  }
+
+  if (messageContent === '!nextstreamlaunch') {
+    Space.nextLaunch()
+      .then((spaceInfo) => {
+        let nextLaunch;
+        for (let i = 0; i < spaceInfo.launches.length; i++) {
+          if (spaceInfo.launches[i].hasStream) {
+            nextLaunch = spaceInfo.launches[i];
+            break;
+          }
+        }
+
+        const codeBlock = '\`\`\`';
+        let info = codeBlock;
+        info = info.concat(`${nextLaunch.provider}s ${nextLaunch.vehicle}`);
+        info = info.concat(`\nPayLoad: ${nextLaunch.payload}`);
+        info = info.concat(`\nLocation: ${nextLaunch.location}`);
+        info = info.concat(`\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`);
+        info = info.concat(`\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`);
+        info = info.concat(`\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`);
+        info = info.concat(codeBlock);
+        message.reply(info);
+      });
+  }
+
   if (message.channel.id !== rpgChannel) {
     return;
   }
 
   //BOT OPERATOR COMMANDS
   if (message.author.id === botOperator) {
-    if (message.content === '!submode') {
+    if (messageContent === '!submode') {
       /*
       Under development, trying to get a list of subscribers
       const onlineUsers = discordBot.users.filter(player => player.presence.status === 'online' && !player.bot);
@@ -36,7 +106,7 @@ discordBot.on('message', (message) => {
       */
     }
 
-    if (message.content === '!resetAll') {
+    if (messageContent === '!resetAll') {
       Game.deleteAllPlayers()
         .then(() => {
           message.author('Done.');
@@ -44,7 +114,7 @@ discordBot.on('message', (message) => {
     }
   }
 
-  if (message.content === '!help') {
+  if (messageContent === '!help') {
     const helpMsg = `\`\`\`
     !me - Sends a PM with your characters stats.
     !onlineUsers - Displays users that are currently in idle-rpg.
@@ -53,12 +123,12 @@ discordBot.on('message', (message) => {
     message.author.send(helpMsg);
   }
 
-  if (message.content === '!map') {
+  if (messageContent === '!map') {
     const map = maps.map(area => `\n  ${area.name}(${area.type})`);
     message.author.send(`\`\`\`Map of Idle-RPG:${map}\`\`\``);
   }
 
-  if (message.content === '!me') {
+  if (messageContent === '!me') {
     Game.playerStats(message.author)
       .then((playerStats) => {
         if (!playerStats) {
@@ -70,25 +140,26 @@ discordBot.on('message', (message) => {
       });
   }
 
-  if (message.content.startsWith('!check ')) {
-    const checkPlayer = message.content.split(' ');
-    const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
-    if (playerObj.size === 0) {
-      message.author.send(`${checkPlayer[1]} was not found!`);
-      return;
+  if (messageContent.startsWith('!check ')) {
+    if (messageContent.includes(' ')) {
+      const checkPlayer = messageContent.split(' ');
+      const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
+      if (playerObj.size === 0) {
+        message.author.send(`${checkPlayer[1]} was not found!`);
+        return;
+      }
+
+      Game.playerStats(playerObj.array()[0])
+        .then((playerStats) => {
+          if (!playerStats) {
+            return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+          }
+
+          const stats = helper.generateStatsString(playerStats);
+          message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
+        });
     }
-
-    Game.playerStats(playerObj.array()[0])
-      .then((playerStats) => {
-        if (!playerStats) {
-          return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-        }
-
-        const stats = helper.generateStatsString(playerStats);
-        message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
-      });
   }
-
 });
 
 discordBot.on('guildMemberAdd', (member) => {

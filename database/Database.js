@@ -69,6 +69,10 @@ class Database {
   }
 
   savePlayer(player) {
+    if (!player) {
+      return;
+    }
+
     connect();
     return new Promise((resolve, reject) => {
       return Player.findOneAndUpdate({ discordId: player.discordId }, player, (err, result) => {
@@ -84,6 +88,10 @@ class Database {
   }
 
   getSameMapPlayers(map) {
+    if (!map) {
+      return;
+    }
+
     connect();
     return new Promise((resolve, reject) => {
       return Player.find({ map: { name: map.name } }, (err, result) => {

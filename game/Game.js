@@ -3,6 +3,7 @@ const enumHelper = require('../utils/enumHelper');
 const Database = require('../database/Database');
 const Event = require('./utils/Event');
 const moment = require('moment');
+const logger = require('../utils/logger');
 
 class Game {
 
@@ -18,8 +19,6 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
-        let updatedPlayer;
-
         selectedPlayer.events++;
         helper.passiveHeal(selectedPlayer);
         console.log(`\nGAME: Random Event ID: ${randomEvent} ${moment().utc('br')}`);
@@ -27,26 +26,26 @@ class Game {
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
-            updatedPlayer = this.moveEvent(selectedPlayer);
-            Database.savePlayer(updatedPlayer);
+            this.moveEvent(selectedPlayer)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
             break;
           case 1:
             console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
-            updatedPlayer = this.attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot);
-            Database.savePlayer(updatedPlayer);
+            this.attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
             break;
           case 2:
             console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
-            updatedPlayer = this.luckEvent(selectedPlayer, discordHook, twitchBot);
-            Database.savePlayer(updatedPlayer);
+            this.luckEvent(selectedPlayer, discordHook, twitchBot)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
             break;
         }
 
         if (selectedPlayer.events % 100 === 0) {
-          helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!\``);
+          helper.sendMessage(discordHook, twitchBot, `\`\`\`css\n${selectedPlayer.name} has encountered ${selectedPlayer.events} events!\`\`\``);
         }
       })
-      .catch(err => console.log(err));
+      .catch(err => logger.error(err));
   }
 
   moveEvent(selectedPlayer) {
@@ -59,10 +58,10 @@ class Game {
       return Event.generateTownItemEvent(discordHook, twitchBot, selectedPlayer);
     }
 
-    if (luckDice >= 75 - (selectedPlayer.stats.luk / 2)) {
-      if (selectedPlayer.map.type !== enumHelper.map.types.town) {
-        return Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
-      }
+    console.log(`GAME: Attack Luck Dice: ${luckDice}`);
+
+    if (luckDice >= 75 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.type !== enumHelper.map.types.town) {
+      return Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
     }
 
     return Event.attackEventMob(discordHook, twitchBot, selectedPlayer);
