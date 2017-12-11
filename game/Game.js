@@ -83,6 +83,10 @@ class Game {
     return Database.loadPlayer(commandAuthor.id);
   }
 
+  getOnlinePlayerMaps(onlinePlayers) {
+    return Database.loadOnlinePlayerMaps(onlinePlayers);
+  }
+
   deleteAllPlayers() {
     return Database.deleteAllPlayers();
   }

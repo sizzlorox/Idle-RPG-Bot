@@ -53,6 +53,28 @@ class Database {
     });
   }
 
+  loadOnlinePlayerMaps(discordIds) {
+    connect();
+    return new Promise((resolve, reject) => {
+      return Player.find({}, (err, result) => {
+        if (err) {
+          disconnect();
+          return reject(err);
+        }
+        console.log('DATABASE: Multiple IDs has been loaded from the Database.');
+        disconnect();
+        return resolve(result);
+      })
+        .where('discordId')
+        .select({
+          discordId: 1,
+          name: 1,
+          map: 1
+        })
+        .in(discordIds);
+    });
+  }
+
   loadPlayer(discordId) {
     connect();
     return new Promise((resolve, reject) => {

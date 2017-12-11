@@ -123,11 +123,6 @@ discordBot.on('message', (message) => {
     message.author.send(helpMsg);
   }
 
-  if (messageContent === '!map') {
-    const map = maps.map(area => `\n  ${area.name}(${area.type})`);
-    message.author.send(`\`\`\`Map of Idle-RPG:${map}\`\`\``);
-  }
-
   if (messageContent === '!me') {
     Game.playerStats(message.author)
       .then((playerStats) => {
@@ -137,6 +132,32 @@ discordBot.on('message', (message) => {
 
         const stats = helper.generateStatsString(playerStats);
         message.author.send(stats);
+      });
+  }
+
+  if (messageContent.startsWith('!map')) {
+    const discordOnlinePlayers = discordBot.users
+      .filter(player => player.presence.status === 'online' && !player.bot
+        || player.presence.status === 'idle' && !player.bot)
+      .map((player) => {
+        return player.id;
+      });
+
+    Game.getOnlinePlayerMaps(discordOnlinePlayers)
+      .then((players) => {
+        let mapInfo = '';
+        players.forEach((player) => {
+          maps.forEach((map) => {
+            mapInfo = mapInfo.concat(`\n${map.name} (`);
+            if (player.map.name === map.name) {
+              mapInfo = mapInfo.concat(`${player.name}, `);
+            }
+            mapInfo = mapInfo.replace(/,\s*$/, '');
+            mapInfo = mapInfo.concat(')');
+          });
+        });
+
+        message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
       });
   }
 
