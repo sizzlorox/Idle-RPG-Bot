@@ -114,12 +114,19 @@ discordBot.on('message', (message) => {
     }
   }
 
+  if (messageContent.includes('(╯°□°）╯︵ ┻━┻')) {
+    message.reply('┬─┬ノ(ಠ_ಠノ)');
+  }
+
   if (messageContent === '!help') {
     const helpMsg = `\`\`\`
     !me - Sends a PM with your characters stats.
     !onlineUsers - Displays users that are currently in idle-rpg.
     !check <Player Name> - Sends a PM with the players stats. (without < > and case-senstive).
-    !map - Displays the worlds locations.\`\`\``;
+    !map - Displays the worlds locations.
+    !crypto - Displays some crypto currencies info.
+    !nextlaunch - Displays next rocket launch info.
+    !nextstreamlaunch - Displayes next rocket launch that will have a stream.\`\`\``;
     message.author.send(helpMsg);
   }
 

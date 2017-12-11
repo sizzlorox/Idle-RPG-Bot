@@ -43,8 +43,8 @@ const heartBeat = () => {
   onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
     .filter((player, index, array) =>
       index === array.findIndex(p => (
-        p.discordId === player.discordId && !discordOfflinePlayers.includes(p.discordId)
-      )));
+        p.discordId === player.discordId
+      ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
 
   const minTimer = 120000 + (60000 * ((onlinePlayerList.length + 1) / 4));
   const maxTimer = 300000 + (60000 * ((onlinePlayerList.length + 1) / 4));
