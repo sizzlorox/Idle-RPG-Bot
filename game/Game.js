@@ -61,7 +61,10 @@ class Game {
     console.log(`GAME: Attack Luck Dice: ${luckDice}`);
 
     if (luckDice >= 75 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.type !== enumHelper.map.types.town) {
-      return Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
+      const updatedPlayer = Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
+      if (updatedPlayer !== selectedPlayer) {
+        return updatedPlayer;
+      }
     }
 
     return Event.attackEventMob(discordHook, twitchBot, selectedPlayer);

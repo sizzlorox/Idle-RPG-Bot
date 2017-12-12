@@ -77,6 +77,7 @@ class Event {
         helper.checkExperience(selectedPlayer, discordHook);
 
         helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience} exp and ${mob.gold} Gold!`);
+        selectedPlayer = this.generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob);
         return resolve(selectedPlayer);
       }
 
@@ -86,6 +87,45 @@ class Event {
       helper.checkHealth(selectedPlayer, mob, discordHook);
 
       helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
+      return resolve(selectedPlayer);
+    });
+  }
+
+  generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob) {
+    return new Promise((resolve) => {
+      const dropitemChance = helper.randomInt(0, 100);
+
+      if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
+        const item = Item.generateItem(selectedPlayer);
+        switch (item.position) {
+          case enumHelper.equipment.types.helmet.position:
+            if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+              return resolve(selectedPlayer);
+            }
+
+            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
+            break;
+          case enumHelper.equipment.types.armor.position:
+            if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+              return resolve(selectedPlayer);
+            }
+
+
+            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
+            break;
+          case enumHelper.equipment.types.weapon.position:
+            if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+              return resolve(selectedPlayer);
+            }
+
+            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
+            break;
+        }
+
+        helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name} dropped a ${item.name} from ${mob.name}!`);
+        return resolve(selectedPlayer);
+      }
+
       return resolve(selectedPlayer);
     });
   }

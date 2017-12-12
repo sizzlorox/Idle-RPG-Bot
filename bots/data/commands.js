@@ -25,6 +25,34 @@ const commands = [
     }
   },
 
+  check = {
+    command: '!check',
+    operatorOnly: false,
+    channelOnlyId: rpgChannel,
+    function: (message, discordBot) => {
+      if (!message.content.includes(' ')) {
+        return;
+      }
+
+      const checkPlayer = message.content.split(' ');
+      const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
+      if (playerObj.size === 0) {
+        message.author.send(`${checkPlayer[1]} was not found!`);
+        return;
+      }
+
+      Game.playerStats(playerObj.array()[0])
+        .then((playerStats) => {
+          if (!playerStats) {
+            return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+          }
+
+          const stats = helper.generateStatsString(playerStats);
+          message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
+        });
+    }
+  },
+
   me = {
     command: '!me',
     operatorOnly: false,

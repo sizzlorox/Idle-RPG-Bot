@@ -17,6 +17,7 @@
     "express": "^4.16.2",
     "moment": "^2.19.3",
     "mongoose": "^4.13.5",
+    "querystring": "^0.2.0",
     "twitch-bot": "^1.0.8",
     "winston": "^3.0.0-rc1"
   },

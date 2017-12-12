@@ -15,14 +15,17 @@ class Requester {
         });
 
         res.on('end', () => {
-          const resObj = JSON.parse(output);
-          return resolve(resObj);
+          return resolve(JSON.parse(output));
         });
       });
 
       req.on('error', (err) => {
-        reject(err);
+        return reject(err);
       });
+
+      if (options.json) {
+        req.write(options.json);
+      }
 
       req.end();
     });
