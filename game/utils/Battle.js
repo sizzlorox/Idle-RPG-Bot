@@ -13,7 +13,6 @@ class Battle {
 
     const playerChance = Math.abs(Math.ceil((playerDamage + playerEvasive) - (mobDefense + mobEvasive)));
     const mobChance = Math.abs(Math.ceil((mobDamage + mobEvasive) - (playerDefense + playerEvasive)));
-    console.log(`PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
 
     return { playerChance, mobChance };
   }

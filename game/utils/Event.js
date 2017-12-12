@@ -37,7 +37,6 @@ class Event {
           if (playerChance >= otherPlayerChance) {
             helper.checkHealth(randomPlayer, selectedPlayer, discordHook);
             randomPlayer.health -= playerChance;
-            // Add chance to steal players item (before check health or else he will always try to steal fists)
 
             helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just attacked \`${randomPlayer.name}\` in ${selectedPlayer.map.name} with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${playerChance} damage!`);
             const { updatedPlayer, updatedRandomPlayer } = this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer);
@@ -48,7 +47,6 @@ class Event {
 
           selectedPlayer.health -= otherPlayerChance;
           helper.checkHealth(selectedPlayer, randomPlayer, discordHook);
-          // Add chance to steal players item (before check health or else he will always try to steal fists)
 
           helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just attacked \`${randomPlayer.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in ${selectedPlayer.map.name} but failed!
             \`${randomPlayer.name}\`s \`${randomPlayer.equipment.weapon.name}\` dealt ${otherPlayerChance} damage!`);
@@ -81,6 +79,8 @@ class Event {
         helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience} exp and ${mob.gold} Gold!`);
         return resolve(selectedPlayer);
       }
+
+      console.log(`GAME: PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
 
       selectedPlayer.health -= mobChance;
       helper.checkHealth(selectedPlayer, mob, discordHook);
@@ -162,28 +162,32 @@ class Event {
           case 0:
             if (helper.calculateItemRating(selectedPlayer.equipment.helmet) < helper.calculateItemRating(randomPlayer.equipment.helmet)) {
               selectedPlayer.equipment.helmet = randomPlayer.equipment.helmet;
-              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet}!\`\`\``);
+              selectedPlayer.equipment.helmet.name = `${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}`;
+              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}!\`\`\``);
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.equip);
             }
             break;
           case 1:
             if (helper.calculateItemRating(selectedPlayer.equipment.armor) < helper.calculateItemRating(randomPlayer.equipment.armor)) {
               selectedPlayer.equipment.armor = randomPlayer.equipment.armor;
-              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.armor}!\`\`\``);
+              selectedPlayer.equipment.armor.name = `${randomPlayer.name}s ${randomPlayer.equipment.armor.name}`;
+              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.armor.name}!\`\`\``);
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.equip);
             }
             break;
           case 2:
             if (helper.calculateItemRating(selectedPlayer.equipment.weapon) < helper.calculateItemRating(randomPlayer.equipment.weapon)) {
               selectedPlayer.equipment.weapon = randomPlayer.equipment.weapon;
-              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon}!\`\`\``);
+              selectedPlayer.equipment.weapon.name = `${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}`;
+              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}!\`\`\``);
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.equip);
             }
             break;
           case 3:
             if (helper.calculateItemRating(selectedPlayer.equipment.relic) < helper.calculateItemRating(randomPlayer.equipment.relic)) {
               selectedPlayer.equipment.relic = randomPlayer.equipment.relic;
-              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.relic}!\`\`\``);
+              selectedPlayer.equipment.relic.name = `${randomPlayer.name}s ${randomPlayer.equipment.relic.name}`;
+              discordHook.send(`\`\`\`css\n${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.relic.name}!\`\`\``);
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.relic.position, enumHelper.equipment.empty.equip);
             }
             break;
