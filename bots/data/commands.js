@@ -85,15 +85,15 @@ const commands = [
       Game.getOnlinePlayerMaps(discordOnlinePlayers)
         .then((players) => {
           let mapInfo = '';
-          players.forEach((player) => {
-            maps.forEach((map) => {
-              mapInfo = mapInfo.concat(`\n${map.name} (`);
+          maps.forEach((map) => {
+            mapInfo = mapInfo.concat(`\n${map.name} (`);
+            players.forEach((player) => {
               if (player.map.name === map.name) {
                 mapInfo = mapInfo.concat(`${player.name}, `);
               }
-              mapInfo = mapInfo.replace(/,\s*$/, '');
-              mapInfo = mapInfo.concat(')');
             });
+            mapInfo = mapInfo.replace(/,\s*$/, '');
+            mapInfo = mapInfo.concat(')');
           });
 
           message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);

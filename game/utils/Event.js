@@ -122,7 +122,7 @@ class Event {
             break;
         }
 
-        helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name} dropped a ${item.name} from ${mob.name}!`);
+        helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` dropped a \`${item.name}\` from \`${mob.name}!\``);
         return resolve(selectedPlayer);
       }
 
