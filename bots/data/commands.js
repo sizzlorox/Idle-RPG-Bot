@@ -113,6 +113,23 @@ const commands = [
     }
   },
 
+  forceAttack = {
+    command: '!forceattack',
+    operatorOnly: true,
+    channelOnlyId: rpgChannel,
+    function: (message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const attackPlayer = message.content.split(' ')[1];
+        const otherAttackPlayer = message.content.split(' ')[2];
+        if (!otherAttackPlayer) {
+          return Game.forcePvp(discordBot, discordHook, message.author, attackPlayer);
+        }
+
+        return Game.forcePvp(discordBot, discordHook, message.author, attackPlayer, otherAttackPlayer);
+      }
+    }
+  },
+
   // MODULE COMMANDS
   nextLaunch = {
     command: '!nextlaunch',

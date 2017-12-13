@@ -12,6 +12,10 @@ class helper {
     // twitchBot.say(msg.replace('/\\*/g', ''));
   }
 
+  setImportantMessage(message) {
+    return `\`\`\`css\n${message}\`\`\``;
+  }
+
   passiveHeal(player) {
     if (player.health <= 100 + (player.level * 5)) {
       player.health += 5;
@@ -83,7 +87,7 @@ class helper {
       selectedPlayer.stats.dex++;
       selectedPlayer.stats.end++;
       selectedPlayer.stats.int++;
-      discordHook.send(`\`\`\`css\n${selectedPlayer.name} is now level ${selectedPlayer.level}!\n\`\`\``);
+      discordHook.send(this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`));
     }
   }
 
@@ -148,7 +152,7 @@ class helper {
         attackerObj.kills.player++;
         LocalDatabase.write(selectedPlayer);
       }
-      hook.send(`\`\`\`css\n${selectedPlayer.name} died! Game over man... Game over.\n\`\`\``);
+      hook.send(helper.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`));
     }
   }
 

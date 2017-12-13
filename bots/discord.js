@@ -23,7 +23,7 @@ discordBot.on('message', (message) => {
     message.reply('┬─┬ノ(ಠ_ಠノ)');
   }
 
-  CommandParser.parseUserCommand(discordBot, message);
+  CommandParser.parseUserCommand(discordBot, hook, message);
 });
 
 discordBot.on('guildMemberAdd', (member) => {

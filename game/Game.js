@@ -42,7 +42,7 @@ class Game {
         }
 
         if (selectedPlayer.events % 100 === 0) {
-          helper.sendMessage(discordHook, twitchBot, `\`\`\`css\n${selectedPlayer.name} has encountered ${selectedPlayer.events} events!\`\`\``);
+          helper.sendMessage(discordHook, twitchBot, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
         }
       })
       .catch(err => logger.error(err));
@@ -60,7 +60,7 @@ class Game {
 
     console.log(`GAME: Attack Luck Dice: ${luckDice}`);
 
-    if (luckDice >= 75 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.type !== enumHelper.map.types.town) {
+    if (luckDice >= 50 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.type !== enumHelper.map.types.town) {
       const updatedPlayer = Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
       if (updatedPlayer !== selectedPlayer) {
         return updatedPlayer;
@@ -84,6 +84,48 @@ class Game {
   // Commands
   playerStats(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
+  }
+
+  forcePvp(discordBot, discordHook, commandAuthor, playerToAttack, otherPlayerToAttack) {
+    if (!otherPlayerToAttack) {
+      return Database.loadPlayer(commandAuthor.id)
+        .then((selectedPlayer) => {
+          const playerToAttackObj = discordBot.users.filter(player => player.username === playerToAttack && !player.bot);
+          if (playerToAttackObj.size === 0) {
+            commandAuthor.send(`${playerToAttack} was not found!`);
+            return;
+          }
+
+          this.playerStats(playerToAttackObj.array()[0])
+            .then((playerToAttackStats) => {
+              if (!playerToAttackStats) {
+                return commandAuthor.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+              }
+
+              const updatedPlayer = Event.attackForcePvPAttack(discordHook, 'twitchBot', selectedPlayer, playerToAttackStats);
+              Database.savePlayer(updatedPlayer);
+            });
+        });
+    }
+    const playerToAttackObj = discordBot.users.filter(player => player.username === playerToAttack && !player.bot);
+    const otherPlayerToAttackObj = discordBot.users.filter(player => player.username === otherPlayerToAttack && !player.bot);
+
+    return this.playerStats(playerToAttackObj.array()[0])
+      .then((playerToAttackStats) => {
+        if (!playerToAttackStats) {
+          return commandAuthor.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+        }
+
+        this.playerStats(otherPlayerToAttackObj.array()[0])
+          .then((otherPlayerToAttackStats) => {
+            if (!otherPlayerToAttackStats) {
+              return commandAuthor.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+            }
+
+            const updatedPlayer = Event.attackForcePvPAttack(discordHook, 'twitchBot', playerToAttackStats, otherPlayerToAttackStats);
+            Database.savePlayer(updatedPlayer);
+          });
+      });
   }
 
   getOnlinePlayerMaps(onlinePlayers) {

@@ -6,7 +6,7 @@ const commandRegex = new RegExp(commandList);
 
 class CommandParser {
 
-  parseUserCommand(discordBot, messageObj) {
+  parseUserCommand(discordBot, hook, messageObj) {
     const messageContent = messageObj.content;
     const command = messageContent.includes(' ') ? messageContent.split(' ')[0].toLowerCase() : messageContent.toLowerCase();
     const authorId = messageObj.author.id;
@@ -15,14 +15,14 @@ class CommandParser {
     if (commandRegex.test(command)) {
       const commandObj = commands.filter(c => c.command === command)[0];
       if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId) {
-        return;
+        return messageObj.reply('This is a RPG channel only command.');
       }
 
       if (commandObj.operatorOnly && authorId !== botOperator) {
-        return;
+        return messageObj.reply('This is a bot operator only command.');
       }
 
-      commandObj.function(messageObj, discordBot);
+      commandObj.function(messageObj, discordBot, hook);
     }
   }
 
