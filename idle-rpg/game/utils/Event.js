@@ -107,8 +107,11 @@ class Event {
       const mob = Monster.generateMonster(selectedPlayer);
       const { playerChance, mobChance } = Battle.simulateBattleWithMob(selectedPlayer, mob);
 
+      console.log(`GAME: PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
+
       if (playerChance >= mobChance) {
         selectedPlayer.experience += mob.experience;
+        selectedPlayer.gold += mob.gold;
         selectedPlayer.kills.mob++;
         helper.checkExperience(selectedPlayer, discordHook);
 
@@ -117,9 +120,11 @@ class Event {
         return resolve(selectedPlayer);
       }
 
-      console.log(`GAME: PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
-
       selectedPlayer.health -= mobChance;
+      selectedPlayer.gold -= mob.gold;
+      if (selectedPlayer.gold <= 0) {
+        selectedPlayer.gold = 0;
+      }
       helper.checkHealth(selectedPlayer, mob, discordHook);
 
       helper.sendMessage(discordHook, twitchBot, `\`${selectedPlayer.name}\` just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
