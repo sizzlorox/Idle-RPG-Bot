@@ -66,7 +66,7 @@ const newPlayerObj = (discordId, name) => {
 };
 
 const playerSchema = mongoose.Schema({
-  discordId: Number,
+  discordId: String,
   name: String,
   health: Number,
   experience: Number,

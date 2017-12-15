@@ -5,8 +5,9 @@ class Monster {
   generateMonster(selectedPlayer) {
     const randomRarityChance = Math.ceil(helper.randomInt(0, 100));
     const randomTypeChance = Math.ceil(helper.randomInt(0, 100));
+    const randomMonsterType = randomTypeChance + randomRarityChance > 100 ? 100 : randomTypeChance + randomRarityChance;
     const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
-    const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomTypeChance);
+    const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType);
 
     const randomRarityIndex = helper.randomInt(0, monsterRarityList.length - 1);
     const randomTypeIndex = helper.randomInt(0, monsterTypeList.length - 1);

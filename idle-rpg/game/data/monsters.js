@@ -20,7 +20,7 @@ const monsters = {
       },
       experience: 2,
       gold: 2,
-      rarity: 75
+      rarity: 50
     },
     elite = {
       name: 'Elite',
@@ -31,7 +31,7 @@ const monsters = {
       },
       experience: 3,
       gold: 3,
-      rarity: 50
+      rarity: 30
     },
     champion = {
       name: 'Champion',
@@ -42,7 +42,7 @@ const monsters = {
       },
       experience: 4,
       gold: 4,
-      rarity: 35
+      rarity: 15
     },
     legendary = {
       name: 'Legendary',
@@ -53,7 +53,7 @@ const monsters = {
       },
       experience: 5,
       gold: 5,
-      rarity: 15
+      rarity: 5
     },
     omega = {
       name: 'Omega',
@@ -64,7 +64,7 @@ const monsters = {
       },
       experience: 6,
       gold: 6,
-      rarity: 5
+      rarity: 2
     }
   ],
 
@@ -166,7 +166,7 @@ const monsters = {
       },
       experience: 20,
       gold: 8,
-      rarity: 30
+      rarity: 20
     },
     elf = {
       name: 'Elf',
@@ -177,7 +177,7 @@ const monsters = {
       },
       experience: 20,
       gold: 9,
-      rarity: 45
+      rarity: 15
     }
   ]
 };

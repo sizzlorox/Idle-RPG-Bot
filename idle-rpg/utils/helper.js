@@ -87,7 +87,7 @@ class helper {
       selectedPlayer.stats.dex++;
       selectedPlayer.stats.end++;
       selectedPlayer.stats.int++;
-      discordHook.send(this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`));
+      discordHook.send(this.setImportantMessage(`<@!${selectedPlayer.discordId}> is now level ${selectedPlayer.level}!`));
     }
   }
 
@@ -191,7 +191,7 @@ class helper {
         attackerObj.kills.player++;
         LocalDatabase.write(selectedPlayer);
       }
-      hook.send(this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`));
+      hook.send(this.setImportantMessage(`<@!${selectedPlayer.discordId}> died! Game over man... Game over.`));
     }
   }
 

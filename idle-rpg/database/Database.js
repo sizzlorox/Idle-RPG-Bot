@@ -109,14 +109,14 @@ class Database {
     });
   }
 
-  getSameMapPlayers(map) {
-    if (!map) {
+  getSameMapPlayers(playerMap) {
+    if (!playerMap) {
       return;
     }
 
     connect();
     return new Promise((resolve, reject) => {
-      return Player.find({ map: { name: map.name } }, (err, result) => {
+      return Player.find({ 'map.name': playerMap }, (err, result) => {
         if (err) {
           disconnect();
           return reject(err);

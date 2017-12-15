@@ -54,15 +54,14 @@ class Game {
 
   attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot) {
     const luckDice = helper.randomInt(0, 100);
-    if (selectedPlayer.map.type === enumHelper.map.types.town && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
+    if (selectedPlayer.map.name === 'Kindale' && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(discordHook, twitchBot, selectedPlayer);
     }
 
     console.log(`GAME: Attack Luck Dice: ${luckDice}`);
 
-    if (luckDice >= 50 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.type !== enumHelper.map.types.town) {
-      const updatedPlayer = Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
-      return updatedPlayer;
+    if (luckDice >= 75 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.name !== 'Kindale') {
+      return Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
     }
 
     return Event.attackEventMob(discordHook, twitchBot, selectedPlayer);

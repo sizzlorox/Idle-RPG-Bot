@@ -184,8 +184,8 @@ const commands = [
     operatorOnly: false,
     function: (message) => {
       let currency = 'BRL';
-      if (messageContent.includes(' ')) {
-        currency = messageContent.split(' ')[1];
+      if (message.content.includes(' ')) {
+        currency = message.content.split(' ')[1];
       }
 
       Crypto.top5(currency)
