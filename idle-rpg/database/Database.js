@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { playerSchema, newPlayerObj } = require('./schemas/player');
-const { mongoDBUri } = require('../settings');
+const { mongoDBUri } = require('../../settings');
 
 const Player = mongoose.model('Player', playerSchema);
 

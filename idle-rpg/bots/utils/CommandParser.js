@@ -1,5 +1,5 @@
 const commands = require('../data/commands');
-const { botOperator } = require('../../settings');
+const { botOperator } = require('../../../settings');
 
 const commandList = commands.map(c => c.command).join('|');
 const commandRegex = new RegExp(commandList);
@@ -14,6 +14,10 @@ class CommandParser {
 
     if (commandRegex.test(command)) {
       const commandObj = commands.filter(c => c.command === command)[0];
+      if (!commandObj) {
+        return;
+      }
+
       if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId) {
         return messageObj.reply('This is a RPG channel only command.');
       }

@@ -9,9 +9,11 @@ const Database = require('../../database/Database');
 class Event {
 
   // Move Events
-  moveEvent(selectedPlayer) {
+  moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
       selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
+      helper.sendMessage(discordHook, 'twitch', `\`${selectedPlayer.name}\` just arrived in \`${selectedPlayer.map.name}.\``);
+
       return resolve(selectedPlayer);
     });
   }
@@ -95,13 +97,8 @@ class Event {
               return battleResults.selectedPlayer;
             });
         }
-        const luckItemDice = helper.randomInt(0, 100);
 
-        if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
-          return this.generateTownItemEvent(discordHook, twitchBot, selectedPlayer);
-        }
-
-        return selectedPlayer;
+        return this.attackEventMob(discordHook, twitchBot, selectedPlayer);
       });
   }
 

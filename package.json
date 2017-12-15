@@ -2,10 +2,10 @@
   "name": "idle-rpg-bot",
   "version": "0.0.1",
   "description": "An Idle-RPG Bot for Discord, Maybe twitch aswell in the future.",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
-    "start-local": "DATABASE=local node index.js",
+    "start": "node app.js",
+    "start-local": "DATABASE=local node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sunny Huang",
@@ -15,6 +15,7 @@
     "discord.js": "^11.2.1",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
+    "jade": "^1.11.0",
     "moment": "^2.19.3",
     "mongoose": "^4.13.5",
     "querystring": "^0.2.0",

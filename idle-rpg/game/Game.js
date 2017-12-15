@@ -26,7 +26,7 @@ class Game {
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
-            this.moveEvent(selectedPlayer)
+            this.moveEvent(selectedPlayer, discordHook)
               .then(updatedPlayer => Database.savePlayer(updatedPlayer));
             break;
           case 1:
@@ -48,8 +48,8 @@ class Game {
       .catch(err => logger.error(err));
   }
 
-  moveEvent(selectedPlayer) {
-    return Event.moveEvent(selectedPlayer);
+  moveEvent(selectedPlayer, discordHook) {
+    return Event.moveEvent(selectedPlayer, discordHook);
   }
 
   attackEvent(selectedPlayer, onlinePlayers, discordHook, twitchBot) {
@@ -62,9 +62,7 @@ class Game {
 
     if (luckDice >= 50 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.type !== enumHelper.map.types.town) {
       const updatedPlayer = Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
-      if (updatedPlayer !== selectedPlayer) {
-        return updatedPlayer;
-      }
+      return updatedPlayer;
     }
 
     return Event.attackEventMob(discordHook, twitchBot, selectedPlayer);

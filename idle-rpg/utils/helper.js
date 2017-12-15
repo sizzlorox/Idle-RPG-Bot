@@ -102,6 +102,43 @@ class helper {
 
   checkHealth(selectedPlayer, attackerObj, hook) {
     if (selectedPlayer.health <= 0) {
+      selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+      selectedPlayer.map = Map.getMapByIndex(4);
+      selectedPlayer.experience = 0;
+      selectedPlayer.gold = 0;
+      selectedPlayer.equipment = {
+        helmet: {
+          name: 'Nothing',
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0
+        },
+        armor: {
+          name: 'Nothing',
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0
+        },
+        weapon: {
+          name: 'Fist',
+          str: 1,
+          dex: 1,
+          end: 1,
+          int: 0
+        },
+        relic: {
+          name: 'Nothing',
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0,
+          luk: 0
+        }
+      };
+
+      /*
       selectedPlayer.health = 105;
       selectedPlayer.experience = 0;
       selectedPlayer.map = Map.getMapByIndex(4);
@@ -145,6 +182,8 @@ class helper {
         int: 1,
         luk: 1
       };
+      */
+
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
       } else {
@@ -152,7 +191,7 @@ class helper {
         attackerObj.kills.player++;
         LocalDatabase.write(selectedPlayer);
       }
-      hook.send(helper.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`));
+      hook.send(this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`));
     }
   }
 
@@ -172,7 +211,7 @@ class helper {
       Luck: ${player.stats.luk} (${this.sumPlayerTotalLuck(player)})
 
     Equipment:
-      Helment: ${player.equipment.helmet.name}
+      Helmet: ${player.equipment.helmet.name}
         Stats:
           Strength: ${player.equipment.helmet.str}
           Dexterity: ${player.equipment.helmet.dex}

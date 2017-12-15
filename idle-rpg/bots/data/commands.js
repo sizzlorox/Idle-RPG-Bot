@@ -4,23 +4,25 @@ const Space = require('../modules/Space');
 const Crypto = require('../modules/Crypto');
 const maps = require('../../game/data/maps');
 const helper = require('../../utils/helper');
-const { rpgChannel } = require('../../settings');
+const { commandChannel } = require('../../../settings');
 
 const commands = [
   // RPG COMMANDS
   help = {
     command: '!help',
     operatorOnly: false,
-    channelOnlyId: rpgChannel,
     function: (message) => {
       const helpMsg = `\`\`\`
         !me - Sends a PM with your characters stats.
-        !onlineUsers - Displays users that are currently in idle-rpg.
         !check <Player Name> - Sends a PM with the players stats. (without < > and case-senstive).
-        !map - Displays the worlds locations.
-        !crypto - Displays some crypto currencies info.
-        !nextlaunch - Displays next rocket launch info.
-        !nextstreamlaunch - Displayes next rocket launch that will have a stream.\`\`\``;
+        !map - Displays the worlds locations.\`\`\``;
+      /*
+
+      !crypto - Displays some crypto currencies info.
+      !nextlaunch - Displays next rocket launch info.
+      !nextstreamlaunch - Displayes next rocket launch that will have a stream.
+      
+      */
       message.author.send(helpMsg);
     }
   },
@@ -28,7 +30,6 @@ const commands = [
   check = {
     command: '!check',
     operatorOnly: false,
-    channelOnlyId: rpgChannel,
     function: (message, discordBot) => {
       if (!message.content.includes(' ')) {
         return;
@@ -56,7 +57,6 @@ const commands = [
   me = {
     command: '!me',
     operatorOnly: false,
-    channelOnlyId: rpgChannel,
     function: (message) => {
       Game.playerStats(message.author)
         .then((playerStats) => {
@@ -73,7 +73,6 @@ const commands = [
   map = {
     command: '!map',
     operatorOnly: false,
-    channelOnlyId: rpgChannel,
     function: (message, discordBot) => {
       const discordOnlinePlayers = discordBot.users
         .filter(player => player.presence.status === 'online' && !player.bot
@@ -104,11 +103,11 @@ const commands = [
   resetAll = {
     command: '!resetall',
     operatorOnly: true,
-    channelOnlyId: rpgChannel,
+    channelOnlyId: commandChannel,
     function: (message) => {
       Game.deleteAllPlayers()
         .then(() => {
-          message.author('Done.');
+          message.author.send('Done.');
         });
     }
   },
@@ -116,7 +115,7 @@ const commands = [
   forceAttack = {
     command: '!forceattack',
     operatorOnly: true,
-    channelOnlyId: rpgChannel,
+    channelOnlyId: commandChannel,
     function: (message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
         const attackPlayer = message.content.split(' ')[1];

@@ -10,7 +10,7 @@ const hook = new Discord.WebhookClient(
 );
 
 discordBot.on('ready', () => {
-  discordBot.user.setAvatar(fs.readFileSync('./res/hal.jpg'), (err) => {
+  discordBot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'), (err) => {
     if (err) logger.error(err);
   });
   discordBot.user.setGame('Idle-RPG Game Master');

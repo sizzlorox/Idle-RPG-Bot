@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const mapSchema = require('./map');
 const Map = require('../../game/utils/Map');
 const moment = require('moment');
-const { starterTown } = require('../../settings');
+const { starterTown } = require('../../../settings');
 
 const newPlayerObj = (discordId, name) => {
   return {
