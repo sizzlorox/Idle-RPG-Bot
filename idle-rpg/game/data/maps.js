@@ -101,5 +101,54 @@ const maps = [
     mobs: [],
     levelReq: 1
   },
+  {
+    id: 13,
+    name: 'Deerhaven',
+    type: type.land.name,
+    mobs: [],
+    levelReq: 1
+  },
+  {
+    id: 14,
+    name: 'Norpond',
+    type: type.land.name,
+    mobs: [],
+    levelReq: 1
+  },
+  {
+    id: 15,
+    name: 'Appleview',
+    type: type.land.name,
+    mobs: [],
+    levelReq: 1
+  },
+  {
+    id: 16,
+    name: 'Aldbarrow',
+    type: type.land.name,
+    mobs: [],
+    levelReq: 1
+  },
+  {
+    id: 17,
+    name: 'Rosepond',
+    type: type.land.name,
+    mobs: [],
+    levelReq: 1
+  },
+  {
+    id: 18,
+    name: 'Witchlyn',
+    type: type.land.name,
+    mobs: [],
+    levelReq: 1
+  },
+  {
+    id: 19,
+    name: 'Kingdom Of Olohaseth',
+    type: type.town.name,
+    mobs: [],
+    levelReq: 1
+  }
 ];
 module.exports = maps;

@@ -53,10 +53,14 @@ const heartBeat = () => {
         p.discordId === player.discordId
       ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
 
-  const minTimer = 120000 + (60000 * ((onlinePlayerList.length + 1) / 8));
-  const maxTimer = 300000 + (60000 * ((onlinePlayerList.length + 1) / 8));
-  console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
+  let minTimer = 120000 + (60000 * ((onlinePlayerList.length + 1) / 8));
+  let maxTimer = 300000 + (60000 * ((onlinePlayerList.length + 1) / 8));
+  console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60} - MAXS : ${(process.env.MIN_MAX_TIMER * 1000) * 60} - ${(process.env.MAX_MAX_TIMER * 1000) * 60}`);
   console.log(`TEST RANDOM INT: ${(randomInt(minTimer, maxTimer) / 1000) / 60}`);
+
+  // Normalizing timers so it doesnt go too high or too low.
+  minTimer = (minTimer / 1000) / 60 >= process.env.MIN_MAX_TIMER ? (process.env.MIN_MAX_TIMER * 1000) * 60 : minTimer;
+  maxTimer = (maxTimer / 1000) / 60 >= process.env.MAX_MAX_TIMER ? (process.env.MAX_MAX_TIMER * 1000) * 60 : maxTimer;
 
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {

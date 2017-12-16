@@ -58,7 +58,6 @@ class Event {
     return Database.getSameMapPlayers(selectedPlayer.map.name)
       .then((mappedPlayers) => {
         const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1);
-        console.log(`${selectedPlayer.map.name} - SMP: ${sameMapPlayers.length} - MP: ${mappedPlayers.length} - OP: ${onlinePlayers.length}`);
 
         if (sameMapPlayers.length > 0) {
           const randomPlayerIndex = helper.randomInt(0, sameMapPlayers.length - 1);
@@ -72,22 +71,26 @@ class Event {
           console.log(`GAME: Attacking Player: ${playerChance} - Random Defending Player: ${otherPlayerChance}`);
 
           if (playerChance >= otherPlayerChance) {
-            helper.checkHealth(randomPlayer, selectedPlayer, discordHook);
+            console.log(`RP1: ${randomPlayer.health}`);
             randomPlayer.health -= Math.abs(playerChance);
+            console.log(`RP2: ${randomPlayer.health}`);
             selectedPlayer.battles.won++;
             randomPlayer.battles.lost++;
 
             helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just attacked <@!${randomPlayer.discordId}> in \`${selectedPlayer.map.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`);
             return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
               .then((battleResults) => {
+                console.log(`RP3: ${battleResults.randomPlayer.health}`);
+                helper.checkHealth(battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
                 Database.savePlayer(battleResults.randomPlayer);
 
                 return battleResults.selectedPlayer;
               });
           }
 
+          console.log(`SP1: ${selectedPlayer.health}`);
           selectedPlayer.health -= Math.abs(otherPlayerChance);
-          helper.checkHealth(selectedPlayer, randomPlayer, discordHook);
+          console.log(`SP2: ${selectedPlayer.health}`);
           randomPlayer.battles.won++;
           selectedPlayer.battles.lost++;
 
@@ -96,6 +99,8 @@ class Event {
 
           return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
             .then((battleResults) => {
+              console.log(`SP3: ${battleResults.selectedPlayer.health}`);
+              helper.checkHealth(battleResults.selectedPlayer, battleResults.randomPlayer, discordHook);
               Database.savePlayer(battleResults.randomPlayer);
 
               return battleResults.selectedPlayer;
@@ -103,7 +108,8 @@ class Event {
         }
 
         return this.attackEventMob(discordHook, twitchBot, selectedPlayer);
-      });
+      })
+      .catch(err => console.log(err));
   }
 
   attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
@@ -241,7 +247,7 @@ class Event {
   stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer) {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomInt(0, 100);
-      if (luckStealChance > 50) {
+      if (luckStealChance > 50 || randomPlayer.health <= 0) {
         const luckItem = helper.randomInt(0, 3);
         switch (luckItem) {
           case 0:
@@ -255,7 +261,7 @@ class Event {
                 selectedPlayer.equipment.helmet.previousOwners.push(randomPlayer.name);
               }
 
-              discordHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}!`));
+              discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}!`));
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.equip);
             }
             break;
@@ -270,7 +276,7 @@ class Event {
                 selectedPlayer.equipment.armor.previousOwners.push(randomPlayer.name);
               }
 
-              discordHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.armor.name}!`));
+              discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.armor.name}!`));
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.equip);
             }
             break;
@@ -285,7 +291,7 @@ class Event {
                 selectedPlayer.equipment.weapon.previousOwners.push(randomPlayer.name);
               }
 
-              discordHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}!`));
+              discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}!`));
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.equip);
             }
             break;
@@ -300,7 +306,7 @@ class Event {
                 selectedPlayer.equipment.relic.previousOwners.push(randomPlayer.name);
               }
 
-              discordHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.relic.name}!`));
+              discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.relic.name}!`));
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.relic.position, enumHelper.equipment.empty.equip);
             }
             break;
@@ -379,7 +385,7 @@ class Event {
   generateGoldEvent(discordHook, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
       const luckGoldChance = helper.randomInt(0, 100);
-      if (luckGoldChance >= 50) {
+      if (luckGoldChance >= 75) {
         const luckGoldDice = helper.randomInt(0, 100);
         const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed()) * multiplier;
         selectedPlayer.gold += goldAmount;

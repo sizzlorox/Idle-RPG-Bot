@@ -12,5 +12,10 @@ class Map {
   getMapByIndex(index) {
     return maps[index];
   }
+
+  getTowns() {
+    return maps.filter(area => area.type === 'Town').map(area => area.name);
+  }
+
 }
 module.exports = new Map();

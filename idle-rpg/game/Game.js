@@ -1,18 +1,24 @@
 const helper = require('../utils/helper');
 const Database = require('../database/Database');
+const { getTowns } = require('./utils/Map');
 const Event = require('./utils/Event');
 const moment = require('moment');
 const logger = require('../utils/logger');
 let { multiplier } = require('../../settings');
-const { powerHourBegin, powerHourEnd } = require('../utils/cron');
+const { powerHourWarn, powerHourBegin, powerHourEnd } = require('../utils/cron');
 
 class Game {
 
   constructor(discordHook) {
     this.discordHook = discordHook;
 
+    powerHourWarn.onTick = this.powerHourWarn;
     powerHourBegin.onTick = this.powerHourBegin;
     powerHourEnd.onTick = this.powerHourEnd;
+
+    powerHourWarn.start();
+    powerHourBegin.start();
+    powerHourEnd.start();
   }
 
   selectEvent(player, onlinePlayers, twitchBot) {
@@ -27,6 +33,7 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
+        selectedPlayer.name = player.name;
         selectedPlayer.events++;
         helper.passiveHeal(selectedPlayer);
         console.log(`\nGAME: Random Event ID: ${randomEvent} ${moment().utc('br')}`);
@@ -62,17 +69,17 @@ class Game {
 
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = helper.randomInt(0, 100);
-    if (selectedPlayer.map.name === 'Kindale' && luckDice <= 15 + (selectedPlayer.stats.luk / 2)) {
+    if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
     console.log(`GAME: Attack Luck Dice: ${luckDice}`);
 
-    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.name !== 'Kindale') {
+    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !getTowns().includes(selectedPlayer.map.name)) {
       return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers);
     }
 
-    if (selectedPlayer.map.name !== 'Kindale') {
+    if (!getTowns().includes(selectedPlayer.map.name)) {
       return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, multiplier);
     }
 
@@ -91,6 +98,10 @@ class Game {
   }
 
   // Event
+  powerHourWarn() {
+    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+  }
+
   powerHourBegin() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
     multiplier = 2;

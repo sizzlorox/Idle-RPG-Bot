@@ -35,11 +35,12 @@ const commands = [
   stats = {
     command: '!stats',
     operatorOnly: false,
+    channelOnlyId: commandChannel,
     function: (message, discordBot) => {
       if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(' ');
-        checkPlayer = checkPlayer.splice(1, checkPlayer.length).join(' ');
-        const playerObj = discordBot.users.filter(player => player.username === checkPlayer && !player.bot);
+        let checkPlayer = message.content.split(' ')[1];
+        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
           message.author.send(`${checkPlayer} was not found!`);
           return;
@@ -52,7 +53,7 @@ const commands = [
             }
 
             const stats = helper.generateStatsString(playerStats);
-            message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer}s stats!`));
+            message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`));
           });
       }
 
@@ -71,11 +72,12 @@ const commands = [
   equip = {
     command: '!equip',
     operatorOnly: false,
+    channelOnlyId: commandChannel,
     function: (message, discordBot) => {
       if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(' ');
-        checkPlayer = checkPlayer.splice(1, checkPlayer.length).join(' ');
-        const playerObj = discordBot.users.filter(player => player.username === checkPlayer && !player.bot);
+        let checkPlayer = message.content.split(' ')[1];
+        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
           message.author.send(`${checkPlayer} was not found!`);
           return;
@@ -88,7 +90,7 @@ const commands = [
             }
 
             const equip = helper.generateEquipmentsString(playerEquipment);
-            message.author.send(equip.replace('Heres your equipment!', `Here is ${checkPlayer}s equipment!`));
+            message.author.send(equip.replace('Heres your equipment!', `Here is ${playerEquipment.name}s equipment!`));
           });
       }
 
@@ -107,6 +109,7 @@ const commands = [
   map = {
     command: '!map',
     operatorOnly: false,
+    channelOnlyId: commandChannel,
     function: (message, discordBot) => {
       const discordOnlinePlayers = discordBot.users
         .filter(player => player.presence.status === 'online' && !player.bot
@@ -138,6 +141,7 @@ const commands = [
   resetPlayer = {
     command: '!resetplayer',
     operatorOnly: true,
+    channelOnlyId: commandChannel,
     function: (message) => {
       game.deletePlayer()
         .then(() => {
@@ -149,6 +153,7 @@ const commands = [
   resetAll = {
     command: '!resetall',
     operatorOnly: true,
+    channelOnlyId: commandChannel,
     function: (message) => {
       if (message.content.includes(' ')) {
         game.deleteAllPlayers(message.content.split(' ')[1])

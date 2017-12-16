@@ -18,8 +18,8 @@ class CommandParser {
         return;
       }
 
-      if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId) {
-        return messageObj.reply('This is a RPG channel only command.');
+      if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId && messageObj.channel.type !== 'dm') {
+        return messageObj.reply(`Please send this to <#${commandObj.channelOnlyId}> or PM me.`);
       }
 
       if (commandObj.operatorOnly && authorId !== botOperator) {
