@@ -37,10 +37,11 @@ const commands = [
     operatorOnly: false,
     function: (message, discordBot) => {
       if (message.content.includes(' ')) {
-        const checkPlayer = message.content.split(' ');
-        const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
+        let checkPlayer = message.content.split(' ');
+        checkPlayer = checkPlayer.splice(1, checkPlayer.length).join(' ');
+        const playerObj = discordBot.users.filter(player => player.username === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
-          message.author.send(`${checkPlayer[1]} was not found!`);
+          message.author.send(`${checkPlayer} was not found!`);
           return;
         }
 
@@ -51,7 +52,7 @@ const commands = [
             }
 
             const stats = helper.generateStatsString(playerStats);
-            message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
+            message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer}s stats!`));
           });
       }
 
@@ -72,10 +73,11 @@ const commands = [
     operatorOnly: false,
     function: (message, discordBot) => {
       if (message.content.includes(' ')) {
-        const checkPlayer = message.content.split(' ');
-        const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
+        let checkPlayer = message.content.split(' ');
+        checkPlayer = checkPlayer.splice(1, checkPlayer.length).join(' ');
+        const playerObj = discordBot.users.filter(player => player.username === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
-          message.author.send(`${checkPlayer[1]} was not found!`);
+          message.author.send(`${checkPlayer} was not found!`);
           return;
         }
 
@@ -86,7 +88,7 @@ const commands = [
             }
 
             const equip = helper.generateEquipmentsString(playerEquipment);
-            message.author.send(equip.replace('Heres your equipment!', `Here is ${checkPlayer[1]}s equipment!`));
+            message.author.send(equip.replace('Heres your equipment!', `Here is ${checkPlayer}s equipment!`));
           });
       }
 
