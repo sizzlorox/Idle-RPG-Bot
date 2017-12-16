@@ -24,7 +24,7 @@ class helper {
 
   passiveHeal(player) {
     if (player.health <= 100 + (player.level * 5)) {
-      player.health += 5;
+      player.health += 2;
     }
 
     if (player.health > 100 + (player.level * 5)) {

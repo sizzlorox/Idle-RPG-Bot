@@ -9,6 +9,8 @@ const Game = require('./idle-rpg/game/Game');
 const { randomInt } = require('./idle-rpg/utils/helper');
 const moment = require('moment');
 
+const game = new Game(hook);
+
 const app = express();
 const { PORT } = process.env;
 const tickInMinutes = 2;
@@ -60,7 +62,7 @@ const heartBeat = () => {
     if (!player.timer) {
       console.log(`${player.name} setting timer ${moment()}`);
       player.timer = setTimeout(() => {
-        Game.selectEvent(player, onlinePlayerList, hook, 'twitchBot');
+        game.selectEvent(player, onlinePlayerList, 'twitchBot');
         delete player.timer;
       }, randomInt(minTimer, maxTimer));
     }

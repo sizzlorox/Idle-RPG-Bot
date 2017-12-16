@@ -6,6 +6,8 @@ const maps = require('../../game/data/maps');
 const helper = require('../../utils/helper');
 const { commandChannel } = require('../../../settings');
 
+const game = new Game();
+
 const commands = [
   // RPG COMMANDS
   help = {
@@ -42,7 +44,7 @@ const commands = [
           return;
         }
 
-        return Game.playerStats(playerObj.array()[0])
+        return game.playerStats(playerObj.array()[0])
           .then((playerStats) => {
             if (!playerStats) {
               return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
@@ -53,7 +55,7 @@ const commands = [
           });
       }
 
-      Game.playerStats(message.author)
+      game.playerStats(message.author)
         .then((playerStats) => {
           if (!playerStats) {
             return message.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -77,7 +79,7 @@ const commands = [
           return;
         }
 
-        return Game.playerEquipment(playerObj.array()[0])
+        return game.playerEquipment(playerObj.array()[0])
           .then((playerEquipment) => {
             if (!playerEquipment) {
               return message.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
@@ -88,7 +90,7 @@ const commands = [
           });
       }
 
-      Game.playerEquipment(message.author)
+      game.playerEquipment(message.author)
         .then((playerEquipment) => {
           if (!playerEquipment) {
             return message.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -112,7 +114,7 @@ const commands = [
           return player.id;
         });
 
-      Game.getOnlinePlayerMaps(discordOnlinePlayers)
+      game.getOnlinePlayerMaps(discordOnlinePlayers)
         .then((players) => {
           let mapInfo = '';
           maps.forEach((map) => {
@@ -135,7 +137,7 @@ const commands = [
     command: '!resetplayer',
     operatorOnly: true,
     function: (message) => {
-      Game.deletePlayer()
+      game.deletePlayer()
         .then(() => {
           message.author.send('Done.');
         });
@@ -147,7 +149,7 @@ const commands = [
     operatorOnly: true,
     function: (message) => {
       if (message.content.includes(' ')) {
-        Game.deleteAllPlayers(message.content.split(' ')[1])
+        game.deleteAllPlayers(message.content.split(' ')[1])
           .then(() => {
             message.author.send('Done.');
           });
@@ -164,10 +166,10 @@ const commands = [
         const attackPlayer = message.content.split(' ')[1];
         const otherAttackPlayer = message.content.split(' ')[2];
         if (!otherAttackPlayer) {
-          return Game.forcePvp(discordBot, discordHook, message.author, attackPlayer);
+          return game.forcePvp(discordBot, discordHook, message.author, attackPlayer);
         }
 
-        return Game.forcePvp(discordBot, discordHook, message.author, attackPlayer, otherAttackPlayer);
+        return game.forcePvp(discordBot, discordHook, message.author, attackPlayer, otherAttackPlayer);
       }
     }
   },
