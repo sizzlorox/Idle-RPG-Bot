@@ -69,6 +69,17 @@ const monsters = {
   ],
 
   type: [
+    rat = {
+      name: 'Rat',
+      stats: {
+        str: 1,
+        dex: 1,
+        end: 1,
+      },
+      experience: 4,
+      gold: 2,
+      rarity: 100
+    },
     crab = {
       name: 'Crab',
       stats: {
@@ -76,8 +87,19 @@ const monsters = {
         dex: 1,
         end: 1,
       },
-      experience: 1,
+      experience: 2,
       gold: 1,
+      rarity: 100
+    },
+    slime = {
+      name: 'Slime',
+      stats: {
+        str: 2,
+        dex: 2,
+        end: 1,
+      },
+      experience: 5,
+      gold: 2,
       rarity: 100
     },
     goblin = {
@@ -87,9 +109,9 @@ const monsters = {
         dex: 1,
         end: 2,
       },
-      experience: 5,
+      experience: 6,
       gold: 2,
-      rarity: 80
+      rarity: 90
     },
     bandit = {
       name: 'Bandit',
@@ -109,7 +131,7 @@ const monsters = {
         dex: 5,
         end: 1,
       },
-      experience: 3,
+      experience: 7,
       gold: 4,
       rarity: 80
     },

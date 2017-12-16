@@ -127,6 +127,20 @@ class Database {
     });
   }
 
+  deletePlayer(playerId) {
+    connect();
+    return new Promise((resolve, reject) => {
+      return Player.remove({ discordId: playerId }, (err, result) => {
+        if (err) {
+          disconnect();
+          return reject(err);
+        }
+        disconnect();
+        return resolve(result);
+      })
+    });
+  }
+
   deleteAllPlayers() {
     connect();
     return new Promise((resolve, reject) => {

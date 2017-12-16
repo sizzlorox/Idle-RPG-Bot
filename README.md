@@ -8,8 +8,10 @@ Anyobody who is willing to join in on this project is welcome to do so!
 # Setup
 Created a .env file in the project root directory with these env variables: (Without < >)
 ```
-DISCORD_WEBHOOK_ID=<Your discord webhook ID here>
-DISCORD_WEBHOOK_TOKEN=<Your discord webhook token here>
+DISCORD_WEBHOOK_ID=<Your discord action channel webhook ID here>
+DISCORD_WEBHOOK_TOKEN=<Your discord action channel webhook token here>
+DISCORD_MOVEMENT_WEBHOOK_ID=<Your discord movement channel webhook ID here>
+DISCORD_MOVEMENT_WEBHOOK_TOKEN=<Your discord movement channel webhook token here>
 DISCORD_BOT_OPERATOR_ID=<Your bot operators discord ID here>
 DISCORD_RPG_CHANNEL_ID=<Your idle-rpg discord channel ID here>
 DISCORD_BOT_LOGIN_TOKEN=<Your bots discord login token here>

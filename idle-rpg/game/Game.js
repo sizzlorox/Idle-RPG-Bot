@@ -42,7 +42,7 @@ class Game {
         }
 
         if (selectedPlayer.events % 100 === 0) {
-          helper.sendMessage(discordHook, twitchBot, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
+          helper.sendMessage(discordHook, twitchBot, helper.setImportantMessage(`<@!${selectedPlayer.discordId}> has encountered ${selectedPlayer.events} events!`));
         }
       })
       .catch(err => logger.error(err));
@@ -60,7 +60,7 @@ class Game {
 
     console.log(`GAME: Attack Luck Dice: ${luckDice}`);
 
-    if (luckDice >= 75 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.name !== 'Kindale') {
+    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && selectedPlayer.map.name !== 'Kindale') {
       return Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
     }
 
@@ -75,7 +75,7 @@ class Game {
       return Event.generateLuckItemEvent(discordHook, twitchBot, selectedPlayer);
     }
 
-    return Event.generateGoldEvent(selectedPlayer);
+    return Event.generateGoldEvent(discordHook, selectedPlayer);
   }
 
   // Commands
@@ -127,6 +127,10 @@ class Game {
 
   getOnlinePlayerMaps(onlinePlayers) {
     return Database.loadOnlinePlayerMaps(onlinePlayers);
+  }
+
+  deletePlayer(playerId) {
+    return Database.deletePlayer(playerId);
   }
 
   deleteAllPlayers() {

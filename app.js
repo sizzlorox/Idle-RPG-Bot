@@ -8,7 +8,6 @@ const { discordBot, hook } = require('./idle-rpg/bots/discord');
 const Game = require('./idle-rpg/game/Game');
 const { randomInt } = require('./idle-rpg/utils/helper');
 const moment = require('moment');
-const helper = require('./idle-rpg/utils/helper');
 
 const app = express();
 const { PORT } = process.env;

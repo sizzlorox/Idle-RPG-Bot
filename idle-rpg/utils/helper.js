@@ -6,8 +6,13 @@ class helper {
     return Math.floor(Math.random() * (((max - min) + 1) + min));
   }
 
-  sendMessage(discordHook, twitchBot, msg) {
-    discordHook.send(msg);
+  sendMessage(discordHook, twitchBot, isMovement, msg) {
+    if (isMovement) {
+      discordHook.movementHook.send(msg);
+    } else {
+      discordHook.actionHook.send(msg);
+    }
+
     // Add if to check if channel is streaming
     // twitchBot.say(msg.replace('/\\*/g', ''));
   }
@@ -87,7 +92,7 @@ class helper {
       selectedPlayer.stats.dex++;
       selectedPlayer.stats.end++;
       selectedPlayer.stats.int++;
-      discordHook.send(this.setImportantMessage(`<@!${selectedPlayer.discordId}> is now level ${selectedPlayer.level}!`));
+      discordHook.actionHook.send(this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`));
     }
   }
 
@@ -191,7 +196,7 @@ class helper {
         attackerObj.kills.player++;
         LocalDatabase.write(selectedPlayer);
       }
-      hook.send(this.setImportantMessage(`<@!${selectedPlayer.discordId}> died! Game over man... Game over.`));
+      hook.actionHook.send(this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`));
     }
   }
 

@@ -4,10 +4,20 @@ const fs = require('fs');
 const logger = require('../utils/logger');
 
 const discordBot = new Discord.Client();
-const hook = new Discord.WebhookClient(
-  process.env.DISCORD_WEBHOOK_ID,
-  process.env.DISCORD_WEBHOOK_TOKEN,
+const actionHook = new Discord.WebhookClient(
+  process.env.DISCORD_ACTION_WEBHOOK_ID,
+  process.env.DISCORD_ACTION_WEBHOOK_TOKEN,
 );
+
+const movementHook = new Discord.WebhookClient(
+  process.env.DISCORD_MOVEMENT_WEBHOOK_ID,
+  process.env.DISCORD_MOVEMENT_WEBHOOK_TOKEN
+);
+
+const hook = {
+  actionHook,
+  movementHook
+};
 
 discordBot.on('ready', () => {
   discordBot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'), (err) => {

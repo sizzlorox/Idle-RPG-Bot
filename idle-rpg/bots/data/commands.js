@@ -76,7 +76,8 @@ const commands = [
     function: (message, discordBot) => {
       const discordOnlinePlayers = discordBot.users
         .filter(player => player.presence.status === 'online' && !player.bot
-          || player.presence.status === 'idle' && !player.bot)
+          || player.presence.status === 'idle' && !player.bot
+          || player.presence.status === 'dnd' && !player.bot)
         .map((player) => {
           return player.id;
         });
@@ -100,15 +101,27 @@ const commands = [
     }
   },
 
-  resetAll = {
-    command: '!resetall',
+  resetPlayer = {
+    command: '!resetplayer',
     operatorOnly: true,
-    channelOnlyId: commandChannel,
     function: (message) => {
-      Game.deleteAllPlayers()
+      Game.deletePlayer()
         .then(() => {
           message.author.send('Done.');
         });
+    }
+  },
+
+  resetAll = {
+    command: '!resetall',
+    operatorOnly: true,
+    function: (message) => {
+      if (message.content.includes(' ')) {
+        Game.deleteAllPlayers(message.content.split(' ')[1])
+          .then(() => {
+            message.author.send('Done.');
+          });
+      }
     }
   },
 
