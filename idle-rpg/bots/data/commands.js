@@ -12,10 +12,13 @@ const commands = [
     command: '!help',
     operatorOnly: false,
     function: (message) => {
-      const helpMsg = `\`\`\`
-        !me - Sends a PM with your characters stats.
-        !check <Player Name> - Sends a PM with the players stats. (without < > and case-senstive).
-        !map - Displays the worlds locations.\`\`\``;
+      const helpMsg = `\`\`\`You can private message me these commands!
+        !stats - Sends a PM with your stats
+        !stats <Player Name> - Sends a PM with the players stats. (without < > and case-senstive).
+        !equip - Sends a PM with your equipment
+        !equip <Player Name> - Sends a PM with the players equipment. (without < > and case-senstive).
+        !map - Displays the worlds locations.
+        \`\`\``;
       /*
 
       !crypto - Displays some crypto currencies info.
@@ -27,37 +30,29 @@ const commands = [
     }
   },
 
-  check = {
-    command: '!check',
+  stats = {
+    command: '!stats',
     operatorOnly: false,
     function: (message, discordBot) => {
-      if (!message.content.includes(' ')) {
-        return;
+      if (message.content.includes(' ')) {
+        const checkPlayer = message.content.split(' ');
+        const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
+        if (playerObj.size === 0) {
+          message.author.send(`${checkPlayer[1]} was not found!`);
+          return;
+        }
+
+        return Game.playerStats(playerObj.array()[0])
+          .then((playerStats) => {
+            if (!playerStats) {
+              return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+            }
+
+            const stats = helper.generateStatsString(playerStats);
+            message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
+          });
       }
 
-      const checkPlayer = message.content.split(' ');
-      const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
-      if (playerObj.size === 0) {
-        message.author.send(`${checkPlayer[1]} was not found!`);
-        return;
-      }
-
-      Game.playerStats(playerObj.array()[0])
-        .then((playerStats) => {
-          if (!playerStats) {
-            return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-          }
-
-          const stats = helper.generateStatsString(playerStats);
-          message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
-        });
-    }
-  },
-
-  me = {
-    command: '!me',
-    operatorOnly: false,
-    function: (message) => {
       Game.playerStats(message.author)
         .then((playerStats) => {
           if (!playerStats) {
@@ -66,6 +61,41 @@ const commands = [
 
           const stats = helper.generateStatsString(playerStats);
           message.author.send(stats);
+        });
+    }
+  },
+
+  equip = {
+    command: '!equip',
+    operatorOnly: false,
+    function: (message, discordBot) => {
+      if (message.content.includes(' ')) {
+        const checkPlayer = message.content.split(' ');
+        const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
+        if (playerObj.size === 0) {
+          message.author.send(`${checkPlayer[1]} was not found!`);
+          return;
+        }
+
+        return Game.playerEquipment(playerObj.array()[0])
+          .then((playerEquipment) => {
+            if (!playerEquipment) {
+              return message.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+            }
+
+            const equip = helper.generateEquipmentsString(playerEquipment);
+            message.author.send(equip.replace('Heres your equipment!', `Here is ${checkPlayer[1]}s equipment!`));
+          });
+      }
+
+      Game.playerEquipment(message.author)
+        .then((playerEquipment) => {
+          if (!playerEquipment) {
+            return message.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+          }
+
+          const equip = helper.generateEquipmentsString(playerEquipment);
+          message.author.send(equip);
         });
     }
   },

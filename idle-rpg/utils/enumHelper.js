@@ -13,7 +13,8 @@ const enumHelper = {
           str: 0,
           dex: 0,
           end: 0,
-          int: 0
+          int: 0,
+          previousOwners: []
         },
       },
       relic: {
@@ -23,7 +24,8 @@ const enumHelper = {
           dex: 0,
           end: 0,
           int: 0,
-          luk: 0
+          luk: 0,
+          previousOwners: []
         }
       }
     },

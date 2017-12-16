@@ -19,21 +19,24 @@ const newPlayerObj = (discordId, name) => {
         str: 0,
         dex: 0,
         end: 0,
-        int: 0
+        int: 0,
+        previousOwners: []
       },
       armor: {
         name: 'Nothing',
         str: 0,
         dex: 0,
         end: 0,
-        int: 0
+        int: 0,
+        previousOwners: []
       },
       weapon: {
         name: 'Fist',
         str: 1,
         dex: 1,
         end: 1,
-        int: 0
+        int: 0,
+        previousOwners: []
       },
       relic: {
         name: 'Nothing',
@@ -41,7 +44,8 @@ const newPlayerObj = (discordId, name) => {
         dex: 0,
         end: 0,
         int: 0,
-        luk: 0
+        luk: 0,
+        previousOwners: []
       }
     },
     stats: {
@@ -57,6 +61,10 @@ const newPlayerObj = (discordId, name) => {
     kills: {
       mob: 0,
       player: 0
+    },
+    battles: {
+      won: 0,
+      lost: 0
     },
     deaths: {
       mob: 0,
@@ -79,21 +87,33 @@ const playerSchema = mongoose.Schema({
       str: Number,
       dex: Number,
       end: Number,
-      int: Number
+      int: Number,
+      previousOwners: {
+        type: Array,
+        default: []
+      }
     },
     armor: {
       name: String,
       str: Number,
       dex: Number,
       end: Number,
-      int: Number
+      int: Number,
+      previousOwners: {
+        type: Array,
+        default: []
+      }
     },
     weapon: {
       name: String,
       str: Number,
       dex: Number,
       end: Number,
-      int: Number
+      int: Number,
+      previousOwners: {
+        type: Array,
+        default: []
+      }
     },
     relic: {
       name: String,
@@ -101,7 +121,11 @@ const playerSchema = mongoose.Schema({
       dex: Number,
       end: Number,
       int: Number,
-      luk: Number
+      luk: Number,
+      previousOwners: {
+        type: Array,
+        default: []
+      }
     }
   },
   stats: {
@@ -117,6 +141,16 @@ const playerSchema = mongoose.Schema({
   kills: {
     mob: Number,
     player: Number
+  },
+  battles: {
+    won: {
+      type: Number,
+      default: 0
+    },
+    lost: {
+      type: Number,
+      default: 0
+    }
   },
   deaths: {
     mob: Number,

@@ -74,6 +74,8 @@ class Event {
           if (playerChance >= otherPlayerChance) {
             helper.checkHealth(randomPlayer, selectedPlayer, discordHook);
             randomPlayer.health -= Math.abs(playerChance);
+            selectedPlayer.battles.won++;
+            randomPlayer.battles.lost++;
 
             helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just attacked <@!${randomPlayer.discordId}> in \`${selectedPlayer.map.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`);
             return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
@@ -86,6 +88,8 @@ class Event {
 
           selectedPlayer.health -= Math.abs(otherPlayerChance);
           helper.checkHealth(selectedPlayer, randomPlayer, discordHook);
+          randomPlayer.battles.won++;
+          selectedPlayer.battles.lost++;
 
           helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just attacked <@!${randomPlayer.discordId}> with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` but failed!
           <@!${randomPlayer.discordId}>s \`${randomPlayer.equipment.weapon.name}\` dealt ${Math.abs(otherPlayerChance)} damage!`);
@@ -244,6 +248,13 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.helmet) < helper.calculateItemRating(randomPlayer.equipment.helmet)) {
               selectedPlayer.equipment.helmet = randomPlayer.equipment.helmet;
               selectedPlayer.equipment.helmet.name = `${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}`;
+              if (!randomPlayer.equipment.helmet.previousOwners) {
+                selectedPlayer.equipment.helmet.previousOwners = [`${randomPlayer.name}`];
+              } else {
+                selectedPlayer.equipment.helmet.previousOwners = randomPlayer.equipment.helmet.previousOwners;
+                selectedPlayer.equipment.helmet.previousOwners.add(randomPlayer.name);
+              }
+
               discordHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}!`));
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.equip);
             }
@@ -252,6 +263,13 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.armor) < helper.calculateItemRating(randomPlayer.equipment.armor)) {
               selectedPlayer.equipment.armor = randomPlayer.equipment.armor;
               selectedPlayer.equipment.armor.name = `${randomPlayer.name}s ${randomPlayer.equipment.armor.name}`;
+              if (!randomPlayer.equipment.armor.previousOwners) {
+                selectedPlayer.equipment.armor.previousOwners = [`${randomPlayer.name}`];
+              } else {
+                selectedPlayer.equipment.armor.previousOwners = randomPlayer.equipment.armor.previousOwners;
+                selectedPlayer.equipment.armor.previousOwners.add(randomPlayer.name);
+              }
+
               discordHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.armor.name}!`));
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.equip);
             }
@@ -260,6 +278,13 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.weapon) < helper.calculateItemRating(randomPlayer.equipment.weapon)) {
               selectedPlayer.equipment.weapon = randomPlayer.equipment.weapon;
               selectedPlayer.equipment.weapon.name = `${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}`;
+              if (!randomPlayer.equipment.weapon.previousOwners) {
+                selectedPlayer.equipment.weapon.previousOwners = [`${randomPlayer.name}`];
+              } else {
+                selectedPlayer.equipment.weapon.previousOwners = randomPlayer.equipment.weapon.previousOwners;
+                selectedPlayer.equipment.weapon.previousOwners.add(randomPlayer.name);
+              }
+
               discordHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}!`));
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.equip);
             }
@@ -268,6 +293,13 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.relic) < helper.calculateItemRating(randomPlayer.equipment.relic)) {
               selectedPlayer.equipment.relic = randomPlayer.equipment.relic;
               selectedPlayer.equipment.relic.name = `${randomPlayer.name}s ${randomPlayer.equipment.relic.name}`;
+              if (!randomPlayer.equipment.relic.previousOwners) {
+                selectedPlayer.equipment.relic.previousOwners = [`${randomPlayer.name}`];
+              } else {
+                selectedPlayer.equipment.relic.previousOwners = randomPlayer.equipment.relic.previousOwners;
+                selectedPlayer.equipment.relic.previousOwners.add(randomPlayer.name);
+              }
+
               discordHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.relic.name}!`));
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.relic.position, enumHelper.equipment.empty.equip);
             }
@@ -286,7 +318,10 @@ class Event {
       switch (luckEvent) {
         case 0:
           const luckStat = helper.randomInt(0, 4);
-          const luckStatAmount = Math.max(1, helper.randomInt(2, 10));
+          let luckStatAmount = helper.randomInt(2, 10);
+          if (luckStatAmount === 0) {
+            luckStatAmount = 1;
+          }
           let stat;
           switch (luckStat) {
             case 0:
@@ -305,13 +340,20 @@ class Event {
               stat = enumHelper.stats.int;
               selectedPlayer.stats.int += luckStatAmount;
               break;
+            default:
+              stat = enumHelper.stats.str;
+              selectedPlayer.stats.str += luckStatAmount;
+              break;
           }
 
           helper.sendMessage(discordHook, twitchBot, false, `Apollo has blessed <@!${selectedPlayer.discordId}> with his music raising his/her \`${stat}\` by ${luckStatAmount}!`);
           return resolve(selectedPlayer);
 
         case 1:
-          const luckExpAmount = helper.randomInt(5, 15);
+          let luckExpAmount = helper.randomInt(5, 15);
+          if (luckExpAmount === 0) {
+            luckExpAmount = 1;
+          }
           selectedPlayer.experience -= luckExpAmount;
           if (selectedPlayer.experience < 0) {
             selectedPlayer.experience = 0;
@@ -321,7 +363,10 @@ class Event {
           return resolve(selectedPlayer);
 
         case 3:
-          const luckHealthAmount = helper.randomInt(5, 15);
+          let luckHealthAmount = helper.randomInt(5, 15);
+          if (luckHealthAmount === 0) {
+            luckHealthAmount = 1;
+          }
           selectedPlayer.health -= luckHealthAmount;
           helper.checkHealth(selectedPlayer, discordHook);
           helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just lost ${luckHealthAmount} health by tripping and hitting his/her head!`);
@@ -333,10 +378,15 @@ class Event {
 
   generateGoldEvent(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckGoldDice = helper.randomInt(0, 100);
-      const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed());
-      selectedPlayer.gold += goldAmount;
-      helper.sendMessage(discordHook, 'twitch', false, `<@!${selectedPlayer.discordId}> found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`);
+      const luckGoldChance = helper.randomInt(0, 100);
+      if (luckGoldChance >= 50) {
+        const luckGoldDice = helper.randomInt(0, 100);
+        const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed());
+        selectedPlayer.gold += goldAmount;
+        helper.sendMessage(discordHook, 'twitch', false, `<@!${selectedPlayer.discordId}> found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`);
+
+        return resolve(selectedPlayer);
+      }
 
       return resolve(selectedPlayer);
     });

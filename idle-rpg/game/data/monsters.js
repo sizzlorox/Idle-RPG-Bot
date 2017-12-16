@@ -122,7 +122,7 @@ const monsters = {
       },
       experience: 10,
       gold: 3,
-      rarity: 65
+      rarity: 80
     },
     bat = {
       name: 'Bat',
@@ -133,7 +133,7 @@ const monsters = {
       },
       experience: 7,
       gold: 4,
-      rarity: 80
+      rarity: 90
     },
     dragon = {
       name: 'Dragon',

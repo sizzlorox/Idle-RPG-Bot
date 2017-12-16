@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Map = require('../game/utils/Map');
+const enumHelper = require('../utils/enumHelper');
 
 class helper {
   randomInt(min, max) {
@@ -24,9 +25,10 @@ class helper {
   passiveHeal(player) {
     if (player.health <= 100 + (player.level * 5)) {
       player.health += 5;
-      if (player.health > 100 + (player.level * 5)) {
-        player.health = 100 + (player.level * 5);
-      }
+    }
+
+    if (player.health > 100 + (player.level * 5)) {
+      player.health = 100 + (player.level * 5);
     }
     return player;
   }
@@ -112,26 +114,15 @@ class helper {
       selectedPlayer.experience = 0;
       selectedPlayer.gold = 0;
       selectedPlayer.equipment = {
-        helmet: {
-          name: 'Nothing',
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0
-        },
-        armor: {
-          name: 'Nothing',
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0
-        },
+        helmet: enumHelper.equipment.empty,
+        armor: enumHelper.equipment.empty,
         weapon: {
           name: 'Fist',
           str: 1,
           dex: 1,
           end: 1,
-          int: 0
+          int: 0,
+          previousOwners: []
         },
         relic: {
           name: 'Nothing',
@@ -139,7 +130,8 @@ class helper {
           dex: 0,
           end: 0,
           int: 0,
-          luk: 0
+          luk: 0,
+          previousOwners: []
         }
       };
 
@@ -208,51 +200,69 @@ class helper {
     Gold: ${player.gold}
     Map: ${player.map.name}
 
-    Stats:
+    Stats (Sum of stats with equipment):
       Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})
       Dexterity: ${player.stats.dex} (${this.sumPlayerTotalDexterity(player)})
       Endurance: ${player.stats.end} (${this.sumPlayerTotalEndurance(player)})
       Intelligence: ${player.stats.int} (${this.sumPlayerTotalIntelligence(player)})
       Luck: ${player.stats.luk} (${this.sumPlayerTotalLuck(player)})
 
-    Equipment:
-      Helmet: ${player.equipment.helmet.name}
-        Stats:
-          Strength: ${player.equipment.helmet.str}
-          Dexterity: ${player.equipment.helmet.dex}
-          Endurance: ${player.equipment.helmet.end}
-          Intelligence: ${player.equipment.helmet.int}
-
-      Armor: ${player.equipment.armor.name}
-        Stats:
-          Strength: ${player.equipment.armor.str}
-          Dexterity: ${player.equipment.armor.dex}
-          Endurance: ${player.equipment.armor.end}
-          Intelligence: ${player.equipment.armor.int}
-
-      Weapon: ${player.equipment.weapon.name}
-        Stats:
-          Strength: ${player.equipment.weapon.str}
-          Dexterity: ${player.equipment.weapon.dex}
-          Endurance: ${player.equipment.weapon.end}
-          Intelligence: ${player.equipment.weapon.int}
-
-      Relic: ${player.equipment.relic.name}
-        Stats:
-          Strength: ${player.equipment.relic.str}
-          Dexterity: ${player.equipment.relic.dex}
-          Endurance: ${player.equipment.relic.end}
-          Intelligence: ${player.equipment.relic.int}
-          Luck: ${player.equipment.relic.luk}
-
     Born: ${player.createdAt}
     Events: ${player.events}
     Kills:
       Monsters: ${player.kills.mob}
       Players: ${player.kills.player}
+    Battles:
+      Won: ${player.battles.won}
+      Lost: ${player.battles.lost}
     Deaths:
       By Monsters: ${player.deaths.mob}
-      By Players: ${player.deaths.player}\`\`\``;
+      By Players: ${player.deaths.player}
+      \`\`\``;
+  }
+
+  generatePreviousOwnerString(equipment) {
+    if (equipment.previousOwners && equipment.previousOwners.length > 0) {
+      let result = 'Previous Owners:\n  ';
+      result = equipment.previousOwners.forEach(owner => result.concat(`${owner}\n`));
+      return result;
+    }
+
+    return '';
+  }
+
+  generateEquipmentsString(player) {
+    return `\`\`\`Heres your equipment!
+    Helmet: ${player.equipment.helmet.name}
+      Stats:
+        Strength: ${player.equipment.helmet.str}
+        Dexterity: ${player.equipment.helmet.dex}
+        Endurance: ${player.equipment.helmet.end}
+        Intelligence: ${player.equipment.helmet.int}
+        ${this.generatePreviousOwnerString(player.equipment.helmet)}
+    Armor: ${player.equipment.armor.name}
+      Stats:
+        Strength: ${player.equipment.armor.str}
+        Dexterity: ${player.equipment.armor.dex}
+        Endurance: ${player.equipment.armor.end}
+        Intelligence: ${player.equipment.armor.int}
+        ${this.generatePreviousOwnerString(player.equipment.armor)}
+    Weapon: ${player.equipment.weapon.name}
+      Stats:
+        Strength: ${player.equipment.weapon.str}
+        Dexterity: ${player.equipment.weapon.dex}
+        Endurance: ${player.equipment.weapon.end}
+        Intelligence: ${player.equipment.weapon.int}
+        ${this.generatePreviousOwnerString(player.equipment.weapon)}
+    Relic: ${player.equipment.relic.name}
+      Stats:
+        Strength: ${player.equipment.relic.str}
+        Dexterity: ${player.equipment.relic.dex}
+        Endurance: ${player.equipment.relic.end}
+        Intelligence: ${player.equipment.relic.int}
+        Luck: ${player.equipment.relic.luk}
+        ${this.generatePreviousOwnerString(player.equipment.relic)}
+        \`\`\``;
   }
 }
 module.exports = new helper();

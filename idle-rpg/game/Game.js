@@ -64,7 +64,11 @@ class Game {
       return Event.attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers);
     }
 
-    return Event.attackEventMob(discordHook, twitchBot, selectedPlayer);
+    if (selectedPlayer.map.name !== 'Kindale') {
+      return Event.attackEventMob(discordHook, twitchBot, selectedPlayer);
+    }
+
+    return selectedPlayer;
   }
 
   luckEvent(selectedPlayer, discordHook, twitchBot) {
@@ -80,6 +84,10 @@ class Game {
 
   // Commands
   playerStats(commandAuthor) {
+    return Database.loadPlayer(commandAuthor.id);
+  }
+
+  playerEquipment(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
   }
 
