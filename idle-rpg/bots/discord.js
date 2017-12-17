@@ -37,11 +37,12 @@ discordBot.on('message', (message) => {
 });
 
 discordBot.on('guildMemberAdd', (member) => {
-  const channel = member.guild.channels.find('name', 'member-log');
+  const channel = member.guild.channels.find('id', process.env.DISCORD_RPG_WELCOME_CHANNEL_ID);
   if (!channel) {
     return;
   }
-  channel.send(`Welcome ${member}! This channel has an Idle-RPG bot! Please type into #idle-rpg channel !help for a list of commands or DM me!`);
+
+  channel.send(`Welcome ${member}! This channel has an Idle-RPG bot! If you have any questions check the <#${process.env.DISCORD_RPQ_FAQ_CHANNEL}> or PM me !help.`);
 });
 
 discordBot.login(process.env.DISCORD_BOT_LOGIN_TOKEN);

@@ -6,6 +6,8 @@ const maps = require('../../game/data/maps');
 const helper = require('../../utils/helper');
 const { commandChannel } = require('../../../settings');
 
+const game = new Game();
+
 const commands = [
   // RPG COMMANDS
   help = {
@@ -33,27 +35,29 @@ const commands = [
   stats = {
     command: '!stats',
     operatorOnly: false,
+    channelOnlyId: commandChannel,
     function: (message, discordBot) => {
       if (message.content.includes(' ')) {
-        const checkPlayer = message.content.split(' ');
-        const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
+        let checkPlayer = message.content.split(' ')[1];
+        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
-          message.author.send(`${checkPlayer[1]} was not found!`);
+          message.author.send(`${checkPlayer} was not found!`);
           return;
         }
 
-        return Game.playerStats(playerObj.array()[0])
+        return game.playerStats(playerObj.array()[0])
           .then((playerStats) => {
             if (!playerStats) {
               return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
             const stats = helper.generateStatsString(playerStats);
-            message.author.send(stats.replace('Here are your stats!', `Here is ${checkPlayer[1]}s stats!`));
+            message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`));
           });
       }
 
-      Game.playerStats(message.author)
+      game.playerStats(message.author)
         .then((playerStats) => {
           if (!playerStats) {
             return message.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -68,27 +72,29 @@ const commands = [
   equip = {
     command: '!equip',
     operatorOnly: false,
+    channelOnlyId: commandChannel,
     function: (message, discordBot) => {
       if (message.content.includes(' ')) {
-        const checkPlayer = message.content.split(' ');
-        const playerObj = discordBot.users.filter(player => player.username === checkPlayer[1] && !player.bot);
+        let checkPlayer = message.content.split(' ')[1];
+        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
-          message.author.send(`${checkPlayer[1]} was not found!`);
+          message.author.send(`${checkPlayer} was not found!`);
           return;
         }
 
-        return Game.playerEquipment(playerObj.array()[0])
+        return game.playerEquipment(playerObj.array()[0])
           .then((playerEquipment) => {
             if (!playerEquipment) {
               return message.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
             const equip = helper.generateEquipmentsString(playerEquipment);
-            message.author.send(equip.replace('Heres your equipment!', `Here is ${checkPlayer[1]}s equipment!`));
+            message.author.send(equip.replace('Heres your equipment!', `Here is ${playerEquipment.name}s equipment!`));
           });
       }
 
-      Game.playerEquipment(message.author)
+      game.playerEquipment(message.author)
         .then((playerEquipment) => {
           if (!playerEquipment) {
             return message.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -103,6 +109,7 @@ const commands = [
   map = {
     command: '!map',
     operatorOnly: false,
+    channelOnlyId: commandChannel,
     function: (message, discordBot) => {
       const discordOnlinePlayers = discordBot.users
         .filter(player => player.presence.status === 'online' && !player.bot
@@ -112,7 +119,7 @@ const commands = [
           return player.id;
         });
 
-      Game.getOnlinePlayerMaps(discordOnlinePlayers)
+      game.getOnlinePlayerMaps(discordOnlinePlayers)
         .then((players) => {
           let mapInfo = '';
           maps.forEach((map) => {
@@ -131,11 +138,34 @@ const commands = [
     }
   },
 
+  giveEquipmentToPlayer = {
+    command: '!giveplayer',
+    operatorOnly: true,
+    function: (message) => {
+      if (message.content.includes(' ')) {
+        const splitArray = message.content.split(' ');
+        const playerId = splitArray[1];
+        const position = splitArray[2];
+        const equipment = JSON.parse(splitArray[3]);
+        game.loadPlayer(playerId)
+          .then((player) => {
+            player.equipment[position] = equipment;
+            console.log(player.equipment);
+            game.savePlayer(player)
+              .then(() => {
+                message.author.send('Done.');
+              });
+          });
+      }
+    }
+  },
+
   resetPlayer = {
     command: '!resetplayer',
     operatorOnly: true,
+    channelOnlyId: commandChannel,
     function: (message) => {
-      Game.deletePlayer()
+      game.deletePlayer()
         .then(() => {
           message.author.send('Done.');
         });
@@ -145,9 +175,10 @@ const commands = [
   resetAll = {
     command: '!resetall',
     operatorOnly: true,
+    channelOnlyId: commandChannel,
     function: (message) => {
       if (message.content.includes(' ')) {
-        Game.deleteAllPlayers(message.content.split(' ')[1])
+        game.deleteAllPlayers(message.content.split(' ')[1])
           .then(() => {
             message.author.send('Done.');
           });
@@ -164,10 +195,10 @@ const commands = [
         const attackPlayer = message.content.split(' ')[1];
         const otherAttackPlayer = message.content.split(' ')[2];
         if (!otherAttackPlayer) {
-          return Game.forcePvp(discordBot, discordHook, message.author, attackPlayer);
+          return game.forcePvp(discordBot, discordHook, message.author, attackPlayer);
         }
 
-        return Game.forcePvp(discordBot, discordHook, message.author, attackPlayer, otherAttackPlayer);
+        return game.forcePvp(discordBot, discordHook, message.author, attackPlayer, otherAttackPlayer);
       }
     }
   },

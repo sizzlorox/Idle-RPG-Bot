@@ -12,9 +12,16 @@ DISCORD_WEBHOOK_ID=<Your discord action channel webhook ID here>
 DISCORD_WEBHOOK_TOKEN=<Your discord action channel webhook token here>
 DISCORD_MOVEMENT_WEBHOOK_ID=<Your discord movement channel webhook ID here>
 DISCORD_MOVEMENT_WEBHOOK_TOKEN=<Your discord movement channel webhook token here>
-DISCORD_BOT_OPERATOR_ID=<Your bot operators discord ID here>
-DISCORD_RPG_CHANNEL_ID=<Your idle-rpg discord channel ID here>
-DISCORD_BOT_LOGIN_TOKEN=<Your bots discord login token here>
+
+DISCORD_BOT_OPERATOR_ID=<Discord bot operator ID here>
+DISCORD_RPG_WELCOME_CHANNEL_ID=<Discord welcome channel ID here>
+DISCORD_RPG_CHANNEL_ID=<Discord action channel ID here>
+DISCORD_RPG_COMMAND_CHANNEL_ID=<Discord command channel ID here>
+DISCORD_RPQ_FAQ_CHANNEL=<Discord FAQ channel ID here>
+DISCORD_BOT_LOGIN_TOKEN=<Discord bot login token here>
+
+MIN_MAX_TIMER=<Minimal timer in minutes here (Minimal Max Timer)>
+MAX_MAX_TIMER=<Maximum timer in minutes here (Maximum Max Timer)>
 
 MONGODB_URI=<mongodb connection URI>
 ```

@@ -24,7 +24,7 @@ class helper {
 
   passiveHeal(player) {
     if (player.health <= 100 + (player.level * 5)) {
-      player.health += 5;
+      player.health += 2;
     }
 
     if (player.health > 100 + (player.level * 5)) {
@@ -224,7 +224,7 @@ class helper {
   generatePreviousOwnerString(equipment) {
     if (equipment.previousOwners && equipment.previousOwners.length > 0) {
       let result = 'Previous Owners:\n  ';
-      result = equipment.previousOwners.forEach(owner => result.concat(`${owner}\n`));
+      result = result.concat(equipment.previousOwners.join('      \n'));
       return result;
     }
 

@@ -8,6 +8,44 @@ const { discordBot, hook } = require('./idle-rpg/bots/discord');
 const Game = require('./idle-rpg/game/Game');
 const { randomInt } = require('./idle-rpg/utils/helper');
 const moment = require('moment');
+const { CronJob } = require('cron');
+
+const game = new Game(hook);
+
+const powerHourWarnTime = '00 00 13 * * 0-6'; // 1pm every day
+const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
+const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
+const timeZone = 'America/Los_Angeles';
+
+new CronJob({
+  cronTime: powerHourWarnTime,
+  onTick: () => {
+    game.powerHourWarn();
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+new CronJob({
+  cronTime: powerHourBeginTime,
+  onTick: () => {
+    game.powerHourBegin();
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+new CronJob({
+  cronTime: powerHourEndTime,
+  onTick: () => {
+    game.powerHourEnd();
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
 
 const app = express();
 const { PORT } = process.env;
@@ -51,16 +89,20 @@ const heartBeat = () => {
         p.discordId === player.discordId
       ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
 
-  const minTimer = 120000 + (60000 * ((onlinePlayerList.length + 1) / 8));
-  const maxTimer = 300000 + (60000 * ((onlinePlayerList.length + 1) / 8));
-  console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
+  let minTimer = 120000 + (60000 * ((onlinePlayerList.length + 1) / 8));
+  let maxTimer = 300000 + (60000 * ((onlinePlayerList.length + 1) / 8));
+  console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60} - MAXS : ${(process.env.MIN_MAX_TIMER * 1000) * 60} - ${(process.env.MAX_MAX_TIMER * 1000) * 60}`);
   console.log(`TEST RANDOM INT: ${(randomInt(minTimer, maxTimer) / 1000) / 60}`);
+
+  // Normalizing timers so it doesnt go too high or too low.
+  minTimer = (minTimer / 1000) / 60 >= process.env.MIN_MAX_TIMER ? (process.env.MIN_MAX_TIMER * 1000) * 60 : minTimer;
+  maxTimer = (maxTimer / 1000) / 60 >= process.env.MAX_MAX_TIMER ? (process.env.MAX_MAX_TIMER * 1000) * 60 : maxTimer;
 
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {
       console.log(`${player.name} setting timer ${moment()}`);
       player.timer = setTimeout(() => {
-        Game.selectEvent(player, onlinePlayerList, hook, 'twitchBot');
+        game.selectEvent(player, onlinePlayerList, 'twitchBot');
         delete player.timer;
       }, randomInt(minTimer, maxTimer));
     }
