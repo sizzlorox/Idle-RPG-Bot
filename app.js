@@ -11,10 +11,10 @@ const moment = require('moment');
 const { CronJob } = require('cron');
 
 const game = new Game(hook);
-// 13, 14, 15
-const powerHourWarnTime = '00 25 14 * * 0-6'; // 1pm every day
-const powerHourBeginTime = '00 40 14 * * 0-6'; // 2pm every day
-const powerHourEndTime = '00 40 15 * * 0-6'; // 3pm every day
+
+const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
+const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
+const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
 const timeZone = 'America/Los_Angeles';
 
 new CronJob({
