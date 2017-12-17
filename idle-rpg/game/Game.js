@@ -5,20 +5,11 @@ const Event = require('./utils/Event');
 const moment = require('moment');
 const logger = require('../utils/logger');
 let { multiplier } = require('../../settings');
-const { powerHourWarn, powerHourBegin, powerHourEnd } = require('../utils/cron');
 
 class Game {
 
   constructor(discordHook) {
     this.discordHook = discordHook;
-
-    powerHourWarn.onTick = this.powerHourWarn;
-    powerHourBegin.onTick = this.powerHourBegin;
-    powerHourEnd.onTick = this.powerHourEnd;
-
-    powerHourWarn.start();
-    powerHourBegin.start();
-    powerHourEnd.start();
   }
 
   selectEvent(player, onlinePlayers, twitchBot) {
@@ -60,7 +51,7 @@ class Game {
           helper.sendMessage(this.discordHook, twitchBot, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
         }
       })
-      .catch(err => logger.error(err));
+      .catch(err => console.log(err));
   }
 
   moveEvent(selectedPlayer) {
@@ -83,7 +74,7 @@ class Game {
       return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, multiplier);
     }
 
-    return selectedPlayer;
+    return Event.generateLuckItemEvent(discordHook, 'twitch', selectedPlayer);
   }
 
   luckEvent(selectedPlayer, twitchBot) {
@@ -166,6 +157,14 @@ class Game {
 
   getOnlinePlayerMaps(onlinePlayers) {
     return Database.loadOnlinePlayerMaps(onlinePlayers);
+  }
+
+  savePlayer(player) {
+    return Database.savePlayer(player);
+  }
+
+  loadPlayer(playerId) {
+    return Database.loadPlayer(playerId);
   }
 
   deletePlayer(playerId) {

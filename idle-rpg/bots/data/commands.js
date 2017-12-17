@@ -138,6 +138,28 @@ const commands = [
     }
   },
 
+  giveEquipmentToPlayer = {
+    command: '!giveplayer',
+    operatorOnly: true,
+    function: (message) => {
+      if (message.content.includes(' ')) {
+        const splitArray = message.content.split(' ');
+        const playerId = splitArray[1];
+        const position = splitArray[2];
+        const equipment = JSON.parse(splitArray[3]);
+        game.loadPlayer(playerId)
+          .then((player) => {
+            player.equipment[position] = equipment;
+            console.log(player.equipment);
+            game.savePlayer(player)
+              .then(() => {
+                message.author.send('Done.');
+              });
+          });
+      }
+    }
+  },
+
   resetPlayer = {
     command: '!resetplayer',
     operatorOnly: true,

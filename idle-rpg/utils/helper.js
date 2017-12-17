@@ -224,7 +224,7 @@ class helper {
   generatePreviousOwnerString(equipment) {
     if (equipment.previousOwners && equipment.previousOwners.length > 0) {
       let result = 'Previous Owners:\n  ';
-      result = equipment.previousOwners.join(`${owner}\n`);
+      result = result.concat(equipment.previousOwners.join('      \n'));
       return result;
     }
 

@@ -71,26 +71,28 @@ class Event {
           console.log(`GAME: Attacking Player: ${playerChance} - Random Defending Player: ${otherPlayerChance}`);
 
           if (playerChance >= otherPlayerChance) {
-            console.log(`RP1: ${randomPlayer.health}`);
+            console.log(`RP1: ${randomPlayer.name} - ${randomPlayer.health}`);
             randomPlayer.health -= Math.abs(playerChance);
-            console.log(`RP2: ${randomPlayer.health}`);
+            console.log(`RP2: ${randomPlayer.name} - ${randomPlayer.health}`);
             selectedPlayer.battles.won++;
             randomPlayer.battles.lost++;
 
             helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just attacked <@!${randomPlayer.discordId}> in \`${selectedPlayer.map.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`);
             return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
               .then((battleResults) => {
-                console.log(`RP3: ${battleResults.randomPlayer.health}`);
+                console.log(`RP3: ${battleResults.randomPlayer.name} - ${battleResults.randomPlayer.health}`);
                 helper.checkHealth(battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
-                Database.savePlayer(battleResults.randomPlayer);
-
-                return battleResults.selectedPlayer;
-              });
+                return Database.savePlayer(battleResults.randomPlayer)
+                  .then(() => {
+                    return battleResults.selectedPlayer;
+                  });
+              })
+              .catch(err => console.log(err));
           }
 
-          console.log(`SP1: ${selectedPlayer.health}`);
+          console.log(`SP1: ${selectedPlayer.name} - ${selectedPlayer.health}`);
           selectedPlayer.health -= Math.abs(otherPlayerChance);
-          console.log(`SP2: ${selectedPlayer.health}`);
+          console.log(`SP2: ${selectedPlayer.name} - ${selectedPlayer.health}`);
           randomPlayer.battles.won++;
           selectedPlayer.battles.lost++;
 
@@ -99,23 +101,26 @@ class Event {
 
           return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
             .then((battleResults) => {
-              console.log(`SP3: ${battleResults.selectedPlayer.health}`);
-              helper.checkHealth(battleResults.selectedPlayer, battleResults.randomPlayer, discordHook);
-              Database.savePlayer(battleResults.randomPlayer);
-
-              return battleResults.selectedPlayer;
-            });
+              //  TODO: inverted because of how I set the stealPlayerItem function (think of a way to make this better!)
+              console.log(`SP3: ${battleResults.randomPlayer.name} - ${battleResults.randomPlayer.health}`);
+              helper.checkHealth(battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
+              return Database.savePlayer(battleResults.selectedPlayer)
+                .then(() => {
+                  return battleResults.randomPlayer;
+                });
+            })
+            .catch(err => console.log(err));
         }
 
-        return this.attackEventMob(discordHook, twitchBot, selectedPlayer);
-      })
-      .catch(err => console.log(err));
+        return this.attackEventMob(discordHook, twitchBot, selectedPlayer)
+          .catch(err => console.log(err));
+      });
   }
 
   attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
       const mob = Monster.generateMonster(selectedPlayer);
-      const { playerChance, mobChance } = Battle.simulateBattleWithMob(selectedPlayer, mob);
+      let { playerChance, mobChance } = Battle.simulateBattleWithMob(selectedPlayer, mob);
 
       console.log(`GAME: PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
 
@@ -130,6 +135,8 @@ class Event {
         return resolve(selectedPlayer);
       }
 
+      mobChance = Math.abs(mobChance);
+
       selectedPlayer.health -= mobChance;
       selectedPlayer.gold -= mob.gold;
       if (selectedPlayer.gold <= 0) {
@@ -137,7 +144,7 @@ class Event {
       }
       helper.checkHealth(selectedPlayer, mob, discordHook);
 
-      helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${Math.abs(mobChance)} health and ${mob.gold} Gold!`);
+      helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
       return resolve(selectedPlayer);
     });
   }

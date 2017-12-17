@@ -8,8 +8,44 @@ const { discordBot, hook } = require('./idle-rpg/bots/discord');
 const Game = require('./idle-rpg/game/Game');
 const { randomInt } = require('./idle-rpg/utils/helper');
 const moment = require('moment');
+const { CronJob } = require('cron');
 
 const game = new Game(hook);
+
+const powerHourWarnTime = '00 00 13 * * 0-6'; // 1pm every day
+const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
+const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
+const timeZone = 'America/Los_Angeles';
+
+new CronJob({
+  cronTime: powerHourWarnTime,
+  onTick: () => {
+    game.powerHourWarn();
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+new CronJob({
+  cronTime: powerHourBeginTime,
+  onTick: () => {
+    game.powerHourBegin();
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+new CronJob({
+  cronTime: powerHourEndTime,
+  onTick: () => {
+    game.powerHourEnd();
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
 
 const app = express();
 const { PORT } = process.env;
