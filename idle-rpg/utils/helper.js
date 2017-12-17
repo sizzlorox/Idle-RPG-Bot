@@ -114,58 +114,10 @@ class helper {
       selectedPlayer.map = Map.getMapByIndex(4);
       selectedPlayer.experience = 0;
       selectedPlayer.gold = 0;
-      selectedPlayer.equipment = {
-        helmet: enumHelper.equipment.empty.equip.helmet,
-        armor: enumHelper.equipment.empty.equip.armor,
-        weapon: enumHelper.equipment.empty.equip.weapon,
-        relic: enumHelper.equipment.empty.equip.relic,
-      };
-
-      /*
-      selectedPlayer.health = 105;
-      selectedPlayer.experience = 0;
-      selectedPlayer.map = Map.getMapByIndex(4);
-      selectedPlayer.level = 1;
-      selectedPlayer.gold = 0;
-      selectedPlayer.equipment = {
-        helmet: {
-          name: 'Nothing',
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0
-        },
-        armor: {
-          name: 'Nothing',
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0
-        },
-        weapon: {
-          name: 'Fist',
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 0
-        },
-        relic: {
-          name: 'Nothing',
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0,
-          luk: 0
-        }
-      };
-      selectedPlayer.stats = {
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 1,
-        luk: 1
-      };
-      */
+      this.setPlayerEquipment(selectedPlayer, 'helmet', enumHelper.equipment.empty.helmet);
+      this.setPlayerEquipment(selectedPlayer, 'armor', enumHelper.equipment.empty.armor);
+      this.setPlayerEquipment(selectedPlayer, 'weapon', enumHelper.equipment.empty.weapon);
+      this.setPlayerEquipment(selectedPlayer, 'relic', enumHelper.equipment.empty.relic);
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
@@ -176,6 +128,52 @@ class helper {
       }
       hook.actionHook.send(this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`));
     }
+
+    /*
+    selectedPlayer.health = 105;
+    selectedPlayer.experience = 0;
+    selectedPlayer.map = Map.getMapByIndex(4);
+    selectedPlayer.level = 1;
+    selectedPlayer.gold = 0;
+    selectedPlayer.equipment = {
+      helmet: {
+        name: 'Nothing',
+        str: 0,
+        dex: 0,
+        end: 0,
+        int: 0
+      },
+      armor: {
+        name: 'Nothing',
+        str: 0,
+        dex: 0,
+        end: 0,
+        int: 0
+      },
+      weapon: {
+        name: 'Fist',
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 0
+      },
+      relic: {
+        name: 'Nothing',
+        str: 0,
+        dex: 0,
+        end: 0,
+        int: 0,
+        luk: 0
+      }
+    };
+    selectedPlayer.stats = {
+      str: 1,
+      dex: 1,
+      end: 1,
+      int: 1,
+      luk: 1
+    };
+    */
   }
 
   generateStatsString(player) {
@@ -195,6 +193,7 @@ class helper {
 
     Born: ${player.createdAt}
     Events: ${player.events}
+    Spells Casted: ${player.spells}
     Kills:
       Monsters: ${player.kills.mob}
       Players: ${player.kills.player}

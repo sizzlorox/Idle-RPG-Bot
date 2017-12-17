@@ -97,15 +97,46 @@ class Game {
 
   powerHourBegin() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
-    multiplier = 2;
+    multiplier += 2;
   }
 
   powerHourEnd() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
-    multiplier = 1;
+    multiplier -= 2;
+  }
+
+  giveGold(playerId, amount) {
+    return Database.loadPlayer(playerId)
+      .then((updatingPlayer) => {
+        updatingPlayer.gold += amount;
+        Database.savePlayer(updatingPlayer);
+      });
   }
 
   // Commands
+  castSpell(commandAuthor, hook, spell) {
+    Database.loadPlayer(commandAuthor.id)
+      .then((castingPlayer) => {
+        switch (spell) {
+          case 'bless':
+            if (castingPlayer.gold >= 1500) {
+              castingPlayer.spells++;
+              castingPlayer.gold -= 1500;
+              multiplier += 1;
+              hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!! Current Multiplier is: ${multiplier}x`));
+              setTimeout(() => {
+                multiplier -= 1;
+                hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off. Current Multiplier is: ${multiplier}x`));
+              }, 900000); // 15minutes
+              Database.savePlayer(castingPlayer);
+            } else {
+              commandAuthor.send(`You do not have enough gold! The spell costs 1500 gold. You are lacking ${1500 - castingPlayer.gold}.`);
+            }
+            break;
+        }
+      });
+  }
+
   playerStats(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
   }
