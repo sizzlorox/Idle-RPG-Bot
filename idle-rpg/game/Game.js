@@ -18,6 +18,8 @@ class Game {
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
+          helper.sendMessage(this.discordHook, twitchBot, false, `<@!${player.discordId}> was born! Welcome to the world of Idle-RPG!`);
+
           return Database.createNewPlayer(player.discordId, player.name);
         }
 
@@ -74,7 +76,7 @@ class Game {
       return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, multiplier);
     }
 
-    return Event.generateLuckItemEvent(discordHook, 'twitch', selectedPlayer);
+    return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);
   }
 
   luckEvent(selectedPlayer, twitchBot) {

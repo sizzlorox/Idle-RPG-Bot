@@ -150,7 +150,6 @@ const commands = [
         game.loadPlayer(playerId)
           .then((player) => {
             player.equipment[position] = equipment;
-            console.log(player.equipment);
             game.savePlayer(player)
               .then(() => {
                 message.author.send('Done.');

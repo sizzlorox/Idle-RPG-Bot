@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Map = require('../game/utils/Map');
+const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 
 class helper {
@@ -114,8 +115,8 @@ class helper {
       selectedPlayer.experience = 0;
       selectedPlayer.gold = 0;
       selectedPlayer.equipment = {
-        helmet: enumHelper.equipment.empty,
-        armor: enumHelper.equipment.empty,
+        helmet: enumHelper.equipment.empty.equip,
+        armor: enumHelper.equipment.empty.equip,
         weapon: {
           name: 'Fist',
           str: 1,
@@ -186,7 +187,7 @@ class helper {
       } else {
         selectedPlayer.deaths.player++;
         attackerObj.kills.player++;
-        LocalDatabase.write(selectedPlayer);
+        Database.savePlayer(selectedPlayer);
       }
       hook.actionHook.send(this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`));
     }
@@ -223,8 +224,9 @@ class helper {
 
   generatePreviousOwnerString(equipment) {
     if (equipment.previousOwners && equipment.previousOwners.length > 0) {
-      let result = 'Previous Owners:\n  ';
-      result = result.concat(equipment.previousOwners.join('      \n'));
+      let result = 'Previous Owners:\n        ';
+      result = result.concat(equipment.previousOwners.join('        \n'));
+      result = result.concat('\n');
       return result;
     }
 
@@ -239,21 +241,21 @@ class helper {
         Dexterity: ${player.equipment.helmet.dex}
         Endurance: ${player.equipment.helmet.end}
         Intelligence: ${player.equipment.helmet.int}
-        ${this.generatePreviousOwnerString(player.equipment.helmet)}
+      ${this.generatePreviousOwnerString(player.equipment.helmet)}
     Armor: ${player.equipment.armor.name}
       Stats:
         Strength: ${player.equipment.armor.str}
         Dexterity: ${player.equipment.armor.dex}
         Endurance: ${player.equipment.armor.end}
         Intelligence: ${player.equipment.armor.int}
-        ${this.generatePreviousOwnerString(player.equipment.armor)}
+      ${this.generatePreviousOwnerString(player.equipment.armor)}
     Weapon: ${player.equipment.weapon.name}
       Stats:
         Strength: ${player.equipment.weapon.str}
         Dexterity: ${player.equipment.weapon.dex}
         Endurance: ${player.equipment.weapon.end}
         Intelligence: ${player.equipment.weapon.int}
-        ${this.generatePreviousOwnerString(player.equipment.weapon)}
+      ${this.generatePreviousOwnerString(player.equipment.weapon)}
     Relic: ${player.equipment.relic.name}
       Stats:
         Strength: ${player.equipment.relic.str}
@@ -261,7 +263,7 @@ class helper {
         Endurance: ${player.equipment.relic.end}
         Intelligence: ${player.equipment.relic.int}
         Luck: ${player.equipment.relic.luk}
-        ${this.generatePreviousOwnerString(player.equipment.relic)}
+      ${this.generatePreviousOwnerString(player.equipment.relic)}
         \`\`\``;
   }
 }

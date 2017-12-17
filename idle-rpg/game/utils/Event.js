@@ -410,37 +410,37 @@ class Event {
       const luckItemDice = helper.randomInt(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
-        const item = Item.generateItem(selectedPlayer);
-        switch (item.position) {
-          case enumHelper.equipment.types.helmet.position:
-            if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
-              return resolve(selectedPlayer);
+        return Item.generateItem(selectedPlayer)
+          .then((item) => {
+            switch (item.position) {
+              case enumHelper.equipment.types.helmet.position:
+                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+                  return resolve(selectedPlayer);
+                }
+
+                selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
+                break;
+              case enumHelper.equipment.types.armor.position:
+                if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+                  return resolve(selectedPlayer);
+                }
+
+
+                selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
+                break;
+              case enumHelper.equipment.types.weapon.position:
+                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+                  return resolve(selectedPlayer);
+                }
+
+                selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
+                break;
             }
 
-            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
-            break;
-          case enumHelper.equipment.types.armor.position:
-            if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
-              return resolve(selectedPlayer);
-            }
-
-
-            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
-            break;
-          case enumHelper.equipment.types.weapon.position:
-            if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
-              return resolve(selectedPlayer);
-            }
-
-            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
-            break;
-        }
-
-        helper.sendMessage(discordHook, twitchBot, false, this.generateItemEventMessage(selectedPlayer, item));
-        return resolve(selectedPlayer);
+            helper.sendMessage(discordHook, twitchBot, false, this.generateItemEventMessage(selectedPlayer, item));
+            return resolve(selectedPlayer);
+          });
       }
-
-      return resolve(selectedPlayer);
     });
   }
 
