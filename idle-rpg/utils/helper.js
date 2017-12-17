@@ -115,25 +115,10 @@ class helper {
       selectedPlayer.experience = 0;
       selectedPlayer.gold = 0;
       selectedPlayer.equipment = {
-        helmet: enumHelper.equipment.empty.equip,
-        armor: enumHelper.equipment.empty.equip,
-        weapon: {
-          name: 'Fist',
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 0,
-          previousOwners: []
-        },
-        relic: {
-          name: 'Nothing',
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0,
-          luk: 0,
-          previousOwners: []
-        }
+        helmet: enumHelper.equipment.empty.equip.helmet,
+        armor: enumHelper.equipment.empty.equip.armor,
+        weapon: enumHelper.equipment.empty.equip.weapon,
+        relic: enumHelper.equipment.empty.equip.relic,
       };
 
       /*

@@ -7,8 +7,31 @@ const enumHelper = {
 
   equipment: {
     empty: {
-      equip: {
+      helmet: {
         name: 'Nothing',
+        position: 'helmet',
+        stats: {
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0,
+          previousOwners: []
+        },
+      },
+      armor: {
+        name: 'Nothing',
+        position: 'armor',
+        stats: {
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0,
+          previousOwners: []
+        },
+      },
+      weapon: {
+        name: 'Fists',
+        position: 'weapon',
         stats: {
           str: 0,
           dex: 0,

@@ -119,33 +119,37 @@ class Event {
 
   attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
-      const mob = Monster.generateMonster(selectedPlayer);
-      let { playerChance, mobChance } = Battle.simulateBattleWithMob(selectedPlayer, mob);
+      return Monster.generateMonster(selectedPlayer)
+        .then((mob) => {
+          return Battle.simulateBattleWithMob(selectedPlayer, mob)
+            .then((playerChance, mobChance) => {
+              console.log(`GAME: PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
+              if (playerChance >= mobChance) {
+                selectedPlayer.experience += mob.experience * multiplier;
+                selectedPlayer.gold += mob.gold * multiplier;
+                selectedPlayer.kills.mob++;
+                helper.checkExperience(selectedPlayer, discordHook);
 
-      console.log(`GAME: PlayerChance: ${playerChance} - MobChance: ${mobChance}`);
+                helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} Gold!`);
+                return this.generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob)
+                  .then((updatedPlayer) => {
+                    return resolve(updatedPlayer);
+                  });
+              }
 
-      if (playerChance >= mobChance) {
-        selectedPlayer.experience += mob.experience * multiplier;
-        selectedPlayer.gold += mob.gold * multiplier;
-        selectedPlayer.kills.mob++;
-        helper.checkExperience(selectedPlayer, discordHook);
+              mobChance = Math.abs(mobChance);
 
-        helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} Gold!`);
-        selectedPlayer = this.generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob);
-        return resolve(selectedPlayer);
-      }
+              selectedPlayer.health -= mobChance;
+              selectedPlayer.gold -= mob.gold;
+              if (selectedPlayer.gold <= 0) {
+                selectedPlayer.gold = 0;
+              }
+              helper.checkHealth(selectedPlayer, mob, discordHook);
 
-      mobChance = Math.abs(mobChance);
-
-      selectedPlayer.health -= mobChance;
-      selectedPlayer.gold -= mob.gold;
-      if (selectedPlayer.gold <= 0) {
-        selectedPlayer.gold = 0;
-      }
-      helper.checkHealth(selectedPlayer, mob, discordHook);
-
-      helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
-      return resolve(selectedPlayer);
+              helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${mobChance} health and ${mob.gold} Gold!`);
+              return resolve(selectedPlayer);
+            });
+        });
     });
   }
 
@@ -154,34 +158,36 @@ class Event {
       const dropitemChance = helper.randomInt(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
-        const item = Item.generateItem(selectedPlayer);
-        switch (item.position) {
-          case enumHelper.equipment.types.helmet.position:
-            if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
-              return resolve(selectedPlayer);
+        return Item.generateItem(selectedPlayer)
+          .then((item) => {
+            switch (item.position) {
+              case enumHelper.equipment.types.helmet.position:
+                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+                  return resolve(selectedPlayer);
+                }
+
+                selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
+                break;
+              case enumHelper.equipment.types.armor.position:
+                if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+                  return resolve(selectedPlayer);
+                }
+
+
+                selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
+                break;
+              case enumHelper.equipment.types.weapon.position:
+                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+                  return resolve(selectedPlayer);
+                }
+
+                selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
+                break;
             }
 
-            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
-            break;
-          case enumHelper.equipment.types.armor.position:
-            if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
-              return resolve(selectedPlayer);
-            }
-
-
-            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
-            break;
-          case enumHelper.equipment.types.weapon.position:
-            if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
-              return resolve(selectedPlayer);
-            }
-
-            selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
-            break;
-        }
-
-        helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> dropped a \`${item.name}\` from \`${mob.name}!\``);
-        return resolve(selectedPlayer);
+            helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> dropped a \`${item.name}\` from \`${mob.name}!\``);
+            return resolve(selectedPlayer);
+          });
       }
 
       return resolve(selectedPlayer);
@@ -269,7 +275,7 @@ class Event {
               }
 
               discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}!`));
-              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.equip);
+              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.equip.helmet);
             }
             break;
           case 1:
@@ -284,7 +290,7 @@ class Event {
               }
 
               discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.armor.name}!`));
-              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.equip);
+              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.equip.armor);
             }
             break;
           case 2:
@@ -299,7 +305,7 @@ class Event {
               }
 
               discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}!`));
-              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.equip);
+              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.equip.weapon);
             }
             break;
           case 3:
@@ -314,7 +320,7 @@ class Event {
               }
 
               discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.relic.name}!`));
-              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.relic.position, enumHelper.equipment.empty.equip);
+              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.relic.position, enumHelper.equipment.empty.equip.relic);
             }
             break;
         }
