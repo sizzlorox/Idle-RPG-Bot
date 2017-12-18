@@ -125,7 +125,7 @@ const commands = [
         .then((players) => {
           let mapInfo = '';
           maps.forEach((map) => {
-            mapInfo = mapInfo.concat(`\n${map.name} (`);
+            mapInfo = mapInfo.concat(`\n${map.name} (${map.type}) (`);
             players.forEach((player) => {
               if (player.map.name === map.name) {
                 mapInfo = mapInfo.concat(`${player.name}, `);
