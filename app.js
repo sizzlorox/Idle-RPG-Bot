@@ -67,6 +67,7 @@ process.on('unhandledRejection', (reason, p) => {
 
 const heartBeat = () => {
   const discordUsers = discordBot.users;
+
   const discordOfflinePlayers = discordUsers
     .filter(player => player.presence.status === 'offline' && !player.bot)
     .map((player) => {
