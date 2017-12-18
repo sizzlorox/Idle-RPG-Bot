@@ -23,10 +23,10 @@ class Monster {
           end: (monsterRarityList[randomRarityIndex].stats.end
             * monsterTypeList[randomTypeIndex].stats.end)
         },
-        experience: (monsterRarityList[randomRarityIndex].experience
-          * monsterTypeList[randomTypeIndex].experience) / 2,
+        experience: Number((monsterRarityList[randomRarityIndex].experience
+          * monsterTypeList[randomTypeIndex].experience) / 2).toFixed(),
         gold: Number((monsterRarityList[randomRarityIndex].gold
-          * monsterTypeList[randomTypeIndex].gold).toFixed())
+          * monsterTypeList[randomTypeIndex].gold)).toFixed()
       };
       return resolve(monsterObj);
     });
