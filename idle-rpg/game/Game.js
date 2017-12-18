@@ -108,7 +108,7 @@ class Game {
   giveGold(playerId, amount) {
     return Database.loadPlayer(playerId)
       .then((updatingPlayer) => {
-        updatingPlayer.gold += amount;
+        updatingPlayer.gold += Number(amount);
         Database.savePlayer(updatingPlayer);
       });
   }
@@ -134,6 +134,13 @@ class Game {
             }
             break;
         }
+      });
+  }
+
+  playerEventLog(playerId, count) {
+    return Database.loadPlayer(playerId)
+      .then((player) => {
+        return helper.generateLog(player, count);
       });
   }
 

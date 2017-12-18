@@ -22,6 +22,8 @@ const commands = [
         !map - Displays the worlds locations.
         !castspell - Lists spells available to cast.
         !castspell <spell> - Casts a global spell onto Idle-RPG.
+        !eventlog - Lists up to 50 past events.
+        !eventlog <@Mention of player> - Lists up to 50 past events of mentioned player.
         \`\`\``;
       /*
 
@@ -172,6 +174,25 @@ const commands = [
         bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 15 minutes.
         \`\`\``);
       }
+    }
+  },
+
+  eventLog = {
+    command: '!eventlog',
+    channelOnlyId: commandChannel,
+    function: (message) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(' ');
+        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 50)
+          .then((result) => {
+            return message.author.send(`\`\`\`${result}\`\`\``);
+          });
+      }
+
+      return game.playerEventLog(message.author.id, 50)
+        .then((result) => {
+          return message.author.send(`\`\`\`${result}\`\`\``);
+        });
     }
   },
 

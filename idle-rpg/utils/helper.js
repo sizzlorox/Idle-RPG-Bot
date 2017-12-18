@@ -21,6 +21,38 @@ class helper {
     return result;
   }
 
+  getTimePassed(timeStamp) {
+    return this.toTimeFormat(Number(new Date().getTime() - timeStamp));
+  }
+
+  toTimeFormat(duration) {
+    let seconds = ((duration / 1000) % 60).toFixed();
+    let minutes = ((duration / (1000 * 60)) % 60).toFixed();
+    let hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
+
+    hours = (hours < 10) ? `0${hours}` : hours;
+    minutes = (minutes < 10) ? `0${minutes}` : minutes;
+    seconds = (seconds < 10) ? `0${seconds}` : seconds;
+
+    const hourString = Number(hours) === 0 ? '' : `${hours}h`;
+    const minuteString = Number(minutes) === 0 ? '' : `${minutes}m`;
+    const secondString = Number(seconds) === 0 ? '' : `${seconds}s`;
+
+    return `${hourString} ${minuteString} ${secondString}`;
+  }
+
+  logEvent(selectedPlayer, msg) {
+    if (selectedPlayer.pastEvents.length === 99) {
+      selectedPlayer.pastEvents.shift();
+    }
+    selectedPlayer.pastEvents.push({
+      event: msg,
+      timeStamp: new Date().getTime()
+    });
+
+    return selectedPlayer;
+  }
+
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
       discordHook.movementHook.send(msg);
@@ -108,7 +140,11 @@ class helper {
       selectedPlayer.stats.dex++;
       selectedPlayer.stats.end++;
       selectedPlayer.stats.int++;
-      discordHook.actionHook.send(this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`));
+      const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
+      const eventLog = `Leveled up to level ${selectedPlayer.level}`;
+
+      this.sendMessage(discordHook, 'twitch', false, eventMsg);
+      selectedPlayer = this.logEvent(selectedPlayer, eventLog);
     }
   }
 
@@ -139,7 +175,12 @@ class helper {
         attackerObj.kills.player++;
         Database.savePlayer(selectedPlayer);
       }
-      hook.actionHook.send(this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`));
+
+      const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`);
+      const eventLog = 'You died. Game over man... Game over.';
+
+      this.sendMessage(discordHook, 'twitch', false, eventMsg);
+      selectedPlayer = this.logEvent(selectedPlayer, eventLog);
     }
 
     /*
@@ -216,6 +257,9 @@ class helper {
     Deaths:
       By Monsters: ${player.deaths.mob}
       By Players: ${player.deaths.player}
+
+    Past Events:
+      ${this.generateLog(player, 5).replace('Heres what you have done so far:\n      ', '')}
       \`\`\``;
   }
 
@@ -262,6 +306,22 @@ class helper {
         Luck: ${player.equipment.relic.luk}
       ${this.generatePreviousOwnerString(player.equipment.relic)}
         \`\`\``;
+  }
+
+  generateLog(player, count) {
+    if (player.pastEvents.length === 0) {
+      return '';
+    }
+
+    let logResult = 'Heres what you have done so far:\n      ';
+    player.pastEvents.forEach((log, index) => {
+      if (index === count) {
+        return;
+      }
+
+      logResult = logResult.concat(`${log.event} - ${this.getTimePassed(log.timeStamp)} ago\n      `);
+    });
+    return logResult;
   }
 }
 module.exports = new helper();

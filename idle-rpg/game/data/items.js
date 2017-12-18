@@ -102,17 +102,6 @@ const items = {
   ],
 
   material: [
-    wooden = {
-      name: 'Wooden',
-      stats: {
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 1
-      },
-      gold: 1,
-      rarity: 100
-    },
     bronze = {
       name: 'Bronze',
       stats: {
@@ -122,7 +111,7 @@ const items = {
         int: 2
       },
       gold: 2,
-      rarity: 75
+      rarity: 100
     },
     iron = {
       name: 'Iron',
