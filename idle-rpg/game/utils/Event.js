@@ -130,6 +130,7 @@ class Event {
                 selectedPlayer.kills.mob++;
                 helper.checkExperience(selectedPlayer, discordHook);
 
+                console.log(`NaN check - EXP: ${mob.experience * multiplier} - GOLD: ${mob.gold * multiplier}`);
                 helper.sendMessage(discordHook, twitchBot, false, `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} Gold!`);
                 return this.generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob)
                   .then((updatedPlayer) => {
