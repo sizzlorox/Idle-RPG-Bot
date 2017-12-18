@@ -6,13 +6,16 @@ const router = require('./routes/index');
 const { discordBot, hook } = require('./idle-rpg/bots/discord');
 // const { twitchBot } = require('./bots/twitch');
 const Game = require('./idle-rpg/game/Game');
-const { randomInt } = require('./idle-rpg/utils/helper');
+const { randomBetween } = require('./idle-rpg/utils/helper');
 const moment = require('moment');
 const { CronJob } = require('cron');
 
 const game = new Game(hook);
 
-const powerHourWarnTime = '00 00 13 * * 0-6'; // 1pm every day
+const minTimer = (process.env.MIN_TIMER * 1000) * 60;
+const maxTimer = (process.env.MAX_TIMER * 1000) * 60;
+
+const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
 const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
 const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
 const timeZone = 'America/Los_Angeles';
@@ -63,7 +66,8 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 const heartBeat = () => {
-  const discordOfflinePlayers = discordBot.users
+  const discordUsers = discordBot.users;
+  const discordOfflinePlayers = discordUsers
     .filter(player => player.presence.status === 'offline' && !player.bot)
     .map((player) => {
       return {
@@ -72,7 +76,7 @@ const heartBeat = () => {
       };
     });
 
-  const discordOnlinePlayers = discordBot.users
+  const discordOnlinePlayers = discordUsers
     .filter(player => player.presence.status === 'online' && !player.bot
       || player.presence.status === 'idle' && !player.bot
       || player.presence.status === 'dnd' && !player.bot)
@@ -89,22 +93,17 @@ const heartBeat = () => {
         p.discordId === player.discordId
       ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
 
-  let minTimer = 120000 + (60000 * ((onlinePlayerList.length + 1) / 8));
-  let maxTimer = 300000 + (60000 * ((onlinePlayerList.length + 1) / 8));
-  console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60} - MAXS : ${(process.env.MIN_MAX_TIMER * 1000) * 60} - ${(process.env.MAX_MAX_TIMER * 1000) * 60}`);
-  console.log(`TEST RANDOM INT: ${(randomInt(minTimer, maxTimer) / 1000) / 60}`);
-
-  // Normalizing timers so it doesnt go too high or too low.
-  minTimer = (minTimer / 1000) / 60 >= process.env.MIN_MAX_TIMER ? (process.env.MIN_MAX_TIMER * 1000) * 60 : minTimer;
-  maxTimer = (maxTimer / 1000) / 60 >= process.env.MAX_MAX_TIMER ? (process.env.MAX_MAX_TIMER * 1000) * 60 : maxTimer;
+  console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
+  console.log(`TEST RANDOM INT: ${(randomBetween(minTimer, maxTimer) / 1000) / 60}`);
 
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {
-      console.log(`${player.name} setting timer ${moment()}`);
+      const playerTimer = randomBetween(minTimer, maxTimer);
+      console.log(`${player.name} setting timer ${(playerTimer / 1000) / 60} ${moment()}`);
       player.timer = setTimeout(() => {
         game.selectEvent(player, onlinePlayerList, 'twitchBot');
         delete player.timer;
-      }, randomInt(minTimer, maxTimer));
+      }, playerTimer);
     }
   });
 };

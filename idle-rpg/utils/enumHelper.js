@@ -7,15 +7,35 @@ const enumHelper = {
 
   equipment: {
     empty: {
-      equip: {
+      helmet: {
         name: 'Nothing',
         stats: {
           str: 0,
           dex: 0,
           end: 0,
           int: 0,
-          previousOwners: []
         },
+        previousOwners: []
+      },
+      armor: {
+        name: 'Nothing',
+        stats: {
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 0,
+        },
+        previousOwners: []
+      },
+      weapon: {
+        name: 'Fists',
+        stats: {
+          str: 1,
+          dex: 1,
+          end: 1,
+          int: 0,
+        },
+        previousOwners: []
       },
       relic: {
         name: 'Nothing',
@@ -24,9 +44,9 @@ const enumHelper = {
           dex: 0,
           end: 0,
           int: 0,
-          luk: 0,
-          previousOwners: []
-        }
+          luk: 0
+        },
+        previousOwners: []
       }
     },
     types: {

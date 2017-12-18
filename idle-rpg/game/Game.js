@@ -13,11 +13,13 @@ class Game {
   }
 
   selectEvent(player, onlinePlayers, twitchBot) {
-    const randomEvent = helper.randomInt(0, 2);
+    const randomEvent = helper.randomBetween(0, 2);
 
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
+          helper.sendMessage(this.discordHook, twitchBot, false, `<@!${player.discordId}> was born! Welcome to the world of Idle-RPG!`);
+
           return Database.createNewPlayer(player.discordId, player.name);
         }
 
@@ -59,7 +61,7 @@ class Game {
   }
 
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    const luckDice = helper.randomInt(0, 100);
+    const luckDice = helper.randomBetween(0, 100);
     if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
@@ -74,11 +76,11 @@ class Game {
       return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, multiplier);
     }
 
-    return Event.generateLuckItemEvent(discordHook, 'twitch', selectedPlayer);
+    return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);
   }
 
   luckEvent(selectedPlayer, twitchBot) {
-    const luckDice = helper.randomInt(0, 100);
+    const luckDice = helper.randomBetween(0, 100);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
     } else if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {
@@ -95,15 +97,46 @@ class Game {
 
   powerHourBegin() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
-    multiplier = 2;
+    multiplier += 2;
   }
 
   powerHourEnd() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
-    multiplier = 1;
+    multiplier -= 2;
+  }
+
+  giveGold(playerId, amount) {
+    return Database.loadPlayer(playerId)
+      .then((updatingPlayer) => {
+        updatingPlayer.gold += amount;
+        Database.savePlayer(updatingPlayer);
+      });
   }
 
   // Commands
+  castSpell(commandAuthor, hook, spell) {
+    Database.loadPlayer(commandAuthor.id)
+      .then((castingPlayer) => {
+        switch (spell) {
+          case 'bless':
+            if (castingPlayer.gold >= 1500) {
+              castingPlayer.spells++;
+              castingPlayer.gold -= 1500;
+              multiplier += 1;
+              hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!! Current Multiplier is: ${multiplier}x`));
+              setTimeout(() => {
+                multiplier -= 1;
+                hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off. Current Multiplier is: ${multiplier}x`));
+              }, 900000); // 15minutes
+              Database.savePlayer(castingPlayer);
+            } else {
+              commandAuthor.send(`You do not have enough gold! The spell costs 1500 gold. You are lacking ${1500 - castingPlayer.gold}.`);
+            }
+            break;
+        }
+      });
+  }
+
   playerStats(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
   }

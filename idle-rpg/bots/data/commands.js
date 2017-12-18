@@ -14,12 +14,14 @@ const commands = [
     command: '!help',
     operatorOnly: false,
     function: (message) => {
-      const helpMsg = `\`\`\`You can private message me these commands!
+      const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !stats - Sends a PM with your stats
-        !stats <Player Name> - Sends a PM with the players stats. (without < > and case-senstive).
+        !stats <@Mention of player> - Sends a PM with the players stats. (without < > and case-senstive).
         !equip - Sends a PM with your equipment
-        !equip <Player Name> - Sends a PM with the players equipment. (without < > and case-senstive).
+        !equip <@Mention of player> - Sends a PM with the players equipment. (without < > and case-senstive).
         !map - Displays the worlds locations.
+        !castspell - Lists spells available to cast.
+        !castspell <spell> - Casts a global spell onto Idle-RPG.
         \`\`\``;
       /*
 
@@ -150,11 +152,40 @@ const commands = [
         game.loadPlayer(playerId)
           .then((player) => {
             player.equipment[position] = equipment;
-            console.log(player.equipment);
             game.savePlayer(player)
               .then(() => {
                 message.author.send('Done.');
               });
+          });
+      }
+    }
+  },
+
+  castSpell = {
+    command: '!castspell',
+    channelOnlyId: commandChannel,
+    function: (message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        game.castSpell(message.author, discordHook, message.content.split(' ')[1].toLowerCase());
+      } else {
+        message.reply(`\`\`\`List of spells:
+        bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 15 minutes.
+        \`\`\``);
+      }
+    }
+  },
+
+  // Bot Operator commands
+  giveGold = {
+    command: '!givegold',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (message) => {
+      if (message.content.includes(' ') && message.content.split(' ').length > 2) {
+        const splitCommand = message.content.split(' ');
+        game.giveGold(splitCommand[1], splitCommand[2])
+          .then(() => {
+            message.author.send('Done.');
           });
       }
     }

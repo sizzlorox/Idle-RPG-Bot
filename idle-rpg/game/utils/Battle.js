@@ -2,19 +2,21 @@ const helper = require('../../utils/helper');
 
 class Battle {
   simulateBattleWithMob(selectedPlayer, mobObj) {
-    const playerDamage = helper.sumPlayerTotalStrength(selectedPlayer);
-    const playerEvasive = helper.sumPlayerTotalDexterity(selectedPlayer)
-      + (helper.sumPlayerTotalIntelligence(selectedPlayer) / 2);
-    const playerDefense = helper.sumPlayerTotalEndurance(selectedPlayer);
+    return new Promise((resolve) => {
+      const playerDamage = helper.sumPlayerTotalStrength(selectedPlayer);
+      const playerEvasive = helper.sumPlayerTotalDexterity(selectedPlayer)
+        + (helper.sumPlayerTotalIntelligence(selectedPlayer) / 2);
+      const playerDefense = helper.sumPlayerTotalEndurance(selectedPlayer);
 
-    const mobDamage = mobObj.stats.str;
-    const mobEvasive = mobObj.stats.dex;
-    const mobDefense = mobObj.stats.end;
+      const mobDamage = mobObj.stats.str;
+      const mobEvasive = mobObj.stats.dex;
+      const mobDefense = mobObj.stats.end;
 
-    const playerChance = Math.ceil((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
-    const mobChance = Math.ceil((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
+      const playerChance = Math.ceil((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
+      const mobChance = Math.ceil((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
 
-    return { playerChance, mobChance };
+      return resolve({ playerChance, mobChance });
+    });
   }
 
   simulateBattleWithPlayer(selectedPlayer, otherPlayer) {
@@ -28,8 +30,8 @@ class Battle {
       + (helper.sumPlayerTotalIntelligence(otherPlayer) / 2);
     const otherPlayerDefense = helper.sumPlayerTotalEndurance(otherPlayer);
 
-    const playerChance = Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + helper.randomInt(1, 5 + helper.sumPlayerTotalLuck(selectedPlayer));
-    const otherPlayerChance = Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + helper.randomInt(1, 5 + helper.sumPlayerTotalLuck(otherPlayer));
+    const playerChance = Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + helper.randomBetween(1, 5 + helper.sumPlayerTotalLuck(selectedPlayer));
+    const otherPlayerChance = Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + helper.randomBetween(1, 5 + helper.sumPlayerTotalLuck(otherPlayer));
     console.log(`PlayerChance: ${playerChance} - OtherPlayerChance: ${otherPlayerChance}`);
 
     return { playerChance, otherPlayerChance };
