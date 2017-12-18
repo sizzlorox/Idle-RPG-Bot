@@ -4,14 +4,14 @@ const monsters = require('../data/monsters');
 class Monster {
   generateMonster(selectedPlayer) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.ceil(helper.randomInt(0, 100));
-      const randomTypeChance = Math.ceil(helper.randomInt(0, 100));
+      const randomRarityChance = Math.ceil(helper.randomBetween(0, 100));
+      const randomTypeChance = Math.ceil(helper.randomBetween(0, 100));
       const randomMonsterType = randomTypeChance + randomRarityChance > 100 ? 100 : randomTypeChance + randomRarityChance;
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType);
 
-      const randomRarityIndex = helper.randomInt(0, monsterRarityList.length - 1);
-      const randomTypeIndex = helper.randomInt(0, monsterTypeList.length - 1);
+      const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
+      const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);
 
       const monsterObj = {
         name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,

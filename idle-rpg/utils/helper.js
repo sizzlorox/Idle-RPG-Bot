@@ -4,8 +4,21 @@ const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 
 class helper {
-  randomInt(min, max) {
-    return Math.floor(Math.random() * (((max - min) + 1) + min));
+  randomBetween(min, max, decimal, exclude) {
+    // https://stackoverflow.com/questions/15594332/unbiased-random-range-generator-in-javascript
+    if (arguments.length < 2) return (Math.random() >= 0.5);
+
+    let factor = 1;
+    let result;
+    if (typeof decimal === 'number') {
+      factor = decimal ** 10;
+    }
+
+    do {
+      result = (Math.random() * (max - min)) + min;
+      result = Math.round(result * factor) / factor;
+    } while (result === exclude);
+    return result;
   }
 
   sendMessage(discordHook, twitchBot, isMovement, msg) {
@@ -16,7 +29,7 @@ class helper {
     }
 
     // Add if to check if channel is streaming
-    // twitchBot.say(msg.replace('/\\*/g', ''));
+    // twitchBot.say(msg.replace('/\*/g', ''));
   }
 
   setImportantMessage(message) {

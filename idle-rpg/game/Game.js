@@ -13,7 +13,7 @@ class Game {
   }
 
   selectEvent(player, onlinePlayers, twitchBot) {
-    const randomEvent = helper.randomInt(0, 2);
+    const randomEvent = helper.randomBetween(0, 2);
 
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
@@ -61,7 +61,7 @@ class Game {
   }
 
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    const luckDice = helper.randomInt(0, 100);
+    const luckDice = helper.randomBetween(0, 100);
     if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
@@ -80,7 +80,7 @@ class Game {
   }
 
   luckEvent(selectedPlayer, twitchBot) {
-    const luckDice = helper.randomInt(0, 100);
+    const luckDice = helper.randomBetween(0, 100);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
     } else if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {

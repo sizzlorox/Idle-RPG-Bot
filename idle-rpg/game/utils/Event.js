@@ -60,7 +60,7 @@ class Event {
         const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1);
 
         if (sameMapPlayers.length > 0) {
-          const randomPlayerIndex = helper.randomInt(0, sameMapPlayers.length - 1);
+          const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
           const randomPlayer = sameMapPlayers[randomPlayerIndex];
 
           const { playerChance, otherPlayerChance } = Battle.simulateBattleWithPlayer(
@@ -156,7 +156,7 @@ class Event {
 
   generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob) {
     return new Promise((resolve) => {
-      const dropitemChance = helper.randomInt(0, 100);
+      const dropitemChance = helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
         return Item.generateItem(selectedPlayer)
@@ -245,7 +245,7 @@ class Event {
   }
 
   generateItemEventMessage(selectedPlayer, item) {
-    const randomEventMessage = helper.randomInt(0, 3);
+    const randomEventMessage = helper.randomBetween(0, 3);
     switch (randomEventMessage) {
       case 0:
         return `<@!${selectedPlayer.discordId}> found a chest containing \`${item.name}\` in \`${selectedPlayer.map.name}\`!`;
@@ -260,9 +260,9 @@ class Event {
 
   stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer) {
     return new Promise((resolve) => {
-      const luckStealChance = helper.randomInt(0, 100);
+      const luckStealChance = helper.randomBetween(0, 100);
       if (luckStealChance > 50 || randomPlayer.health <= 0) {
-        const luckItem = helper.randomInt(0, 3);
+        const luckItem = helper.randomBetween(0, 3);
         switch (luckItem) {
           case 0:
             if (helper.calculateItemRating(selectedPlayer.equipment.helmet) < helper.calculateItemRating(randomPlayer.equipment.helmet)) {
@@ -358,11 +358,11 @@ class Event {
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = helper.randomInt(0, 3);
+      const luckEvent = helper.randomBetween(0, 3);
       switch (luckEvent) {
         case 0:
-          const luckStat = helper.randomInt(0, 4);
-          let luckStatAmount = helper.randomInt(2, 10);
+          const luckStat = helper.randomBetween(0, 4);
+          let luckStatAmount = helper.randomBetween(2, 10);
           if (luckStatAmount === 0) {
             luckStatAmount = 1;
           }
@@ -394,7 +394,7 @@ class Event {
           return resolve(selectedPlayer);
 
         case 1:
-          let luckExpAmount = helper.randomInt(5, 15);
+          let luckExpAmount = helper.randomBetween(5, 15);
           if (luckExpAmount === 0) {
             luckExpAmount = 1;
           }
@@ -407,7 +407,7 @@ class Event {
           return resolve(selectedPlayer);
 
         case 3:
-          let luckHealthAmount = helper.randomInt(5, 15);
+          let luckHealthAmount = helper.randomBetween(5, 15);
           if (luckHealthAmount === 0) {
             luckHealthAmount = 1;
           }
@@ -422,9 +422,9 @@ class Event {
 
   generateGoldEvent(discordHook, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
-      const luckGoldChance = helper.randomInt(0, 100);
+      const luckGoldChance = helper.randomBetween(0, 100);
       if (luckGoldChance >= 75) {
-        const luckGoldDice = helper.randomInt(0, 100);
+        const luckGoldDice = helper.randomBetween(0, 100);
         const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed()) * multiplier;
         selectedPlayer.gold += goldAmount;
         helper.sendMessage(discordHook, 'twitch', false, `<@!${selectedPlayer.discordId}> found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`);
@@ -438,7 +438,7 @@ class Event {
 
   generateLuckItemEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckItemDice = helper.randomInt(0, 100);
+      const luckItemDice = helper.randomBetween(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
         return Item.generateItem(selectedPlayer)

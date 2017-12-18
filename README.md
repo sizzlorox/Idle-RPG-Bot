@@ -20,8 +20,8 @@ DISCORD_RPG_COMMAND_CHANNEL_ID=<Discord command channel ID here>
 DISCORD_RPQ_FAQ_CHANNEL=<Discord FAQ channel ID here>
 DISCORD_BOT_LOGIN_TOKEN=<Discord bot login token here>
 
-MIN_MAX_TIMER=<Minimal timer in minutes here (Minimal Max Timer)>
-MAX_MAX_TIMER=<Maximum timer in minutes here (Maximum Max Timer)>
+MIN_TIMER=<Minimal timer in minutes here>
+MAX_TIMER=<Maximum timer in minutes here>
 
 MONGODB_URI=<mongodb connection URI>
 ```
