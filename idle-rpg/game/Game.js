@@ -119,9 +119,10 @@ class Game {
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
-            if (castingPlayer.gold >= 1500) {
+            const spellCost = 1500;
+            if (castingPlayer.gold >= spellCost) {
               castingPlayer.spells++;
-              castingPlayer.gold -= 1500;
+              castingPlayer.gold -= spellCost;
               multiplier += 1;
               hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!! Current Multiplier is: ${multiplier}x`));
               setTimeout(() => {
@@ -130,7 +131,7 @@ class Game {
               }, 900000); // 15minutes
               Database.savePlayer(castingPlayer);
             } else {
-              commandAuthor.send(`You do not have enough gold! The spell costs 1500 gold. You are lacking ${1500 - castingPlayer.gold}.`);
+              commandAuthor.send(`You do not have enough gold! This spell costs ${spellCost} gold. You are lacking ${spellCost - castingPlayer.gold} gold.`);
             }
             break;
         }

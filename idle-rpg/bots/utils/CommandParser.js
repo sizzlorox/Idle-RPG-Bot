@@ -26,7 +26,11 @@ class CommandParser {
         return messageObj.reply('This is a bot operator only command.');
       }
 
-      commandObj.function(messageObj, discordBot, hook);
+      return commandObj.function(messageObj, discordBot, hook);
+    }
+
+    if (messageContent.startsWith('!')) {
+      return messageObj.reply(`Please check !help for more info. ${messageContent} was an invalid command.`);
     }
   }
 

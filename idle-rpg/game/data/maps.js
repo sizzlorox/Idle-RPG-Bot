@@ -149,6 +149,13 @@ const maps = [
     type: type.town.name,
     mobs: [],
     levelReq: 1
-  }
+  },
+  {
+    id: 20,
+    name: 'Damascus Fields',
+    type: type.land.name,
+    mobs: [],
+    levelReq: 1
+  },
 ];
 module.exports = maps;

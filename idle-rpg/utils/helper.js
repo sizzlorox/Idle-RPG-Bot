@@ -30,15 +30,11 @@ class helper {
     let minutes = ((duration / (1000 * 60)) % 60).toFixed();
     let hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
 
-    hours = (hours < 10) ? `0${hours}` : hours;
-    minutes = (minutes < 10) ? `0${minutes}` : minutes;
-    seconds = (seconds < 10) ? `0${seconds}` : seconds;
-
-    const hourString = Number(hours) === 0 ? '' : `${hours}h`;
-    const minuteString = Number(minutes) === 0 ? '' : `${minutes}m`;
+    const hourString = Number(hours) === 0 ? '' : `${hours}h `;
+    const minuteString = Number(minutes) === 0 ? '' : `${minutes}m `;
     const secondString = Number(seconds) === 0 ? '' : `${seconds}s`;
 
-    return `${hourString} ${minuteString} ${secondString}`;
+    return `${hourString}${minuteString}${secondString}`;
   }
 
   logEvent(selectedPlayer, msg) {
@@ -314,13 +310,15 @@ class helper {
     }
 
     let logResult = 'Heres what you have done so far:\n      ';
-    player.pastEvents.forEach((log, index) => {
-      if (index === count) {
-        return;
+    let logCount = 0;
+    for (let i = player.pastEvents.length - 1; i >= 0; i--) {
+      if (logCount === count) {
+        break;
       }
 
-      logResult = logResult.concat(`${log.event} - ${this.getTimePassed(log.timeStamp)} ago\n      `);
-    });
+      logResult = logResult.concat(`${player.pastEvents[i].event} [${this.getTimePassed(player.pastEvents[i].timeStamp)} ago]\n      `);
+      logCount++;
+    }
     return logResult;
   }
 }
