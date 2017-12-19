@@ -97,12 +97,12 @@ class Game {
 
   powerHourBegin() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
-    multiplier += 2;
+    multiplier += 1;
   }
 
   powerHourEnd() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
-    multiplier -= 2;
+    multiplier -= 1;
   }
 
   giveGold(playerId, amount) {
@@ -115,7 +115,7 @@ class Game {
 
   // Commands
   castSpell(commandAuthor, hook, spell) {
-    Database.loadPlayer(commandAuthor.id)
+    return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
@@ -128,7 +128,7 @@ class Game {
               setTimeout(() => {
                 multiplier -= 1;
                 hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off. Current Multiplier is: ${multiplier}x`));
-              }, 900000); // 15minutes
+              }, 1800000); // 30 minutes
               Database.savePlayer(castingPlayer);
             } else {
               commandAuthor.send(`You do not have enough gold! This spell costs ${spellCost} gold. You are lacking ${spellCost - castingPlayer.gold} gold.`);
