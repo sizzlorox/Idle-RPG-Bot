@@ -97,6 +97,11 @@ class Database {
 
   loadTop10(type) {
     connect();
+    const select = {
+      name: 1
+    };
+    select[Object.keys(type)[0]] = 1;
+
     return new Promise((resolve, reject) => {
       return Player.find({}, (err, result) => {
         if (err) {
@@ -107,12 +112,7 @@ class Database {
         disconnect();
         return resolve(result);
       })
-        .select({
-          name: 1,
-          gold: 1,
-          level: 1,
-          spells: 1
-        })
+        .select(select)
         .sort(type)
         .limit(10);
     });

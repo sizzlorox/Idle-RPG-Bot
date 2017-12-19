@@ -13,7 +13,7 @@ const commands = [
     function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
-        !top10 <gold, spells, level, stolen, stole> - Retrives top 10 highest of selected section
+        !top10 <gold, spells, level, stolen, stole, gambles> - Retrives top 10 highest of selected section
         !stats - Sends a PM with your stats
         !stats <@Mention of player> - Sends a PM with the players stats. (without < > and case-senstive).
         !equip - Sends a PM with your equipment
@@ -145,6 +145,9 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       switch ((message.content.split(' ')[1] === undefined) ? 'level' : message.content.split(' ')[1].toLowerCase()) {
+        case 'gambles':
+          game.top10(message.author, { gambles: -1 });
+          break;
         case 'stolen':
           game.top10(message.author, { stolen: -1 });
           break;
