@@ -84,6 +84,8 @@ class Game {
     const luckDice = helper.randomBetween(0, 100);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
+    } else if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 10 + (selectedPlayer.stats.luk / 2)) {
+      return Event.generateGamblingEvent(this.discordHook, selectedPlayer);
     } else if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {
       return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
