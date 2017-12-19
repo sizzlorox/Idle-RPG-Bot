@@ -26,9 +26,9 @@ class helper {
   }
 
   toTimeFormat(duration) {
-    let seconds = ((duration / 1000) % 60).toFixed();
-    let minutes = ((duration / (1000 * 60)) % 60).toFixed();
-    let hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
+    const seconds = ((duration / 1000) % 60).toFixed();
+    const minutes = ((duration / (1000 * 60)) % 60).toFixed();
+    const hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
 
     const hourString = Number(hours) === 0 ? '' : `${hours}h `;
     const minuteString = Number(minutes) === 0 ? '' : `${minutes}m `;
@@ -175,7 +175,7 @@ class helper {
       const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`);
       const eventLog = 'You died. Game over man... Game over.';
 
-      this.sendMessage(discordHook, 'twitch', false, eventMsg);
+      this.sendMessage(hook, 'twitch', false, eventMsg);
       selectedPlayer = this.logEvent(selectedPlayer, eventLog);
     }
 

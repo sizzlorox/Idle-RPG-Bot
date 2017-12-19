@@ -22,8 +22,8 @@ const commands = [
         !map - Displays the worlds locations.
         !castspell - Lists spells available to cast.
         !castspell <spell> - Casts a global spell onto Idle-RPG.
-        !eventlog - Lists up to 50 past events.
-        !eventlog <@Mention of player> - Lists up to 50 past events of mentioned player.
+        !eventlog - Lists up to 25 past events.
+        !eventlog <@Mention of player> - Lists up to 25 past events of mentioned player.
         \`\`\``;
       /*
 
@@ -127,14 +127,13 @@ const commands = [
         .then((players) => {
           let mapInfo = '';
           maps.forEach((map) => {
-            mapInfo = mapInfo.concat(`\n${map.name} (${map.type}) (`);
+            mapInfo = mapInfo.concat(`\n${map.name} (${map.type}):\n`);
             players.forEach((player) => {
               if (player.map.name === map.name) {
                 mapInfo = mapInfo.concat(`${player.name}, `);
               }
             });
-            mapInfo = mapInfo.replace(/,\s*$/, '');
-            mapInfo = mapInfo.concat(')');
+            mapInfo = mapInfo.concat('\n').replace(/,\s*$/, '');
           });
 
           message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
@@ -168,7 +167,10 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
-        game.castSpell(message.author, discordHook, message.content.split(' ')[1].toLowerCase());
+        game.castSpell(message.author, discordHook, message.content.split(' ')[1].toLowerCase())
+          .then(() => {
+            message.author.send('Spell has been casted!');
+          });
       } else {
         message.reply(`\`\`\`List of spells:
         bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 15 minutes.
@@ -189,7 +191,7 @@ const commands = [
           });
       }
 
-      return game.playerEventLog(message.author.id, 50)
+      return game.playerEventLog(message.author.id, 25)
         .then((result) => {
           return message.author.send(`\`\`\`${result}\`\`\``);
         });
@@ -217,10 +219,12 @@ const commands = [
     operatorOnly: true,
     channelOnlyId: commandChannel,
     function: (message) => {
-      game.deletePlayer()
-        .then(() => {
-          message.author.send('Done.');
-        });
+      if (message.content.includes(' ')) {
+        game.deletePlayer(message.content.split(' ')[1])
+          .then(() => {
+            message.author.send('Done.');
+          });
+      }
     }
   },
 

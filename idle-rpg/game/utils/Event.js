@@ -157,7 +157,6 @@ class Event {
             .then((battleResults) => {
               console.log(`GAME: PlayerChance: ${battleResults.playerChance} - MobChance: ${battleResults.mobChance}`);
               if (battleResults.playerChance >= battleResults.mobChance) {
-                console.log(`TOF EXP: ${typeof mob.experience} ${Number.isNaN(multiplier)} - TOF Multiplier: ${typeof multiplier} ${Number.isNaN(multiplier)}`);
                 selectedPlayer.experience += mob.experience * multiplier;
                 selectedPlayer.gold += mob.gold * multiplier;
                 selectedPlayer.kills.mob++;
@@ -228,8 +227,8 @@ class Event {
                 break;
             }
 
-            const eventMsg = `<@!${selectedPlayer.discordId}> dropped a \`${item.name}\` from \`${mob.name}!\``;
-            const eventLog = `Dropped ${item.name} from ${mob.name}`;
+            const eventMsg = `<@!${selectedPlayer.discordId}> received \`${item.name}\` from \`${mob.name}!\``;
+            const eventLog = `Received ${item.name} from ${mob.name}`;
 
             helper.sendMessage(discordHook, 'twitch', false, eventMsg);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -247,16 +246,18 @@ class Event {
     return new Promise((resolve) => {
       return Item.generateItem(selectedPlayer)
         .then((item) => {
+          if (selectedPlayer.gold <= item.gold) {
+            return resolve(selectedPlayer);
+          }
+
           switch (item.position) {
             case enumHelper.equipment.types.helmet.position:
               if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
                 return resolve(selectedPlayer);
               }
 
-              if (selectedPlayer.gold >= item.gold) {
-                selectedPlayer.gold -= item.gold;
-                helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
-              }
+              selectedPlayer.gold -= item.gold;
+              helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
               break;
 
             case enumHelper.equipment.types.armor.position:
@@ -264,10 +265,8 @@ class Event {
                 return resolve(selectedPlayer);
               }
 
-              if (selectedPlayer.gold >= item.gold) {
-                selectedPlayer.gold -= item.gold;
-                helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
-              }
+              selectedPlayer.gold -= item.gold;
+              helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
               break;
 
             case enumHelper.equipment.types.weapon.position:
@@ -275,10 +274,8 @@ class Event {
                 return resolve(selectedPlayer);
               }
 
-              if (selectedPlayer.gold >= item.gold) {
-                selectedPlayer.gold -= item.gold;
-                helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
-              }
+              selectedPlayer.gold -= item.gold;
+              helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
               break;
           }
 
