@@ -243,6 +243,8 @@ class helper {
 
     Born: ${player.createdAt}
     Events: ${player.events}
+    Items Stole: ${player.stole}
+    Items Stolen: ${player.stolen}
     Spells Casted: ${player.spells}
     Kills:
       Monsters: ${player.kills.mob}

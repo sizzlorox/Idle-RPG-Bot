@@ -26,7 +26,7 @@ class Event {
       .then((mappedPlayers) => {
         const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
           && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
-          && player.level <= selectedPlayer.level + 10 && player.level >= selectedPlayer.level - 10);
+          && player.level <= selectedPlayer.level + 5 && player.level >= selectedPlayer.level - 5);
 
         if (sameMapPlayers.length > 0) {
           const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
@@ -110,8 +110,8 @@ class Event {
                 selectedPlayer.kills.mob++;
                 helper.checkExperience(selectedPlayer, discordHook);
 
-                const eventMsg = `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} Gold!`;
-                const eventLog = `Killed ${mob.name} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} Gold`;
+                const eventMsg = `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
+                const eventLog = `Killed ${mob.name} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -131,8 +131,8 @@ class Event {
               }
               helper.checkHealth(selectedPlayer, mob, discordHook);
 
-              const eventMsg = `<@!${selectedPlayer.discordId}> just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${battleResults.mobChance} health and ${mob.gold} Gold!`;
-              const eventLog = `Lost a battle to ${mob.name} in ${selectedPlayer.map.name} losing ${battleResults.mobChance} health and ${mob.gold} Gold`;
+              const eventMsg = `<@!${selectedPlayer.discordId}> just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${battleResults.mobChance} health and ${mob.gold} gold!`;
+              const eventLog = `Lost a battle to ${mob.name} in ${selectedPlayer.map.name} losing ${battleResults.mobChance} health and ${mob.gold} gold`;
 
               helper.sendMessage(discordHook, 'twitch', false, eventMsg);
               selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -297,6 +297,8 @@ class Event {
                 selectedPlayer.equipment.helmet.previousOwners = randomPlayer.equipment.helmet.previousOwners;
                 selectedPlayer.equipment.helmet.previousOwners.push(randomPlayer.name);
               }
+              randomPlayer.stolen++;
+              selectedPlayer.stole++;
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
             }
             break;
@@ -327,6 +329,8 @@ class Event {
                 selectedPlayer.equipment.armor.previousOwners = randomPlayer.equipment.armor.previousOwners;
                 selectedPlayer.equipment.armor.previousOwners.push(randomPlayer.name);
               }
+              randomPlayer.stolen++;
+              selectedPlayer.stole++;
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
             }
             break;
@@ -357,6 +361,8 @@ class Event {
                 selectedPlayer.equipment.weapon.previousOwners = randomPlayer.equipment.weapon.previousOwners;
                 selectedPlayer.equipment.weapon.previousOwners.push(randomPlayer.name);
               }
+              randomPlayer.stolen++;
+              selectedPlayer.stole++;
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
             }
             break;
@@ -387,6 +393,8 @@ class Event {
                 selectedPlayer.equipment.relic.previousOwners = randomPlayer.equipment.relic.previousOwners;
                 selectedPlayer.equipment.relic.previousOwners.push(randomPlayer.name);
               }
+              randomPlayer.stolen++;
+              selectedPlayer.stole++;
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.relic.position, enumHelper.equipment.empty.relic);
             }
             break;

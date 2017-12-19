@@ -95,6 +95,29 @@ class Database {
     });
   }
 
+  loadTop10(type) {
+    connect();
+    return new Promise((resolve, reject) => {
+      return Player.find({}, (err, result) => {
+        if (err) {
+          disconnect();
+          return reject(err);
+        }
+
+        disconnect();
+        return resolve(result);
+      })
+        .select({
+          name: 1,
+          gold: 1,
+          level: 1,
+          spells: 1
+        })
+        .sort(type)
+        .limit(10);
+    });
+  }
+
   loadPlayer(discordId) {
     connect();
     return new Promise((resolve, reject) => {
