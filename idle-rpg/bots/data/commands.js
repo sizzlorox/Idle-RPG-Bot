@@ -1,19 +1,16 @@
 const moment = require('moment');
-const Game = require('../../game/Game');
 const Space = require('../modules/Space');
 const Crypto = require('../modules/Crypto');
 const maps = require('../../game/data/maps');
 const helper = require('../../utils/helper');
 const { commandChannel } = require('../../../settings');
 
-const game = new Game();
-
 const commands = [
   // RPG COMMANDS
   help = {
     command: '!help',
     operatorOnly: false,
-    function: (message) => {
+    function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !stats - Sends a PM with your stats
         !stats <@Mention of player> - Sends a PM with the players stats. (without < > and case-senstive).
@@ -23,7 +20,7 @@ const commands = [
         !castspell - Lists spells available to cast.
         !castspell <spell> - Casts a global spell onto Idle-RPG.
         !eventlog - Lists up to 25 past events.
-        !eventlog <@Mention of player> - Lists up to 25 past events of mentioned player.
+        !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
         \`\`\``;
       /*
 
@@ -40,7 +37,7 @@ const commands = [
     command: '!stats',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (message, discordBot) => {
+    function: (game, message, discordBot) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(' ')[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -77,7 +74,7 @@ const commands = [
     command: '!equip',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (message, discordBot) => {
+    function: (game, message, discordBot) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(' ')[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -114,7 +111,7 @@ const commands = [
     command: '!map',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (message, discordBot) => {
+    function: (game, message, discordBot) => {
       const discordOnlinePlayers = discordBot.users
         .filter(player => player.presence.status === 'online' && !player.bot
           || player.presence.status === 'idle' && !player.bot
@@ -133,7 +130,7 @@ const commands = [
                 mapInfo = mapInfo.concat(`${player.name}, `);
               }
             });
-            mapInfo = mapInfo.concat('\n').replace(/,\s*$/, '');
+            mapInfo = mapInfo.replace(/,\s*$/, '');
           });
 
           message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
@@ -144,7 +141,7 @@ const commands = [
   giveEquipmentToPlayer = {
     command: '!giveplayer',
     operatorOnly: true,
-    function: (message) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitArray = message.content.split(' ');
         const playerId = splitArray[1];
@@ -165,15 +162,12 @@ const commands = [
   castSpell = {
     command: '!castspell',
     channelOnlyId: commandChannel,
-    function: (message, discordBot, discordHook) => {
+    function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
-        game.castSpell(message.author, discordHook, message.content.split(' ')[1].toLowerCase())
-          .then(() => {
-            message.author.send('Spell has been casted!');
-          });
+        game.castSpell(message.author, discordHook, message.content.split(' ')[1].toLowerCase());
       } else {
         message.reply(`\`\`\`List of spells:
-        bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 15 minutes.
+        bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
         \`\`\``);
       }
     }
@@ -182,7 +176,7 @@ const commands = [
   eventLog = {
     command: '!eventlog',
     channelOnlyId: commandChannel,
-    function: (message) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(' ');
         return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 50)
@@ -191,8 +185,9 @@ const commands = [
           });
       }
 
-      return game.playerEventLog(message.author.id, 25)
+      return game.playerEventLog(message.author.id, 15)
         .then((result) => {
+          console.log(`\`\`\`${result}\`\`\``.length);
           return message.author.send(`\`\`\`${result}\`\`\``);
         });
     }
@@ -203,7 +198,7 @@ const commands = [
     command: '!givegold',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (message) => {
+    function: (game, message) => {
       if (message.content.includes(' ') && message.content.split(' ').length > 2) {
         const splitCommand = message.content.split(' ');
         game.giveGold(splitCommand[1], splitCommand[2])
@@ -218,7 +213,7 @@ const commands = [
     command: '!resetplayer',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (message) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         game.deletePlayer(message.content.split(' ')[1])
           .then(() => {
@@ -232,7 +227,7 @@ const commands = [
     command: '!resetall',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (message) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         game.deleteAllPlayers(message.content.split(' ')[1])
           .then(() => {
@@ -242,28 +237,11 @@ const commands = [
     }
   },
 
-  forceAttack = {
-    command: '!forceattack',
-    operatorOnly: true,
-    channelOnlyId: commandChannel,
-    function: (message, discordBot, discordHook) => {
-      if (message.content.includes(' ')) {
-        const attackPlayer = message.content.split(' ')[1];
-        const otherAttackPlayer = message.content.split(' ')[2];
-        if (!otherAttackPlayer) {
-          return game.forcePvp(discordBot, discordHook, message.author, attackPlayer);
-        }
-
-        return game.forcePvp(discordBot, discordHook, message.author, attackPlayer, otherAttackPlayer);
-      }
-    }
-  },
-
   // MODULE COMMANDS
   nextLaunch = {
     command: '!nextlaunch',
     operatorOnly: false,
-    function: (message) => {
+    function: (game, message) => {
       Space.nextLaunch()
         .then((spaceInfo) => {
           const nextLaunch = spaceInfo.launches[0];
@@ -284,7 +262,7 @@ const commands = [
   nextStreamlaunch = {
     command: '!nextstreamlaunch',
     operatorOnly: false,
-    function: (message) => {
+    function: (game, message) => {
       Space.nextLaunch()
         .then((spaceInfo) => {
           let nextLaunch;
@@ -312,7 +290,7 @@ const commands = [
   crypto = {
     command: '!crypto',
     operatorOnly: false,
-    function: (message) => {
+    function: (game, message) => {
       let currency = 'BRL';
       if (message.content.includes(' ')) {
         currency = message.content.split(' ')[1];

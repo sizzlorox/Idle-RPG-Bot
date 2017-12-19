@@ -21,57 +21,12 @@ class Event {
     });
   }
 
-  // Attack Events
-  attackForcePvPAttack(discordHook, twitchBot, selectedPlayer, playerToAttack) {
-    const { playerChance, otherPlayerChance } = Battle.simulateBattleWithPlayer(
-      selectedPlayer,
-      playerToAttack
-    );
-
-    console.log(`GAME: Attacking Player: ${playerChance} - Random Defending Player: ${otherPlayerChance}`);
-
-    if (playerChance >= otherPlayerChance) {
-      helper.checkHealth(playerToAttack, selectedPlayer, discordHook);
-      playerToAttack.health -= Math.abs(playerChance);
-
-      const eventMsg = `<@!${selectedPlayer.discordId}> just attacked <@!${playerToAttack.discordId}> in ${selectedPlayer.map.name} with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`;
-      const eventLog = `Attacked ${playerToAttack.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${Math.abs(playerChance)} damage`;
-
-      helper.sendMessage(discordHook, 'twitch', false, eventMsg);
-      selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
-
-      return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, playerToAttack)
-        .then((battleResults) => {
-          Database.savePlayer(battleResults.randomPlayer);
-
-          return battleResults.selectedPlayer;
-        });
-    }
-
-    selectedPlayer.health -= Math.abs(otherPlayerChance);
-    helper.checkHealth(selectedPlayer, playerToAttack, discordHook);
-
-    const eventMsg = `<@!${selectedPlayer.discordId}> just attacked <@!${playerToAttack.discordId}> with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` but failed!
-    <@!${playerToAttack.discordId}>s \`${playerToAttack.equipment.weapon.name}\` dealt ${Math.abs(otherPlayerChance)} damage!`;
-
-    const eventLog = `Attacked ${playerToAttack.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and failed.
-    ${playerToAttack.name} did ${Math.abs(otherPlayerChance)} damage with ${playerToAttack.equipment.weapon.name}`;
-
-    helper.sendMessage(discordHook, 'twitch', false, eventMsg);
-    selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
-
-    return this.stealPlayerItem(discordHook, twitchBot, playerToAttack, selectedPlayer)
-      .then((battleResults) => {
-        Database.savePlayer(battleResults.randomPlayer);
-
-        return battleResults.selectedPlayer;
-      });
-  }
-
-  attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers) {
+  attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers, multiplier) {
     return Database.getSameMapPlayers(selectedPlayer.map.name)
       .then((mappedPlayers) => {
-        const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1);
+        const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
+          && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
+          && player.level >= selectedPlayer.level + 10 && player.level <= selectedPlayer.level - 10);
 
         if (sameMapPlayers.length > 0) {
           const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
@@ -85,15 +40,12 @@ class Event {
           console.log(`GAME: Attacking Player: ${playerChance} - Random Defending Player: ${otherPlayerChance}`);
 
           if (playerChance >= otherPlayerChance) {
-            console.log(`RP1: ${randomPlayer.name} - ${randomPlayer.health}`);
             randomPlayer.health -= Math.abs(playerChance);
-            console.log(`RP2: ${randomPlayer.name} - ${randomPlayer.health}`);
             selectedPlayer.battles.won++;
             randomPlayer.battles.lost++;
 
             const eventMsg = `<@!${selectedPlayer.discordId}> just attacked <@!${randomPlayer.discordId}> in \`${selectedPlayer.map.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`;
             const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${Math.abs(playerChance)} damage`;
-
             const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and lost ${Math.abs(playerChance)} health`;
 
             helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -102,7 +54,6 @@ class Event {
 
             return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
               .then((battleResults) => {
-                console.log(`RP3: ${battleResults.randomPlayer.name} - ${battleResults.randomPlayer.health}`);
                 helper.checkHealth(battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
                 return Database.savePlayer(battleResults.randomPlayer)
                   .then(() => {
@@ -112,9 +63,7 @@ class Event {
               .catch(err => console.log(err));
           }
 
-          console.log(`SP1: ${selectedPlayer.name} - ${selectedPlayer.health}`);
           selectedPlayer.health -= Math.abs(otherPlayerChance);
-          console.log(`SP2: ${selectedPlayer.name} - ${selectedPlayer.health}`);
           randomPlayer.battles.won++;
           selectedPlayer.battles.lost++;
 
@@ -134,7 +83,6 @@ class Event {
           return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
             .then((battleResults) => {
               //  TODO: inverted because of how I set the stealPlayerItem function (think of a way to make this better!)
-              console.log(`SP3: ${battleResults.randomPlayer.name} - ${battleResults.randomPlayer.health}`);
               helper.checkHealth(battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
               return Database.savePlayer(battleResults.selectedPlayer)
                 .then(() => {
@@ -144,7 +92,7 @@ class Event {
             .catch(err => console.log(err));
         }
 
-        return this.attackEventMob(discordHook, twitchBot, selectedPlayer)
+        return this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
           .catch(err => console.log(err));
       });
   }
