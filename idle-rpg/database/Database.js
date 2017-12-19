@@ -7,15 +7,15 @@ const Player = mongoose.model('Player', playerSchema);
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 
 mongoose.connection.on('open', () => {
-  console.log('\nDATABASE: Connected!');
+  // console.log('\nDATABASE: Connected!');
 });
 
 mongoose.connection.on('close', () => {
-  console.log('DATABASE: Disconnected!\n');
+  // console.log('DATABASE: Disconnected!\n');
 });
 
 process.on('close', () => {
-  console.log('Database disconnecting on app termination');
+  // console.log('Database disconnecting on app termination');
 });
 
 process.on('SIGINT', () => {
@@ -46,10 +46,30 @@ class Database {
           disconnect();
           return reject(err);
         }
-        console.log(`DATABASE: ${discordId} has been created.`);
+        // console.log(`DATABASE: ${discordId} has been created.`);
         disconnect();
         return resolve(result);
       });
+    });
+  }
+
+  loadOnlinePlayers(discordId) {
+    connect();
+    return new Promise((resolve, reject) => {
+      return Player.find({}, (err, result) => {
+        if (err) {
+          disconnect();
+          return reject(err);
+        }
+
+        disconnect();
+        return resolve(result);
+      })
+        .where('discordId')
+        .select({
+
+        })
+        .in(discordId);
     });
   }
 
@@ -61,7 +81,7 @@ class Database {
           disconnect();
           return reject(err);
         }
-        console.log('DATABASE: Multiple IDs has been loaded from the Database.');
+        // console.log('DATABASE: Multiple IDs has been loaded from the Database.');
         disconnect();
         return resolve(result);
       })
@@ -83,7 +103,7 @@ class Database {
           disconnect();
           return reject(err);
         }
-        console.log(`DATABASE: ${discordId} has been loaded from the Database.`);
+        // console.log(`DATABASE: ${discordId} has been loaded from the Database.`);
         disconnect();
         return resolve(result);
       });
@@ -102,7 +122,7 @@ class Database {
           disconnect();
           return reject(err);
         }
-        console.log(`DATABASE: ${player.discordId} has been saved into the Database.`);
+        // console.log(`DATABASE: ${player.discordId} has been saved into the Database.`);
         disconnect();
         return resolve(result);
       });

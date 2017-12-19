@@ -2,14 +2,17 @@ const helper = require('../utils/helper');
 const Database = require('../database/Database');
 const { getTowns } = require('./utils/Map');
 const Event = require('./utils/Event');
+const spells = require('./data/spells');
 const moment = require('moment');
 const logger = require('../utils/logger');
-let { multiplier } = require('../../settings');
+const { multiplier } = require('../../settings');
 
 class Game {
 
   constructor(discordHook) {
     this.discordHook = discordHook;
+    this.multiplier = multiplier;
+    this.activeSpells = [];
   }
 
   selectEvent(player, onlinePlayers, twitchBot) {
@@ -66,14 +69,12 @@ class Game {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
-    console.log(`GAME: Attack Luck Dice: ${luckDice}`);
-
     if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !getTowns().includes(selectedPlayer.map.name)) {
-      return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers);
+      return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
     }
 
     if (!getTowns().includes(selectedPlayer.map.name)) {
-      return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, multiplier);
+      return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
     }
 
     return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);
@@ -87,7 +88,7 @@ class Game {
       return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
-    return Event.generateGoldEvent(this.discordHook, selectedPlayer, multiplier);
+    return Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier);
   }
 
   // Event
@@ -97,12 +98,12 @@ class Game {
 
   powerHourBegin() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
-    multiplier += 1;
+    this.multiplier += 1;
   }
 
   powerHourEnd() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
-    multiplier -= 1;
+    this.multiplier -= 1;
   }
 
   giveGold(playerId, amount) {
@@ -119,19 +120,37 @@ class Game {
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
-            const spellCost = 1500;
-            if (castingPlayer.gold >= spellCost) {
+            if (castingPlayer.gold >= spells.bless.spellCost) {
               castingPlayer.spells++;
-              castingPlayer.gold -= spellCost;
-              multiplier += 1;
-              hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!! Current Multiplier is: ${multiplier}x`));
+              castingPlayer.gold -= spells.bless.spellCost;
+              this.multiplier += 1;
+              const blessLogObj = {
+                spellName: 'Bless',
+                caster: castingPlayer.discordId
+              };
+
+              this.activeSpells.push(blessLogObj);
+
+              let activeBlessCount = this.activeSpells.filter((bless) => {
+                return bless.spellName === 'Bless';
+              }).length;
+
+              hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               setTimeout(() => {
-                multiplier -= 1;
-                hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off. Current Multiplier is: ${multiplier}x`));
+                this.multiplier -= 1;
+                this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
+                activeBlessCount = this.activeSpells.filter((bless) => {
+                  return bless.spellName === 'Bless';
+                }).length;
+
+                hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               }, 1800000); // 30 minutes
-              Database.savePlayer(castingPlayer);
+              Database.savePlayer(castingPlayer)
+                .then(() => {
+                  commandAuthor.send('Spell has been casted!');
+                });
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${spellCost} gold. You are lacking ${spellCost - castingPlayer.gold} gold.`);
+              commandAuthor.send(`You do not have enough gold! This spell costs ${spells.bless.spellCost} gold. You are lacking ${spells.bless.spellCost - castingPlayer.gold} gold.`);
             }
             break;
         }
@@ -151,49 +170,6 @@ class Game {
 
   playerEquipment(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
-  }
-
-  forcePvp(discordBot, commandAuthor, playerToAttack, otherPlayerToAttack) {
-    if (!otherPlayerToAttack) {
-      return Database.loadPlayer(commandAuthor.id)
-        .then((selectedPlayer) => {
-          const playerToAttackObj = discordBot.users.filter(player => player.username === playerToAttack && !player.bot);
-          if (playerToAttackObj.size === 0) {
-            commandAuthor.send(`${playerToAttack} was not found!`);
-            return;
-          }
-
-          this.playerStats(playerToAttackObj.array()[0])
-            .then((playerToAttackStats) => {
-              if (!playerToAttackStats) {
-                return commandAuthor.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-              }
-
-              const updatedPlayer = Event.attackForcePvPAttack(this.discordHook, 'twitchBot', selectedPlayer, playerToAttackStats);
-              Database.savePlayer(updatedPlayer);
-            });
-        });
-    }
-
-    const playerToAttackObj = discordBot.users.filter(player => player.username === playerToAttack && !player.bot);
-    const otherPlayerToAttackObj = discordBot.users.filter(player => player.username === otherPlayerToAttack && !player.bot);
-
-    return this.playerStats(playerToAttackObj.array()[0])
-      .then((playerToAttackStats) => {
-        if (!playerToAttackStats) {
-          return commandAuthor.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-        }
-
-        this.playerStats(otherPlayerToAttackObj.array()[0])
-          .then((otherPlayerToAttackStats) => {
-            if (!otherPlayerToAttackStats) {
-              return commandAuthor.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-            }
-
-            const updatedPlayer = Event.attackForcePvPAttack(discordHook, 'twitchBot', playerToAttackStats, otherPlayerToAttackStats);
-            Database.savePlayer(updatedPlayer);
-          });
-      });
   }
 
   getOnlinePlayerMaps(onlinePlayers) {
