@@ -58,6 +58,9 @@ const newPlayerObj = (discordId, name) => {
     isOnline: true,
     createdAt: moment().toISOString(),
     events: 0,
+    gambles: 0,
+    stole: 0,
+    stolen: 0,
     spells: 0,
     kills: {
       mob: 0,
@@ -140,6 +143,10 @@ const playerSchema = mongoose.Schema({
   isOnline: Boolean,
   createdAt: Date,
   events: Number,
+  gambles: {
+    type: Number,
+    default: 0
+  },
   stole: {
     type: Number,
     default: 0
