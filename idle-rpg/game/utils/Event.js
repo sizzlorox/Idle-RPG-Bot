@@ -556,6 +556,7 @@ class Event {
 
       const luckGambleChance = helper.randomBetween(0, 100);
       const luckGambleGold = Math.round(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3)) * multiplier;
+      selectedPlayer.gambles++;
 
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 2)) {
         selectedPlayer.gold -= luckGambleGold;
