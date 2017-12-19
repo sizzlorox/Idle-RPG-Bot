@@ -547,6 +547,38 @@ class Event {
       }
     });
   }
-
+   generateGamblingEvent(discordHook, selectedPlayer) {
+     return new Promise((resolve) => {
+      
+       if (selectedPlayer.gold < 10) {
+         return resolve(selectedPlayer)
+       }
+      
+       const luckGambleChance = helper.randomBetween(0, 100);
+       const luckGambleGold = helper.randomBetween(Math.round(selectedPlayer.gold / 10), Math.round(selectedPlayer.gold / 3));
+       
+       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 2)) {
+         selectedPlayer.gold -= luckGambleGold;
+         
+         const eventMsgLoseGamble = `<@!${selectedPlayer.discordId}> decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, he/she lost ${luckGambleGold} gold!`;
+         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} by gambling in tavern.`;
+ 
+         helper.sendMessage(discordHook, 'twitch', false, eventMsgLoseGamble);
+         selectedPlayer = helper.logEvent(selectedPlayer, eventLogLoseGamble);
+ 
+         return resolve(selectedPlayer);
+       } else {
+         selectedPlayer.gold += luckGambleGold;
+         
+         const eventMsgWinGamble = `<@!${selectedPlayer.discordId}> decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Fortunately, he/she won ${luckGambleGold} gold!`;
+         const eventLogWinGamble = `Congrats! You won ${luckGambleGold} by gambling in tavern.`;
+ 
+         helper.sendMessage(discordHook, 'twitch', false, eventMsgWinGamble);
+         selectedPlayer = helper.logEvent(selectedPlayer, eventLogWinGamble);
+ 
+         return resolve(selectedPlayer);
+       }
+     });
+  }
 }
 module.exports = new Event();
