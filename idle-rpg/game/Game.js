@@ -115,6 +115,15 @@ class Game {
   }
 
   // Commands
+  top10(commandAuthor, type = { level: -1 }) {
+    return Database.loadTop10(type)
+      .then((top10) => {
+        commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0]}:
+${top10.filter(player => player[Object.keys(type)[0]] > 0).map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`).join('\n')}
+        \`\`\``);
+      });
+  }
+
   castSpell(commandAuthor, hook, spell) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {

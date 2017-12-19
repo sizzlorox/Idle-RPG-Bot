@@ -12,6 +12,8 @@ const commands = [
     operatorOnly: false,
     function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
+        !top10 - Retrieves top 10 highest level players
+        !top10 <gold, spells or level> - Retrives top 10 highest of selected section
         !stats - Sends a PM with your stats
         !stats <@Mention of player> - Sends a PM with the players stats. (without < > and case-senstive).
         !equip - Sends a PM with your equipment
@@ -135,6 +137,24 @@ const commands = [
 
           message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
         });
+    }
+  },
+
+  top10 = {
+    command: '!top10',
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      switch ((message.content.split(' ')[1] === undefined) ? 'level' : message.content.split(' ')[1].toLowerCase()) {
+        case 'gold':
+          game.top10(message.author, { gold: -1 });
+          break;
+        case 'spells':
+          game.top10(message.author, { spells: -1 });
+          break;
+        default:
+          game.top10(message.author, { level: -1 });
+          break;
+      }
     }
   },
 
