@@ -26,7 +26,7 @@ class Event {
       .then((mappedPlayers) => {
         const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
           && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
-          && player.level >= selectedPlayer.level + 10 && player.level <= selectedPlayer.level - 10);
+          && player.level <= selectedPlayer.level + 10 && player.level >= selectedPlayer.level - 10);
 
         if (sameMapPlayers.length > 0) {
           const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
