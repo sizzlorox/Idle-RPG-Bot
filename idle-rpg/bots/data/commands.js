@@ -13,7 +13,7 @@ const commands = [
     function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
-        !top10 <gold, spells or level> - Retrives top 10 highest of selected section
+        !top10 <gold, spells, level, stolen, stole> - Retrives top 10 highest of selected section
         !stats - Sends a PM with your stats
         !stats <@Mention of player> - Sends a PM with the players stats. (without < > and case-senstive).
         !equip - Sends a PM with your equipment
@@ -132,7 +132,7 @@ const commands = [
                 mapInfo = mapInfo.concat(`${player.name}, `);
               }
             });
-            mapInfo = mapInfo.replace(/,\s*$/, '');
+            mapInfo = mapInfo.replace(/,\s*$/, '\n');
           });
 
           message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
@@ -145,6 +145,12 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       switch ((message.content.split(' ')[1] === undefined) ? 'level' : message.content.split(' ')[1].toLowerCase()) {
+        case 'stolen':
+          game.top10(message.author, { stolen: -1 });
+          break;
+        case 'stole':
+          game.top10(message.author, { stole: -1 });
+          break;
         case 'gold':
           game.top10(message.author, { gold: -1 });
           break;

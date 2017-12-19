@@ -140,6 +140,14 @@ const playerSchema = mongoose.Schema({
   isOnline: Boolean,
   createdAt: Date,
   events: Number,
+  stole: {
+    type: Number,
+    default: 0
+  },
+  stolen: {
+    type: Number,
+    default: 0
+  },
   spells: {
     type: Number,
     default: 0
