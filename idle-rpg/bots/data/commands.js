@@ -145,6 +145,9 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       switch ((message.content.split(' ')[1] === undefined) ? 'level' : message.content.split(' ')[1].toLowerCase()) {
+        case 'gambles':
+          game.top10(message.author, { gambles: -1 });
+          break;
         case 'stolen':
           game.top10(message.author, { stolen: -1 });
           break;
