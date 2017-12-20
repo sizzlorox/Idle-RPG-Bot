@@ -2,6 +2,7 @@ const helper = require('../../utils/helper');
 const monsters = require('../data/monsters');
 
 class Monster {
+
   generateMonster(selectedPlayer) {
     return new Promise((resolve) => {
       const randomRarityChance = Math.ceil(helper.randomBetween(0, 100));
@@ -31,5 +32,11 @@ class Monster {
       return resolve(monsterObj);
     });
   }
+
+  // GETTER SETTERS
+  get monsters() {
+    return monsters.type;
+  }
+
 }
-module.exports = new Monster();
+module.exports = Monster;

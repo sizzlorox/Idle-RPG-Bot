@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
 const { randomBetween } = require('../utils/helper');
-const moment = require('moment');
 const logger = require('../utils/logger');
 const Game = require('../game/Game');
 const { CronJob } = require('cron');

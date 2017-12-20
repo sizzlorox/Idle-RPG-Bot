@@ -71,6 +71,8 @@ const monsters = {
   type: [
     rat = {
       name: 'Rat',
+      isSpawnable: true,
+      spawnableMapType: ['land', 'snow'],
       stats: {
         str: 1,
         dex: 1,
@@ -82,6 +84,8 @@ const monsters = {
     },
     crab = {
       name: 'Crab',
+      isSpawnable: true,
+      spawnableMapType: ['land'],
       stats: {
         str: 1,
         dex: 1,
@@ -93,6 +97,8 @@ const monsters = {
     },
     slime = {
       name: 'Slime',
+      isSpawnable: true,
+      spawnableMapType: ['land', 'snow'],
       stats: {
         str: 2,
         dex: 2,
@@ -104,6 +110,8 @@ const monsters = {
     },
     goblin = {
       name: 'Goblin',
+      isSpawnable: true,
+      spawnableMapType: ['land', 'snow'],
       stats: {
         str: 2,
         dex: 1,
@@ -115,6 +123,8 @@ const monsters = {
     },
     bandit = {
       name: 'Bandit',
+      isSpawnable: true,
+      spawnableMapType: ['land', 'snow'],
       stats: {
         str: 5,
         dex: 2,
@@ -126,6 +136,8 @@ const monsters = {
     },
     bat = {
       name: 'Bat',
+      isSpawnable: true,
+      spawnableMapType: ['land'],
       stats: {
         str: 2,
         dex: 5,
@@ -137,6 +149,8 @@ const monsters = {
     },
     dragon = {
       name: 'Dragon',
+      isSpawnable: true,
+      spawnableMapType: ['land'],
       stats: {
         str: 10,
         dex: 7,
@@ -148,6 +162,8 @@ const monsters = {
     },
     knight = {
       name: 'Knight',
+      isSpawnable: true,
+      spawnableMapType: ['land'],
       stats: {
         str: 7,
         dex: 3,
@@ -159,6 +175,8 @@ const monsters = {
     },
     necromancer = {
       name: 'Necromancer',
+      isSpawnable: true,
+      spawnableMapType: ['land'],
       stats: {
         str: 19,
         dex: 2,
@@ -170,6 +188,8 @@ const monsters = {
     },
     zombie = {
       name: 'Zombie',
+      isSpawnable: true,
+      spawnableMapType: ['land'],
       stats: {
         str: 4,
         dex: 1,
@@ -181,6 +201,8 @@ const monsters = {
     },
     orc = {
       name: 'Orc',
+      isSpawnable: true,
+      spawnableMapType: ['land'],
       stats: {
         str: 17,
         dex: 1,
@@ -192,6 +214,8 @@ const monsters = {
     },
     elf = {
       name: 'Elf',
+      isSpawnable: true,
+      spawnableMapType: ['land'],
       stats: {
         str: 4,
         dex: 29,
@@ -200,6 +224,34 @@ const monsters = {
       experience: 20,
       gold: 9,
       rarity: 15
+    },
+    yeti = {
+      name: 'Yeti',
+      isXmasEvent: true,
+      isSpawnable: false,
+      spawnableMapType: ['snow'],
+      stats: {
+        str: 20,
+        dex: 2,
+        end: 15
+      },
+      experience: 25,
+      gold: 12,
+      rarity: 50
+    },
+    xmasGnome = {
+      name: 'Christmas Gnome',
+      isXmasEvent: true,
+      isSpawnable: false,
+      spawnableMapType: ['snow'],
+      stats: {
+        str: 5,
+        dex: 2,
+        end: 15
+      },
+      experience: 5,
+      gold: 9,
+      rarity: 85
     }
   ]
 };
