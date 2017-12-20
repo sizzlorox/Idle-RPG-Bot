@@ -1,6 +1,5 @@
 const helper = require('../utils/helper');
 const Database = require('../database/Database');
-const { getTowns } = require('./utils/Map');
 const Event = require('./utils/Event');
 const spells = require('./data/spells');
 const moment = require('moment');
@@ -96,15 +95,15 @@ class Game {
 
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
-    if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
+    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
-    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !getTowns().includes(selectedPlayer.map.name)) {
+    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
       return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
     }
 
-    if (!getTowns().includes(selectedPlayer.map.name)) {
+    if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
       return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
     }
 
@@ -115,7 +114,7 @@ class Game {
     const luckDice = helper.randomBetween(0, 100);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
-    } else if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
+    } else if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGamblingEvent(this.discordHook, selectedPlayer, this.multiplier);
     } else if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {
       return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);

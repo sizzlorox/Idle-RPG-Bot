@@ -9,7 +9,9 @@ class Monster {
       const randomTypeChance = Math.ceil(helper.randomBetween(0, 100));
       const randomMonsterType = randomTypeChance + randomRarityChance > 100 ? 100 : randomTypeChance + randomRarityChance;
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
-      const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType);
+      const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
+        && mobType.isSpawnable
+        && mobType.spawnableMapType.includes(selectedPlayer.map.type.name));
 
       const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);

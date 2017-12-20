@@ -105,7 +105,7 @@ class Event {
 
   attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
-      return Monster.generateMonster(selectedPlayer)
+      return this.MonsterManager.generateMonster(selectedPlayer)
         .then((mob) => {
           return Battle.simulateBattleWithMob(selectedPlayer, mob)
             .then((battleResults) => {
@@ -116,7 +116,12 @@ class Event {
                 selectedPlayer.kills.mob++;
                 helper.checkExperience(selectedPlayer, discordHook);
 
-                const eventMsg = `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
+                let eventMsg;
+                if (!mob.isXmasEvent) {
+                  eventMsg = `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
+                } else {
+                  eventMsg = `<@!${selectedPlayer.discordId}> \`\`\`python just killed ${mob.name} with his/her ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!\`\`\``;
+                }
                 const eventLog = `Killed ${mob.name} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -517,7 +522,7 @@ class Event {
       const luckItemDice = helper.randomBetween(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
-        return Item.generateItem(selectedPlayer)
+        return this.ItemManager.generateItem(selectedPlayer)
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
