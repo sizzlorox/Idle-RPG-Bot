@@ -120,7 +120,7 @@ class Event {
                 if (!mob.isXmasEvent) {
                   eventMsg = `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
                 } else {
-                  eventMsg = `<@!${selectedPlayer.discordId}> \`\`\`python just killed ${mob.name} with his/her ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!\`\`\``;
+                  eventMsg = `<@!${selectedPlayer.discordId}> **just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!**`;
                 }
                 const eventLog = `Killed ${mob.name} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold`;
 
@@ -159,7 +159,7 @@ class Event {
       const dropitemChance = helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
-        return this.ItemManager.generateItem(selectedPlayer)
+        return this.ItemManager.generateItem(selectedPlayer, mob)
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
@@ -174,7 +174,6 @@ class Event {
                   return resolve(selectedPlayer);
                 }
 
-
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
                 break;
               case enumHelper.equipment.types.weapon.position:
@@ -184,9 +183,21 @@ class Event {
 
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
                 break;
+              case enumHelper.equipment.types.relic.position:
+                if (helper.calculateItemRating(selectedPlayer.equipment.relic) > item.rating) {
+                  return resolve(selectedPlayer);
+                }
+
+                selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, item);
+                break;
             }
 
-            const eventMsg = `<@!${selectedPlayer.discordId}> received \`${item.name}\` from \`${mob.name}!\``;
+            let eventMsg;
+            if (!item.isXmasEvent) {
+              eventMsg = `<@!${selectedPlayer.discordId}> received \`${item.name}\` from \`${mob.name}!\``;
+            } else {
+              eventMsg = `<@!${selectedPlayer.discordId}> **received \`${item.name}\` from \`${mob.name}!\`**`;
+            }
             const eventLog = `Received ${item.name} from ${mob.name}`;
 
             helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -203,7 +214,7 @@ class Event {
   // Item Events
   generateTownItemEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      return this.ItemManager.generateItem(selectedPlayer)
+      return this.ItemManager.generateItem(selectedPlayer, mob)
         .then((item) => {
           if (selectedPlayer.gold <= item.gold) {
             return resolve(selectedPlayer);
@@ -522,7 +533,7 @@ class Event {
       const luckItemDice = helper.randomBetween(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
-        return this.ItemManager.generateItem(selectedPlayer)
+        return this.ItemManager.generateItem(selectedPlayer, mob)
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:

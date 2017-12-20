@@ -231,9 +231,9 @@ const monsters = {
       isSpawnable: false,
       spawnableMapType: ['Snow'],
       stats: {
-        str: 20,
+        str: 12,
         dex: 2,
-        end: 15
+        end: 8
       },
       experience: 25,
       gold: 12,
@@ -247,11 +247,11 @@ const monsters = {
       stats: {
         str: 5,
         dex: 2,
-        end: 15
+        end: 9
       },
       experience: 5,
       gold: 9,
-      rarity: 85
+      rarity: 100
     }
   ]
 };

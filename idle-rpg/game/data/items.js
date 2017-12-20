@@ -173,6 +173,7 @@ const items = {
         gold: 3
       },
     ],
+
     weapon = [
       club = {
         name: 'Club',
@@ -367,6 +368,40 @@ const items = {
         gold: 3,
         rarity: 25
       },
+    ],
+
+    relic = [
+      snowFlake = {
+        name: 'Snowflake',
+        droppedBy: ['Yeti', 'Christmas Gnome'],
+        isXmasEvent: true,
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 1,
+          dex: 1,
+          end: 1,
+          int: 1,
+          luk: 4,
+        },
+        gold: 3,
+        rarity: 60
+      },
+      candyCane = {
+        name: 'Candy Cane',
+        droppedBy: ['Yeti', 'Christmas Gnome'],
+        isXmasEvent: true,
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 2
+        },
+        gold: 3,
+        rarity: 90
+      }
     ]
   ]
 };

@@ -5,34 +5,6 @@ const spells = require('./data/spells');
 const moment = require('moment');
 const logger = require('../utils/logger');
 const { multiplier } = require('../../settings');
-const { CronJob } = require('cron');
-
-/**
- * EVENT CRONS
- */
-const christmasEventStart = '00 23 14 * 11 0-6';
-const christmasEventEnd = '00 31 15 * 11 0-6';
-const timeZone = 'America/Los_Angeles';
-
-new CronJob({
-  cronTime: christmasEventStart,
-  onTick: () => {
-    //this.updateChristmasMonsters(true);
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-new CronJob({
-  cronTime: christmasEventEnd,
-  onTick: () => {
-    // this.updateChristmasMonsters(false);
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
 
 /**
  * GANE CLASS
@@ -95,6 +67,16 @@ class Game {
 
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
+    selectedPlayer.map = {
+      id: 10,
+      name: 'Wintermere',
+      type: {
+        id: 1,
+        name: 'Snow'
+      },
+      levelReq: 1
+    };
+
     if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
@@ -240,13 +222,33 @@ ${rankString}
   /**
    * SPECIAL EVENTS
    */
-  updateChristmasMonsters(isStarting) {
+  updateChristmasEvent(isStarting) {
     if (isStarting) {
-      Event.MonsterClass.monsters.find(mob => mob.isXmasEvent).isSpawnable = true;
+      Event.MonsterClass.monsters.forEach((mob) => {
+        if (mob.isXmasEvent) {
+          mob.isSpawnable = true;
+        }
+      });
+      Event.ItemClass.items.forEach((type) => {
+        type.forEach((item) => {
+          if (item.isXmasEvent) {
+            item.isDroppable = true;
+          }
+        });
+      });
       return '';
     }
 
-    Event.MonsterClass.monsters.find(mob => mob.isXmasEvent).isSpawnable = false;
+    Event.MonsterClass.monsters.forEach((mob) => {
+      if (mob.isXmasEvent) {
+        mob.isSpawnable = false;
+      }
+    });
+    Event.ItemClass.items.forEach((type) => {
+      type.forEach((item) => {
+        item.isDroppable = false;
+      });
+    });
     return '';
   }
 

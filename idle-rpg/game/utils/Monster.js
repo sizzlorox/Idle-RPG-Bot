@@ -26,6 +26,7 @@ class Monster {
           end: (monsterRarityList[randomRarityIndex].stats.end
             * monsterTypeList[randomTypeIndex].stats.end)
         },
+        isXmasEvent: monsterTypeList[randomTypeIndex].isXmasEvent,
         experience: Number((monsterRarityList[randomRarityIndex].experience
           * monsterTypeList[randomTypeIndex].experience) / 2).toFixed(),
         gold: Number((monsterRarityList[randomRarityIndex].gold
