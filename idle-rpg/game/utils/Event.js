@@ -8,10 +8,16 @@ const Database = require('../../database/Database');
 
 class Event {
 
+  constructor() {
+    this.MonsterManager = new Monster();
+    this.ItemManager = new Item();
+    this.MapManager = new Map();
+  }
+
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
-      selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
+      selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `<@!${selectedPlayer.discordId}> just arrived in \`${selectedPlayer.map.name}\`.`;
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       helper.sendMessage(discordHook, 'twitch', true, eventMsg);
@@ -148,7 +154,7 @@ class Event {
       const dropitemChance = helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
-        return Item.generateItem(selectedPlayer)
+        return this.ItemManager.generateItem(selectedPlayer)
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
@@ -192,7 +198,7 @@ class Event {
   // Item Events
   generateTownItemEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      return Item.generateItem(selectedPlayer)
+      return this.ItemManager.generateItem(selectedPlayer)
         .then((item) => {
           if (selectedPlayer.gold <= item.gold) {
             return resolve(selectedPlayer);
@@ -556,9 +562,13 @@ class Event {
 
       const luckGambleChance = helper.randomBetween(0, 100);
       const luckGambleGold = Math.round(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3)) * multiplier;
+      selectedPlayer.gambles++;
 
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 2)) {
         selectedPlayer.gold -= luckGambleGold;
+        if (selectedPlayer.gold <= 0) {
+          selectedPlayer.gold = 0;
+        }
 
         const eventMsgLoseGamble = `<@!${selectedPlayer.discordId}> decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, he/she lost ${luckGambleGold} gold!`;
         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} by gambling in a tavern.`;
@@ -580,5 +590,21 @@ class Event {
       return resolve(selectedPlayer);
     });
   }
+
+  /**
+   * GETTER SETTERS
+   */
+  get MonsterClass() {
+    return this.MonsterManager;
+  }
+
+  get ItemClass() {
+    return this.ItemManager;
+  }
+
+  get MapClass() {
+    return this.MapManager;
+  }
+
 }
 module.exports = new Event();

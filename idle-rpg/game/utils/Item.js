@@ -50,4 +50,4 @@ class Item {
     });
   }
 }
-module.exports = new Item();
+module.exports = Item;

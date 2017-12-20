@@ -6,7 +6,38 @@ const spells = require('./data/spells');
 const moment = require('moment');
 const logger = require('../utils/logger');
 const { multiplier } = require('../../settings');
+const { CronJob } = require('cron');
 
+/**
+ * EVENT CRONS
+ */
+const christmasEventStart = '00 23 14 * 11 0-6';
+const christmasEventEnd = '00 31 15 * 11 0-6';
+const timeZone = 'America/Los_Angeles';
+
+new CronJob({
+  cronTime: christmasEventStart,
+  onTick: () => {
+    //this.updateChristmasMonsters(true);
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+new CronJob({
+  cronTime: christmasEventEnd,
+  onTick: () => {
+    // this.updateChristmasMonsters(false);
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+/**
+ * GANE CLASS
+ */
 class Game {
 
   constructor(discordHook) {
@@ -120,8 +151,12 @@ class Game {
   top10(commandAuthor, type = { level: -1 }) {
     return Database.loadTop10(type)
       .then((top10) => {
+        const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
+          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`)
+          .join('\n')}`;
+
         commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0]}:
-${top10.filter(player => player[Object.keys(type)[0]] > 0).map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`).join('\n')}
+${rankString}
         \`\`\``);
       });
   }
@@ -201,6 +236,19 @@ ${top10.filter(player => player[Object.keys(type)[0]] > 0).map((player, rank) =>
 
   deleteAllPlayers() {
     return Database.deleteAllPlayers();
+  }
+
+  /**
+   * SPECIAL EVENTS
+   */
+  updateChristmasMonsters(isStarting) {
+    if (isStarting) {
+      Event.MonsterClass.monsters.find(mob => mob.isXmasEvent).isSpawnable = true;
+      return '';
+    }
+
+    Event.MonsterClass.monsters.find(mob => mob.isXmasEvent).isSpawnable = false;
+    return '';
   }
 
 }

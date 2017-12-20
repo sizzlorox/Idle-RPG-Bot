@@ -14,8 +14,8 @@ class Map {
   }
 
   getTowns() {
-    return maps.filter(area => area.type === 'Town').map(area => area.name);
+    return maps.filter(area => area.type.name === 'Town').map(area => area.type.name);
   }
 
 }
-module.exports = new Map();
+module.exports = Map;
