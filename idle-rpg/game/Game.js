@@ -67,16 +67,6 @@ class Game {
 
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
-    selectedPlayer.map = {
-      id: 10,
-      name: 'Wintermere',
-      type: {
-        id: 1,
-        name: 'Snow'
-      },
-      levelReq: 1
-    };
-
     if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
