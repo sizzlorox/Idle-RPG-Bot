@@ -159,7 +159,6 @@ class helper {
       selectedPlayer.map = Map.getMapByIndex(4);
       selectedPlayer.experience = 0;
       selectedPlayer.gold /= 2;
-
       switch (this.randomBetween(0, 2)) {
         case 0:
           this.setPlayerEquipment(selectedPlayer, 'helmet', enumHelper.equipment.empty.helmet);
@@ -205,6 +204,7 @@ class helper {
 
     Born: ${player.createdAt}
     Events: ${player.events}
+    Gambles: ${player.gambles}
     Items Stole: ${player.stole}
     Items Stolen: ${player.stolen}
     Spells Casted: ${player.spells}

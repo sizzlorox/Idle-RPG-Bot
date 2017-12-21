@@ -84,6 +84,7 @@ class Game {
 
   luckEvent(selectedPlayer, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
+    console.log(`Player: ${selectedPlayer.name} - Dice: ${luckDice}`);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
     } else if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
@@ -213,9 +214,7 @@ ${rankString}
    * SPECIAL EVENTS
    */
   sendChristmasPreEventMessage() {
-    return helper.sendMessage(`\`\`\`python
-    Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don't remember exactly what or who did it to them but they keep warning not to travel to another lands...
-  \`\`\``);
+    return helper.sendMessage(this.discordHook, 'twitch', false, '\`\`\`python\nTerrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\'t remember exactly what or who did it to them but they keep warning not to travel to another lands...\`\`\`');
   }
 
   updateChristmasEvent(isStarting) {
