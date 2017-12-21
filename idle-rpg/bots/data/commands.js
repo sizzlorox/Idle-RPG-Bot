@@ -23,7 +23,7 @@ const commands = [
         !castspell <spell> - Casts a global spell onto Idle-RPG.
         !eventlog - Lists up to 25 past events.
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
-		!mentions <on|off> - Change if events relating to you will @Mention you
+        !mentions <on|off> - Change if events relating to you will @Mention you
         \`\`\``;
       /*
 
