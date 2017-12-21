@@ -13,6 +13,7 @@ const newPlayerObj = (discordId, name) => {
     map: Map.getMapByIndex(starterTown),
     level: 1,
     gold: 0,
+    isMentionInDiscord: true,
     equipment: {
       helmet: {
         name: 'Nothing',
@@ -86,6 +87,7 @@ const playerSchema = mongoose.Schema({
   map: mapSchema,
   level: Number,
   gold: Number,
+  isMentionInDiscord: Boolean,
   equipment: {
     helmet: {
       name: String,

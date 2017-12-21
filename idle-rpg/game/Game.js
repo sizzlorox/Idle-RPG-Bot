@@ -67,7 +67,7 @@ class Game {
     const luckDice = helper.randomBetween(0, 100);
     if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
-    }
+    } 
 
     if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !getTowns().includes(selectedPlayer.map.name)) {
       return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
@@ -126,6 +126,23 @@ ${top10.filter(player => player[Object.keys(type)[0]] > 0).map((player, rank) =>
       });
   }
 
+  /**
+   * Modify player preference for being @mentionned in events
+   * @param Player commandAuthor
+   * @param DiscordHook hook
+   * @param Boolean isMentionInDiscord
+   */
+  modifyMention(commandAuthor, hook, isMentionInDiscord) {
+    return Database.loadPlayer(commandAuthor.id)
+      .then((castingPlayer) => {
+        castingPlayer.isMentionInDiscord = isMentionInDiscord;
+        Database.savePlayer(castingPlayer)
+          .then(() => {
+            commandAuthor.send('Preference for being @mention has been updated.');
+          });
+    });
+  }
+  
   castSpell(commandAuthor, hook, spell) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
