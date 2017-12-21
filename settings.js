@@ -16,8 +16,8 @@ const settings = {
     ? process.env.DISCORD_RPG_WELCOME_CHANNEL_ID
     : process.env.TEST_DISCORD_RPG_WELCOME_CHANNEL_ID,
   faqChannelId: process.env.NODE_ENV === 'production'
-    ? process.env.DISCORD_RPQ_FAQ_CHANNEL
-    : process.env.TEST_DISCORD_RPQ_FAQ_CHANNEL,
+    ? process.env.DISCORD_RPG_FAQ_CHANNEL
+    : process.env.TEST_DISCORD_RPG_FAQ_CHANNEL,
 
   botLoginToken: process.env.NODE_ENV === 'production'
     ? process.env.DISCORD_BOT_LOGIN_TOKEN
