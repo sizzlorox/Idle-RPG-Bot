@@ -268,13 +268,13 @@ class Event {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomBetween(0, 100);
       if (luckStealChance > 50 || randomPlayer.health <= 0) {
-        const luckItem = helper.randomBetween(0, 3);
+        const luckItem = helper.randomBetween(0, 2);
         switch (luckItem) {
           case 0:
             if (helper.calculateItemRating(selectedPlayer.equipment.helmet) < helper.calculateItemRating(randomPlayer.equipment.helmet)) {
               selectedPlayer.equipment.helmet = randomPlayer.equipment.helmet;
               if (randomPlayer.equipment.helmet.previousOwners.length > 0) {
-                const removePreviousOwnerName = randomPlayer.equipment.helmet.name.replace(`${randomPlayer.equipment.helmet.previousOwners[randomPlayer.equipment.helmet.previousOwners.length - 1]}s`, '');
+                const removePreviousOwnerName = randomPlayer.equipment.helmet.name.replace(`${randomPlayer.equipment.helmet.previousOwners[randomPlayer.equipment.helmet.previousOwners.length - 1]}s`, `${randomPlayer.name}s`);
                 selectedPlayer.equipment.helmet.name = removePreviousOwnerName;
 
                 const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${removePreviousOwnerName}!`);
@@ -306,7 +306,7 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.armor) < helper.calculateItemRating(randomPlayer.equipment.armor)) {
               selectedPlayer.equipment.armor = randomPlayer.equipment.armor;
               if (randomPlayer.equipment.armor.previousOwners.length > 0) {
-                const removePreviousOwnerName = randomPlayer.equipment.armor.name.replace(`${randomPlayer.equipment.armor.previousOwners[randomPlayer.equipment.armor.previousOwners.length - 1]}s`, '');
+                const removePreviousOwnerName = randomPlayer.equipment.armor.name.replace(`${randomPlayer.equipment.armor.previousOwners[randomPlayer.equipment.armor.previousOwners.length - 1]}s`, `${randomPlayer.name}s`);
                 selectedPlayer.equipment.armor.name = removePreviousOwnerName;
 
                 const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${removePreviousOwnerName}!`);
@@ -338,7 +338,7 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.weapon) < helper.calculateItemRating(randomPlayer.equipment.weapon)) {
               selectedPlayer.equipment.weapon = randomPlayer.equipment.weapon;
               if (randomPlayer.equipment.weapon.previousOwners.length > 0) {
-                const removePreviousOwnerName = randomPlayer.equipment.weapon.name.replace(`${randomPlayer.equipment.weapon.previousOwners[randomPlayer.equipment.weapon.previousOwners.length - 1]}s`, '');
+                const removePreviousOwnerName = randomPlayer.equipment.weapon.name.replace(`${randomPlayer.equipment.weapon.previousOwners[randomPlayer.equipment.weapon.previousOwners.length - 1]}s`, `${randomPlayer.name}s`);
                 selectedPlayer.equipment.weapon.name = removePreviousOwnerName;
 
                 const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${removePreviousOwnerName}!`);
@@ -366,38 +366,6 @@ class Event {
               randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
             }
             break;
-          case 3:
-            if (helper.calculateItemRating(selectedPlayer.equipment.relic) < helper.calculateItemRating(randomPlayer.equipment.relic)) {
-              selectedPlayer.equipment.relic = randomPlayer.equipment.relic;
-              if (randomPlayer.equipment.relic.previousOwners.length > 0) {
-                const removePreviousOwnerName = randomPlayer.equipment.relic.name.replace(`${randomPlayer.equipment.relic.previousOwners[randomPlayer.equipment.relic.previousOwners.length - 1]}s`, '');
-                selectedPlayer.equipment.relic.name = removePreviousOwnerName;
-
-                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${removePreviousOwnerName}!`);
-                const eventLog = `Stole ${randomPlayer.name}s ${removePreviousOwnerName}`;
-
-                helper.sendMessage(discordHook, 'twitch', false, eventMsg);
-                selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
-              } else {
-                selectedPlayer.equipment.relic.name = `${randomPlayer.name}s ${randomPlayer.equipment.relic.name}`;
-                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.relic.name}!`);
-                const eventLog = `Stole ${randomPlayer.name}s ${randomPlayer.equipment.relic.name}`;
-
-                helper.sendMessage(discordHook, 'twitch', false, eventMsg);
-                selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
-              }
-
-              if (!randomPlayer.equipment.relic.previousOwners) {
-                selectedPlayer.equipment.relic.previousOwners = [`${randomPlayer.name}`];
-              } else {
-                selectedPlayer.equipment.relic.previousOwners = randomPlayer.equipment.relic.previousOwners;
-                selectedPlayer.equipment.relic.previousOwners.push(randomPlayer.name);
-              }
-              randomPlayer.stolen++;
-              selectedPlayer.stole++;
-              randomPlayer = helper.setPlayerEquipment(randomPlayer, enumHelper.equipment.types.relic.position, enumHelper.equipment.empty.relic);
-            }
-            break;
         }
       }
 
@@ -408,14 +376,11 @@ class Event {
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = helper.randomBetween(0, 3);
+      const luckEvent = helper.randomBetween(0, 2);
       switch (luckEvent) {
         case 0:
           const luckStat = helper.randomBetween(0, 4);
           let luckStatAmount = helper.randomBetween(2, 10);
-          if (luckStatAmount === 0) {
-            luckStatAmount = 1;
-          }
           let stat;
           switch (luckStat) {
             case 0:
@@ -434,10 +399,6 @@ class Event {
               stat = enumHelper.stats.int;
               selectedPlayer.stats.int += luckStatAmount;
               break;
-            default:
-              stat = enumHelper.stats.str;
-              selectedPlayer.stats.str += luckStatAmount;
-              break;
           }
 
           const eventMsgApollo = `Apollo has blessed <@!${selectedPlayer.discordId}> with his music raising his/her \`${stat}\` by ${luckStatAmount}!`;
@@ -450,9 +411,6 @@ class Event {
 
         case 1:
           let luckExpAmount = helper.randomBetween(5, 15);
-          if (luckExpAmount === 0) {
-            luckExpAmount = 1;
-          }
           selectedPlayer.experience -= luckExpAmount;
           if (selectedPlayer.experience < 0) {
             selectedPlayer.experience = 0;
@@ -466,11 +424,8 @@ class Event {
 
           return resolve(selectedPlayer);
 
-        case 3:
-          let luckHealthAmount = helper.randomBetween(5, 15);
-          if (luckHealthAmount === 0) {
-            luckHealthAmount = 1;
-          }
+        case 2:
+          let luckHealthAmount = helper.randomBetween(5, 50);
           selectedPlayer.health -= luckHealthAmount;
           helper.checkHealth(selectedPlayer, discordHook);
 
@@ -489,7 +444,7 @@ class Event {
     return new Promise((resolve) => {
       const luckGoldChance = helper.randomBetween(0, 100);
       if (luckGoldChance >= 75) {
-        const luckGoldDice = helper.randomBetween(0, 100);
+        const luckGoldDice = helper.randomBetween(5, 100);
         const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed()) * multiplier;
         selectedPlayer.gold += goldAmount;
 
@@ -556,9 +511,13 @@ class Event {
 
       const luckGambleChance = helper.randomBetween(0, 100);
       const luckGambleGold = Math.round(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3)) * multiplier;
+      selectedPlayer.gambles++;
 
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 2)) {
         selectedPlayer.gold -= luckGambleGold;
+        if (selectedPlayer.gold <= 0) {
+          selectedPlayer.gold = 0;
+        }
 
         const eventMsgLoseGamble = `<@!${selectedPlayer.discordId}> decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, he/she lost ${luckGambleGold} gold!`;
         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} by gambling in a tavern.`;
