@@ -22,19 +22,21 @@ class helper {
   }
 
   getTimePassed(timeStamp) {
-    return this.toTimeFormat(Number(new Date().getTime() - timeStamp));
+    return this.toTimeFormat(new Date().getTime() - timeStamp);
   }
 
   toTimeFormat(duration) {
     const seconds = ((duration / 1000) % 60).toFixed();
     const minutes = ((duration / (1000 * 60)) % 60).toFixed();
     const hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
+    const days = (duration / (1000 * 60 * 60 * 24)).toFixed();
 
-    const hourString = Number(hours) === 0 ? '' : `${hours}h `;
-    const minuteString = Number(minutes) === 0 ? '' : `${minutes}m `;
-    const secondString = Number(seconds) === 0 ? '' : `${seconds}s`;
+    const dayString = Number(days) === 0 ? '' : `${days}d `;
+    const hourString = Number(hours) === 0 || Number(hours) === 24 ? '' : `${hours}h `;
+    const minuteString = Number(minutes) === 0 || Number(minutes) === 60 ? '' : `${minutes}m `;
+    const secondString = Number(seconds) === 0 || Number(seconds) === 60 ? '' : `${seconds}s`;
 
-    return `${hourString}${minuteString}${secondString}`;
+    return `${dayString}${hourString}${minuteString}${secondString}`;
   }
 
   logEvent(selectedPlayer, msg) {

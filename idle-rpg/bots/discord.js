@@ -35,17 +35,15 @@ const hook = {
 };
 
 const game = new Game(hook);
-// TESTING FOR EVENT
-game.updateChristmasEvent(true);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
 const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
 const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
 
 // Christmas Event times
-const christmasEventPre1 = '00 00 12 * * 0-6';
-const christmasEventStart = '00 00 01 * 11';
-const christmasEventEnd = '00 00 01 * 11';
+const christmasEventPre = '00 00 12 23 11 *';
+const christmasEventStart = '00 00 1 24 11 *';
+const christmasEventEnd = '00 00 1 6 1 *';
 const timeZone = 'America/Los_Angeles';
 
 const minTimer = (minimalTimer * 1000) * 60;
@@ -163,12 +161,12 @@ new CronJob({
  * EVENT CRONS
  */
 new CronJob({
-  cronTime: christmasEventPre1,
+  cronTime: christmasEventPre,
   onTick: () => {
     game.sendChristmasPreEventMessage();
   },
   start: false,
-  // timeZone,
+  timeZone,
   runOnInit: false
 }).start();
 

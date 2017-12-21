@@ -13,11 +13,11 @@ class Item {
       const randomRarityIndex = helper.randomBetween(0, itemRarityList.length - 1);
       const randomMaterialIndex = helper.randomBetween(0, itemMaterialList.length - 1);
 
-      const mobName = mob.name.replace(' ', '_').split('_')[1];
+      const mobName = mob ? mob.name.replace(' ', '_').split('_')[1] : undefined;
       let itemType;
       let randomEquipmentIndex;
       let randomTypeIndex;
-      if (mob.isXmasEvent) {
+      if (mob && mob.isXmasEvent) {
         do {
           console.log('generating relic item');
           randomTypeIndex = helper.randomBetween(0, items.type[3].length - 1);
@@ -49,20 +49,16 @@ class Item {
 
       if (itemType.position === 'relic') {
         itemStr = (itemRarityList[randomRarityIndex].stats.str
-          * (itemMaterialList[randomMaterialIndex].stats.str
-            + itemType.stats.str)) / 4;
+          + itemType.stats.str) / 4;
 
         itemDex = (itemRarityList[randomRarityIndex].stats.dex
-          * (itemMaterialList[randomMaterialIndex].stats.dex
-            + itemType.stats.dex)) / 4;
+          + itemType.stats.dex) / 4;
 
         itemEnd = (itemRarityList[randomRarityIndex].stats.end
-          * (itemMaterialList[randomMaterialIndex].stats.end
-            + itemType.stats.end)) / 4;
+          + itemType.stats.end) / 4;
 
         itemInt = (itemRarityList[randomRarityIndex].stats.int
-          * (itemMaterialList[randomMaterialIndex].stats.int
-            + itemType.stats.int)) / 4;
+          + itemType.stats.int) / 4;
 
         itemLuk = itemType.stats.luk !== undefined ? itemType.stats.luk : 0;
 
@@ -81,7 +77,6 @@ class Item {
           isXmasEvent: itemType.isXmasEvent,
           rating: itemRating,
           gold: Number((itemRarityList[randomRarityIndex].gold
-            * itemMaterialList[randomMaterialIndex].gold
             * itemType.gold).toFixed()) * itemRating
         };
       } else {
@@ -121,6 +116,47 @@ class Item {
       }
       return resolve(itemObj);
     });
+  }
+
+  // EVENT ITEM
+  generateSnowflake(selectedPlayer) {
+    const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
+    const randomRarityChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
+    const randomRarityIndex = helper.randomBetween(0, itemRarityList.length - 1);
+
+    const itemStr = (itemRarityList[randomRarityIndex].stats.str
+      + snowFlake.stats.str) / 4;
+
+    const itemDex = (itemRarityList[randomRarityIndex].stats.dex
+      + snowFlake.stats.dex) / 4;
+
+    const itemEnd = (itemRarityList[randomRarityIndex].stats.end
+      + snowFlake.stats.end) / 4;
+
+    const itemInt = (itemRarityList[randomRarityIndex].stats.int
+      + snowFlake.stats.int) / 4;
+
+    const itemLuk = snowFlake.stats.luk !== undefined ? snowFlake.stats.luk : 0;
+
+    const itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
+
+    const itemObj = {
+      name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,
+      position: snowFlake.position,
+      stats: {
+        str: itemStr,
+        dex: itemDex,
+        end: itemEnd,
+        int: itemInt
+      },
+      isXmasEvent: snowFlake.isXmasEvent,
+      rating: itemRating,
+      gold: Number((itemRarityList[randomRarityIndex].gold
+        * snowFlake.gold).toFixed()) * itemRating
+    };
+
+    return itemObj;
   }
 
   // GETTER SETTERS

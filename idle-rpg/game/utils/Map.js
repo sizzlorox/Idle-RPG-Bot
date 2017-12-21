@@ -18,5 +18,9 @@ class Map {
     return maps.filter(area => area.type.name === 'Town').map(area => area.name);
   }
 
+  getMapsByType(type) {
+    return maps.filter(area => area.type.name === type).map(area => area.name);
+  }
+
 }
 module.exports = Map;

@@ -208,7 +208,7 @@ const commands = [
     function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(' ');
-        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 50)
+        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
           .then((result) => {
             return message.author.send(`\`\`\`${result}\`\`\``);
           });
@@ -223,6 +223,26 @@ const commands = [
   },
 
   // Bot Operator commands
+  activateBlizzard = {
+    command: '!blizzard',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(' ');
+        const blizzardBoolean = game.blizzardSwitch(splitCommand[1]);
+        switch (splitCommand) {
+          case 'on':
+            message.author.send(blizzardBoolean ? 'Blizzard is already activated!' : 'Blizzard activated.');
+            break;
+          case 'off':
+            message.author.send(!blizzardBoolean ? 'Blizzard is already deactivated!' : 'Blizzard deactivated.');
+            break;
+        }
+      }
+    }
+  },
+
   giveGold = {
     command: '!givegold',
     operatorOnly: true,

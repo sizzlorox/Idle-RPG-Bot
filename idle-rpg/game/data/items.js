@@ -382,6 +382,22 @@ const items = {
           dex: 1,
           end: 1,
           int: 1,
+          luk: 2,
+        },
+        gold: 3,
+        rarity: 60
+      },
+      yetiTooth = {
+        name: 'Yetis Tooth',
+        droppedBy: ['Yeti'],
+        isXmasEvent: true,
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 1,
+          dex: 1,
+          end: 1,
+          int: 1,
           luk: 4,
         },
         gold: 3,
