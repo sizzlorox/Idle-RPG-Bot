@@ -41,8 +41,11 @@ game.updateChristmasEvent(true);
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
 const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
 const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
-const christmasEventStart = '00 00 01 * 11 0-6';
-const christmasEventEnd = '00 00 01 * 11 0-6';
+
+// Christmas Event times
+const christmasEventPre1 = '00 55 11 * * 0-6';
+const christmasEventStart = '00 00 01 * 11';
+const christmasEventEnd = '00 00 01 * 11';
 const timeZone = 'America/Los_Angeles';
 
 const minTimer = (minimalTimer * 1000) * 60;
@@ -159,11 +162,20 @@ new CronJob({
 /**
  * EVENT CRONS
  */
+new CronJob({
+  cronTime: christmasEventPre1,
+  onTick: () => {
+    game.sendChristmasPreEventMessage();
+  },
+  start: false,
+  // timeZone,
+  runOnInit: false
+}).start();
 
 new CronJob({
   cronTime: christmasEventStart,
   onTick: () => {
-    //this.updateChristmasMonsters(true);
+    game.updateChristmasEvent(true);
   },
   start: false,
   timeZone,
@@ -173,7 +185,7 @@ new CronJob({
 new CronJob({
   cronTime: christmasEventEnd,
   onTick: () => {
-    // this.updateChristmasMonsters(false);
+    game.updateChristmasEvent(false);
   },
   start: false,
   timeZone,

@@ -212,6 +212,12 @@ ${rankString}
   /**
    * SPECIAL EVENTS
    */
+  sendChristmasPreEventMessage() {
+    return helper.sendMessage(`\`\`\`python
+    Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don't remember exactly what or who did it to them but they keep warning not to travel to another lands...
+  \`\`\``);
+  }
+
   updateChristmasEvent(isStarting) {
     if (isStarting) {
       Event.MonsterClass.monsters.forEach((mob) => {
