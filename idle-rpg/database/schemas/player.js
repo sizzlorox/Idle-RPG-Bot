@@ -87,7 +87,10 @@ const playerSchema = mongoose.Schema({
   map: mapSchema,
   level: Number,
   gold: Number,
-  isMentionInDiscord: Boolean,
+  isMentionInDiscord: {
+    type: Boolean,
+    default: true
+  },
   equipment: {
     helmet: {
       name: String,

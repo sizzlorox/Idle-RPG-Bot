@@ -23,7 +23,7 @@ const commands = [
         !castspell <spell> - Casts a global spell onto Idle-RPG.
         !eventlog - Lists up to 25 past events.
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
-        !mentions <on|off> - Change if events relating to you will @Mention you
+        !mention <on|off> - Change if events relating to you will @Mention you
         \`\`\``;
       /*
 
@@ -226,7 +226,7 @@ const commands = [
   /**
    * Modify if player will be @Mentioned in events
    */
-	modifyMention = {
+  modifyMention = {
     command: '!mention',
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {

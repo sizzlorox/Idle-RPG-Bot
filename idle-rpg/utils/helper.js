@@ -281,19 +281,15 @@ class helper {
   }
   
   /**
-   * Based on player setting, either return <!@discordId> or playerName
-   * @param discordId
+   * Based on player setting, either return <@!discordId> or playerName
+   * @param player
    * @returns String
    */
-  generateDiscordMentionPlayerName(discordId) {
-	return Database.loadPlayer(discordId)
-	  .then((player) => {
-		  if (player.isMentionInDiscord === false){
-			  return "<@!${player.discordId}>";
-		  } else {
-			  return player.name;
-		  }
-	  });
+  generatePlayerName(player) {
+    if (player.isMentionInDiscord === false){
+      return player.name;      
+    }
+    return `<@!${player.discordId}>`;
   }
 
   generateEquipmentsString(player) {

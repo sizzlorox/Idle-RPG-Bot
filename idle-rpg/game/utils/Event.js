@@ -12,7 +12,7 @@ class Event {
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
       selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
-      const eventMsg = `<@!${selectedPlayer.discordId}> just arrived in \`${selectedPlayer.map.name}\`.`;
+      const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       helper.sendMessage(discordHook, 'twitch', true, eventMsg);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -44,7 +44,7 @@ class Event {
             selectedPlayer.battles.won++;
             randomPlayer.battles.lost++;
 
-            const eventMsg = `<@!${selectedPlayer.discordId}> just attacked <@!${randomPlayer.discordId}> in \`${selectedPlayer.map.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`;
+            const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} in \`${selectedPlayer.map.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`;
             const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${Math.abs(playerChance)} damage`;
             const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and lost ${Math.abs(playerChance)} health`;
 
@@ -67,8 +67,8 @@ class Event {
           randomPlayer.battles.won++;
           selectedPlayer.battles.lost++;
 
-          const eventMsg = `<@!${selectedPlayer.discordId}> just attacked <@!${randomPlayer.discordId}> with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` but failed!
-          <@!${randomPlayer.discordId}>s \`${randomPlayer.equipment.weapon.name}\` dealt ${Math.abs(otherPlayerChance)} damage!`;
+          const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` but failed!
+          ${helper.generatePlayerName(randomPlayer)}s \`${randomPlayer.equipment.weapon.name}\` dealt ${Math.abs(otherPlayerChance)} damage!`;
 
           const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and failed.
           ${randomPlayer.name} did ${Math.abs(otherPlayerChance)} damage with ${randomPlayer.equipment.weapon.name}`;
@@ -110,7 +110,7 @@ class Event {
                 selectedPlayer.kills.mob++;
                 helper.checkExperience(selectedPlayer, discordHook);
 
-                const eventMsg = `<@!${selectedPlayer.discordId}> just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
+                const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
                 const eventLog = `Killed ${mob.name} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -131,7 +131,7 @@ class Event {
               }
               helper.checkHealth(selectedPlayer, mob, discordHook);
 
-              const eventMsg = `<@!${selectedPlayer.discordId}> just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${battleResults.mobChance} health and ${mob.gold} gold!`;
+              const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${battleResults.mobChance} health and ${mob.gold} gold!`;
               const eventLog = `Lost a battle to ${mob.name} in ${selectedPlayer.map.name} losing ${battleResults.mobChance} health and ${mob.gold} gold`;
 
               helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -175,7 +175,7 @@ class Event {
                 break;
             }
 
-            const eventMsg = `<@!${selectedPlayer.discordId}> received \`${item.name}\` from \`${mob.name}!\``;
+            const eventMsg = `${helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\``;
             const eventLog = `Received ${item.name} from ${mob.name}`;
 
             helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -227,7 +227,7 @@ class Event {
               break;
           }
 
-          const eventMsg = `<@!${selectedPlayer.discordId}> just purchased \`${item.name}\` from Town for ${item.gold} Gold!`;
+          const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` from Town for ${item.gold} Gold!`;
           const eventLog = `Purchased ${item.name} from Town for ${item.gold} Gold`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -243,22 +243,22 @@ class Event {
     switch (randomEventMessage) {
       case 0:
         return {
-          eventMsg: `<@!${selectedPlayer.discordId}> found a chest containing \`${item.name}\` in \`${selectedPlayer.map.name}\`!`,
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} found a chest containing \`${item.name}\` in \`${selectedPlayer.map.name}\`!`,
           eventLog: `Found a chest containing ${item.name} in ${selectedPlayer.map.name}`
         };
       case 1:
         return {
-          eventMsg: `<@!${selectedPlayer.discordId}> found \`${item.name}\` on the ground in \`${selectedPlayer.map.name}\`!`,
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} found \`${item.name}\` on the ground in \`${selectedPlayer.map.name}\`!`,
           eventLog: `Found ${item.name} on the ground in ${selectedPlayer.map.name}`
         };
       case 2:
         return {
-          eventMsg: `<@!${selectedPlayer.discordId}> explored an abandoned hut in \`${selectedPlayer.map.name}\` which had \`${item.name}\` inside!`,
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} explored an abandoned hut in \`${selectedPlayer.map.name}\` which had \`${item.name}\` inside!`,
           eventLog: `Explored an abandoned hut in ${selectedPlayer.map.name} which had ${item.name} inside`
         };
       case 3:
         return {
-          eventMsg: `<@!${selectedPlayer.discordId}> a bird just dropped \`${item.name}\` infront of him/her in \`${selectedPlayer.map.name}\`!`,
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} a bird just dropped \`${item.name}\` infront of him/her in \`${selectedPlayer.map.name}\`!`,
           eventLog: `A bird just dropped ${item.name} infront of you in ${selectedPlayer.map.name}`
         };
     }
@@ -401,7 +401,7 @@ class Event {
               break;
           }
 
-          const eventMsgApollo = `Apollo has blessed <@!${selectedPlayer.discordId}> with his music raising his/her \`${stat}\` by ${luckStatAmount}!`;
+          const eventMsgApollo = `Apollo has blessed ${helper.generatePlayerName(selectedPlayer)} with his music raising his/her \`${stat}\` by ${luckStatAmount}!`;
           const eventLogApollo = `Apollo blessed you with his music raising your ${stat} by ${luckStatAmount}`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgApollo);
@@ -416,7 +416,7 @@ class Event {
             selectedPlayer.experience = 0;
           }
 
-          const eventMsgHades = `Hades unleashed his wrath upon <@!${selectedPlayer.discordId}> making him/her lose ${luckExpAmount} experience!`;
+          const eventMsgHades = `Hades unleashed his wrath upon ${helper.generatePlayerName(selectedPlayer)} making him/her lose ${luckExpAmount} experience!`;
           const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgHades);
@@ -429,7 +429,7 @@ class Event {
           selectedPlayer.health -= luckHealthAmount;
           helper.checkHealth(selectedPlayer, discordHook);
 
-          const eventMsgTrip = `<@!${selectedPlayer.discordId}> just lost ${luckHealthAmount} health by tripping and hitting his/her head!`;
+          const eventMsgTrip = `${helper.generatePlayerName(selectedPlayer)} just lost ${luckHealthAmount} health by tripping and hitting his/her head!`;
           const eventLogTrip = `You lost ${luckHealthAmount} health by tripping and hitting your head`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgTrip);
@@ -448,7 +448,7 @@ class Event {
         const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed()) * multiplier;
         selectedPlayer.gold += goldAmount;
 
-        const eventMsg = `<@!${selectedPlayer.discordId}> found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`;
+        const eventMsg = `${helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`;
         const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
 
         helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -519,7 +519,7 @@ class Event {
           selectedPlayer.gold = 0;
         }
 
-        const eventMsgLoseGamble = `<@!${selectedPlayer.discordId}> decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, he/she lost ${luckGambleGold} gold!`;
+        const eventMsgLoseGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, he/she lost ${luckGambleGold} gold!`;
         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} by gambling in a tavern.`;
 
         helper.sendMessage(discordHook, 'twitch', false, eventMsgLoseGamble);
@@ -530,7 +530,7 @@ class Event {
 
       selectedPlayer.gold += luckGambleGold;
 
-      const eventMsgWinGamble = `<@!${selectedPlayer.discordId}> decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Fortunately, he/she won ${luckGambleGold} gold!`;
+      const eventMsgWinGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Fortunately, he/she won ${luckGambleGold} gold!`;
       const eventLogWinGamble = `Congrats! You won ${luckGambleGold} by gambling in a tavern.`;
 
       helper.sendMessage(discordHook, 'twitch', false, eventMsgWinGamble);

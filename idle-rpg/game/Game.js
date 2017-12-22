@@ -21,7 +21,7 @@ class Game {
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          helper.sendMessage(this.discordHook, twitchBot, false, `<@!${player.discordId}> was born! Welcome to the world of Idle-RPG!`);
+          helper.sendMessage(this.discordHook, twitchBot, false, `${helper.generatePlayerName(player)} was born! Welcome to the world of Idle-RPG!`);
 
           return Database.createNewPlayer(player.discordId, player.name);
         }
