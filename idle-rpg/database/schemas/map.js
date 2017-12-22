@@ -7,7 +7,6 @@ const mapSchema = mongoose.Schema({
     id: Number,
     name: String
   },
-  mobs: Array,
   levelReq: Number
 });
 module.exports = mapSchema;
