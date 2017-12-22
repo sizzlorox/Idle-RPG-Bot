@@ -235,6 +235,18 @@ class helper {
 
     return '';
   }
+  
+  /**
+   * Based on player setting, either return <@!discordId> or playerName
+   * @param player
+   * @returns String
+   */
+  generatePlayerName(player) {
+    if (player.isMentionInDiscord === false){
+      return player.name;      
+    }
+    return `<@!${player.discordId}>`;
+  }
 
   generateEquipmentsString(player) {
     return `\`\`\`Heres your equipment!

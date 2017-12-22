@@ -22,7 +22,7 @@ class Game {
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          helper.sendMessage(this.discordHook, twitchBot, false, `<@!${player.discordId}> was born! Welcome to the world of Idle-RPG!`);
+          helper.sendMessage(this.discordHook, twitchBot, false, `${helper.generatePlayerName(player)} was born! Welcome to the world of Idle-RPG!`);
 
           return Database.createNewPlayer(player.discordId, player.name);
         }
@@ -131,6 +131,23 @@ class Game {
         commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0]}:
 ${rankString}
         \`\`\``);
+      });
+  }
+
+  /**
+   * Modify player preference for being @mentionned in events
+   * @param Player commandAuthor
+   * @param DiscordHook hook
+   * @param Boolean isMentionInDiscord
+   */
+  modifyMention(commandAuthor, hook, isMentionInDiscord) {
+    return Database.loadPlayer(commandAuthor.id)
+      .then((castingPlayer) => {
+        castingPlayer.isMentionInDiscord = isMentionInDiscord;
+        return Database.savePlayer(castingPlayer)
+          .then(() => {
+            return commandAuthor.send('Preference for being @mention has been updated.');
+          });
       });
   }
 
