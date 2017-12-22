@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const mapSchema = require('./map');
-const Map = require('../../game/utils/Map');
+const maps = require('../../game/data/maps');
 const moment = require('moment');
 const { starterTown } = require('../../../settings');
 
@@ -10,7 +10,7 @@ const newPlayerObj = (discordId, name) => {
     name,
     health: 105,
     experience: 0,
-    map: Map.getMapByIndex(starterTown),
+    map: maps[starterTown],
     level: 1,
     gold: 0,
     isMentionInDiscord: true,

@@ -8,11 +8,21 @@ const Database = require('../../database/Database');
 
 class Event {
 
+  constructor() {
+    this.MonsterManager = new Monster();
+    this.ItemManager = new Item();
+    this.MapManager = new Map();
+
+    // Events
+    this.isBlizzardActive = false;
+  }
+
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
-      selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
+      selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
+      selectedPlayer.map = this.MapClass.moveToRandomMap(selectedPlayer);
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       helper.sendMessage(discordHook, 'twitch', true, eventMsg);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -99,7 +109,7 @@ class Event {
 
   attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
-      return Monster.generateMonster(selectedPlayer)
+      return this.MonsterManager.generateMonster(selectedPlayer)
         .then((mob) => {
           return Battle.simulateBattleWithMob(selectedPlayer, mob)
             .then((battleResults) => {
@@ -110,7 +120,12 @@ class Event {
                 selectedPlayer.kills.mob++;
                 helper.checkExperience(selectedPlayer, discordHook);
 
-                const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
+                let eventMsg;
+                if (!mob.isXmasEvent) {
+                  eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
+                } else {
+                  eventMsg = `**${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!**`;
+                }
                 const eventLog = `Killed ${mob.name} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -148,7 +163,7 @@ class Event {
       const dropitemChance = helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
-        return Item.generateItem(selectedPlayer)
+        return this.ItemManager.generateItem(selectedPlayer, mob)
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
@@ -163,7 +178,6 @@ class Event {
                   return resolve(selectedPlayer);
                 }
 
-
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
                 break;
               case enumHelper.equipment.types.weapon.position:
@@ -173,9 +187,21 @@ class Event {
 
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
                 break;
+              case enumHelper.equipment.types.relic.position:
+                if (helper.calculateItemRating(selectedPlayer.equipment.relic) > item.rating) {
+                  return resolve(selectedPlayer);
+                }
+
+                selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, item);
+                break;
             }
 
-            const eventMsg = `${helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\``;
+            let eventMsg;
+            if (!item.isXmasEvent) {
+              eventMsg = `${helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\``;
+            } else {
+              eventMsg = `**\`${helper.generatePlayerName(selectedPlayer)}\` received \`${item.name}\` from \`${mob.name}!\`**`;
+            }
             const eventLog = `Received ${item.name} from ${mob.name}`;
 
             helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -192,7 +218,7 @@ class Event {
   // Item Events
   generateTownItemEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      return Item.generateItem(selectedPlayer)
+      return this.ItemManager.generateItem(selectedPlayer)
         .then((item) => {
           if (selectedPlayer.gold <= item.gold) {
             return resolve(selectedPlayer);
@@ -380,7 +406,7 @@ class Event {
       switch (luckEvent) {
         case 0:
           const luckStat = helper.randomBetween(0, 4);
-          let luckStatAmount = helper.randomBetween(2, 10);
+          const luckStatAmount = helper.randomBetween(2, 10);
           let stat;
           switch (luckStat) {
             case 0:
@@ -410,7 +436,7 @@ class Event {
           return resolve(selectedPlayer);
 
         case 1:
-          let luckExpAmount = helper.randomBetween(5, 15);
+          const luckExpAmount = helper.randomBetween(5, 15);
           selectedPlayer.experience -= luckExpAmount;
           if (selectedPlayer.experience < 0) {
             selectedPlayer.experience = 0;
@@ -425,7 +451,7 @@ class Event {
           return resolve(selectedPlayer);
 
         case 2:
-          let luckHealthAmount = helper.randomBetween(5, 50);
+          const luckHealthAmount = helper.randomBetween(5, 50);
           selectedPlayer.health -= luckHealthAmount;
           helper.checkHealth(selectedPlayer, discordHook);
 
@@ -466,7 +492,7 @@ class Event {
       const luckItemDice = helper.randomBetween(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
-        return Item.generateItem(selectedPlayer)
+        return this.ItemManager.generateItem(selectedPlayer)
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
@@ -539,5 +565,62 @@ class Event {
       return resolve(selectedPlayer);
     });
   }
+
+  /**
+   * EVENT FUNCTIONS
+   */
+  blizzardSwitch(discordHook, blizzardSwitch) {
+    switch (blizzardSwitch) {
+      case 'on':
+        if (this.isBlizzardActive) {
+          return this.isBlizzardActive;
+        }
+
+        this.isBlizzardActive = true;
+        helper.sendMessage(discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
+        return this.isBlizzardActive;
+      case 'off':
+        if (!this.isBlizzardActive) {
+          return this.isBlizzardActive;
+        }
+
+        this.isBlizzardActive = false;
+        helper.sendMessage(discordHook, 'twitch', false, '@everyone\`\`\`python\n\'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!\'\`\`\`');
+        return this.isBlizzardActive;
+    }
+  }
+
+  chanceToCatchSnowflake(discordHook, selectedPlayer) {
+    return new Promise((resolve) => {
+      const snowFlakeDice = helper.randomBetween(0, 100);
+      if (snowFlakeDice >= 50 && selectedPlayer.equipment.relic.name !== 'Snowflake') {
+        const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
+        selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
+        const eventMsgLoseGamble = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
+        const eventLogLoseGamble = 'You caught a strange looking snowflake while travelling inside the blizzard.';
+
+        helper.sendMessage(discordHook, 'twitch', false, eventMsgLoseGamble);
+        selectedPlayer = helper.logEvent(selectedPlayer, eventLogLoseGamble);
+      }
+
+      return resolve(selectedPlayer);
+    });
+  }
+
+  /**
+   * GETTER SETTERS
+   */
+  get MonsterClass() {
+    return this.MonsterManager;
+  }
+
+  get ItemClass() {
+    return this.ItemManager;
+  }
+
+  get MapClass() {
+    return this.MapManager;
+  }
+
 }
 module.exports = new Event();
