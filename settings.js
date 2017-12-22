@@ -1,30 +1,30 @@
 const settings = {
-  actionWebHookId: process.env.NODE_ENV === 'production'
+  actionWebHookId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_ACTION_WEBHOOK_ID
     : process.env.TEST_DISCORD_ACTION_WEBHOOK_ID,
-  actionWebHookToken: process.env.NODE_ENV === 'production'
+  actionWebHookToken: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_ACTION_WEBHOOK_TOKEN
     : process.env.TEST_DISCORD_ACTION_WEBHOOK_TOKEN,
-  moveWebHookId: process.env.NODE_ENV === 'production'
+  moveWebHookId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_MOVEMENT_WEBHOOK_ID
     : process.env.TEST_DISCORD_MOVEMENT_WEBHOOK_ID,
-  moveWebHookToken: process.env.NODE_ENV === 'production'
+  moveWebHookToken: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_MOVEMENT_WEBHOOK_TOKEN
     : process.env.TEST_DISCORD_MOVEMENT_WEBHOOK_TOKEN,
 
-  welcomeChannelId: process.env.NODE_ENV === 'production'
+  welcomeChannelId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_RPG_WELCOME_CHANNEL_ID
     : process.env.TEST_DISCORD_RPG_WELCOME_CHANNEL_ID,
-  faqChannelId: process.env.NODE_ENV === 'production'
+  faqChannelId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_RPG_FAQ_CHANNEL
     : process.env.TEST_DISCORD_RPG_FAQ_CHANNEL,
 
-  botLoginToken: process.env.NODE_ENV === 'production'
+  botLoginToken: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_BOT_LOGIN_TOKEN
     : process.env.TEST_DISCORD_BOT_LOGIN_TOKEN,
 
-  minimalTimer: process.env.NODE_ENV === 'production' ? process.env.MIN_TIMER : process.env.TEST_MIN_TIMER,
-  maximumTimer: process.env.NODE_ENV === 'production' ? process.env.MAX_TIMER : process.env.TEST_MAX_TIMER,
+  minimalTimer: process.env.NODE_ENV.includes('production') ? process.env.MIN_TIMER : process.env.TEST_MIN_TIMER,
+  maximumTimer: process.env.NODE_ENV.includes('production') ? process.env.MAX_TIMER : process.env.TEST_MAX_TIMER,
 
   botOperator: process.env.DISCORD_BOT_OPERATOR_ID,
   rpgChannel: process.env.DISCORD_RPG_CHANNEL_ID,

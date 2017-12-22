@@ -82,7 +82,7 @@ discordBot.login(botLoginToken);
 console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
 
 const heartBeat = () => {
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV.includes('production')) {
     const discordUsers = discordBot.users;
 
     const discordOfflinePlayers = discordUsers

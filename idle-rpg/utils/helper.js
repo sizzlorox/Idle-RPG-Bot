@@ -2,6 +2,7 @@ const fs = require('fs');
 const Map = require('../game/utils/Map');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
+const logger = require('../utils/logger');
 
 class helper {
   randomBetween(min, max, decimal, exclude) {
@@ -52,10 +53,14 @@ class helper {
   }
 
   sendMessage(discordHook, twitchBot, isMovement, msg) {
-    if (isMovement) {
-      discordHook.movementHook.send(msg);
-    } else {
-      discordHook.actionHook.send(msg);
+    try {
+      if (isMovement) {
+        discordHook.movementHook.send(msg);
+      } else {
+        discordHook.actionHook.send(msg);
+      }
+    } catch (err) {
+      logger.error(err);
     }
 
     // Add if to check if channel is streaming
@@ -235,15 +240,15 @@ class helper {
 
     return '';
   }
-  
+
   /**
    * Based on player setting, either return <@!discordId> or playerName
    * @param player
    * @returns String
    */
   generatePlayerName(player) {
-    if (player.isMentionInDiscord === false){
-      return player.name;      
+    if (player.isMentionInDiscord === false) {
+      return player.name;
     }
     return `<@!${player.discordId}>`;
   }
