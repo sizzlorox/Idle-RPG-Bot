@@ -24,13 +24,14 @@ const commands = [
         !eventlog - Lists up to 25 past events.
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
         !mention <on|off> - Change if events relating to you will @Mention you
+        !gender <boy|girl|neutral> - Change your character's gender
         \`\`\``;
       /*
 
       !crypto - Displays some crypto currencies info.
       !nextlaunch - Displays next rocket launch info.
       !nextstreamlaunch - Displayes next rocket launch that will have a stream.
-      
+
       */
       message.author.send(helpMsg);
     }
@@ -245,6 +246,34 @@ const commands = [
         on - You will be tagged in events that include you
         off - You won't be tagged in events that include you
         \`\`\``);
+    }
+  },
+
+  /**
+   * Modify player's gender
+   */
+  modifyGender = {
+    command: '!gender',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(' ');
+
+        // Use switch to validate the value
+        switch (splitCommand[1]) {
+          case 'boy':
+          case 'girl':
+          case 'neutral':
+            game.modifyGender(message.author, discordHook, splitCommand[1]);
+        }
+
+      } else {
+        message.reply(`\`\`\`Possible options
+        boy
+        girl
+        neutral
+        \`\`\``);
+      }
     }
   },
 

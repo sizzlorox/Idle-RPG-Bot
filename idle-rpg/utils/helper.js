@@ -194,6 +194,7 @@ class helper {
     Health: ${player.health} / ${100 + (player.level * 5)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
+    Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}
 
@@ -235,17 +236,51 @@ class helper {
 
     return '';
   }
-  
+
   /**
    * Based on player setting, either return <@!discordId> or playerName
    * @param player
    * @returns String
    */
   generatePlayerName(player) {
-    if (player.isMentionInDiscord === false){
-      return player.name;      
+    if (player.isMentionInDiscord === false) {
+      return player.name;
     }
     return `<@!${player.discordId}>`;
+  }
+
+  /**
+   * Based on player setting, transform into the correct gender
+   * @param player
+   * @param word
+   * @returns String
+   */
+  generateGenderString(player, word) {
+    const wordMapping = {
+      boy: {
+        he: 'he',
+        his: 'his',
+        him: 'him',
+        himself: 'himself',
+      },
+      girl: {
+        he: 'she',
+        his: 'her',
+        him: 'her',
+        himself: 'herself',
+      },
+      neutral: {
+        he: 'they',
+        his: 'their',
+        him: 'them',
+        himself: 'themself',
+      }
+    };
+
+    if (wordMapping[player.gender] && wordMapping[player.gender][word]) {
+      return wordMapping[player.gender][word];
+    }
+    return word;
   }
 
   generateEquipmentsString(player) {
