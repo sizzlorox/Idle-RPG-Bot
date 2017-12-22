@@ -128,7 +128,7 @@ const commands = [
         .then((players) => {
           let mapInfo = '';
           maps.forEach((map) => {
-            mapInfo = mapInfo.concat(`\n${map.name} (${map.type}):\n`);
+            mapInfo = mapInfo.concat(`\n${map.name} (${map.type.name}):\n`);
             players.forEach((player) => {
               if (player.map.name === map.name) {
                 mapInfo = mapInfo.concat(`${player.name}, `);
@@ -210,7 +210,7 @@ const commands = [
     function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(' ');
-        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 50)
+        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
           .then((result) => {
             return message.author.send(`\`\`\`${result}\`\`\``);
           });
@@ -233,20 +233,19 @@ const commands = [
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(' ');
-        
+
         // Use switch to validate the value
-        switch(splitCommand[1]){
-          case "on":
-          case "off":
-            game.modifyMention(message.author, discordHook, splitCommand[1] === "on");
+        switch (splitCommand[1]) {
+          case 'on':
+          case 'off':
+            return game.modifyMention(message.author, discordHook, splitCommand[1] === 'on');
         }
-        
-      } else {
-        message.reply(`\`\`\`Possible options
+      }
+
+      return message.reply(`\`\`\`Possible options
         on - You will be tagged in events that include you
         off - You won't be tagged in events that include you
         \`\`\``);
-      }
     }
   },
 
@@ -279,6 +278,26 @@ const commands = [
   },
 
   // Bot Operator commands
+  activateBlizzard = {
+    command: '!blizzard',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(' ');
+        const blizzardBoolean = game.blizzardSwitch(splitCommand[1]);
+        switch (splitCommand) {
+          case 'on':
+            message.author.send(blizzardBoolean ? 'Blizzard is already activated!' : 'Blizzard activated.');
+            break;
+          case 'off':
+            message.author.send(!blizzardBoolean ? 'Blizzard is already deactivated!' : 'Blizzard deactivated.');
+            break;
+        }
+      }
+    }
+  },
+
   giveGold = {
     command: '!givegold',
     operatorOnly: true,

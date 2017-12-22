@@ -1,12 +1,13 @@
 const helper = require('../utils/helper');
 const Database = require('../database/Database');
-const { getTowns } = require('./utils/Map');
 const Event = require('./utils/Event');
 const spells = require('./data/spells');
 const moment = require('moment');
-const logger = require('../utils/logger');
 const { multiplier } = require('../../settings');
 
+/**
+ * GANE CLASS
+ */
 class Game {
 
   constructor(discordHook) {
@@ -31,6 +32,10 @@ class Game {
       .then((selectedPlayer) => {
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
+        if (selectedPlayer.events % 100 === 0) {
+          helper.sendMessage(this.discordHook, twitchBot, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
+        }
+
         helper.passiveHeal(selectedPlayer);
         console.log(`\nGAME: Random Event ID: ${randomEvent} ${moment().utc('br')}`);
 
@@ -51,10 +56,6 @@ class Game {
               .then(updatedPlayer => Database.savePlayer(updatedPlayer));
             break;
         }
-
-        if (selectedPlayer.events % 100 === 0) {
-          helper.sendMessage(this.discordHook, twitchBot, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
-        }
       })
       .catch(err => console.log(err));
   }
@@ -65,15 +66,15 @@ class Game {
 
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
-    if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
+    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
-    } 
+    }
 
-    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !getTowns().includes(selectedPlayer.map.name)) {
+    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
       return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
     }
 
-    if (!getTowns().includes(selectedPlayer.map.name)) {
+    if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
       return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
     }
 
@@ -85,8 +86,10 @@ class Game {
     console.log(`Player: ${selectedPlayer.name} - Dice: ${luckDice}`);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
-    } else if (getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
+    } else if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGamblingEvent(this.discordHook, selectedPlayer, this.multiplier);
+    } else if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 2)) {
+      Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer);
     } else if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {
       return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
@@ -121,8 +124,12 @@ class Game {
   top10(commandAuthor, type = { level: -1 }) {
     return Database.loadTop10(type)
       .then((top10) => {
+        const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
+          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`)
+          .join('\n')}`;
+
         commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0]}:
-${top10.filter(player => player[Object.keys(type)[0]] > 0).map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`).join('\n')}
+${rankString}
         \`\`\``);
       });
   }
@@ -136,12 +143,16 @@ ${top10.filter(player => player[Object.keys(type)[0]] > 0).map((player, rank) =>
   modifyMention(commandAuthor, hook, isMentionInDiscord) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
-        castingPlayer.isMentionInDiscord = isMentionInDiscord;
-        Database.savePlayer(castingPlayer)
-          .then(() => {
-            commandAuthor.send('Preference for being @mention has been updated.');
-          });
-     });
+        if (castingPlayer.isMentionInDiscord !== isMentionInDiscord) {
+          castingPlayer.isMentionInDiscord = isMentionInDiscord;
+          return Database.savePlayer(castingPlayer)
+            .then(() => {
+              return commandAuthor.send('Preference for being @mention has been updated.');
+            });
+        }
+
+        return commandAuthor.send('Your @mention preference is already set to this value.');
+      });
   }
 
   /**
@@ -240,6 +251,55 @@ ${top10.filter(player => player[Object.keys(type)[0]] > 0).map((player, rank) =>
 
   deleteAllPlayers() {
     return Database.deleteAllPlayers();
+  }
+
+  /**
+   * SPECIAL EVENTS
+   */
+  blizzardSwitch(blizzardSwitch) {
+    return Event.blizzardSwitch(this.discordHook, blizzardSwitch);
+  }
+
+  sendChristmasPreEventMessage() {
+    setTimeout(() => {
+      helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
+    }, 75600000); // 21hr
+
+    return helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to another lands...\'\`\`\`');
+  }
+
+  updateChristmasEvent(isStarting) {
+    if (isStarting) {
+      helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      Event.MonsterClass.monsters.forEach((mob) => {
+        if (mob.isXmasEvent) {
+          mob.isSpawnable = true;
+        }
+      });
+      Event.ItemClass.items.forEach((type) => {
+        type.forEach((item) => {
+          if (item.isXmasEvent && item.name !== 'Snowflake') {
+            item.isDroppable = true;
+          }
+        });
+      });
+      return '';
+    }
+
+    helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
+    Event.MonsterClass.monsters.forEach((mob) => {
+      if (mob.isXmasEvent) {
+        mob.isSpawnable = false;
+      }
+    });
+    Event.ItemClass.items.forEach((type) => {
+      type.forEach((item) => {
+        if (item.isXmasEvent && item.name !== 'Snowflake') {
+          item.isDroppable = false;
+        }
+      });
+    });
+    return '';
   }
 
 }
