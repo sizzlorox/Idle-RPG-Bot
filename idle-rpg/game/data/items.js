@@ -107,7 +107,7 @@ const items = {
         end: 3,
         int: 3
       },
-      gold: 30,
+      gold: 10,
       rarity: 30
     },
     hardened = {
@@ -118,7 +118,7 @@ const items = {
         end: 3,
         int: 3
       },
-      gold: 30,
+      gold: 15,
       rarity: 15
     },
     sturdy = {
@@ -129,7 +129,7 @@ const items = {
         end: 3,
         int: 2
       },
-      gold: 30,
+      gold: 15,
       rarity: 43
     },
     crude = {
@@ -140,7 +140,7 @@ const items = {
         end: -1,
         int: 2
       },
-      gold: 30,
+      gold: 5,
       rarity: 75
     },
     battered = {
@@ -151,7 +151,7 @@ const items = {
         end: 2,
         int: 0
       },
-      gold: 30,
+      gold: 5,
       rarity: 50
     },
     crack = {
@@ -162,7 +162,7 @@ const items = {
         end: -1,
         int: -1
       },
-      gold: 30,
+      gold: 1,
       rarity: 100
     },
   ],
@@ -316,7 +316,7 @@ const items = {
         gold: 3
       },
       minerHelmet = {
-        name: 'Miner Helmet',
+        name: 'Miners Helmet',
         position: 'helmet',
         stats: {
           str: 2,

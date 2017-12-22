@@ -82,36 +82,36 @@ discordBot.login(botLoginToken);
 console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
 
 const heartBeat = () => {
-  const discordUsers = discordBot.users;
+  if (process.env.NODE_ENV === 'production') {
+    const discordUsers = discordBot.users;
 
-  const discordOfflinePlayers = discordUsers
-    .filter(player => player.presence.status === 'offline' && !player.bot)
-    .map((player) => {
-      return {
-        name: player.username,
-        discordId: player.id
-      };
-    });
+    const discordOfflinePlayers = discordUsers
+      .filter(player => player.presence.status === 'offline' && !player.bot)
+      .map((player) => {
+        return {
+          name: player.username,
+          discordId: player.id
+        };
+      });
 
-  const discordOnlinePlayers = discordUsers
-    .filter(player => player.presence.status === 'online' && !player.bot
-      || player.presence.status === 'idle' && !player.bot
-      || player.presence.status === 'dnd' && !player.bot)
-    .map((player) => {
-      return {
-        name: player.username,
-        discordId: player.id
-      };
-    });
+    const discordOnlinePlayers = discordUsers
+      .filter(player => player.presence.status === 'online' && !player.bot
+        || player.presence.status === 'idle' && !player.bot
+        || player.presence.status === 'dnd' && !player.bot)
+      .map((player) => {
+        return {
+          name: player.username,
+          discordId: player.id
+        };
+      });
 
-  onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
-    .filter((player, index, array) =>
-      index === array.findIndex(p => (
-        p.discordId === player.discordId
-      ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
-
-  if (process.env.NODE_ENV !== 'production') {
-    onlinePlayerList = onlinePlayerList.concat(mockPlayers);
+    onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
+      .filter((player, index, array) =>
+        index === array.findIndex(p => (
+          p.discordId === player.discordId
+        ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
+  } else {
+    onlinePlayerList = onlinePlayerList.push(mockPlayers);
   }
 
   onlinePlayerList.forEach((player) => {
