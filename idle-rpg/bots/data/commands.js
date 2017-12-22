@@ -23,6 +23,7 @@ const commands = [
         !castspell <spell> - Casts a global spell onto Idle-RPG.
         !eventlog - Lists up to 25 past events.
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
+        !mention <on|off> - Change if events relating to you will @Mention you
         \`\`\``;
       /*
 
@@ -219,6 +220,32 @@ const commands = [
           console.log(`\`\`\`${result}\`\`\``.length);
           return message.author.send(`\`\`\`${result}\`\`\``);
         });
+    }
+  },
+
+  /**
+   * Modify if player will be @Mentioned in events
+   */
+  modifyMention = {
+    command: '!mention',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(' ');
+        
+        // Use switch to validate the value
+        switch(splitCommand[1]){
+          case "on":
+          case "off":
+            game.modifyMention(message.author, discordHook, splitCommand[1] === "on");
+        }
+        
+      } else {
+        message.reply(`\`\`\`Possible options
+        on - You will be tagged in events that include you
+        off - You won't be tagged in events that include you
+        \`\`\``);
+      }
     }
   },
 
