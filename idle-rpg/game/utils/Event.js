@@ -22,7 +22,6 @@ class Event {
     return new Promise((resolve) => {
       selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
-      selectedPlayer.map = this.MapClass.moveToRandomMap(selectedPlayer);
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       helper.sendMessage(discordHook, 'twitch', true, eventMsg);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -54,7 +53,7 @@ class Event {
             selectedPlayer.battles.won++;
             randomPlayer.battles.lost++;
 
-            const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} in \`${selectedPlayer.map.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`;
+            const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} in \`${selectedPlayer.map.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.abs(playerChance)} damage!`;
             const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${Math.abs(playerChance)} damage`;
             const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and lost ${Math.abs(playerChance)} health`;
 
@@ -77,13 +76,13 @@ class Event {
           randomPlayer.battles.won++;
           selectedPlayer.battles.lost++;
 
-          const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` but failed!
+          const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` but failed!
           ${helper.generatePlayerName(randomPlayer)}s \`${randomPlayer.equipment.weapon.name}\` dealt ${Math.abs(otherPlayerChance)} damage!`;
 
           const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and failed.
           ${randomPlayer.name} did ${Math.abs(otherPlayerChance)} damage with ${randomPlayer.equipment.weapon.name}`;
 
-          const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} but he/she failed.
+          const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} but ${helper.generateGenderString(selectedPlayer, 'he')} failed.
           You did ${Math.abs(otherPlayerChance)} damage with ${randomPlayer.equipment.weapon.name}`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -109,6 +108,7 @@ class Event {
 
   attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
+      selectedPlayer.map = this.MapClass.getMapByName(selectedPlayer.map.name);
       return this.MonsterManager.generateMonster(selectedPlayer)
         .then((mob) => {
           return Battle.simulateBattleWithMob(selectedPlayer, mob)
@@ -122,9 +122,9 @@ class Event {
 
                 let eventMsg;
                 if (!mob.isXmasEvent) {
-                  eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
+                  eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
                 } else {
-                  eventMsg = `**${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with his/her \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!**`;
+                  eventMsg = `**${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!**`;
                 }
                 const eventLog = `Killed ${mob.name} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold`;
 
@@ -200,7 +200,7 @@ class Event {
             if (!item.isXmasEvent) {
               eventMsg = `${helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\``;
             } else {
-              eventMsg = `**\`${helper.generatePlayerName(selectedPlayer)}\` received \`${item.name}\` from \`${mob.name}!\`**`;
+              eventMsg = `**${helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\`**`;
             }
             const eventLog = `Received ${item.name} from ${mob.name}`;
 
@@ -284,7 +284,7 @@ class Event {
         };
       case 3:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} a bird just dropped \`${item.name}\` infront of him/her in \`${selectedPlayer.map.name}\`!`,
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} a bird just dropped \`${item.name}\` infront of ${helper.generateGenderString(selectedPlayer, 'him')} in \`${selectedPlayer.map.name}\`!`,
           eventLog: `A bird just dropped ${item.name} infront of you in ${selectedPlayer.map.name}`
         };
     }
@@ -402,10 +402,10 @@ class Event {
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = helper.randomBetween(0, 2);
+      const luckEvent = helper.randomBetween(0, 5);
       switch (luckEvent) {
         case 0:
-          const luckStat = helper.randomBetween(0, 4);
+          const luckStat = helper.randomBetween(0, 3);
           const luckStatAmount = helper.randomBetween(2, 10);
           let stat;
           switch (luckStat) {
@@ -421,13 +421,13 @@ class Event {
               stat = enumHelper.stats.end;
               selectedPlayer.stats.end += luckStatAmount;
               break;
-            case 4:
+            case 3:
               stat = enumHelper.stats.int;
               selectedPlayer.stats.int += luckStatAmount;
               break;
           }
 
-          const eventMsgApollo = `Apollo has blessed ${helper.generatePlayerName(selectedPlayer)} with his music raising his/her \`${stat}\` by ${luckStatAmount}!`;
+          const eventMsgApollo = `Apollo has blessed ${helper.generatePlayerName(selectedPlayer)} with his music raising ${helper.generateGenderString(selectedPlayer, 'his')} \`${stat}\` by ${luckStatAmount}!`;
           const eventLogApollo = `Apollo blessed you with his music raising your ${stat} by ${luckStatAmount}`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgApollo);
@@ -442,7 +442,7 @@ class Event {
             selectedPlayer.experience = 0;
           }
 
-          const eventMsgHades = `Hades unleashed his wrath upon ${helper.generatePlayerName(selectedPlayer)} making him/her lose ${luckExpAmount} experience!`;
+          const eventMsgHades = `Hades unleashed his wrath upon ${helper.generatePlayerName(selectedPlayer)} making ${helper.generateGenderString(selectedPlayer, 'him')} lose ${luckExpAmount} experience!`;
           const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgHades);
@@ -455,11 +455,72 @@ class Event {
           selectedPlayer.health -= luckHealthAmount;
           helper.checkHealth(selectedPlayer, discordHook);
 
-          const eventMsgTrip = `${helper.generatePlayerName(selectedPlayer)} just lost ${luckHealthAmount} health by tripping and hitting his/her head!`;
-          const eventLogTrip = `You lost ${luckHealthAmount} health by tripping and hitting your head`;
+          const eventMsgZeus = `${helper.generatePlayerName(selectedPlayer)} was struck down by thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
+          const eventLogZeus = `Zeus struck you down with his thunderbold and you lost ${luckHealthAmount} health`;
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgTrip);
-          selectedPlayer = helper.logEvent(selectedPlayer, eventLogTrip);
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgZeus);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogZeus);
+
+          return resolve(selectedPlayer);
+          
+        case 3:
+          const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
+          
+          if (healthDeficit) {
+            const healAmount = Math.round(healthDeficit / 3);
+          
+            const eventMsgAseco = `Fortune smiles upon ${helper.generatePlayerName(selectedPlayer)} as Aseco cured his sickness and restored ${helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
+            const eventLogAseco = `Aseco healed you for ${healAmount}`;
+            
+            selectedPlayer.health += healAmount;
+            
+            helper.sendMessage(discordHook, 'twitch', false, eventMsgAseco);
+            selectedPlayer = helper.logEvent(selectedPlayer, eventLogAseco);
+            
+            return resolve(selectedPlayer);
+          }
+          
+          const eventMsgAsecoFull = `Aseco gave ${helper.generatePlayerName(selectedPlayer)} an elixir of life but it caused no effect on ${helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
+          const eventLogAsecoFull = `Aseco wanted to heal you, but you had full health`;
+          
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgAsecoFull);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogAsecoFull);
+            
+          return resolve(selectedPlayer);
+        
+        case 4:
+          if (selectedPlayer.gold < 20) {
+            const eventMsgHermesFail = `Hermes demanded some gold from ${helper.generatePlayerName(selectedPlayer)} but as ${helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
+            const eventLogHermesFail = `Hermes demanded gold from you but you had nothing to give`;
+            
+            helper.sendMessage(discordHook, 'twitch', false, eventMsgHermesFail);
+            selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermesFail);
+            
+            return resolve(selectedPlayer);
+          }
+          
+          const goldTaken = Math.round(selectedPlayer.gold / 20);
+          
+          const eventMsgHermes = `Hermes took ${goldTaken} from ${helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
+          const eventLogHermes = `Hermes took ${goldTaken} from you. It will be spent in favor of Greek pantheon. He promises!`
+          
+          selectedPlayer.gold -= goldTaken;
+          
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgHermes);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermes);
+          
+          return resolve(selectedPlayer);
+          
+        case 5:
+          const luckExpAmount = helper.randomBetween(5, 15);
+          selectedPlayer.experience += luckExpAmount;
+          helper.checkExperience(selectedPlayer, discordHook)
+
+          const eventMsgAthene = `Athene shared her wisdom with ${helper.generatePlayerName(selectedPlayer)} making ${helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAmount} experience!`;
+          const eventLogAthene = `Athene shared her wisdom with you making you gain ${luckExpAmount} experience`;
+
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgAthene);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogAthene);
 
           return resolve(selectedPlayer);
       }
@@ -545,7 +606,7 @@ class Event {
           selectedPlayer.gold = 0;
         }
 
-        const eventMsgLoseGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, he/she lost ${luckGambleGold} gold!`;
+        const eventMsgLoseGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, ${helper.generateGenderString(selectedPlayer, 'he')} lost ${luckGambleGold} gold!`;
         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} by gambling in a tavern.`;
 
         helper.sendMessage(discordHook, 'twitch', false, eventMsgLoseGamble);
@@ -556,7 +617,7 @@ class Event {
 
       selectedPlayer.gold += luckGambleGold;
 
-      const eventMsgWinGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try his/her luck in \`${selectedPlayer.map.name}\` tavern. Fortunately, he/she won ${luckGambleGold} gold!`;
+      const eventMsgWinGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern. Fortunately, ${helper.generateGenderString(selectedPlayer, 'he')} won ${luckGambleGold} gold!`;
       const eventLogWinGamble = `Congrats! You won ${luckGambleGold} by gambling in a tavern.`;
 
       helper.sendMessage(discordHook, 'twitch', false, eventMsgWinGamble);

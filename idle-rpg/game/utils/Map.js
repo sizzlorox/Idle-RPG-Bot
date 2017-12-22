@@ -18,6 +18,10 @@ class Map {
     return maps.filter(area => area.type.name === 'Town').map(area => area.name);
   }
 
+  getMapByName(name) {
+    return maps.find(map => map.name === name);
+  }
+
   getMapsByType(type) {
     return maps.filter(area => area.type.name === type).map(area => area.name);
   }

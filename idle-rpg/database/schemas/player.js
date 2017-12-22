@@ -14,6 +14,7 @@ const newPlayerObj = (discordId, name) => {
     level: 1,
     gold: 0,
     isMentionInDiscord: true,
+    gender: 'neutral',
     equipment: {
       helmet: {
         name: 'Nothing',
@@ -90,6 +91,10 @@ const playerSchema = mongoose.Schema({
   isMentionInDiscord: {
     type: Boolean,
     default: true
+  },
+  gender: {
+    type: String,
+    default: 'neutral'
   },
   equipment: {
     helmet: {

@@ -155,6 +155,27 @@ ${rankString}
       });
   }
 
+  /**
+   * Modify player gender
+   * @param Player commandAuthor
+   * @param DiscordHook hook
+   * @param String gender
+   */
+  modifyGender(commandAuthor, hook, gender) {
+    return Database.loadPlayer(commandAuthor.id)
+      .then((castingPlayer) => {
+        if (castingPlayer.gender !== gender) {
+          castingPlayer.gender = gender;
+          return Database.savePlayer(castingPlayer)
+            .then(() => {
+              return commandAuthor.send('Gender has been updated.');
+            });
+        }
+
+        return commandAuthor.send('Your gender is already set to this value.');
+      });
+  }
+
   castSpell(commandAuthor, hook, spell) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
@@ -242,7 +263,7 @@ ${rankString}
   sendChristmasPreEventMessage() {
     setTimeout(() => {
       helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
-    }, 75600000); // 21hr
+    }, 43200000); // 21hr
 
     return helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to another lands...\'\`\`\`');
   }

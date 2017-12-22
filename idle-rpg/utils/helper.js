@@ -2,6 +2,7 @@ const fs = require('fs');
 const Map = require('../game/utils/Map');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
+const logger = require('../utils/logger');
 
 class helper {
   randomBetween(min, max, decimal, exclude) {
@@ -53,9 +54,13 @@ class helper {
 
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
-      discordHook.movementHook.send(msg);
+      discordHook.movementHook.send(msg)
+        .then(debugMsg => logger.move(debugMsg))
+        .catch(err => logger.error(err));
     } else {
-      discordHook.actionHook.send(msg);
+      discordHook.actionHook.send(msg)
+        .then(debugMsg => logger.action(debugMsg))
+        .catch(err => logger.error(err));
     }
 
     // Add if to check if channel is streaming
@@ -194,6 +199,7 @@ class helper {
     Health: ${player.health} / ${100 + (player.level * 5)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
+    Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}
 
@@ -235,17 +241,51 @@ class helper {
 
     return '';
   }
-  
+
   /**
    * Based on player setting, either return <@!discordId> or playerName
    * @param player
    * @returns String
    */
   generatePlayerName(player) {
-    if (player.isMentionInDiscord === false){
-      return player.name;      
+    if (player.isMentionInDiscord === false) {
+      return `\`${player.name}\``;
     }
     return `<@!${player.discordId}>`;
+  }
+
+  /**
+   * Based on player setting, transform into the correct gender
+   * @param player
+   * @param word
+   * @returns String
+   */
+  generateGenderString(player, word) {
+    const wordMapping = {
+      boy: {
+        he: 'he',
+        his: 'his',
+        him: 'him',
+        himself: 'himself',
+      },
+      girl: {
+        he: 'she',
+        his: 'her',
+        him: 'her',
+        himself: 'herself',
+      },
+      neutral: {
+        he: 'they',
+        his: 'their',
+        him: 'them',
+        himself: 'themself',
+      }
+    };
+
+    if (wordMapping[player.gender] && wordMapping[player.gender][word]) {
+      return wordMapping[player.gender][word];
+    }
+    return word;
   }
 
   generateEquipmentsString(player) {
