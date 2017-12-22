@@ -194,6 +194,7 @@ class helper {
     Health: ${player.health} / ${100 + (player.level * 5)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
+    Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}
 
