@@ -155,6 +155,27 @@ ${rankString}
       });
   }
 
+  /**
+   * Modify player gender
+   * @param Player commandAuthor
+   * @param DiscordHook hook
+   * @param String gender
+   */
+  modifyGender(commandAuthor, hook, gender) {
+    return Database.loadPlayer(commandAuthor.id)
+      .then((castingPlayer) => {
+        if (castingPlayer.gender !== gender) {
+          castingPlayer.gender = gender;
+          return Database.savePlayer(castingPlayer)
+            .then(() => {
+              return commandAuthor.send('Gender has been updated.');
+            });
+        }
+
+        return commandAuthor.send('Your gender is already set to this value.');
+      });
+  }
+
   castSpell(commandAuthor, hook, spell) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {

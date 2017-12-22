@@ -1,7 +1,7 @@
 const winston = require('winston');
 
 const logger = winston.createLogger({
-  level: ['info', 'action', 'move'],
+  level: ['info', 'welcome', 'action', 'move'],
   format: winston.format.json(),
   transports: [
     new winston.transports.Console({
@@ -10,13 +10,14 @@ const logger = winston.createLogger({
       silent: false,
       timestamp: true
     }),
-    new winston.transports.File({ filename: './logs/info.log', level: 'info', silent: false }),
-    new winston.transports.File({ filename: './logs/action.log', level: 'action', silent: true }),
-    new winston.transports.File({ filename: './logs/move.log', level: 'move', silent: true }),
-    new winston.transports.File({ filename: './logs/error.log', level: 'error', silent: false })
+    new winston.transports.File({ filename: './logs/info.log', level: 'info', silent: false, timestamp: true }),
+    new winston.transports.File({ filename: './logs/welcome.log', level: 'welcome', silent: false, timestamp: true }),
+    new winston.transports.File({ filename: './logs/action.log', level: 'action', silent: true, timestamp: true }),
+    new winston.transports.File({ filename: './logs/move.log', level: 'move', silent: true, timestamp: true }),
+    new winston.transports.File({ filename: './logs/error.log', level: 'error', silent: false, timestamp: true })
   ],
   exceptionHandlers: [
-    new transports.File({ filename: './logs/exceptions.log', silent: false })
+    new winston.transports.File({ filename: './logs/exceptions.log', silent: false })
   ]
 });
 
