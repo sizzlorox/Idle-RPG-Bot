@@ -22,7 +22,7 @@ class Event {
     return new Promise((resolve) => {
       selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
-      selectedPlayer.map = Map.moveToRandomMap(selectedPlayer);
+      selectedPlayer.map = this.MapClass.moveToRandomMap(selectedPlayer);
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       helper.sendMessage(discordHook, 'twitch', true, eventMsg);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);

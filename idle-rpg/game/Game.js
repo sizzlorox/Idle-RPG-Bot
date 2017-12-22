@@ -143,11 +143,15 @@ ${rankString}
   modifyMention(commandAuthor, hook, isMentionInDiscord) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
-        castingPlayer.isMentionInDiscord = isMentionInDiscord;
-        return Database.savePlayer(castingPlayer)
-          .then(() => {
-            return commandAuthor.send('Preference for being @mention has been updated.');
-          });
+        if (castingPlayer.isMentionInDiscord !== isMentionInDiscord) {
+          castingPlayer.isMentionInDiscord = isMentionInDiscord;
+          return Database.savePlayer(castingPlayer)
+            .then(() => {
+              return commandAuthor.send('Preference for being @mention has been updated.');
+            });
+        }
+
+        return commandAuthor.send('Your @mention preference is already set to this value.');
       });
   }
 
