@@ -402,7 +402,7 @@ class Event {
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = helper.randomBetween(0, 2);
+      const luckEvent = helper.randomBetween(0, 5);
       switch (luckEvent) {
         case 0:
           const luckStat = helper.randomBetween(0, 4);
@@ -455,11 +455,72 @@ class Event {
           selectedPlayer.health -= luckHealthAmount;
           helper.checkHealth(selectedPlayer, discordHook);
 
-          const eventMsgTrip = `${helper.generatePlayerName(selectedPlayer)} just lost ${luckHealthAmount} health by tripping and hitting ${helper.generateGenderString(selectedPlayer, 'his')} head!`;
-          const eventLogTrip = `You lost ${luckHealthAmount} health by tripping and hitting your head`;
+          const eventMsgZeus = `${helper.generatePlayerName(selectedPlayer)} was struck down by thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
+          const eventLogZeus = `Zeus struck you down with his thunderbold and you lost ${luckHealthAmount} health`;
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgTrip);
-          selectedPlayer = helper.logEvent(selectedPlayer, eventLogTrip);
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgZeus);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogZeus);
+
+          return resolve(selectedPlayer);
+          
+        case 3:
+          const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
+          
+          if (healthDeficit) {
+            const healAmount = Math.round(healthDeficit / 3);
+          
+            const eventMsgAseco = `Fortune smiles upon ${helper.generatePlayerName(selectedPlayer)} as Aseco cured his sickness and restored ${helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
+            const eventLogAseco = `Aseco healed you for ${healAmount}`;
+            
+            selectedPlayer.health += healAmount;
+            
+            helper.sendMessage(discordHook, 'twitch', false, eventMsgAseco);
+            selectedPlayer = helper.logEvent(selectedPlayer, eventLogAseco);
+            
+            return resolve(selectedPlayer);
+          }
+          
+          const eventMsgAsecoFull = `Aseco gave ${helper.generatePlayerName(selectedPlayer)} an elixir of life but it caused no effect on ${helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
+          const eventLogAsecoFull = `Aseco wanted to heal you, but you had full health`;
+          
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgAsecoFull);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogAsecoFull);
+            
+          return resolve(selectedPlayer);
+        
+        case 4:
+          if (selectedPlayer.gold < 20) {
+            const eventMsgHermesFail = `Hermes demanded some gold from ${helper.generatePlayerName(selectedPlayer)} but as ${helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
+            const eventLogHermesFail = `Hermes demanded gold from you but you had nothing to give`;
+            
+            helper.sendMessage(discordHook, 'twitch', false, eventMsgHermesFail);
+            selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermesFail);
+            
+            return resolve(selectedPlayer);
+          }
+          
+          const goldTaken = Math.round(selectedPlayer.gold / 20);
+          
+          const eventMsgHermes = `Hermes took ${goldTaken} from ${helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
+          const eventLogHermes = `Hermes took ${goldTaken} from you. It will be spent in favor of Greek pantheon. He promises!`
+          
+          selectedPlayer.gold -= goldTaken;
+          
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgHermes);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermes);
+          
+          return resolve(selectedPlayer);
+          
+        case 5:
+          const luckExpAmount = helper.randomBetween(5, 15);
+          selectedPlayer.experience += luckExpAmount;
+          helper.checkExperience(selectedPlayer, discordHook)
+
+          const eventMsgAthene = `Athene shared her wisdom with ${helper.generatePlayerName(selectedPlayer)} making ${helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAmount} experience!`;
+          const eventLogAthene = `Athene shared her wisdom with you making you gain ${luckExpAmount} experience`;
+
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgAthene);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogAthene);
 
           return resolve(selectedPlayer);
       }
