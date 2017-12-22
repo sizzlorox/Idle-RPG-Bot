@@ -242,7 +242,7 @@ const commands = [
         }
       }
 
-      return message.reply(`\`\`\`Possible options
+      return message.reply(`\`\`\`Possible options:
         on - You will be tagged in events that include you
         off - You won't be tagged in events that include you
         \`\`\``);
@@ -264,16 +264,16 @@ const commands = [
           case 'boy':
           case 'girl':
           case 'neutral':
-            game.modifyGender(message.author, discordHook, splitCommand[1]);
+            return game.modifyGender(message.author, discordHook, splitCommand[1]);
         }
 
-      } else {
-        message.reply(`\`\`\`Possible options
+      }
+
+      return message.reply(`\`\`\`Possible options:
         boy
         girl
         neutral
         \`\`\``);
-      }
     }
   },
 
@@ -332,12 +332,10 @@ const commands = [
     operatorOnly: true,
     channelOnlyId: commandChannel,
     function: (game, message) => {
-      if (message.content.includes(' ')) {
-        game.deleteAllPlayers(message.content.split(' ')[1])
-          .then(() => {
-            message.author.send('Done.');
-          });
-      }
+      game.deleteAllPlayers()
+        .then(() => {
+          message.author.send('Done.');
+        });
     }
   },
 

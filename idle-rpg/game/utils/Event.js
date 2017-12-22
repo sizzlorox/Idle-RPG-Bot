@@ -22,7 +22,6 @@ class Event {
     return new Promise((resolve) => {
       selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
-      selectedPlayer.map = this.MapClass.moveToRandomMap(selectedPlayer);
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       helper.sendMessage(discordHook, 'twitch', true, eventMsg);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -109,6 +108,7 @@ class Event {
 
   attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
+      selectedPlayer.map = this.MapClass.getMapByName(selectedPlayer.map.name);
       return this.MonsterManager.generateMonster(selectedPlayer)
         .then((mob) => {
           return Battle.simulateBattleWithMob(selectedPlayer, mob)
@@ -200,7 +200,7 @@ class Event {
             if (!item.isXmasEvent) {
               eventMsg = `${helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\``;
             } else {
-              eventMsg = `**\`${helper.generatePlayerName(selectedPlayer)}\` received \`${item.name}\` from \`${mob.name}!\`**`;
+              eventMsg = `**${helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\`**`;
             }
             const eventLog = `Received ${item.name} from ${mob.name}`;
 
@@ -405,7 +405,7 @@ class Event {
       const luckEvent = helper.randomBetween(0, 5);
       switch (luckEvent) {
         case 0:
-          const luckStat = helper.randomBetween(0, 4);
+          const luckStat = helper.randomBetween(0, 3);
           const luckStatAmount = helper.randomBetween(2, 10);
           let stat;
           switch (luckStat) {
@@ -421,7 +421,7 @@ class Event {
               stat = enumHelper.stats.end;
               selectedPlayer.stats.end += luckStatAmount;
               break;
-            case 4:
+            case 3:
               stat = enumHelper.stats.int;
               selectedPlayer.stats.int += luckStatAmount;
               break;
