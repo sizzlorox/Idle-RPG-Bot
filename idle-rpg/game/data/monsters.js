@@ -72,7 +72,7 @@ const monsters = {
     rat = {
       name: 'Rat',
       isSpawnable: true,
-      spawnableMapType: ['Snow'],
+      spawnableMapType: ['Land'],
       stats: {
         str: 1,
         dex: 1,
