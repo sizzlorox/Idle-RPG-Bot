@@ -83,18 +83,22 @@ class Item {
         itemStr = (itemRarityList[randomRarityIndex].stats.str
           * (itemMaterialList[randomMaterialIndex].stats.str
             + itemType.stats.str)) / 4;
+        itemStr = itemStr < 0 ? 0 : itemStr;
 
         itemDex = (itemRarityList[randomRarityIndex].stats.dex
           * (itemMaterialList[randomMaterialIndex].stats.dex
             + itemType.stats.dex)) / 4;
+        itemDex = itemDex < 0 ? 0 : itemDex;
 
         itemEnd = (itemRarityList[randomRarityIndex].stats.end
           * (itemMaterialList[randomMaterialIndex].stats.end
             + itemType.stats.end)) / 4;
+        itemEnd = itemEnd < 0 ? 0 : itemEnd;
 
         itemInt = (itemRarityList[randomRarityIndex].stats.int
           * (itemMaterialList[randomMaterialIndex].stats.int
             + itemType.stats.int)) / 4;
+        itemInt = itemInt < 0 ? 0 : itemInt;
 
         itemRating = itemStr + itemDex + itemEnd + itemInt;
 
