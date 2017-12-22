@@ -53,14 +53,14 @@ class helper {
   }
 
   sendMessage(discordHook, twitchBot, isMovement, msg) {
-    try {
-      if (isMovement) {
-        discordHook.movementHook.send(msg);
-      } else {
-        discordHook.actionHook.send(msg);
-      }
-    } catch (err) {
-      logger.error(err);
+    if (isMovement) {
+      discordHook.movementHook.send(msg)
+        .then(debugMsg => logger.move(debugMsg))
+        .catch(err => logger.error(err));
+    } else {
+      discordHook.actionHook.send(msg)
+        .then(debugMsg => logger.action(debugMsg))
+        .catch(err => logger.error(err));
     }
 
     // Add if to check if channel is streaming
@@ -248,7 +248,7 @@ class helper {
    */
   generatePlayerName(player) {
     if (player.isMentionInDiscord === false) {
-      return player.name;
+      return `\`${player.name}\``;
     }
     return `<@!${player.discordId}>`;
   }

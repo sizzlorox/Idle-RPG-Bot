@@ -303,12 +303,10 @@ const commands = [
     operatorOnly: true,
     channelOnlyId: commandChannel,
     function: (game, message) => {
-      if (message.content.includes(' ')) {
-        game.deleteAllPlayers(message.content.split(' ')[1])
-          .then(() => {
-            message.author.send('Done.');
-          });
-      }
+      game.deleteAllPlayers()
+        .then(() => {
+          message.author.send('Done.');
+        });
     }
   },
 
