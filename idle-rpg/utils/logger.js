@@ -1,7 +1,13 @@
 const winston = require('winston');
 
 const logger = winston.createLogger({
-  level: ['info', 'welcome', 'action', 'move'],
+  level: 'info',
+  levels: {
+    info: 0,
+    welcome: 1,
+    action: 2,
+    move: 3
+  },
   format: winston.format.json(),
   transports: [
     new winston.transports.Console({

@@ -21,7 +21,7 @@ const commands = [
         !map - Displays the worlds locations.
         !castspell - Lists spells available to cast.
         !castspell <spell> - Casts a global spell onto Idle-RPG.
-        !eventlog - Lists up to 25 past events.
+        !eventlog - Lists up to 15 past events.
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
         !mention <on|off> - Change if events relating to you will @Mention you
         !gender <boy|girl|neutral> - Change your character's gender
