@@ -102,6 +102,10 @@ class Database {
     };
     select[Object.keys(type)[0]] = 1;
 
+    if (Object.keys(type)[0] === 'level') {
+      select.experience = 1;
+    }
+
     return new Promise((resolve, reject) => {
       return Player.find({}, (err, result) => {
         if (err) {
