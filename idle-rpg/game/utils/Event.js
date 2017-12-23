@@ -501,7 +501,7 @@ class Event {
 
           const goldTaken = Math.round(selectedPlayer.gold / 20);
 
-          const eventMsgHermes = `Hermes took ${goldTaken} from ${helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
+          const eventMsgHermes = `Hermes took ${goldTaken} gold from ${helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
           const eventLogHermes = `Hermes took ${goldTaken} from you. It will be spent in favor of Greek pantheon. He promises!`;
 
           selectedPlayer.gold -= goldTaken;
