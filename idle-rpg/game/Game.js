@@ -32,6 +32,11 @@ class Game {
       .then((selectedPlayer) => {
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
+        if (selectedPlayer.gender === 'boy')
+          selectedPlayer.gender = 'male';
+        if (selectedPlayer.gender === 'girl')
+          selectedPlayer.gender = 'female';
+
         if (selectedPlayer.events % 100 === 0) {
           helper.sendMessage(this.discordHook, twitchBot, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
         }

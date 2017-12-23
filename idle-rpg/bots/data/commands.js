@@ -24,7 +24,7 @@ const commands = [
         !eventlog - Lists up to 15 past events.
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
         !mention <on|off> - Change if events relating to you will @Mention you
-        !gender <boy|girl|neutral> - Change your character's gender
+        !gender <male|female|neutral> - Change your character's gender
         \`\`\``;
       /*
 
@@ -260,9 +260,9 @@ const commands = [
         const splitCommand = message.content.split(' ');
 
         // Use switch to validate the value
-        switch (splitCommand[1]) {
-          case 'boy':
-          case 'girl':
+        switch (splitCommand[1].toLowerCase()) {
+          case 'male':
+          case 'female':
           case 'neutral':
             return game.modifyGender(message.author, discordHook, splitCommand[1]);
         }
@@ -270,8 +270,8 @@ const commands = [
       }
 
       return message.reply(`\`\`\`Possible options:
-        boy
-        girl
+        male
+        female
         neutral
         \`\`\``);
     }

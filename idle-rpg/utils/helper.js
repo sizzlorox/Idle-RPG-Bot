@@ -261,13 +261,13 @@ class helper {
    */
   generateGenderString(player, word) {
     const wordMapping = {
-      boy: {
+      male: {
         he: 'he',
         his: 'his',
         him: 'him',
         himself: 'himself',
       },
-      girl: {
+      female: {
         he: 'she',
         his: 'her',
         him: 'her',
