@@ -220,7 +220,7 @@ class Event {
     return new Promise((resolve) => {
       return this.ItemManager.generateItem(selectedPlayer)
         .then((item) => {
-          if (selectedPlayer.gold <= item.gold) {
+          if (selectedPlayer.gold <= item.gold || item.name.startsWith('Cracked')) {
             return resolve(selectedPlayer);
           }
 
