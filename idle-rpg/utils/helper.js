@@ -55,12 +55,11 @@ class helper {
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
       discordHook.movementHook.send(msg)
-        .then(debugMsg => logger.move(debugMsg))
+        .then(debugMsg => logger.log('move', debugMsg))
         .catch(err => logger.error(err));
     } else {
       discordHook.actionHook.send(msg)
-        .then(debugMsg => logger.action(debugMsg))
-        .catch(err => logger.error(err));
+        .then(debugMsg => logger.log('action', debugMsg))
     }
 
     // Add if to check if channel is streaming
