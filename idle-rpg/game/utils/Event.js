@@ -406,7 +406,7 @@ class Event {
       switch (luckEvent) {
         case 0:
           const luckStat = helper.randomBetween(0, 3);
-          const luckStatAmount = helper.randomBetween(2, 10);
+          const luckStatAmount = helper.randomBetween(2, 5);
           let stat;
           switch (luckStat) {
             case 0:
@@ -481,7 +481,7 @@ class Event {
           }
 
           const eventMsgAsecoFull = `Aseco gave ${helper.generatePlayerName(selectedPlayer)} an elixir of life but it caused no effect on ${helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
-          const eventLogAsecoFull = `Aseco wanted to heal you, but you had full health`;
+          const eventLogAsecoFull = 'Aseco wanted to heal you, but you had full health';
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgAsecoFull);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogAsecoFull);
@@ -491,7 +491,7 @@ class Event {
         case 4:
           if (selectedPlayer.gold < 20) {
             const eventMsgHermesFail = `Hermes demanded some gold from ${helper.generatePlayerName(selectedPlayer)} but as ${helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
-            const eventLogHermesFail = `Hermes demanded gold from you but you had nothing to give`;
+            const eventLogHermesFail = 'Hermes demanded gold from you but you had nothing to give';
 
             helper.sendMessage(discordHook, 'twitch', false, eventMsgHermesFail);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermesFail);
@@ -502,9 +502,12 @@ class Event {
           const goldTaken = Math.round(selectedPlayer.gold / 20);
 
           const eventMsgHermes = `Hermes took ${goldTaken} from ${helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
-          const eventLogHermes = `Hermes took ${goldTaken} from you. It will be spent in favor of Greek pantheon. He promises!`
+          const eventLogHermes = `Hermes took ${goldTaken} from you. It will be spent in favor of Greek pantheon. He promises!`;
 
           selectedPlayer.gold -= goldTaken;
+          if (selectedPlayer.gold < 0) {
+            selectedPlayer.gold = 0;
+          }
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgHermes);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermes);

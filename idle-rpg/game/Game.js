@@ -112,6 +112,11 @@ class Game {
     this.multiplier -= 1;
   }
 
+  /**
+   * Gives gold amount to player
+   * @param {*} playerId 
+   * @param {*} amount 
+   */
   giveGold(playerId, amount) {
     return Database.loadPlayer(playerId)
       .then((updatingPlayer) => {
@@ -120,7 +125,11 @@ class Game {
       });
   }
 
-  // Commands
+  /**
+   * Returns top10 of a certain attribute
+   * @param {*} commandAuthor 
+   * @param {*} type 
+   */
   top10(commandAuthor, type = { level: -1 }) {
     return Database.loadTop10(type)
       .then((top10) => {
@@ -176,6 +185,12 @@ ${rankString}
       });
   }
 
+  /**
+   * Casts spell
+   * @param {*} commandAuthor 
+   * @param {*} hook 
+   * @param {*} spell 
+   */
   castSpell(commandAuthor, hook, spell) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
@@ -218,6 +233,11 @@ ${rankString}
       });
   }
 
+  /**
+   * Returns player eventlog by <count> amount
+   * @param {*} playerId 
+   * @param {*} count 
+   */
   playerEventLog(playerId, count) {
     return Database.loadPlayer(playerId)
       .then((player) => {
