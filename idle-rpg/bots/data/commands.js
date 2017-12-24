@@ -278,6 +278,40 @@ const commands = [
   },
 
   // Bot Operator commands
+  sendChristmasFirstPreMessage = {
+    command: '!xmasfirst',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      game.sendChristmasFirstPreEventMessage();
+    }
+  },
+
+  sendChristmasSecondPreMessage = {
+    command: '!xmassecond',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      game.sendChristmasSecondPreEventMessage();
+    }
+  },
+
+  christmasEventCommand = {
+    command: '!xmas',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        switch (message.content.split(' ')[1].toLowerCase()) {
+          case 'true':
+            return game.updateChristmasEvent(true);
+          case 'false':
+            return game.updateChristmasEvent(false);
+        }
+      }
+    }
+  },
+
   activateBlizzard = {
     command: '!blizzard',
     operatorOnly: true,
