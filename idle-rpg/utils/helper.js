@@ -2,6 +2,7 @@ const fs = require('fs');
 const Map = require('../game/utils/Map');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
+const logger = require('../utils/logger');
 
 class helper {
   randomBetween(min, max, decimal, exclude) {
@@ -22,19 +23,21 @@ class helper {
   }
 
   getTimePassed(timeStamp) {
-    return this.toTimeFormat(Number(new Date().getTime() - timeStamp));
+    return this.toTimeFormat(new Date().getTime() - timeStamp);
   }
 
   toTimeFormat(duration) {
     const seconds = ((duration / 1000) % 60).toFixed();
     const minutes = ((duration / (1000 * 60)) % 60).toFixed();
     const hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
+    const days = (duration / (1000 * 60 * 60 * 24)).toFixed();
 
-    const hourString = Number(hours) === 0 ? '' : `${hours}h `;
-    const minuteString = Number(minutes) === 0 ? '' : `${minutes}m `;
-    const secondString = Number(seconds) === 0 ? '' : `${seconds}s`;
+    const dayString = Number(days) === 0 ? '' : `${days}d `;
+    const hourString = Number(hours) === 0 || Number(hours) === 24 ? '' : `${hours}h `;
+    const minuteString = Number(minutes) === 0 || Number(minutes) === 60 ? '' : `${minutes}m `;
+    const secondString = Number(seconds) === 0 || Number(seconds) === 60 ? '' : `${seconds}s`;
 
-    return `${hourString}${minuteString}${secondString}`;
+    return `${dayString}${hourString}${minuteString}${secondString}`;
   }
 
   logEvent(selectedPlayer, msg) {
@@ -51,9 +54,12 @@ class helper {
 
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
-      discordHook.movementHook.send(msg);
+      discordHook.movementHook.send(msg)
+        .then(debugMsg => logger.log('move', debugMsg))
+        .catch(err => logger.error(err));
     } else {
-      discordHook.actionHook.send(msg);
+      discordHook.actionHook.send(msg)
+        .then(debugMsg => logger.log('action', debugMsg))
     }
 
     // Add if to check if channel is streaming
@@ -158,11 +164,18 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = Map.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold = 0;
-      this.setPlayerEquipment(selectedPlayer, 'helmet', enumHelper.equipment.empty.helmet);
-      this.setPlayerEquipment(selectedPlayer, 'armor', enumHelper.equipment.empty.armor);
-      this.setPlayerEquipment(selectedPlayer, 'weapon', enumHelper.equipment.empty.weapon);
-      this.setPlayerEquipment(selectedPlayer, 'relic', enumHelper.equipment.empty.relic);
+      selectedPlayer.gold /= 2;
+      switch (this.randomBetween(0, 2)) {
+        case 0:
+          this.setPlayerEquipment(selectedPlayer, 'helmet', enumHelper.equipment.empty.helmet);
+          break;
+        case 1:
+          this.setPlayerEquipment(selectedPlayer, 'armor', enumHelper.equipment.empty.armor);
+          break;
+        case 2:
+          this.setPlayerEquipment(selectedPlayer, 'weapon', enumHelper.equipment.empty.weapon);
+          break;
+      }
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
@@ -178,52 +191,6 @@ class helper {
       this.sendMessage(hook, 'twitch', false, eventMsg);
       selectedPlayer = this.logEvent(selectedPlayer, eventLog);
     }
-
-    /*
-    selectedPlayer.health = 105;
-    selectedPlayer.experience = 0;
-    selectedPlayer.map = Map.getMapByIndex(4);
-    selectedPlayer.level = 1;
-    selectedPlayer.gold = 0;
-    selectedPlayer.equipment = {
-      helmet: {
-        name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0
-      },
-      armor: {
-        name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0
-      },
-      weapon: {
-        name: 'Fist',
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 0
-      },
-      relic: {
-        name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0,
-        luk: 0
-      }
-    };
-    selectedPlayer.stats = {
-      str: 1,
-      dex: 1,
-      end: 1,
-      int: 1,
-      luk: 1
-    };
-    */
   }
 
   generateStatsString(player) {
@@ -231,6 +198,7 @@ class helper {
     Health: ${player.health} / ${100 + (player.level * 5)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
+    Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}
 
@@ -243,6 +211,7 @@ class helper {
 
     Born: ${player.createdAt}
     Events: ${player.events}
+    Gambles: ${player.gambles}
     Items Stole: ${player.stole}
     Items Stolen: ${player.stolen}
     Spells Casted: ${player.spells}
@@ -270,6 +239,52 @@ class helper {
     }
 
     return '';
+  }
+
+  /**
+   * Based on player setting, either return <@!discordId> or playerName
+   * @param player
+   * @returns String
+   */
+  generatePlayerName(player) {
+    if (player.isMentionInDiscord === false) {
+      return `\`${player.name}\``;
+    }
+    return `<@!${player.discordId}>`;
+  }
+
+  /**
+   * Based on player setting, transform into the correct gender
+   * @param player
+   * @param word
+   * @returns String
+   */
+  generateGenderString(player, word) {
+    const wordMapping = {
+      boy: {
+        he: 'he',
+        his: 'his',
+        him: 'him',
+        himself: 'himself',
+      },
+      girl: {
+        he: 'she',
+        his: 'her',
+        him: 'her',
+        himself: 'herself',
+      },
+      neutral: {
+        he: 'they',
+        his: 'their',
+        him: 'them',
+        himself: 'themself',
+      }
+    };
+
+    if (wordMapping[player.gender] && wordMapping[player.gender][word]) {
+      return wordMapping[player.gender][word];
+    }
+    return word;
   }
 
   generateEquipmentsString(player) {

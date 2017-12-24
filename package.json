@@ -4,9 +4,8 @@
   "description": "An Idle-RPG Bot for Discord, Maybe twitch aswell in the future.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "start-local": "DATABASE=local node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "SET NODE_ENV=production && node app.js",
+    "test": "NODE_ENV=development node app.js"
   },
   "author": "Sunny Huang",
   "license": "ISC",

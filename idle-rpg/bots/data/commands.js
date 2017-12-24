@@ -21,15 +21,17 @@ const commands = [
         !map - Displays the worlds locations.
         !castspell - Lists spells available to cast.
         !castspell <spell> - Casts a global spell onto Idle-RPG.
-        !eventlog - Lists up to 25 past events.
+        !eventlog - Lists up to 15 past events.
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
+        !mention <on|off> - Change if events relating to you will @Mention you
+        !gender <boy|girl|neutral> - Change your character's gender
         \`\`\``;
       /*
 
       !crypto - Displays some crypto currencies info.
       !nextlaunch - Displays next rocket launch info.
       !nextstreamlaunch - Displayes next rocket launch that will have a stream.
-      
+
       */
       message.author.send(helpMsg);
     }
@@ -126,7 +128,7 @@ const commands = [
         .then((players) => {
           let mapInfo = '';
           maps.forEach((map) => {
-            mapInfo = mapInfo.concat(`\n${map.name} (${map.type}):\n`);
+            mapInfo = mapInfo.concat(`\n${map.name} (${map.type.name}):\n`);
             players.forEach((player) => {
               if (player.map.name === map.name) {
                 mapInfo = mapInfo.concat(`${player.name}, `);
@@ -208,7 +210,7 @@ const commands = [
     function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(' ');
-        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 50)
+        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
           .then((result) => {
             return message.author.send(`\`\`\`${result}\`\`\``);
           });
@@ -222,7 +224,80 @@ const commands = [
     }
   },
 
+  /**
+   * Modify if player will be @Mentioned in events
+   */
+  modifyMention = {
+    command: '!mention',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(' ');
+
+        // Use switch to validate the value
+        switch (splitCommand[1]) {
+          case 'on':
+          case 'off':
+            return game.modifyMention(message.author, discordHook, splitCommand[1] === 'on');
+        }
+      }
+
+      return message.reply(`\`\`\`Possible options:
+        on - You will be tagged in events that include you
+        off - You won't be tagged in events that include you
+        \`\`\``);
+    }
+  },
+
+  /**
+   * Modify player's gender
+   */
+  modifyGender = {
+    command: '!gender',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(' ');
+
+        // Use switch to validate the value
+        switch (splitCommand[1]) {
+          case 'boy':
+          case 'girl':
+          case 'neutral':
+            return game.modifyGender(message.author, discordHook, splitCommand[1]);
+        }
+
+      }
+
+      return message.reply(`\`\`\`Possible options:
+        boy
+        girl
+        neutral
+        \`\`\``);
+    }
+  },
+
   // Bot Operator commands
+  activateBlizzard = {
+    command: '!blizzard',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(' ');
+        const blizzardBoolean = game.blizzardSwitch(splitCommand[1]);
+        switch (splitCommand) {
+          case 'on':
+            message.author.send(blizzardBoolean ? 'Blizzard is already activated!' : 'Blizzard activated.');
+            break;
+          case 'off':
+            message.author.send(!blizzardBoolean ? 'Blizzard is already deactivated!' : 'Blizzard deactivated.');
+            break;
+        }
+      }
+    }
+  },
+
   giveGold = {
     command: '!givegold',
     operatorOnly: true,
@@ -257,12 +332,10 @@ const commands = [
     operatorOnly: true,
     channelOnlyId: commandChannel,
     function: (game, message) => {
-      if (message.content.includes(' ')) {
-        game.deleteAllPlayers(message.content.split(' ')[1])
-          .then(() => {
-            message.author.send('Done.');
-          });
-      }
+      game.deleteAllPlayers()
+        .then(() => {
+          message.author.send('Done.');
+        });
     }
   },
 

@@ -107,7 +107,7 @@ const items = {
         end: 3,
         int: 3
       },
-      gold: 30,
+      gold: 10,
       rarity: 30
     },
     hardened = {
@@ -118,7 +118,7 @@ const items = {
         end: 3,
         int: 3
       },
-      gold: 30,
+      gold: 15,
       rarity: 15
     },
     sturdy = {
@@ -129,7 +129,7 @@ const items = {
         end: 3,
         int: 2
       },
-      gold: 30,
+      gold: 15,
       rarity: 43
     },
     crude = {
@@ -140,7 +140,7 @@ const items = {
         end: -1,
         int: 2
       },
-      gold: 30,
+      gold: 5,
       rarity: 75
     },
     battered = {
@@ -151,7 +151,7 @@ const items = {
         end: 2,
         int: 0
       },
-      gold: 30,
+      gold: 5,
       rarity: 50
     },
     crack = {
@@ -162,7 +162,7 @@ const items = {
         end: -1,
         int: -1
       },
-      gold: 30,
+      gold: 1,
       rarity: 100
     },
   ],
@@ -224,7 +224,7 @@ const items = {
       rarity: 20
     },
     mithral = {
-      name: 'Mithral',
+      name: 'Mithril',
       stats: {
         str: 8,
         dex: 8,
@@ -235,7 +235,7 @@ const items = {
       rarity: 5
     },
     diamond = {
-      name: 'Diamodn',
+      name: 'Diamond',
       stats: {
         str: 12,
         dex: 4,
@@ -257,7 +257,7 @@ const items = {
       rarity: 70
     },
     stone = {
-      name: 'Mithral',
+      name: 'Stone',
       stats: {
         str: 3,
         dex: 0,
@@ -316,7 +316,7 @@ const items = {
         gold: 3
       },
       minerHelmet = {
-        name: 'Miner Helmet',
+        name: 'Miners Helmet',
         position: 'helmet',
         stats: {
           str: 2,
@@ -393,6 +393,7 @@ const items = {
         gold: 3
       },
     ],
+
     weapon = [
       club = {
         name: 'Club',
@@ -570,7 +571,7 @@ const items = {
         },
         gold: 5
       },
-      ulfberht  = {
+      ulfberht = {
         name: 'Ulfberht',
         position: 'weapon',
         stats: {
@@ -581,7 +582,7 @@ const items = {
         },
         gold: 5
       },
-      morningStar  = {
+      morningStar = {
         name: 'Morning star',
         position: 'weapon',
         stats: {
@@ -592,7 +593,7 @@ const items = {
         },
         gold: 5
       },
-      glaive  = {
+      glaive = {
         name: 'Glaive',
         position: 'weapon',
         stats: {
@@ -603,7 +604,7 @@ const items = {
         },
         gold: 5
       },
-      sling  = {
+      sling = {
         name: 'Sling',
         position: 'weapon',
         stats: {
@@ -614,7 +615,7 @@ const items = {
         },
         gold: 5
       },
-      chakram  = {
+      chakram = {
         name: 'Chakram',
         position: 'weapon',
         stats: {
@@ -625,7 +626,7 @@ const items = {
         },
         gold: 5
       },
-      Shuriken  = {
+      Shuriken = {
         name: 'shuriken',
         position: 'weapon',
         stats: {
@@ -636,7 +637,7 @@ const items = {
         },
         gold: 5
       },
-      spear  = {
+      spear = {
         name: 'Spear',
         position: 'weapon',
         stats: {
@@ -647,7 +648,7 @@ const items = {
         },
         gold: 5
       },
-      dagger  = {
+      dagger = {
         name: 'Dagger',
         position: 'weapon',
         stats: {
@@ -658,7 +659,7 @@ const items = {
         },
         gold: 5
       },
-      whip  = {
+      whip = {
         name: 'Tipped Whip',
         position: 'weapon',
         stats: {
@@ -669,7 +670,7 @@ const items = {
         },
         gold: 5
       },
-      wizardStaff  = {
+      wizardStaff = {
         name: 'Wizard Staff',
         position: 'weapon',
         stats: {
@@ -738,10 +739,11 @@ const items = {
           str: 1,
           dex: 1,
           end: 1,
-          int: 1
+          int: 1,
+          luk: 4,
         },
         gold: 3,
-        rarity: 100
+        rarity: 60
       },
       segmented = {
         name: 'Segmented Armor',
@@ -755,6 +757,56 @@ const items = {
         gold: 3,
         rarity: 50
       },
+    ],
+
+    relic = [
+      snowFlake = {
+        name: 'Snowflake',
+        droppedBy: ['Yeti', 'Christmas Gnome'],
+        isXmasEvent: true,
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 1,
+          dex: 1,
+          end: 1,
+          int: 1,
+          luk: 2,
+        },
+        gold: 3,
+        rarity: 60
+      },
+      yetiTooth = {
+        name: 'Yetis Tooth',
+        droppedBy: ['Yeti'],
+        isXmasEvent: true,
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 1,
+          dex: 1,
+          end: 1,
+          int: 1,
+          luk: 4,
+        },
+        gold: 3,
+        rarity: 60
+      },
+      candyCane = {
+        name: 'Candy Cane',
+        droppedBy: ['Yeti', 'Christmas Gnome'],
+        isXmasEvent: true,
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 0,
+          dex: 0,
+          end: 0,
+          int: 2
+        },
+        gold: 3,
+        rarity: 90
+      }
     ]
   ]
 };
