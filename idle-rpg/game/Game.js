@@ -16,6 +16,12 @@ class Game {
     this.activeSpells = [];
   }
 
+  /**
+   * Loads player by discordID and rolls a dice to select which type of event to activate
+   * @param {*} player 
+   * @param {*} onlinePlayers 
+   * @param {*} twitchBot 
+   */
   selectEvent(player, onlinePlayers, twitchBot) {
     const randomEvent = helper.randomBetween(0, 2);
 
@@ -32,6 +38,11 @@ class Game {
       .then((selectedPlayer) => {
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
+        if (selectedPlayer.gender === 'boy')
+          selectedPlayer.gender = 'male';
+        if (selectedPlayer.gender === 'girl')
+          selectedPlayer.gender = 'female';
+
         if (selectedPlayer.events % 100 === 0) {
           helper.sendMessage(this.discordHook, twitchBot, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
         }
@@ -64,6 +75,12 @@ class Game {
     return Event.moveEvent(selectedPlayer, this.discordHook);
   }
 
+  /**
+   * Rolls dice to select which type of attack event is activated for the player
+   * @param {*} selectedPlayer 
+   * @param {*} onlinePlayers 
+   * @param {*} twitchBot 
+   */
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
     if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
@@ -81,16 +98,27 @@ class Game {
     return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);
   }
 
+  /**
+   * Rolls dice to select which type of luck event is activated for the player
+   * @param {*} selectedPlayer 
+   * @param {*} twitchBot 
+   */
   luckEvent(selectedPlayer, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
     console.log(`Player: ${selectedPlayer.name} - Dice: ${luckDice}`);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
-    } else if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
+    }
+
+    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGamblingEvent(this.discordHook, selectedPlayer, this.multiplier);
-    } else if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 2)) {
-      Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer);
-    } else if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {
+    }
+
+    if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 2)) {
+      return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer);
+    }
+
+    if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {
       return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
@@ -112,6 +140,11 @@ class Game {
     this.multiplier -= 1;
   }
 
+  /**
+   * Gives gold amount to player
+   * @param {*} playerId 
+   * @param {*} amount 
+   */
   giveGold(playerId, amount) {
     return Database.loadPlayer(playerId)
       .then((updatingPlayer) => {
@@ -120,11 +153,16 @@ class Game {
       });
   }
 
-  // Commands
+  /**
+   * Returns top10 of a certain attribute
+   * @param {*} commandAuthor 
+   * @param {*} type 
+   */
   top10(commandAuthor, type = { level: -1 }) {
     return Database.loadTop10(type)
       .then((top10) => {
         const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
+          .sort((player1, player2) => player2.experience - player1.experience)
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`)
           .join('\n')}`;
 
@@ -176,6 +214,12 @@ ${rankString}
       });
   }
 
+  /**
+   * Casts spell
+   * @param {*} commandAuthor 
+   * @param {*} hook 
+   * @param {*} spell 
+   */
   castSpell(commandAuthor, hook, spell) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
@@ -218,6 +262,11 @@ ${rankString}
       });
   }
 
+  /**
+   * Returns player eventlog by <count> amount
+   * @param {*} playerId 
+   * @param {*} count 
+   */
   playerEventLog(playerId, count) {
     return Database.loadPlayer(playerId)
       .then((player) => {
@@ -225,30 +274,57 @@ ${rankString}
       });
   }
 
+  /**
+   * Loads player stats by dicordId
+   * @param {*} commandAuthor 
+   */
   playerStats(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
   }
 
+  /**
+   * Loads player equipment by discordId
+   * @param {*} commandAuthor 
+   */
   playerEquipment(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
   }
 
+  /**
+   * Get online players maps by an array of discordIds
+   * @param {*} onlinePlayers 
+   */
   getOnlinePlayerMaps(onlinePlayers) {
     return Database.loadOnlinePlayerMaps(onlinePlayers);
   }
 
+  /**
+   * Saves player into database
+   * @param {*} player 
+   */
   savePlayer(player) {
     return Database.savePlayer(player);
   }
 
+  /**
+   * Loads player by discordId
+   * @param {*} playerId 
+   */
   loadPlayer(playerId) {
     return Database.loadPlayer(playerId);
   }
 
+  /**
+   * Deletes player by discordId
+   * @param {*} playerId 
+   */
   deletePlayer(playerId) {
     return Database.deletePlayer(playerId);
   }
 
+  /**
+   * Deletes all players in database
+   */
   deleteAllPlayers() {
     return Database.deleteAllPlayers();
   }
@@ -260,6 +336,9 @@ ${rankString}
     return Event.blizzardSwitch(this.discordHook, blizzardSwitch);
   }
 
+  /**
+   * Sends Christmas Pre Event Message and another pre event message after 21 hours
+   */
   sendChristmasPreEventMessage() {
     setTimeout(() => {
       helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
@@ -268,6 +347,11 @@ ${rankString}
     return helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to another lands...\'\`\`\`');
   }
 
+  // TODO change to utilize setTimeout
+  /**
+   * Activates christmas mobs to be spawnable and items droppable
+   * @param {*} isStarting 
+   */
   updateChristmasEvent(isStarting) {
     if (isStarting) {
       helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');

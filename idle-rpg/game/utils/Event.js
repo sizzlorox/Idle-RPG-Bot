@@ -63,7 +63,7 @@ class Event {
 
             return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
               .then((battleResults) => {
-                helper.checkHealth(battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
+                helper.checkHealth(this.MapClass, battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
                 return Database.savePlayer(battleResults.randomPlayer)
                   .then(() => {
                     return battleResults.selectedPlayer;
@@ -92,7 +92,7 @@ class Event {
           return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
             .then((battleResults) => {
               //  TODO: inverted because of how I set the stealPlayerItem function (think of a way to make this better!)
-              helper.checkHealth(battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
+              helper.checkHealth(this.MapClass, battleResults.randomPlayer, battleResults.selectedPlayer, discordHook);
               return Database.savePlayer(battleResults.selectedPlayer)
                 .then(() => {
                   return battleResults.randomPlayer;
@@ -144,7 +144,7 @@ class Event {
               if (selectedPlayer.gold <= 0) {
                 selectedPlayer.gold = 0;
               }
-              helper.checkHealth(selectedPlayer, mob, discordHook);
+              helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
 
               const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${battleResults.mobChance} health and ${mob.gold} gold!`;
               const eventLog = `Lost a battle to ${mob.name} in ${selectedPlayer.map.name} losing ${battleResults.mobChance} health and ${mob.gold} gold`;
@@ -406,7 +406,7 @@ class Event {
       switch (luckEvent) {
         case 0:
           const luckStat = helper.randomBetween(0, 3);
-          const luckStatAmount = helper.randomBetween(2, 10);
+          const luckStatAmount = helper.randomBetween(2, 5);
           let stat;
           switch (luckStat) {
             case 0:
@@ -453,7 +453,7 @@ class Event {
         case 2:
           const luckHealthAmount = helper.randomBetween(5, 50);
           selectedPlayer.health -= luckHealthAmount;
-          helper.checkHealth(selectedPlayer, discordHook);
+          helper.checkHealth(this.MapClass, selectedPlayer, discordHook);
 
           const eventMsgZeus = `${helper.generatePlayerName(selectedPlayer)} was struck down by thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
           const eventLogZeus = `Zeus struck you down with his thunderbold and you lost ${luckHealthAmount} health`;
@@ -481,7 +481,7 @@ class Event {
           }
 
           const eventMsgAsecoFull = `Aseco gave ${helper.generatePlayerName(selectedPlayer)} an elixir of life but it caused no effect on ${helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
-          const eventLogAsecoFull = `Aseco wanted to heal you, but you had full health`;
+          const eventLogAsecoFull = 'Aseco wanted to heal you, but you had full health';
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgAsecoFull);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogAsecoFull);
@@ -491,7 +491,7 @@ class Event {
         case 4:
           if (selectedPlayer.gold < 20) {
             const eventMsgHermesFail = `Hermes demanded some gold from ${helper.generatePlayerName(selectedPlayer)} but as ${helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
-            const eventLogHermesFail = `Hermes demanded gold from you but you had nothing to give`;
+            const eventLogHermesFail = 'Hermes demanded gold from you but you had nothing to give';
 
             helper.sendMessage(discordHook, 'twitch', false, eventMsgHermesFail);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermesFail);
@@ -501,10 +501,13 @@ class Event {
 
           const goldTaken = Math.round(selectedPlayer.gold / 20);
 
-          const eventMsgHermes = `Hermes took ${goldTaken} from ${helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
-          const eventLogHermes = `Hermes took ${goldTaken} from you. It will be spent in favor of Greek pantheon. He promises!`
+          const eventMsgHermes = `Hermes took ${goldTaken} gold from ${helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
+          const eventLogHermes = `Hermes took ${goldTaken} from you. It will be spent in favor of Greek pantheon. He promises!`;
 
           selectedPlayer.gold -= goldTaken;
+          if (selectedPlayer.gold < 0) {
+            selectedPlayer.gold = 0;
+          }
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgHermes);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermes);

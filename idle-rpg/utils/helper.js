@@ -159,10 +159,10 @@ class helper {
     return selectedPlayer;
   }
 
-  checkHealth(selectedPlayer, attackerObj, hook) {
+  checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
     if (selectedPlayer.health <= 0) {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
-      selectedPlayer.map = Map.getMapByIndex(4);
+      selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
       selectedPlayer.gold /= 2;
       switch (this.randomBetween(0, 2)) {
@@ -261,13 +261,13 @@ class helper {
    */
   generateGenderString(player, word) {
     const wordMapping = {
-      boy: {
+      male: {
         he: 'he',
         his: 'his',
         him: 'him',
         himself: 'himself',
       },
-      girl: {
+      female: {
         he: 'she',
         his: 'her',
         him: 'her',
