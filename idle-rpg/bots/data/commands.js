@@ -149,20 +149,21 @@ const commands = [
     function: (game, message, discordBot) => {
       let requestedMap = message.content.split(' ')[1];
       let mapNameArray = [];
-      maps.forEach (function(mapObject){
+      maps.forEach ((mapObject) => {
         mapNameArray.push(mapObject.name)
       });
-      let mapIndexLookedFor = mapNameArray.indexOf(requestedMap);
+      const mapIndexLookedFor = mapNameArray.indexOf(requestedMap);
       
       if (mapIndexLookedFor === -1) {
         console.log('Are you sure you have the correct spelling? Captilization counts!');  
         //message.author.send(`\`\`\`Are you sure you have the correct spelling? Captilization counts!\`\`\``);
       };
-      let loreOfMap = maps[mapIndexLookedFor].lore;
+      const loreOfMap = maps[mapIndexLookedFor].lore;
 
-      console.log('The lore of ' + requestedMap + 'is '+ loreOfMap);  
-      //message.author.send('\`\`\`The lore of ' + requestedMap + 'is '+ loreOfMap+'\`\`\`');
+      console.log(`The lore of ${requestedMap} is ${loreOfMap}`);  
+      //message.author.send(`\`\`\`The lore of ${requestedMap} is ${loreOfMap}\`\`\``);
 
+      return console.log (`You need to enter a map name to get lore.`);
     
     }
   },
