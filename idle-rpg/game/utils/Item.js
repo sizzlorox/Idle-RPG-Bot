@@ -60,7 +60,7 @@ class Item {
         itemInt = (itemRarityList[randomRarityIndex].stats.int
           + itemType.stats.int) / 4;
 
-        itemLuk = itemType.stats.luk !== undefined ? itemType.stats.luk : 0;
+        itemLuk = typeof itemType.stats.luk !== 'undefined' ? itemType.stats.luk : 0;
 
         itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
 
@@ -152,7 +152,8 @@ class Item {
         str: itemStr,
         dex: itemDex,
         end: itemEnd,
-        int: itemInt
+        int: itemInt,
+        luk: itemLuk
       },
       isXmasEvent: snowFlake.isXmasEvent,
       rating: itemRating,

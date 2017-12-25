@@ -21,6 +21,10 @@ class helper {
     return result;
   }
 
+  capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   getTimePassed(timeStamp) {
     return this.toTimeFormat(new Date().getTime() - timeStamp);
   }
@@ -211,8 +215,8 @@ class helper {
     Born: ${player.createdAt}
     Events: ${player.events}
     Gambles: ${player.gambles}
-    Items Stole: ${player.stole}
-    Items Stolen: ${player.stolen}
+    Items Stolen: ${player.stole}
+    Items Lost: ${player.stolen}
     Spells Casted: ${player.spells}
     Kills:
       Monsters: ${player.kills.mob}

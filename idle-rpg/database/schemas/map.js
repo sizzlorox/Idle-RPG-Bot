@@ -9,6 +9,5 @@ const mapSchema = mongoose.Schema({
   },
   levelReq: Number,
   lore: String
-    
 });
 module.exports = mapSchema;

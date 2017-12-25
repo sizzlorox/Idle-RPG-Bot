@@ -218,7 +218,7 @@ const items = {
         str: 1,
         dex: -3,
         end: -3,
-        int: 8
+        int: 4
       },
       gold: 15,
       rarity: 20
@@ -226,10 +226,10 @@ const items = {
     mithral = {
       name: 'Mithril',
       stats: {
-        str: 8,
-        dex: 8,
-        end: 8,
-        int: 8
+        str: 5,
+        dex: 5,
+        end: 5,
+        int: 5
       },
       gold: 15,
       rarity: 5
@@ -237,10 +237,10 @@ const items = {
     diamond = {
       name: 'Diamond',
       stats: {
-        str: 12,
+        str: 5,
         dex: 4,
-        end: 4,
-        int: 12
+        end: 2,
+        int: 5
       },
       gold: 15,
       rarity: 10
@@ -626,8 +626,8 @@ const items = {
         },
         gold: 5
       },
-      Shuriken = {
-        name: 'shuriken',
+      shuriken = {
+        name: 'Shuriken',
         position: 'weapon',
         stats: {
           str: 1,
@@ -771,7 +771,7 @@ const items = {
           dex: 1,
           end: 1,
           int: 1,
-          luk: 2,
+          luk: 4,
         },
         gold: 3,
         rarity: 60
@@ -787,7 +787,7 @@ const items = {
           dex: 1,
           end: 1,
           int: 1,
-          luk: 4,
+          luk: 3,
         },
         gold: 3,
         rarity: 60
@@ -802,7 +802,8 @@ const items = {
           str: 0,
           dex: 0,
           end: 0,
-          int: 2
+          int: 2,
+          luk: 1
         },
         gold: 3,
         rarity: 90
