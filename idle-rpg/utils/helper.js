@@ -120,11 +120,11 @@ class helper {
   }
 
   sumPlayerTotalIntelligence(player) {
-    return (player.stats.int
+    return player.stats.int
       + player.equipment.helmet.int
       + player.equipment.armor.int
       + player.equipment.weapon.int
-      + player.equipment.relic.int) / 2;
+      + player.equipment.relic.int;
   }
 
   sumPlayerTotalLuck(player) {
