@@ -21,6 +21,10 @@ class helper {
     return result;
   }
 
+  capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   getTimePassed(timeStamp) {
     return this.toTimeFormat(new Date().getTime() - timeStamp);
   }
@@ -120,11 +124,11 @@ class helper {
   }
 
   sumPlayerTotalIntelligence(player) {
-    return (player.stats.int
+    return player.stats.int
       + player.equipment.helmet.int
       + player.equipment.armor.int
       + player.equipment.weapon.int
-      + player.equipment.relic.int) / 2;
+      + player.equipment.relic.int;
   }
 
   sumPlayerTotalLuck(player) {
@@ -211,8 +215,8 @@ class helper {
     Born: ${player.createdAt}
     Events: ${player.events}
     Gambles: ${player.gambles}
-    Items Stole: ${player.stole}
-    Items Stolen: ${player.stolen}
+    Items Stolen: ${player.stole}
+    Items Lost: ${player.stolen}
     Spells Casted: ${player.spells}
     Kills:
       Monsters: ${player.kills.mob}
