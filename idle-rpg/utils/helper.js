@@ -159,6 +159,7 @@ class helper {
     selectedPlayer.equipment[equipment].dex = item.stats.dex;
     selectedPlayer.equipment[equipment].end = item.stats.end;
     selectedPlayer.equipment[equipment].int = item.stats.int;
+    selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
     return selectedPlayer;
   }
 

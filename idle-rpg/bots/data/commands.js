@@ -25,6 +25,7 @@ const commands = [
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
         !gender <male|female|neutral> - Change your character's gender
+        !lore <Map Name> - Retrieves the lore of map selected
         \`\`\``;
       /*
 
@@ -149,7 +150,7 @@ const commands = [
     function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitMessage = message.content.split(/ (.+)/)[1].toLowerCase();
-        const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage.toLowerCase())
+        const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage)
           .map(map => map.lore);
 
         if (requestedMap.length === 0) {
@@ -195,10 +196,10 @@ const commands = [
     operatorOnly: true,
     function: (game, message) => {
       if (message.content.includes(' ')) {
-        const splitArray = message.content.split(/ (.+)/);
+        const splitArray = message.content.split(' ');
         const playerId = splitArray[1];
         const position = splitArray[2];
-        const equipment = JSON.parse(splitArray[3]);
+        const equipment = JSON.parse(splitArray.slice(3, splitArray.length).join(' '));
         game.loadPlayer(playerId)
           .then((player) => {
             player.equipment[position] = equipment;
