@@ -300,11 +300,12 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.helmet) < helper.calculateItemRating(randomPlayer.equipment.helmet)) {
               selectedPlayer.equipment.helmet = randomPlayer.equipment.helmet;
               if (randomPlayer.equipment.helmet.previousOwners.length > 0) {
-                const removePreviousOwnerName = randomPlayer.equipment.helmet.name.replace(`${randomPlayer.equipment.helmet.previousOwners[randomPlayer.equipment.helmet.previousOwners.length - 1]}s`, `${randomPlayer.name}s`);
+                const lastOwnerInList = randomPlayer.equipment.helmet.previousOwners[randomPlayer.equipment.helmet.previousOwners.length - 1];
+                const removePreviousOwnerName = randomPlayer.equipment.helmet.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}s`);
                 selectedPlayer.equipment.helmet.name = removePreviousOwnerName;
 
-                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${removePreviousOwnerName}!`);
-                const eventLog = `Stole ${randomPlayer.name}s ${removePreviousOwnerName}`;
+                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${removePreviousOwnerName}!`);
+                const eventLog = `Stole ${removePreviousOwnerName}`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -332,11 +333,12 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.armor) < helper.calculateItemRating(randomPlayer.equipment.armor)) {
               selectedPlayer.equipment.armor = randomPlayer.equipment.armor;
               if (randomPlayer.equipment.armor.previousOwners.length > 0) {
-                const removePreviousOwnerName = randomPlayer.equipment.armor.name.replace(`${randomPlayer.equipment.armor.previousOwners[randomPlayer.equipment.armor.previousOwners.length - 1]}s`, `${randomPlayer.name}s`);
+                const lastOwnerInList = randomPlayer.equipment.armor.previousOwners[randomPlayer.equipment.armor.previousOwners.length - 1];
+                const removePreviousOwnerName = randomPlayer.equipment.armor.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}s`);
                 selectedPlayer.equipment.armor.name = removePreviousOwnerName;
 
-                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${removePreviousOwnerName}!`);
-                const eventLog = `Stole ${randomPlayer.name}s ${removePreviousOwnerName}`;
+                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${removePreviousOwnerName}!`);
+                const eventLog = `Stole ${removePreviousOwnerName}`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -364,11 +366,12 @@ class Event {
             if (helper.calculateItemRating(selectedPlayer.equipment.weapon) < helper.calculateItemRating(randomPlayer.equipment.weapon)) {
               selectedPlayer.equipment.weapon = randomPlayer.equipment.weapon;
               if (randomPlayer.equipment.weapon.previousOwners.length > 0) {
-                const removePreviousOwnerName = randomPlayer.equipment.weapon.name.replace(`${randomPlayer.equipment.weapon.previousOwners[randomPlayer.equipment.weapon.previousOwners.length - 1]}s`, `${randomPlayer.name}s`);
+                const lastOwnerInList = randomPlayer.equipment.weapon.previousOwners[randomPlayer.equipment.weapon.previousOwners.length - 1];
+                const removePreviousOwnerName = randomPlayer.equipment.weapon.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}s`);
                 selectedPlayer.equipment.weapon.name = removePreviousOwnerName;
 
-                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${removePreviousOwnerName}!`);
-                const eventLog = `Stole ${randomPlayer.name}s ${removePreviousOwnerName}`;
+                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${removePreviousOwnerName}!`);
+                const eventLog = `Stole ${removePreviousOwnerName}`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -406,7 +409,7 @@ class Event {
       switch (luckEvent) {
         case 0:
           const luckStat = helper.randomBetween(0, 3);
-          const luckStatAmount = helper.randomBetween(2, 5);
+          const luckStatAmount = helper.randomBetween(1, 5);
           let stat;
           switch (luckStat) {
             case 0:
@@ -436,7 +439,7 @@ class Event {
           return resolve(selectedPlayer);
 
         case 1:
-          const luckExpAmount = helper.randomBetween(5, 15);
+          const luckExpAmount = helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
           selectedPlayer.experience -= luckExpAmount;
           if (selectedPlayer.experience < 0) {
             selectedPlayer.experience = 0;
@@ -451,11 +454,11 @@ class Event {
           return resolve(selectedPlayer);
 
         case 2:
-          const luckHealthAmount = helper.randomBetween(5, 50);
+          const luckHealthAmount = helper.randomBetween(5, 50 + (selectedPlayer.level * 2));
           selectedPlayer.health -= luckHealthAmount;
           helper.checkHealth(this.MapClass, selectedPlayer, discordHook);
 
-          const eventMsgZeus = `${helper.generatePlayerName(selectedPlayer)} was struck down by thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
+          const eventMsgZeus = `${helper.generatePlayerName(selectedPlayer)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
           const eventLogZeus = `Zeus struck you down with his thunderbold and you lost ${luckHealthAmount} health`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgZeus);
@@ -515,7 +518,7 @@ class Event {
           return resolve(selectedPlayer);
 
         case 5:
-          const luckExpAthena = helper.randomBetween(5, 15);
+          const luckExpAthena = helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
           selectedPlayer.experience += luckExpAthena;
           helper.checkExperience(selectedPlayer, discordHook)
 

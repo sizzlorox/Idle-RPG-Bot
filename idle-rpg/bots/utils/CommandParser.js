@@ -19,18 +19,18 @@ class CommandParser {
       }
 
       if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId && messageObj.channel.type !== 'dm') {
-        return messageObj.reply(`Please send this to <#${commandObj.channelOnlyId}> or PM me.`);
+        return messageObj.author.send(`Please send this to <#${commandObj.channelOnlyId}> or PM me.`);
       }
 
       if (commandObj.operatorOnly && authorId !== botOperator) {
-        return messageObj.reply('This is a bot operator only command.');
+        return messageObj.author.send('This is a bot operator only command.');
       }
 
       return commandObj.function(game, messageObj, discordBot, hook);
     }
 
     if (messageContent.startsWith('!')) {
-      return messageObj.reply(`Please check !help for more info. ${messageContent} was an invalid command.`);
+      return messageObj.author.send(`Please check !help for more info. ${messageContent} was an invalid command.`);
     }
   }
 

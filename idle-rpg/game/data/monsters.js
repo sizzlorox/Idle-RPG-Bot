@@ -354,11 +354,11 @@ const monsters = {
       stats: {
         str: 12,
         dex: 2,
-        end: 8
+        end: 9
       },
       experience: 25,
       gold: 12,
-      rarity: 50
+      rarity: 60
     },
     xmasGnome = {
       name: 'Christmas Gnome',
@@ -372,7 +372,7 @@ const monsters = {
       },
       experience: 5,
       gold: 9,
-      rarity: 100
+      rarity: 95
     },
     basilisk = {
       name: 'Basilisk',
@@ -854,8 +854,7 @@ const monsters = {
       experience: 44,
       gold: 50,
       rarity: 2
-    },
-
+    }
   ]
 };
 module.exports = monsters;
