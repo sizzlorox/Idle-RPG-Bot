@@ -162,7 +162,7 @@ class Game {
     return Database.loadTop10(type)
       .then((top10) => {
         const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
-          .sort((player1, player2) => player2.experience - player1.experience)
+          .sort((player1, player2) => player2.experience - player1.experience && player2.level - player2.level)
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`)
           .join('\n')}`;
 
@@ -339,12 +339,12 @@ ${rankString}
   /**
    * Sends Christmas Pre Event Message and another pre event message after 21 hours
    */
-  sendChristmasPreEventMessage() {
-    setTimeout(() => {
-      helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
-    }, 43200000); // 21hr
+  sendChristmasFirstPreEventMessage() {
+    return helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
+  }
 
-    return helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to another lands...\'\`\`\`');
+  sendChristmasSecondPreEventMessage() {
+    return helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
   }
 
   // TODO change to utilize setTimeout
@@ -354,7 +354,7 @@ ${rankString}
    */
   updateChristmasEvent(isStarting) {
     if (isStarting) {
-      helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
       Event.MonsterClass.monsters.forEach((mob) => {
         if (mob.isXmasEvent) {
           mob.isSpawnable = true;
@@ -370,7 +370,7 @@ ${rankString}
       return '';
     }
 
-    helper.sendMessage(this.discordHook, 'twitch', false, '@veryone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
+    helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
     Event.MonsterClass.monsters.forEach((mob) => {
       if (mob.isXmasEvent) {
         mob.isSpawnable = false;

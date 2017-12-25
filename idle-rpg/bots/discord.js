@@ -18,15 +18,31 @@ const {
   maximumTimer
 } = require('../../settings');
 
+const webHookOptions = {
+  apiRequestMethod: 'sequential',
+  shardId: 0,
+  shardCount: 0,
+  messageCacheMaxSize: 200,
+  messageCacheLifetime: 0,
+  messageSweepInterval: 0,
+  fetchAllMembers: false,
+  disableEveryone: false,
+  sync: false,
+  restWsBridgeTimeout: 5000,
+  restTimeOffset: 500
+};
+
 const discordBot = new Discord.Client();
 const actionHook = new Discord.WebhookClient(
   actionWebHookId,
-  actionWebHookToken
+  actionWebHookToken,
+  webHookOptions
 );
 
 const movementHook = new Discord.WebhookClient(
   moveWebHookId,
-  moveWebHookToken
+  moveWebHookToken,
+  webHookOptions
 );
 
 const hook = {
@@ -41,9 +57,9 @@ const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
 const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
 
 // Christmas Event times
-const christmasEventPre = '00 00 12 23 11 *';
-const christmasEventStart = '00 00 1 24 11 *';
-const christmasEventEnd = '00 00 1 6 1 *';
+const christmasEventPre = '00 00 4 14 11 *';
+const christmasEventStart = '00 00 13 24 11 *';
+const christmasEventEnd = '00 00 13 6 1 *';
 const timeZone = 'America/Los_Angeles';
 
 const minTimer = (minimalTimer * 1000) * 60;

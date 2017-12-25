@@ -1,5 +1,4 @@
 const fs = require('fs');
-const Map = require('../game/utils/Map');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const logger = require('../utils/logger');
@@ -121,11 +120,11 @@ class helper {
   }
 
   sumPlayerTotalIntelligence(player) {
-    return player.stats.int
+    return (player.stats.int
       + player.equipment.helmet.int
       + player.equipment.armor.int
       + player.equipment.weapon.int
-      + player.equipment.relic.int;
+      + player.equipment.relic.int) / 2;
   }
 
   sumPlayerTotalLuck(player) {
