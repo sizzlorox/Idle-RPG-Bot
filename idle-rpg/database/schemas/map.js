@@ -5,8 +5,10 @@ const mapSchema = mongoose.Schema({
   name: String,
   type: {
     id: Number,
-    name: String
+    name: String,
   },
-  levelReq: Number
+  levelReq: Number,
+  lore: String
+    
 });
 module.exports = mapSchema;

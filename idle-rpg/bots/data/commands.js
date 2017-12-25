@@ -13,16 +13,16 @@ const commands = [
     function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
-        !top10 <gold, spells, level, stolen, stole, gambles> - Retrives top 10 highest of selected section
+        !top10 <gold, spells, level, stolen, stole, gambles> - Retrieves top 10 highest of selected section
         !stats - Sends a PM with your stats
-        !stats <@Mention of player> - Sends a PM with the players stats. (without < > and case-senstive).
+        !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
         !equip - Sends a PM with your equipment
-        !equip <@Mention of player> - Sends a PM with the players equipment. (without < > and case-senstive).
-        !map - Displays the worlds locations.
-        !castspell - Lists spells available to cast.
-        !castspell <spell> - Casts a global spell onto Idle-RPG.
-        !eventlog - Lists up to 15 past events.
-        !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
+        !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-senstive)
+        !map - Displays the worlds locations
+        !castspell - Lists spells available to cast
+        !castspell <spell> - Casts a global spell onto Idle-RPG
+        !eventlog - Lists up to 15 past events
+        !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
         !gender <male|female|neutral> - Change your character's gender
         \`\`\``;
@@ -139,6 +139,32 @@ const commands = [
 
           message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
         });
+    }
+  },
+
+ lore = {
+    command: '!lore',
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot) => {
+      let requestedMap = message.content.split(' ')[1];
+      let mapNameArray = [];
+      maps.forEach ((mapObject) => {
+        mapNameArray.push(mapObject.name)
+      });
+      const mapIndexLookedFor = mapNameArray.indexOf(requestedMap);
+      
+      if (mapIndexLookedFor === -1) {
+        console.log('Are you sure you have the correct spelling? Captilization counts!');  
+        //message.author.send(`\`\`\`Are you sure you have the correct spelling? Captilization counts!\`\`\``);
+      };
+      const loreOfMap = maps[mapIndexLookedFor].lore;
+
+      console.log(`The lore of ${requestedMap} is ${loreOfMap}`);  
+      //message.author.send(`\`\`\`The lore of ${requestedMap} is ${loreOfMap}\`\`\``);
+
+      return console.log (`You need to enter a map name to get lore.`);
+    
     }
   },
 
