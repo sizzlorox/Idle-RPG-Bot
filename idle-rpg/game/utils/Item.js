@@ -41,27 +41,21 @@ class Item {
       }
 
       let itemObj;
-      let itemStr;
-      let itemDex;
-      let itemEnd;
-      let itemInt;
-      let itemLuk;
-      let itemRating;
 
       if (itemType.position === 'relic') {
-        itemStr = (itemRarityList[randomRarityIndex].stats.str
+        const itemStr = (itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4;
 
-        itemDex = (itemRarityList[randomRarityIndex].stats.dex
+        const itemDex = (itemRarityList[randomRarityIndex].stats.dex
           + itemType.stats.dex) / 4;
 
-        itemEnd = (itemRarityList[randomRarityIndex].stats.end
+        const itemEnd = (itemRarityList[randomRarityIndex].stats.end
           + itemType.stats.end) / 4;
 
-        itemInt = (itemRarityList[randomRarityIndex].stats.int
+        const itemInt = (itemRarityList[randomRarityIndex].stats.int
           + itemType.stats.int) / 4;
 
-        itemLuk = itemType.stats.luk;
+        const itemLuk = itemType.stats.luk;
 
         itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
 
@@ -78,41 +72,18 @@ class Item {
           isXmasEvent: itemType.isXmasEvent,
           rating: itemRating,
           gold: Number((itemRarityList[randomRarityIndex].gold
-            * itemType.gold).toFixed()) * itemRating
+            * itemType.gold).toFixed()) * itemType.power
         };
       } else {
-        itemStr = (itemRarityList[randomRarityIndex].stats.str
-          * (itemMaterialList[randomMaterialIndex].stats.str
-            + itemType.stats.str)) / 4;
-
-        itemDex = (itemRarityList[randomRarityIndex].stats.dex
-          * (itemMaterialList[randomMaterialIndex].stats.dex
-            + itemType.stats.dex)) / 4;
-
-        itemEnd = (itemRarityList[randomRarityIndex].stats.end
-          * (itemMaterialList[randomMaterialIndex].stats.end
-            + itemType.stats.end)) / 4;
-
-        itemInt = (itemRarityList[randomRarityIndex].stats.int
-          * (itemMaterialList[randomMaterialIndex].stats.int
-            + itemType.stats.int)) / 4;
-
-        itemRating = itemStr + itemDex + itemEnd + itemInt;
-
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
           position: itemType.position,
-          stats: {
-            str: itemStr,
-            dex: itemDex,
-            end: itemEnd,
-            int: itemInt
-          },
           isXmasEvent: itemType.isXmasEvent,
-          rating: itemRating,
+          power: itemType.power,
+          attackType: itemType.attackType,
           gold: Number((itemRarityList[randomRarityIndex].gold
             * itemMaterialList[randomMaterialIndex].gold
-            * itemType.gold).toFixed()) * itemRating
+            * itemType.gold).toFixed()) * itemType.power
         };
       }
       return resolve(itemObj);

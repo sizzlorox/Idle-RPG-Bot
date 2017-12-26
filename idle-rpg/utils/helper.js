@@ -107,7 +107,7 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-      return item.str + item.dex + item.end + item.int;
+      return item.power;
     }
 
     return item.str + item.dex + item.end + item.int + item.luk;
@@ -115,33 +115,21 @@ class helper {
 
   sumPlayerTotalStrength(player) {
     return player.stats.str
-      + player.equipment.helmet.str
-      + player.equipment.armor.str
-      + player.equipment.weapon.str
       + player.equipment.relic.str;
   }
 
   sumPlayerTotalDexterity(player) {
     return player.stats.dex
-      + player.equipment.helmet.dex
-      + player.equipment.armor.dex
-      + player.equipment.weapon.dex
       + player.equipment.relic.dex;
   }
 
   sumPlayerTotalEndurance(player) {
     return player.stats.end
-      + player.equipment.helmet.end
-      + player.equipment.armor.end
-      + player.equipment.weapon.end
       + player.equipment.relic.end;
   }
 
   sumPlayerTotalIntelligence(player) {
     return player.stats.int
-      + player.equipment.helmet.int
-      + player.equipment.armor.int
-      + player.equipment.weapon.int
       + player.equipment.relic.int;
   }
 
@@ -169,14 +157,20 @@ class helper {
 
   setPlayerEquipment(selectedPlayer, equipment, item) {
     selectedPlayer.equipment[equipment].name = item.name;
-    selectedPlayer.equipment[equipment].str = item.stats.str;
-    selectedPlayer.equipment[equipment].dex = item.stats.dex;
-    selectedPlayer.equipment[equipment].end = item.stats.end;
-    selectedPlayer.equipment[equipment].int = item.stats.int;
-    if (equipment === enumHelper.equipment.types.relic.position) {
+    if (equipment !== enumHelper.equipment.types.relic.position) {
+      selectedPlayer.equipment[equipment].power = item.power;
+      if (equipment === enumHelper.equipment.types.weapon.position) {
+        selectedPlayer.equipment[equipment].attackType = item.attackType;
+      }
+    } else if (equipment === enumHelper.equipment.types.relic.position) {
+      selectedPlayer.equipment[equipment].str = item.stats.str;
+      selectedPlayer.equipment[equipment].dex = item.stats.dex;
+      selectedPlayer.equipment[equipment].end = item.stats.end;
+      selectedPlayer.equipment[equipment].int = item.stats.int;
       selectedPlayer.equipment[equipment].luk = item.stats.luk;
     }
     selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
+
     return selectedPlayer;
   }
 
@@ -188,13 +182,22 @@ class helper {
       selectedPlayer.gold /= 2;
       switch (this.randomBetween(0, 2)) {
         case 0:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
+          this.setPlayerEquipment(selectedPlayer,
+            enumHelper.equipment.types.helmet.position,
+            enumHelper.equipment.empty.helmet);
+
           break;
         case 1:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
+          this.setPlayerEquipment(selectedPlayer,
+            enumHelper.equipment.types.armor.position,
+            enumHelper.equipment.empty.armor);
+
           break;
         case 2:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
+          this.setPlayerEquipment(selectedPlayer,
+            enumHelper.equipment.types.weapon.position,
+            enumHelper.equipment.empty.weapon);
+
           break;
       }
 
@@ -311,26 +314,15 @@ class helper {
   generateEquipmentsString(player) {
     return `\`\`\`Heres your equipment!
     Helmet: ${player.equipment.helmet.name}
-      Stats:
-        Strength: ${player.equipment.helmet.str}
-        Dexterity: ${player.equipment.helmet.dex}
-        Endurance: ${player.equipment.helmet.end}
-        Intelligence: ${player.equipment.helmet.int}
-      ${this.generatePreviousOwnerString(player.equipment.helmet)}
+      Defense: ${player.equipment.helmet.power}
+        ${this.generatePreviousOwnerString(player.equipment.helmet)}
     Armor: ${player.equipment.armor.name}
-      Stats:
-        Strength: ${player.equipment.armor.str}
-        Dexterity: ${player.equipment.armor.dex}
-        Endurance: ${player.equipment.armor.end}
-        Intelligence: ${player.equipment.armor.int}
-      ${this.generatePreviousOwnerString(player.equipment.armor)}
+      Defense: ${player.equipment.armor.power}
+        ${this.generatePreviousOwnerString(player.equipment.armor)}
     Weapon: ${player.equipment.weapon.name}
-      Stats:
-        Strength: ${player.equipment.weapon.str}
-        Dexterity: ${player.equipment.weapon.dex}
-        Endurance: ${player.equipment.weapon.end}
-        Intelligence: ${player.equipment.weapon.int}
-      ${this.generatePreviousOwnerString(player.equipment.weapon)}
+      AttackPower: ${player.equipment.weapon.power}
+      AttackType: ${player.equipment.weapon.attackType}
+        ${this.generatePreviousOwnerString(player.equipment.weapon)}
     Relic: ${player.equipment.relic.name}
       Stats:
         Strength: ${player.equipment.relic.str}

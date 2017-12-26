@@ -18,26 +18,18 @@ const newPlayerObj = (discordId, name) => {
     equipment: {
       helmet: {
         name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0,
+        power: 0.5,
         previousOwners: []
       },
       armor: {
         name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0,
+        power: 0.5,
         previousOwners: []
       },
       weapon: {
         name: 'Fist',
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 0,
+        power: 0.5,
+        attackType: 'melee',
         previousOwners: []
       },
       relic: {
@@ -99,10 +91,7 @@ const playerSchema = mongoose.Schema({
   equipment: {
     helmet: {
       name: String,
-      str: Number,
-      dex: Number,
-      end: Number,
-      int: Number,
+      power: Number,
       previousOwners: {
         type: Array,
         default: []
@@ -110,10 +99,7 @@ const playerSchema = mongoose.Schema({
     },
     armor: {
       name: String,
-      str: Number,
-      dex: Number,
-      end: Number,
-      int: Number,
+      power: Number,
       previousOwners: {
         type: Array,
         default: []
@@ -121,10 +107,8 @@ const playerSchema = mongoose.Schema({
     },
     weapon: {
       name: String,
-      str: Number,
-      dex: Number,
-      end: Number,
-      int: Number,
+      power: Number,
+      attackType: String,
       previousOwners: {
         type: Array,
         default: []
