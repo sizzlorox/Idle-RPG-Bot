@@ -96,7 +96,12 @@ class helper {
   }
 
   calculateItemRating(item) {
-    return item.str + item.dex + item.end + item.int;
+    if (item.position !== 'relic') {
+
+      return item.str + item.dex + item.end + item.int;
+    }
+
+    return item.str + item.dex + item.end + item.int + item.luk;
   }
 
   sumPlayerTotalStrength(player) {

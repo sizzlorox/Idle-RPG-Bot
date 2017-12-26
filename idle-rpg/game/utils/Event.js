@@ -644,7 +644,7 @@ class Event {
         }
 
         this.isBlizzardActive = true;
-        helper.sendMessage(discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
+        // helper.sendMessage(discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
         return this.isBlizzardActive;
       case 'off':
         if (!this.isBlizzardActive) {
@@ -660,14 +660,16 @@ class Event {
   chanceToCatchSnowflake(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
       const snowFlakeDice = helper.randomBetween(0, 100);
-      if (snowFlakeDice >= 50 && selectedPlayer.equipment.relic.name !== 'Snowflake') {
+      if (snowFlakeDice <= 15 && selectedPlayer.equipment.relic.name !== 'Snowflake') {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
-        selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
-        const eventMsgLoseGamble = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
-        const eventLogLoseGamble = 'You caught a strange looking snowflake while travelling inside the blizzard.';
+        if (helper.calculateItemRating(selectedPlayer.equipment.relic) < helper.calculateItemRating(snowFlake)) {
+          selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
+          const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
+          const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
 
-        helper.sendMessage(discordHook, 'twitch', false, eventMsgLoseGamble);
-        selectedPlayer = helper.logEvent(selectedPlayer, eventLogLoseGamble);
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgSnowflake);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogSnowflake);
+        }
       }
 
       return resolve(selectedPlayer);

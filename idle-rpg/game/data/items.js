@@ -88,17 +88,6 @@ const items = {
       gold: 10,
       rarity: 10
     },
-    berserker = {
-      name: 'Berserker',
-      stats: {
-        str: 8,
-        dex: 5,
-        end: 1,
-        int: 3
-      },
-      gold: 11,
-      rarity: 8
-    },
     legendary = {
       name: 'Legendary',
       stats: {
@@ -177,7 +166,7 @@ const items = {
       rarity: 75
     },
   ],
-  
+
   material: [
     wood = {
       name: 'Wooden',
@@ -256,17 +245,6 @@ const items = {
       gold: 15,
       rarity: 30
     },
-    gold = {
-      name: 'Golden',
-      stats: {
-        str: 0,
-        dex: 1,
-        end: 0,
-        int: 10
-      },
-      gold: 20,
-      rarity: 20
-    },
     diamond = {
       name: 'Diamond',
       stats: {
@@ -278,7 +256,7 @@ const items = {
       gold: 22,
       rarity: 10
     },
-    mithral = {
+    mithril = {
       name: 'Mithril',
       stats: {
         str: 5,
@@ -772,8 +750,7 @@ const items = {
           str: 1,
           dex: 1,
           end: 1,
-          int: 1,
-          luk: 4,
+          int: 1
         },
         gold: 3,
         rarity: 60

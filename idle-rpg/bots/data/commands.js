@@ -359,8 +359,8 @@ const commands = [
     operatorOnly: true,
     channelOnlyId: commandChannel,
     function: (game, message) => {
-      if (message.content.includes(' ') && message.content.split(/ (.+)/).length > 2) {
-        const splitCommand = message.content.split(/ (.+)/);
+      if (message.content.includes(' ') && message.content.split(' ').length > 2) {
+        const splitCommand = message.content.split(' ');
         game.giveGold(splitCommand[1], splitCommand[2])
           .then(() => {
             message.author.send('Done.');

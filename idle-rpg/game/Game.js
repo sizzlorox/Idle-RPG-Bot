@@ -354,7 +354,7 @@ ${rankString}
    */
   updateChristmasEvent(isStarting) {
     if (isStarting) {
-      helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      // helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
       Event.MonsterClass.monsters.forEach((mob) => {
         if (mob.isXmasEvent) {
           mob.isSpawnable = true;

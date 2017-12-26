@@ -64,8 +64,7 @@ class Item {
           + itemType.stats.int) / 4;
         itemInt = itemInt < 0 ? 0 : itemInt;
 
-        itemLuk = itemType.stats.luk !== undefined || itemType.stats.luk !== null ? itemType.stats.luk : 0;
-        itemLuk = itemLuk < 0 ? 0 : itemLuk;
+        itemLuk = itemType.stats.luk;
 
         itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
 
@@ -150,7 +149,7 @@ class Item {
       + snowFlake.stats.int) / 4;
     itemInt = itemInt < 0 ? 0 : itemInt;
 
-    const itemLuk = itemType.stats.luk !== undefined || itemType.stats.luk !== null ? itemType.stats.luk : 0;
+    const itemLuk = snowFlake.stats.luk;
 
     const itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
 
