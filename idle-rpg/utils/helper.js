@@ -58,15 +58,24 @@ class helper {
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
       discordHook.movementHook.send(msg)
-        .then(debugMsg => logger.log('move', debugMsg))
+        .then(debugMsg => logger.log('move', this.formatLog(debugMsg)))
         .catch(err => logger.error(err));
     } else {
       discordHook.actionHook.send(msg)
-        .then(debugMsg => logger.log('action', debugMsg))
+        .then(debugMsg => logger.log('action', this.formatLog(debugMsg)))
     }
 
     // Add if to check if channel is streaming
     // twitchBot.say(msg.replace('/\*/g', ''));
+  }
+
+  formatLog(json) {
+    const formattedLog = {
+      timeStamp: json.timestamp,
+      content: json.content,
+      mentions: json.mentions,
+    };
+    return formattedLog;
   }
 
   setImportantMessage(message) {
@@ -96,7 +105,7 @@ class helper {
   }
 
   calculateItemRating(item) {
-    if (item.position !== 'relic') {
+    if (item.position !== enumHelper.equipment.types.relic.position) {
 
       return item.str + item.dex + item.end + item.int;
     }
@@ -164,7 +173,7 @@ class helper {
     selectedPlayer.equipment[equipment].dex = item.stats.dex;
     selectedPlayer.equipment[equipment].end = item.stats.end;
     selectedPlayer.equipment[equipment].int = item.stats.int;
-    if (equipment === 'relic') {
+    if (equipment === enumHelper.equipment.types.relic.position) {
       selectedPlayer.equipment[equipment].luk = item.stats.luk;
     }
     selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
@@ -179,13 +188,13 @@ class helper {
       selectedPlayer.gold /= 2;
       switch (this.randomBetween(0, 2)) {
         case 0:
-          this.setPlayerEquipment(selectedPlayer, 'helmet', enumHelper.equipment.empty.helmet);
+          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
           break;
         case 1:
-          this.setPlayerEquipment(selectedPlayer, 'armor', enumHelper.equipment.empty.armor);
+          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
           break;
         case 2:
-          this.setPlayerEquipment(selectedPlayer, 'weapon', enumHelper.equipment.empty.weapon);
+          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
           break;
       }
 

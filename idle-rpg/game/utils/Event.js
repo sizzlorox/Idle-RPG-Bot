@@ -660,7 +660,7 @@ class Event {
   chanceToCatchSnowflake(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
       const snowFlakeDice = helper.randomBetween(0, 100);
-      if (snowFlakeDice <= 15 && selectedPlayer.equipment.relic.name !== 'Snowflake') {
+      if (snowFlakeDice <= 15) {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
         if (helper.calculateItemRating(selectedPlayer.equipment.relic) < helper.calculateItemRating(snowFlake)) {
           selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);

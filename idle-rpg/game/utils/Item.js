@@ -1,5 +1,6 @@
 const helper = require('../../utils/helper');
 const items = require('../data/items');
+const enumHelper = require('../../utils/enumHelper');
 
 class Item {
 
@@ -33,7 +34,7 @@ class Item {
           randomEquipmentIndex = helper.randomBetween(0, items.type.length - 1);
           randomTypeIndex = helper.randomBetween(0, items.type[randomEquipmentIndex].length - 1);
 
-          if (items.type[randomEquipmentIndex][randomTypeIndex].position !== 'relic') {
+          if (items.type[randomEquipmentIndex][randomTypeIndex].position !== enumHelper.equipment.types.relic.position) {
             itemType = items.type[randomEquipmentIndex][randomTypeIndex];
           }
         } while (itemType === undefined);
