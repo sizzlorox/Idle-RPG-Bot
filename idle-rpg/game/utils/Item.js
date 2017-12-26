@@ -50,19 +50,15 @@ class Item {
       if (itemType.position === 'relic') {
         itemStr = (itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4;
-        itemStr = itemStr < 0 ? 0 : itemStr;
 
         itemDex = (itemRarityList[randomRarityIndex].stats.dex
           + itemType.stats.dex) / 4;
-        itemDex = itemDex < 0 ? 0 : itemDex;
 
         itemEnd = (itemRarityList[randomRarityIndex].stats.end
           + itemType.stats.end) / 4;
-        itemEnd = itemEnd < 0 ? 0 : itemEnd;
 
         itemInt = (itemRarityList[randomRarityIndex].stats.int
           + itemType.stats.int) / 4;
-        itemInt = itemInt < 0 ? 0 : itemInt;
 
         itemLuk = itemType.stats.luk;
 
@@ -87,22 +83,18 @@ class Item {
         itemStr = (itemRarityList[randomRarityIndex].stats.str
           * (itemMaterialList[randomMaterialIndex].stats.str
             + itemType.stats.str)) / 4;
-        itemStr = itemStr < 0 ? 1 : itemStr;
 
         itemDex = (itemRarityList[randomRarityIndex].stats.dex
           * (itemMaterialList[randomMaterialIndex].stats.dex
             + itemType.stats.dex)) / 4;
-        itemDex = itemDex < 0 ? 1 : itemDex;
 
         itemEnd = (itemRarityList[randomRarityIndex].stats.end
           * (itemMaterialList[randomMaterialIndex].stats.end
             + itemType.stats.end)) / 4;
-        itemEnd = itemEnd < 0 ? 1 : itemEnd;
 
         itemInt = (itemRarityList[randomRarityIndex].stats.int
           * (itemMaterialList[randomMaterialIndex].stats.int
             + itemType.stats.int)) / 4;
-        itemInt = itemInt < 0 ? 1 : itemInt;
 
         itemRating = itemStr + itemDex + itemEnd + itemInt;
 
@@ -133,21 +125,17 @@ class Item {
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = helper.randomBetween(0, itemRarityList.length - 1);
 
-    let itemStr = (itemRarityList[randomRarityIndex].stats.str
+    const itemStr = (itemRarityList[randomRarityIndex].stats.str
       + snowFlake.stats.str) / 4;
-    itemStr = itemStr < 0 ? 0 : itemStr;
 
-    let itemDex = (itemRarityList[randomRarityIndex].stats.dex
+    const itemDex = (itemRarityList[randomRarityIndex].stats.dex
       + snowFlake.stats.dex) / 4;
-    itemDex = itemDex < 0 ? 0 : itemDex;
 
-    let itemEnd = (itemRarityList[randomRarityIndex].stats.end
+    const itemEnd = (itemRarityList[randomRarityIndex].stats.end
       + snowFlake.stats.end) / 4;
-    itemEnd = itemEnd < 0 ? 0 : itemEnd;
 
-    let itemInt = (itemRarityList[randomRarityIndex].stats.int
+    const itemInt = (itemRarityList[randomRarityIndex].stats.int
       + snowFlake.stats.int) / 4;
-    itemInt = itemInt < 0 ? 0 : itemInt;
 
     const itemLuk = snowFlake.stats.luk;
 

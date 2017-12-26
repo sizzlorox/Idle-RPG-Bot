@@ -164,6 +164,9 @@ class helper {
     selectedPlayer.equipment[equipment].dex = item.stats.dex;
     selectedPlayer.equipment[equipment].end = item.stats.end;
     selectedPlayer.equipment[equipment].int = item.stats.int;
+    if (equipment === 'relic') {
+      selectedPlayer.equipment[equipment].luk = item.stats.luk;
+    }
     selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
     return selectedPlayer;
   }
