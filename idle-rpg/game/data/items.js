@@ -8,7 +8,7 @@ const items = {
         end: 1,
         int: 1
       },
-      gold: 1,
+      gold: 2,
       rarity: 100
     },
     uncommon = {
@@ -19,8 +19,30 @@ const items = {
         end: 2,
         int: 2
       },
-      gold: 2,
+      gold: 3,
       rarity: 50
+    },
+    sturdy = {
+      name: 'Sturdy',
+      stats: {
+        str: 3,
+        dex: 2,
+        end: 3,
+        int: 2
+      },
+      gold: 4,
+      rarity: 40
+    },
+    reinforced = {
+      name: 'Reinforced',
+      stats: {
+        str: 3,
+        dex: 1,
+        end: 4,
+        int: 2
+      },
+      gold: 4,
+      rarity: 30
     },
     unique = {
       name: 'Unique',
@@ -30,8 +52,19 @@ const items = {
         end: 3,
         int: 3
       },
-      gold: 3,
+      gold: 5,
       rarity: 25
+    },
+    hardened = {
+      name: 'Hardened',
+      stats: {
+        str: 5,
+        dex: 2,
+        end: 5,
+        int: 2
+      },
+      gold: 6,
+      rarity: 20
     },
     rare = {
       name: 'Rare',
@@ -41,7 +74,7 @@ const items = {
         end: 4,
         int: 4
       },
-      gold: 5,
+      gold: 7,
       rarity: 15
     },
     magic = {
@@ -54,6 +87,17 @@ const items = {
       },
       gold: 10,
       rarity: 10
+    },
+    berserker = {
+      name: 'Berserker',
+      stats: {
+        str: 8,
+        dex: 5,
+        end: 1,
+        int: 3
+      },
+      gold: 11,
+      rarity: 8
     },
     legendary = {
       name: 'Legendary',
@@ -99,96 +143,107 @@ const items = {
       gold: 30,
       rarity: 1
     },
-    reinforced = {
-      name: 'Reinforced',
+    crack = {
+      name: 'Cracked',
       stats: {
-        str: 5,
-        dex: 3,
-        end: 3,
-        int: 3
+        str: 0,
+        dex: 0,
+        end: 0,
+        int: 0
       },
-      gold: 10,
-      rarity: 30
-    },
-    hardened = {
-      name: 'Hardened',
-      stats: {
-        str: 6,
-        dex: 4,
-        end: 3,
-        int: 3
-      },
-      gold: 15,
-      rarity: 15
-    },
-    sturdy = {
-      name: 'Sturdy',
-      stats: {
-        str: 3,
-        dex: 2,
-        end: 3,
-        int: 2
-      },
-      gold: 15,
-      rarity: 43
+      gold: 1,
+      rarity: 100
     },
     crude = {
       name: 'Crude',
       stats: {
         str: 1,
-        dex: -2,
-        end: -1,
-        int: 2
+        dex: 0,
+        end: 1,
+        int: 0
       },
-      gold: 5,
+      gold: 1,
       rarity: 75
     },
     battered = {
       name: 'Battered',
       stats: {
-        str: 0,
-        dex: 2,
-        end: 2,
-        int: 0
-      },
-      gold: 5,
-      rarity: 50
-    },
-    crack = {
-      name: 'Cracked',
-      stats: {
-        str: -1,
-        dex: -1,
-        end: -1,
-        int: -1
+        str: 1,
+        dex: 1,
+        end: 0,
+        int: 1
       },
       gold: 1,
-      rarity: 100
+      rarity: 75
     },
   ],
-
+  
   material: [
-    bronze = {
-      name: 'Bronze',
+    wood = {
+      name: 'Wooden',
+      stats: {
+        str: 0,
+        dex: 3,
+        end: 1,
+        int: 1
+      },
+      gold: 5,
+      rarity: 100
+    },
+    stone = {
+      name: 'Stone',
+      stats: {
+        str: 1,
+        dex: 0,
+        end: 3,
+        int: 1
+      },
+      gold: 5,
+      rarity: 100
+    },
+    copper = {
+      name: 'Copper',
+      stats: {
+        str: 2,
+        dex: 2,
+        end: 1,
+        int: 1
+      },
+      gold: 8,
+      rarity: 90
+    },
+    iron = {
+      name: 'Iron',
       stats: {
         str: 2,
         dex: 2,
         end: 2,
         int: 2
       },
-      gold: 5,
-      rarity: 100
+      gold: 10,
+      rarity: 70
     },
-    iron = {
-      name: 'Iron',
+    bronze = {
+      name: 'Bronze',
       stats: {
         str: 3,
         dex: 3,
         end: 3,
         int: 3
       },
-      gold: 10,
+      gold: 13,
       rarity: 50
+    },
+    bone = {
+      name: 'Bone',
+      stats: {
+        str: 2,
+        dex: 5,
+        end: 2,
+        int: 5
+      },
+      gold: 15,
+      rarity: 40
     },
     steel = {
       name: 'Steel',
@@ -201,27 +256,27 @@ const items = {
       gold: 15,
       rarity: 30
     },
-    bone = {
-      name: 'Bone',
-      stats: {
-        str: 2,
-        dex: 6,
-        end: 6,
-        int: 2
-      },
-      gold: 15,
-      rarity: 30
-    },
     gold = {
-      name: 'Gold',
+      name: 'Golden',
       stats: {
-        str: 1,
-        dex: -3,
-        end: -3,
+        str: 0,
+        dex: 1,
+        end: 0,
+        int: 10
+      },
+      gold: 20,
+      rarity: 20
+    },
+    diamond = {
+      name: 'Diamond',
+      stats: {
+        str: 4,
+        dex: 3,
+        end: 5,
         int: 4
       },
-      gold: 15,
-      rarity: 20
+      gold: 22,
+      rarity: 10
     },
     mithral = {
       name: 'Mithril',
@@ -231,41 +286,19 @@ const items = {
         end: 5,
         int: 5
       },
-      gold: 15,
+      gold: 25,
       rarity: 5
     },
-    diamond = {
-      name: 'Diamond',
+    adamant = {
+      name: 'Adamantine',
       stats: {
-        str: 5,
-        dex: 4,
-        end: 2,
-        int: 5
+        str: 6,
+        dex: 6,
+        end: 6,
+        int: 6
       },
-      gold: 15,
-      rarity: 10
-    },
-    copper = {
-      name: 'Copper',
-      stats: {
-        str: 1,
-        dex: 3,
-        end: 3,
-        int: 1
-      },
-      gold: 15,
-      rarity: 70
-    },
-    stone = {
-      name: 'Stone',
-      stats: {
-        str: 3,
-        dex: 0,
-        end: -1,
-        int: 2
-      },
-      gold: 15,
-      rarity: 100
+      gold: 30,
+      rarity: 3
     },
   ],
 
