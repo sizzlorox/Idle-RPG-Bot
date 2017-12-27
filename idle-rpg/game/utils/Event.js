@@ -3,6 +3,7 @@ const enumHelper = require('../../utils/enumHelper');
 const Battle = require('../utils/Battle');
 const Monster = require('../utils/Monster');
 const Item = require('../utils/Item');
+const Spell = require('../utils/Spell');
 const Map = require('../utils/Map');
 const Database = require('../../database/Database');
 
@@ -12,6 +13,7 @@ class Event {
     this.MonsterManager = new Monster();
     this.ItemManager = new Item();
     this.MapManager = new Map();
+    this.SpellManager = new Spell();
 
     // Events
     this.isBlizzardActive = false;
@@ -286,7 +288,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
   stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomBetween(0, 100);
-      if (luckStealChance > 50 || victimPlayer.health <= 0) {
+      if (luckStealChance > 50) {
         const luckItem = helper.randomBetween(0, 2);
         switch (luckItem) {
           case 0:
@@ -299,16 +301,20 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
                 const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${removePreviousOwnerName}!`);
                 const eventLog = `Stole ${removePreviousOwnerName}`;
+                const otherPlayerLog = `${stealingPlayer.name} stole ${removePreviousOwnerName} from you`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
+                victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
               } else {
                 stealingPlayer.equipment.helmet.name = `${victimPlayer.name}s ${victimPlayer.equipment.helmet.name}`;
                 const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${victimPlayer.equipment.helmet.name}!`);
                 const eventLog = `Stole ${victimPlayer.name}s ${victimPlayer.equipment.helmet.name}`;
+                const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.helmet.name} from you`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
+                victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
               }
 
               if (!victimPlayer.equipment.helmet.previousOwners) {
@@ -332,16 +338,20 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
                 const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${removePreviousOwnerName}!`);
                 const eventLog = `Stole ${removePreviousOwnerName}`;
+                const otherPlayerLog = `${stealingPlayer.name} stole ${removePreviousOwnerName} from you`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
+                victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
               } else {
                 stealingPlayer.equipment.armor.name = `${victimPlayer.name}s ${victimPlayer.equipment.armor.name}`;
                 const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${victimPlayer.equipment.armor.name}!`);
                 const eventLog = `Stole ${victimPlayer.name}s ${victimPlayer.equipment.armor.name}`;
+                const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
+                victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
               }
 
               if (!victimPlayer.equipment.armor.previousOwners) {
@@ -365,16 +375,20 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
                 const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${removePreviousOwnerName}!`);
                 const eventLog = `Stole ${removePreviousOwnerName}`;
+                const otherPlayerLog = `${stealingPlayer.name} stole ${removePreviousOwnerName} from you`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
+                victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
               } else {
                 stealingPlayer.equipment.weapon.name = `${victimPlayer.name}s ${victimPlayer.equipment.weapon.name}`;
-                const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${victimPlayer.equipment.weapon.name}!`);
+                const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${victimPlayer.equipment.weapon.name}`);
                 const eventLog = `Stole ${victimPlayer.name}s ${victimPlayer.equipment.weapon.name}`;
+                const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.weapon.name} gold from you`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
+                victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
               }
 
               if (!victimPlayer.equipment.weapon.previousOwners) {
@@ -389,6 +403,16 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
             }
             break;
         }
+      } else if (victimPlayer.gold > 0) {
+        const goldStolen = Math.abs(victimPlayer.gold / 4);
+        stealingPlayer.gold += goldStolen;
+        victimPlayer.gold -= goldStolen;
+
+        const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`);
+        const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
+
+        helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+        stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
       }
 
       return resolve({ stealingPlayer, victimPlayer });
@@ -398,7 +422,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = helper.randomBetween(0, 5);
+      const luckEvent = helper.randomBetween(0, 6);
       switch (luckEvent) {
         case 0:
           const luckStat = helper.randomBetween(0, 3);
@@ -452,7 +476,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
           helper.checkHealth(this.MapClass, selectedPlayer, discordHook);
 
           const eventMsgZeus = `${helper.generatePlayerName(selectedPlayer)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
-          const eventLogZeus = `Zeus struck you down with his thunderbold and you lost ${luckHealthAmount} health`;
+          const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgZeus);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogZeus);
@@ -520,6 +544,17 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgAthene);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogAthene);
+
+          return resolve(selectedPlayer);
+
+        case 6:
+          const spell = this.SpellManager.generateSpell(selectedPlayer);
+
+          const eventMsgEris = `**Eris has given ${helper.generatePlayerName(selectedPlayer)} a scroll containing ${spell.name} to add to ${helper.generateGenderString(selectedPlayer, 'his')} spellbook!**`;
+          const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
+
+          helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
+          selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
 
           return resolve(selectedPlayer);
       }
@@ -682,6 +717,10 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
   get MapClass() {
     return this.MapManager;
+  }
+
+  get SpellClass() {
+    return this.SpellManager;
   }
 
 }

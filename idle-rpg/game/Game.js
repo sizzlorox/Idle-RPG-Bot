@@ -1,7 +1,7 @@
 const helper = require('../utils/helper');
 const Database = require('../database/Database');
 const Event = require('./utils/Event');
-const spells = require('./data/spells');
+const globalSpells = require('./data/globalSpells');
 const moment = require('moment');
 const { multiplier } = require('../../settings');
 
@@ -38,10 +38,6 @@ class Game {
       .then((selectedPlayer) => {
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
-        if (selectedPlayer.gender === 'boy')
-          selectedPlayer.gender = 'male';
-        if (selectedPlayer.gender === 'girl')
-          selectedPlayer.gender = 'female';
 
         if (selectedPlayer.events % 100 === 0) {
           helper.sendMessage(this.discordHook, twitchBot, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
@@ -225,9 +221,9 @@ ${rankString}
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
-            if (castingPlayer.gold >= spells.bless.spellCost) {
-              castingPlayer.spells++;
-              castingPlayer.gold -= spells.bless.spellCost;
+            if (castingPlayer.gold >= globalSpells.bless.spellCost) {
+              castingPlayer.spellCasted++;
+              castingPlayer.gold -= globalSpells.bless.spellCost;
               this.multiplier += 1;
               const blessLogObj = {
                 spellName: 'Bless',
@@ -255,7 +251,7 @@ ${rankString}
                   commandAuthor.send('Spell has been casted!');
                 });
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${spells.bless.spellCost} gold. You are lacking ${spells.bless.spellCost - castingPlayer.gold} gold.`);
+              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold} gold.`);
             }
             break;
         }

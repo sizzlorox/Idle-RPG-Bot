@@ -59,7 +59,7 @@ class helper {
     if (isMovement) {
       discordHook.movementHook.send(msg)
         .then(debugMsg => logger.log('move', this.formatLog(debugMsg)))
-        .catch(err => logger.error(err));
+        .catch(err => logger.log('error', err));
     } else {
       discordHook.actionHook.send(msg)
         .then(debugMsg => logger.log('action', this.formatLog(debugMsg)))
@@ -217,6 +217,15 @@ class helper {
     }
   }
 
+  generateSpellBookString(player) {
+    let spellBookString = '\`\`\`Here\'s your spellbook!\n';
+    player.spells.forEach((spell) => {
+      spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
+    });
+    spellBookString = spellBookString.concat('\`\`\`');
+    return spellBookString;
+  }
+
   generateStatsString(player) {
     return `\`\`\`Here are your stats!
     Health: ${player.health} / ${100 + (player.level * 5)}
@@ -238,7 +247,7 @@ class helper {
     Gambles: ${player.gambles}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
-    Spells Casted: ${player.spells}
+    Spells Casted: ${player.spellCasted}
     Kills:
       Monsters: ${player.kills.mob}
       Players: ${player.kills.player}

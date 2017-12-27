@@ -9,32 +9,18 @@ const enumHelper = {
     empty: {
       helmet: {
         name: 'Nothing',
-        stats: {
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0,
-        },
+        power: 0.5,
         previousOwners: []
       },
       armor: {
         name: 'Nothing',
-        stats: {
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0,
-        },
+        power: 0.5,
         previousOwners: []
       },
       weapon: {
         name: 'Fists',
-        stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 0,
-        },
+        power: 0.5,
+        attackType: 'melee',
         previousOwners: []
       },
       relic: {
@@ -78,44 +64,44 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'T1',
-    discordId: 'T1'
+    name: 'Testa1',
+    discordId: 'Testa1'
   },
   {
-    name: 'T2',
-    discordId: 'T2'
+    name: 'Testa2',
+    discordId: 'Testa2'
   },
   {
-    name: 'T3',
-    discordId: 'T3'
+    name: 'Testa3',
+    discordId: 'Testa3'
   },
   {
-    name: 'T4',
-    discordId: 'T4'
+    name: 'Testa4',
+    discordId: 'Testa4'
   },
   {
-    name: 'T5',
-    discordId: 'T5'
+    name: 'Testa5',
+    discordId: 'Testa5'
   },
   {
-    name: 'T6',
-    discordId: 'T6'
+    name: 'Testa6',
+    discordId: 'Testa6'
   },
   {
-    name: 'T7',
-    discordId: 'T7'
+    name: 'Testa7',
+    discordId: 'Testa7'
   },
   {
-    name: 'T8',
-    discordId: 'T8'
+    name: 'Testa8',
+    discordId: 'Testa8'
   },
   {
-    name: 'T9',
-    discordId: 'T9'
+    name: 'Testa9',
+    discordId: 'Testa9'
   },
   {
-    name: 'T10',
-    discordId: 'T10'
+    name: 'Testa10',
+    discordId: 'Testa10'
   }]
 };
 module.exports = enumHelper;

@@ -79,7 +79,7 @@ class Item {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
           position: itemType.position,
           isXmasEvent: itemType.isXmasEvent,
-          power: itemType.power,
+          power: itemRarityList[randomRarityIndex].power + itemType.power,
           attackType: itemType.attackType,
           gold: Number((itemRarityList[randomRarityIndex].gold
             * itemMaterialList[randomMaterialIndex].gold

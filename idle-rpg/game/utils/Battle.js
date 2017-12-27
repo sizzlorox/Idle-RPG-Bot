@@ -56,6 +56,12 @@ class Battle {
             attackerDamage += result.attackerDamage ? result.attackerDamage : 0;
             defenderDamage += result.defenderDamage ? result.defenderDamage : 0;
           });
+          if (attacker.health < 0) {
+            attacker.health = 0;
+          }
+          if (defender.health < 0) {
+            defender.health = 0;
+          }
 
           return resolve({ attacker, defender, attackerDamage, defenderDamage });
         });
@@ -78,8 +84,8 @@ class Battle {
       defender: this.getBattleStats(defender)
     };
 
-    return this.battleTurn(attacker, defender, battleStats);
-    // .then(battleResults => this.spellTurn(battleResults.attacker, battleResults.defender))
+    return this.battleTurn(attacker, defender, battleStats)
+      .then(battleResults => this.spellTurn(battleResults.attacker, battleResults.defender, battleStats, battleResults.attackerDamage, battleResults.defenderDamage));
   }
 
   battleTurn(attacker, defender, battleStats) {
@@ -88,16 +94,16 @@ class Battle {
       let attackerDamage;
       let defenderDamage;
       if (initiative.name === attacker.name) {
-        console.log('Initiative is Attacker');
+        console.log('Battle Initiative is Attacker');
         if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-          attackerDamage = battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower;
+          attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower);
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
 
           defender.health -= attackerDamage;
         } else {
-          attackerDamage = battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower;
+          attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -111,14 +117,14 @@ class Battle {
         }
 
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-          defenderDamage = battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower;
+          defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower);
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
 
           attacker.health -= defenderDamage;
         } else {
-          defenderDamage = battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower;
+          defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -128,16 +134,16 @@ class Battle {
 
         console.log(`Defender Damage: ${defenderDamage}`);
       } else if (initiative.name === defender.name) {
-        console.log('Initiative is Defender');
+        console.log('Battle Initiative is Defender');
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-          defenderDamage = battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower;
+          defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower);
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
 
           attacker.health -= defenderDamage;
         } else {
-          defenderDamage = battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower;
+          defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -151,14 +157,14 @@ class Battle {
         }
 
         if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-          attackerDamage = battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower;
+          attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower);
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
 
           defender.health -= attackerDamage;
         } else {
-          attackerDamage = battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower;
+          attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -173,10 +179,59 @@ class Battle {
     });
   }
 
-  spellTurn(attacker, defender, battleStats) {
+  spellTurn(attacker, defender, battleStats, attackerDamage, defenderDamage) {
     return new Promise((resolve) => {
-
-      return resolve({ attacker, defender });
+      const initiative = this.initialAttack(attacker, defender);
+      if (initiative.name === attacker.name) {
+        console.log('Spell Initiative is Attacker');
+        if (attacker.spells.length > 0) {
+          const attackerSpellToCast = helper.randomBetween(0, attacker.spells.length - 1);
+          switch (attackerSpellToCast.type) {
+            case 'self':
+              attackerSpellToCast.function(attacker, attackerSpellToCast.power);
+              break;
+            case 'target':
+              attackerDamage += attackerSpellToCast.function(defender, attackerSpellToCast.power, battleStats.defender.defensePower.magicDefensePower);
+              break;
+          }
+        }
+        if (defender.spells.length > 0) {
+          const defenderSpellToCast = helper.randomBetween(0, defender.spells.length - 1);
+          switch (defenderSpellToCast.type) {
+            case 'self':
+              defenderSpellToCast.function(defender, defenderSpellToCast.power);
+              break;
+            case 'target':
+              defenderDamage += defenderSpellToCast.function(attacker, defenderSpellToCast.power, battleStats.attacker.defensePower.magicDefensePower);
+              break;
+          }
+        }
+      } else if (initiative.name === defender.name) {
+        console.log('Spell Initiative is Defender');
+        if (defender.spells.length > 0) {
+          const defenderSpellToCast = helper.randomBetween(0, defender.spells.length - 1);
+          switch (defenderSpellToCast.type) {
+            case 'self':
+              defenderSpellToCast.function(defender, defenderSpellToCast.power);
+              break;
+            case 'target':
+              defenderDamage += defenderSpellToCast.function(attacker, defenderSpellToCast.power, battleStats.attacker.defensePower.magicDefensePower);
+              break;
+          }
+        }
+        if (attacker.spells.length > 0) {
+          const attackerSpellToCast = helper.randomBetween(0, attacker.spells.length - 1);
+          switch (attackerSpellToCast.type) {
+            case 'self':
+              attackerSpellToCast.function(attacker, attackerSpellToCast.power);
+              break;
+            case 'target':
+              attackerDamage += attackerSpellToCast.function(defender, attackerSpellToCast.power, battleStats.defender.defensePower.magicDefensePower);
+              break;
+          }
+        }
+      }
+      return resolve({ attacker, defender, attackerDamage, defenderDamage });
     });
   }
 
@@ -197,32 +252,40 @@ class Battle {
 
   calculateAttack(player) {
     let attackPower;
+    console.log(`${player.name} - ${player.equipment.weapon.name} - ${player.equipment.weapon.attackType} - ${player.equipment.weapon.power}`);
     switch (player.equipment.weapon.attackType) {
       case 'melee':
         attackPower = (helper.sumPlayerTotalStrength(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
-            + ((helper.sumPlayerTotalLuck(player) + helper.randomBetween(1, helper.sumPlayerTotalStrength(player))) / 2));
+            + ((helper.sumPlayerTotalLuck(player)
+              + helper.randomBetween(1, helper.sumPlayerTotalStrength(player))) / 2));
         break;
       case 'range':
         attackPower = (helper.sumPlayerTotalDexterity(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
-            + ((helper.sumPlayerTotalLuck(player) + helper.randomBetween(1, helper.sumPlayerTotalDexterity(player))) / 2));
+            + ((helper.sumPlayerTotalLuck(player)
+              + helper.randomBetween(1, helper.sumPlayerTotalDexterity(player))) / 2));
         break;
       case 'magic':
         attackPower = (helper.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
-            + ((helper.sumPlayerTotalLuck(player) + helper.randomBetween(1, helper.sumPlayerTotalIntelligence(player))) / 2));
+            + ((helper.sumPlayerTotalLuck(player)
+              + helper.randomBetween(1, helper.sumPlayerTotalIntelligence(player))) / 2));
         break;
     }
+    attackPower = helper.randomBetween(attackPower / 2, attackPower);
 
     return attackPower;
   }
 
   calculateDefense(player) {
-    const physicalDefensePower = (helper.sumPlayerTotalEndurance(player) + player.equipment.armor.power)
+    const physicalDefensePower = (helper.sumPlayerTotalEndurance(player)
+      + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
-    const magicDefensePower = (helper.sumPlayerTotalIntelligence(player) + player.equipment.armor.power)
+    const magicDefensePower = (helper.sumPlayerTotalIntelligence(player)
+      + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
+    console.log(`${player.name} - ${physicalDefensePower} - ${magicDefensePower}`);
 
     return { physicalDefensePower, magicDefensePower };
   }

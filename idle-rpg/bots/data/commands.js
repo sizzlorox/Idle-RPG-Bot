@@ -112,6 +112,43 @@ const commands = [
     }
   },
 
+  spellbook = {
+    command: '!spellbook',
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        let checkPlayer = message.content.split(/ (.+)/)[1];
+        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
+        if (playerObj.size === 0) {
+          message.author.send(`${checkPlayer} was not found!`);
+          return;
+        }
+
+        return game.playerStats(playerObj.array()[0])
+          .then((playerSpells) => {
+            if (!playerSpells) {
+              return message.author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+            }
+
+            const spellBook = helper.generateSpellBookString(playerSpells);
+            message.author.send(spellBook.replace('Here\'s your spellbook!', `Here is ${playerSpells.name}'s spellbook!`));
+          });
+      }
+
+      game.playerStats(message.author)
+        .then((playerSpells) => {
+          if (!playerSpells) {
+            return message.author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+          }
+
+          const spellBook = helper.generateSpellBookString(playerSpells);
+          message.author.send(spellBook);
+        });
+    }
+  },
+
   map = {
     command: '!map',
     operatorOnly: false,
@@ -182,7 +219,7 @@ const commands = [
           game.top10(message.author, { gold: -1 });
           break;
         case 'spells':
-          game.top10(message.author, { spells: -1 });
+          game.top10(message.author, { spellCasted: -1 });
           break;
         default:
           game.top10(message.author, { level: -1 });
