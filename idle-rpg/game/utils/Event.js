@@ -548,15 +548,33 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
           return resolve(selectedPlayer);
 
         case 6:
-          const spell = this.SpellManager.generateSpell(selectedPlayer);
+          return this.SpellManager.generateSpell(selectedPlayer)
+            .then((spell) => {
+              const eventMsgEris = `**Eris has given ${helper.generatePlayerName(selectedPlayer)} a scroll containing ${spell.name} to add to ${helper.generateGenderString(selectedPlayer, 'his')} spellbook!**`;
+              const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
+              if (selectedPlayer.spells.length > 0) {
+                selectedPlayer.spells.forEach((ownedSpell, index) => {
+                  const spellName = ownedSpell.name.split(/ (.+)/);
+                  if (spell.name.includes(spellName)) {
+                    if (spell.power > ownedSpell.power) {
+                      selectedPlayer.spells.splice(index, 1);
+                      selectedPlayer.spells.push(spell);
+                      helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
+                    }
+                  } else {
+                    selectedPlayer.spells.push(spell);
+                    helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
+                  }
+                });
+              } else {
+                selectedPlayer.spells.push(spell);
+                helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
+              }
 
-          const eventMsgEris = `**Eris has given ${helper.generatePlayerName(selectedPlayer)} a scroll containing ${spell.name} to add to ${helper.generateGenderString(selectedPlayer, 'his')} spellbook!**`;
-          const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
+              selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
-          selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
-
-          return resolve(selectedPlayer);
+              return resolve(selectedPlayer);
+            });
       }
     });
   }
@@ -587,6 +605,34 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
       const luckItemDice = helper.randomBetween(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
+        return this.SpellManager.generateSpell(selectedPlayer)
+          .then((spell) => {
+            const spellEventResult = this.generateItemEventMessage(selectedPlayer, spell);
+            if (selectedPlayer.spells.length > 0) {
+              selectedPlayer.spells.forEach((ownedSpell) => {
+                const spellName = ownedSpell.name.split(/ (.+)/);
+                if (spell.name.includes(spellName)) {
+                  if (spell.power > ownedSpell.power) {
+                    selectedPlayer.spells.splice(index, 1);
+                    selectedPlayer.spells.push(spell);
+                    helper.sendMessage(discordHook, 'twitch', false, spellEventResult.eventMsg);
+                    selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+                  }
+                } else {
+                  selectedPlayer.spells.push(spell);
+                  helper.sendMessage(discordHook, 'twitch', false, spellEventResult.eventMsg);
+                  selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+                }
+              });
+            } else {
+              selectedPlayer.spells.push(spell);
+              helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
+              selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+            }
+
+            return resolve(selectedPlayer);
+          });
+      } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 2)) {
         return this.ItemManager.generateItem(selectedPlayer)
           .then((item) => {
             switch (item.position) {
