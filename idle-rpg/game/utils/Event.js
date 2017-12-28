@@ -404,7 +404,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
             break;
         }
       } else if (victimPlayer.gold > 0) {
-        const goldStolen = Math.abs(victimPlayer.gold / 4);
+        const goldStolen = Math.floor(victimPlayer.gold / 4);
         stealingPlayer.gold += goldStolen;
         victimPlayer.gold -= goldStolen;
 

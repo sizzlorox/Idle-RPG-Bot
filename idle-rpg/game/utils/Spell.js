@@ -19,7 +19,7 @@ class Spell {
         spellType = spellSpellList[randomSpellIndex];
       } while (spellType === undefined);
 
-      spellObj = {
+      const spellObj = {
         name: `${spellRarityList[randomRarityIndex].name} ${spellType.name}`,
         description: spellType.description,
         power: spellRarityList[randomRarityIndex].power + spellType.power,
