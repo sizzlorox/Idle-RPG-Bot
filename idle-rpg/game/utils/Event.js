@@ -615,12 +615,12 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                   if (spell.power > ownedSpell.power) {
                     selectedPlayer.spells.splice(index, 1);
                     selectedPlayer.spells.push(spell);
-                    helper.sendMessage(discordHook, 'twitch', false, spellEventResult.eventMsg);
+                    helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
                     selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
                   }
                 } else {
                   selectedPlayer.spells.push(spell);
-                  helper.sendMessage(discordHook, 'twitch', false, spellEventResult.eventMsg);
+                  helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
                   selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
                 }
               });
