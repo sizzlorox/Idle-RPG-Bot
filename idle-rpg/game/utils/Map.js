@@ -1,10 +1,11 @@
 const maps = require('../data/maps');
+const helper = require('../../utils/helper');
 
 class Map {
 
   moveToRandomMap(selectedPlayer) {
-    const movement = Math.random();
-    if (movement >= 0.5 && selectedPlayer.map.id !== 0 && selectedPlayer.map.id !== maps.length - 1 || selectedPlayer.map.id === 0) {
+    const movement = helper.randomBetween(0, 100);
+    if (movement >= 50 && selectedPlayer.map.id !== 0 && selectedPlayer.map.id !== maps.length - 1 || selectedPlayer.map.id === 0) {
       return maps[selectedPlayer.map.id + 1];
     }
     return maps[selectedPlayer.map.id - 1];
