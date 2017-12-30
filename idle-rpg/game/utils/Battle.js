@@ -185,7 +185,8 @@ class Battle {
       if (initiative.name === attacker.name) {
         console.log('Spell Initiative is Attacker');
         if (attacker.spells.length > 0) {
-          const attackerSpellToCast = helper.randomBetween(0, attacker.spells.length - 1);
+          const attackerRandomSpell = helper.randomBetween(0, attacker.spells.length - 1);
+          const attackerSpellToCast = attacker.spells[attackerRandomSpell];
           switch (attackerSpellToCast.type) {
             case 'self':
               attackerSpellToCast.function(attacker, attackerSpellToCast.power);
@@ -196,7 +197,8 @@ class Battle {
           }
         }
         if (defender.spells.length > 0) {
-          const defenderSpellToCast = helper.randomBetween(0, defender.spells.length - 1);
+          const defenderRandomSpell = helper.randomBetween(0, defender.spells.length - 1);
+          const defenderSpellToCast = defender.spells[defenderRandomSpell];
           switch (defenderSpellToCast.type) {
             case 'self':
               defenderSpellToCast.function(defender, defenderSpellToCast.power);
@@ -209,7 +211,8 @@ class Battle {
       } else if (initiative.name === defender.name) {
         console.log('Spell Initiative is Defender');
         if (defender.spells.length > 0) {
-          const defenderSpellToCast = helper.randomBetween(0, defender.spells.length - 1);
+          const defenderRandomSpell = helper.randomBetween(0, defender.spells.length - 1);
+          const defenderSpellToCast = defender.spells[defenderRandomSpell];
           switch (defenderSpellToCast.type) {
             case 'self':
               defenderSpellToCast.function(defender, defenderSpellToCast.power);
@@ -220,7 +223,8 @@ class Battle {
           }
         }
         if (attacker.spells.length > 0) {
-          const attackerSpellToCast = helper.randomBetween(0, attacker.spells.length - 1);
+          const attackerRandomSpell = helper.randomBetween(0, attacker.spells.length - 1);
+          const attackerSpellToCast = attacker.spells[attackerRandomSpell];
           switch (attackerSpellToCast.type) {
             case 'self':
               attackerSpellToCast.function(attacker, attackerSpellToCast.power);

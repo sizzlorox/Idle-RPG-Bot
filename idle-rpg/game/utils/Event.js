@@ -553,22 +553,31 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
               const eventMsgEris = `**Eris has given ${helper.generatePlayerName(selectedPlayer)} a scroll containing ${spell.name} to add to ${helper.generateGenderString(selectedPlayer, 'his')} spellbook!**`;
               const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
               if (selectedPlayer.spells.length > 0) {
-                selectedPlayer.spells.forEach((ownedSpell, index) => {
+                let shouldAddToList = false;
+                let tempArray;
+                selectedPlayer.spells.forEach((ownedSpell) => {
                   const spellName = ownedSpell.name.split(/ (.+)/);
                   if (spell.name.includes(spellName)) {
                     if (spell.power > ownedSpell.power) {
-                      selectedPlayer.spells.splice(index, 1);
-                      selectedPlayer.spells.push(spell);
-                      helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
+                      selectedPlayer.spells.splice(index, 1, spell);
+                      shouldAddToList = true;
                     }
                   } else {
-                    selectedPlayer.spells.push(spell);
-                    helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
+                    shouldAddToList = true;
                   }
                 });
+
+                if (shouldAddToList) {
+                  helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
+                  selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+                  if (tempArray) {
+                    selectedPlayer.spells = tempArray;
+                  }
+                  selectedPlayer.spells.push(spell);
+                }
               } else {
-                selectedPlayer.spells.push(spell);
                 helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
+                selectedPlayer.spells.push(spell);
               }
 
               selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
@@ -609,25 +618,32 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
           .then((spell) => {
             const spellEventResult = this.generateItemEventMessage(selectedPlayer, spell);
             if (selectedPlayer.spells.length > 0) {
+              let shouldAddToList = false;
+              let tempArray;
               selectedPlayer.spells.forEach((ownedSpell) => {
                 const spellName = ownedSpell.name.split(/ (.+)/);
                 if (spell.name.includes(spellName)) {
                   if (spell.power > ownedSpell.power) {
-                    selectedPlayer.spells.splice(index, 1);
-                    selectedPlayer.spells.push(spell);
-                    helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
-                    selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+                    tempArray = selectedPlayer.spells.splice(index, 1, spell);
+                    shouldAddToList = true;
                   }
                 } else {
-                  selectedPlayer.spells.push(spell);
-                  helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
-                  selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+                  shouldAddToList = true;
                 }
               });
+
+              if (shouldAddToList) {
+                helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
+                selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+                if (tempArray) {
+                  selectedPlayer.spells = tempArray;
+                }
+                selectedPlayer.spells.push(spell);
+              }
             } else {
-              selectedPlayer.spells.push(spell);
               helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
               selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+              selectedPlayer.spells.push(spell);
             }
 
             return resolve(selectedPlayer);

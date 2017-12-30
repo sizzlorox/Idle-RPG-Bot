@@ -24,7 +24,8 @@ class Spell {
         description: spellType.description,
         power: spellRarityList[randomRarityIndex].power + spellType.power,
         chance: spellType.chance,
-        function: spellType.function
+        function: spellType.function,
+        type: spellType.type
       };
       return resolve(spellObj);
     });
