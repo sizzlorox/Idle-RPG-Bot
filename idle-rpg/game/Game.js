@@ -36,6 +36,7 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
+        selectedPlayer = Event.regenItem(selectedPlayer);
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
         if (selectedPlayer.gender === 'boy')
@@ -326,7 +327,7 @@ ${rankString}
    * Deletes all players in database
    */
   deleteAllPlayers() {
-    return Database.deleteAllPlayers();
+    return Database.resetAllPlayers();
   }
 
   /**

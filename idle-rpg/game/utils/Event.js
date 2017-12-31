@@ -17,6 +17,18 @@ class Event {
     this.isBlizzardActive = false;
   }
 
+  regenItem(selectedPlayer) {
+    const regeneratedHelmet = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.helmet, 'helmet');
+    selectedPlayer.equipment.helmet = regeneratedHelmet;
+
+    const regeneratedArmor = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.armor, 'armor');
+    selectedPlayer.equipment.armor = regeneratedArmor;
+
+    const regeneratedWeapon = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.weapon, 'weapon');
+    selectedPlayer.equipment.weapon = regeneratedWeapon;
+    return selectedPlayer;
+  }
+
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {

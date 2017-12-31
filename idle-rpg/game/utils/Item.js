@@ -4,6 +4,78 @@ const enumHelper = require('../../utils/enumHelper');
 
 class Item {
 
+  regenerateItemByName(item, position) {
+    const itemName = item.name;
+    console.log(itemName);
+    const splitItemName = itemName.split(' ');
+    let rarity;
+    let material;
+    let type;
+    if (itemName === 'Fists' || itemName === 'Fist') {
+      item.str = 1;
+      item.dex = 1;
+      item.end = 1;
+      item.int = 0;
+      item.position = position;
+      return item;
+    } else if (itemName === 'Nothing') {
+      item.str = 0;
+      item.dex = 0;
+      item.end = 0;
+      item.int = 0;
+      item.position = position;
+      return item;
+    }
+    splitItemName.forEach((thing) => {
+      if (!rarity) {
+        rarity = items.rarity.find(obj => obj.name.includes(thing));
+      }
+
+      if (!material) {
+        material = items.material.find(obj => obj.name.includes(thing));
+      }
+
+      if (!type) {
+        switch (position) {
+          case 'helmet':
+            type = items.type[0].find(obj => obj.name.includes(thing));
+            break;
+          case 'armor':
+            type = items.type[2].find(obj => obj.name.includes(thing));
+            break;
+          case 'weapon':
+            type = items.type[1].find(obj => obj.name.includes(thing));
+            break;
+        }
+      }
+    });
+
+    const itemStr = (rarity.stats.str
+      * (material.stats.str
+        + type.stats.str)) / 4;
+
+    const itemDex = (rarity.stats.dex
+      * (material.stats.dex
+        + type.stats.dex)) / 4;
+
+    const itemEnd = (rarity.stats.end
+      * (material.stats.end
+        + type.stats.end)) / 4;
+
+    const itemInt = (rarity.stats.int
+      * (material.stats.int
+        + type.stats.int)) / 4;
+
+    const itemPosition = position;
+
+    item.str = itemStr;
+    item.dex = itemDex;
+    item.end = itemEnd;
+    item.int = itemInt;
+    item.position = itemPosition;
+    return item;
+  }
+
   generateItem(selectedPlayer, mob) {
     return new Promise((resolve) => {
       const randomRarityChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
