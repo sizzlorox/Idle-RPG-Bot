@@ -568,19 +568,18 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                 });
 
                 if (shouldAddToList) {
-                  helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
-                  selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+                  helper.sendMessage(discordHook, 'twitch', false, `**${eventMsgEris}**`);
+                  selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
                   if (tempArray) {
                     selectedPlayer.spells = tempArray;
                   }
                   selectedPlayer.spells.push(spell);
                 }
               } else {
-                helper.sendMessage(discordHook, 'twitch', false, eventMsgEris);
+                helper.sendMessage(discordHook, 'twitch', false, `**${eventMsgEris}**`);
+                selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
                 selectedPlayer.spells.push(spell);
               }
-
-              selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
 
               return resolve(selectedPlayer);
             });

@@ -25,14 +25,7 @@ const spells = {
       type: 'self',
       power: 1,
       chance: 50,
-      rarity: 75,
-      function: (self, totalPower) => {
-        self.health += totalPower * 2;
-        console.log(`${selft.name} healed for ${totalPower * 2}`);
-        if (self.health >= 100 + (player.level * 5)) {
-          selft.health = 100 + (player.level * 5);
-        }
-      }
+      rarity: 75
     },
     fireball = {
       name: 'Fireball',
@@ -40,16 +33,7 @@ const spells = {
       type: 'target',
       power: 1,
       chance: 50,
-      rarity: 100,
-      function: (target, totalPower, magicDefense) => {
-        let spellDamage = Math.ceil((totalPower * 2) - magicDefense);
-        if (spellDamage < 0) {
-          spellDamage = 0;
-        }
-        target.health -= spellDamage;
-        console.log(`${target.name} took a fireball to the face for ${spellDamage} damage`);
-        return spellDamage;
-      }
+      rarity: 100
     },
   ]
 };

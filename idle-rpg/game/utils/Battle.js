@@ -84,8 +84,7 @@ class Battle {
       defender: this.getBattleStats(defender)
     };
 
-    return this.battleTurn(attacker, defender, battleStats)
-      .then(battleResults => this.spellTurn(battleResults.attacker, battleResults.defender, battleStats, battleResults.attackerDamage, battleResults.defenderDamage));
+    return this.battleTurn(attacker, defender, battleStats);
   }
 
   battleTurn(attacker, defender, battleStats) {
@@ -102,6 +101,7 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
+          console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
           attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
           if (attackerDamage < 0) {
@@ -109,6 +109,7 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
+          console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         }
 
         console.log(`Attacker Damage: ${attackerDamage}`);
@@ -123,6 +124,7 @@ class Battle {
           }
 
           attacker.health -= defenderDamage;
+          console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
           defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
           if (defenderDamage < 0) {
@@ -130,6 +132,7 @@ class Battle {
           }
 
           attacker.health -= defenderDamage;
+          console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         }
 
         console.log(`Defender Damage: ${defenderDamage}`);
@@ -142,6 +145,7 @@ class Battle {
           }
 
           attacker.health -= defenderDamage;
+          console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
           defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
           if (defenderDamage < 0) {
@@ -149,6 +153,7 @@ class Battle {
           }
 
           attacker.health -= defenderDamage;
+          console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         }
 
         console.log(`Defender Damage: ${defenderDamage}`);
@@ -163,6 +168,7 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
+          console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
           attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
           if (attackerDamage < 0) {
@@ -170,12 +176,13 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
+          console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         }
 
         console.log(`Attacker Damage: ${attackerDamage}`);
       }
 
-      return resolve({ attacker, defender, attackerDamage, defenderDamage });
+      return resolve(this.spellTurn(attacker, defender, battleStats, attackerDamage, defenderDamage));
     });
   }
 
@@ -189,10 +196,25 @@ class Battle {
           const attackerSpellToCast = attacker.spells[attackerRandomSpell];
           switch (attackerSpellToCast.type) {
             case 'self':
-              attackerSpellToCast.function(attacker, attackerSpellToCast.power);
+              if (attackerSpellToCast.name.toLowerCase().includes('heal')) {
+                attacker.health += attackerSpellToCast.power * 2;
+                console.log(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
+                HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
+                if (attacker.health >= 100 + (attacker.level * 5)) {
+                  attacker.health = 100 + (attacker.level * 5);
+                }
+              }
               break;
             case 'target':
-              attackerDamage += attackerSpellToCast.function(defender, attackerSpellToCast.power, battleStats.defender.defensePower.magicDefensePower);
+              if (attackerSpellToCast.name.toLowerCase().includes('fireball')) {
+                let spellDamage = Math.ceil((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
+                if (spellDamage < 0) {
+                  spellDamage = 0;
+                }
+                defender.health -= spellDamage;
+                console.log(`${defender.name} took a fireball to the face for ${spellDamage} damage
+                HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
+              }
               break;
           }
         }
@@ -201,10 +223,25 @@ class Battle {
           const defenderSpellToCast = defender.spells[defenderRandomSpell];
           switch (defenderSpellToCast.type) {
             case 'self':
-              defenderSpellToCast.function(defender, defenderSpellToCast.power);
+              if (defenderSpellToCast.name.toLowerCase().includes('heal')) {
+                defender.health += defenderSpellToCast.power * 2;
+                console.log(`${defender.name} healed for ${defenderSpellToCast.power * 2}
+                HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
+                if (defender.health >= 100 + (defender.level * 5)) {
+                  defender.health = 100 + (defender.level * 5);
+                }
+              }
               break;
             case 'target':
-              defenderDamage += defenderSpellToCast.function(attacker, defenderSpellToCast.power, battleStats.attacker.defensePower.magicDefensePower);
+              if (defenderSpellToCast.name.toLowerCase().includes('fireball')) {
+                let spellDamage = Math.ceil((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
+                if (spellDamage < 0) {
+                  spellDamage = 0;
+                }
+                attacker.health -= spellDamage;
+                console.log(`${attacker.name} took a fireball to the face for ${spellDamage} damage
+                HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
+              }
               break;
           }
         }
@@ -215,10 +252,25 @@ class Battle {
           const defenderSpellToCast = defender.spells[defenderRandomSpell];
           switch (defenderSpellToCast.type) {
             case 'self':
-              defenderSpellToCast.function(defender, defenderSpellToCast.power);
+              if (defenderSpellToCast.name.toLowerCase().includes('heal')) {
+                defender.health += defenderSpellToCast.power * 2;
+                console.log(`${defender.name} healed for ${defenderSpellToCast.power * 2}
+                HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
+                if (defender.health >= 100 + (defender.level * 5)) {
+                  defender.health = 100 + (defender.level * 5);
+                }
+              }
               break;
             case 'target':
-              defenderDamage += defenderSpellToCast.function(attacker, defenderSpellToCast.power, battleStats.attacker.defensePower.magicDefensePower);
+              if (defenderSpellToCast.name.toLowerCase().includes('fireball')) {
+                let spellDamage = Math.ceil((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
+                if (spellDamage < 0) {
+                  spellDamage = 0;
+                }
+                attacker.health -= spellDamage;
+                console.log(`${attacker.name} took a fireball to the face for ${spellDamage} damage
+                HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
+              }
               break;
           }
         }
@@ -227,10 +279,25 @@ class Battle {
           const attackerSpellToCast = attacker.spells[attackerRandomSpell];
           switch (attackerSpellToCast.type) {
             case 'self':
-              attackerSpellToCast.function(attacker, attackerSpellToCast.power);
+              if (attackerSpellToCast.name.toLowerCase().includes('heal')) {
+                attacker.health += attackerSpellToCast.power * 2;
+                console.log(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
+                HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
+                if (attacker.health >= 100 + (attacker.level * 5)) {
+                  attacker.health = 100 + (attacker.level * 5);
+                }
+              }
               break;
             case 'target':
-              attackerDamage += attackerSpellToCast.function(defender, attackerSpellToCast.power, battleStats.defender.defensePower.magicDefensePower);
+              if (attackerSpellToCast.name.toLowerCase().includes('fireball')) {
+                let spellDamage = Math.ceil((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
+                if (spellDamage < 0) {
+                  spellDamage = 0;
+                }
+                defender.health -= spellDamage;
+                console.log(`${defender.name} took a fireball to the face for ${spellDamage} damage
+                HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
+              }
               break;
           }
         }

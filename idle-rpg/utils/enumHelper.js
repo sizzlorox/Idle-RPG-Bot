@@ -64,44 +64,44 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'hmmmmm1',
-    discordId: 'hmmmmm1'
+    name: 'castspells1',
+    discordId: 'castspells1'
   },
   {
-    name: 'hmmmmm2',
-    discordId: 'hmmmmm2'
+    name: 'castspells2',
+    discordId: 'castspells2'
   },
   {
-    name: 'hmmmmm3',
-    discordId: 'hmmmmm3'
+    name: 'castspells3',
+    discordId: 'castspells3'
   },
   {
-    name: 'hmmmmm4',
-    discordId: 'hmmmmm4'
+    name: 'castspells4',
+    discordId: 'castspells4'
   },
   {
-    name: 'hmmmmm5',
-    discordId: 'hmmmmm5'
+    name: 'castspells5',
+    discordId: 'castspells5'
   },
   {
-    name: 'hmmmmm6',
-    discordId: 'hmmmmm6'
+    name: 'castspells6',
+    discordId: 'castspells6'
   },
   {
-    name: 'hmmmmm7',
-    discordId: 'hmmmmm7'
+    name: 'castspells7',
+    discordId: 'castspells7'
   },
   {
-    name: 'hmmmmm8',
-    discordId: 'hmmmmm8'
+    name: 'castspells8',
+    discordId: 'castspells8'
   },
   {
-    name: 'hmmmmm9',
-    discordId: 'hmmmmm9'
+    name: 'castspells9',
+    discordId: 'castspells9'
   },
   {
-    name: 'hmmmmm10',
-    discordId: 'hmmmmm10'
+    name: 'castspells10',
+    discordId: 'castspells10'
   }]
 };
 module.exports = enumHelper;
