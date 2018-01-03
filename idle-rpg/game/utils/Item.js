@@ -121,21 +121,21 @@ class Item {
       let itemRating;
 
       if (itemType.position === 'relic') {
-        itemStr = (itemRarityList[randomRarityIndex].stats.str
-          + itemType.stats.str) / 4;
+        itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
+          + itemType.stats.str) / 4);
 
-        itemDex = (itemRarityList[randomRarityIndex].stats.dex
-          + itemType.stats.dex) / 4;
+        itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
+          + itemType.stats.dex) / 4);
 
-        itemEnd = (itemRarityList[randomRarityIndex].stats.end
-          + itemType.stats.end) / 4;
+        itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
+          + itemType.stats.end) / 4);
 
-        itemInt = (itemRarityList[randomRarityIndex].stats.int
-          + itemType.stats.int) / 4;
+        itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
+          + itemType.stats.int) / 4);
 
         itemLuk = itemType.stats.luk;
 
-        itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
+        itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
@@ -153,23 +153,23 @@ class Item {
             * itemType.gold).toFixed()) * itemRating
         };
       } else {
-        itemStr = (itemRarityList[randomRarityIndex].stats.str
+        itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
           * (itemMaterialList[randomMaterialIndex].stats.str
-            + itemType.stats.str)) / 4;
+            + itemType.stats.str)) / 4);
 
-        itemDex = (itemRarityList[randomRarityIndex].stats.dex
+        itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
           * (itemMaterialList[randomMaterialIndex].stats.dex
-            + itemType.stats.dex)) / 4;
+            + itemType.stats.dex)) / 4);
 
-        itemEnd = (itemRarityList[randomRarityIndex].stats.end
+        itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
           * (itemMaterialList[randomMaterialIndex].stats.end
-            + itemType.stats.end)) / 4;
+            + itemType.stats.end)) / 4);
 
-        itemInt = (itemRarityList[randomRarityIndex].stats.int
+        itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
           * (itemMaterialList[randomMaterialIndex].stats.int
-            + itemType.stats.int)) / 4;
+            + itemType.stats.int)) / 4);
 
-        itemRating = itemStr + itemDex + itemEnd + itemInt;
+        itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt);
 
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
@@ -198,21 +198,21 @@ class Item {
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = helper.randomBetween(0, itemRarityList.length - 1);
 
-    const itemStr = (itemRarityList[randomRarityIndex].stats.str
-      + snowFlake.stats.str) / 4;
+    const itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
+      + snowFlake.stats.str) / 4);
 
-    const itemDex = (itemRarityList[randomRarityIndex].stats.dex
-      + snowFlake.stats.dex) / 4;
+    const itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
+      + snowFlake.stats.dex) / 4);
 
-    const itemEnd = (itemRarityList[randomRarityIndex].stats.end
-      + snowFlake.stats.end) / 4;
+    const itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
+      + snowFlake.stats.end) / 4);
 
-    const itemInt = (itemRarityList[randomRarityIndex].stats.int
-      + snowFlake.stats.int) / 4;
+    const itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
+      + snowFlake.stats.int) / 4);
 
     const itemLuk = snowFlake.stats.luk;
 
-    const itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
+    const itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
     const itemObj = {
       name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,

@@ -36,7 +36,7 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
-        selectedPlayer = Event.regenItem(selectedPlayer);
+        //selectedPlayer = Event.regenItem(selectedPlayer);
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
         if (selectedPlayer.gender === 'boy')
@@ -139,6 +139,7 @@ class Game {
   powerHourEnd() {
     helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
     this.multiplier -= 1;
+    this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
   }
 
   /**
@@ -244,6 +245,7 @@ ${rankString}
               hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               setTimeout(() => {
                 this.multiplier -= 1;
+                this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
                 this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
                 activeBlessCount = this.activeSpells.filter((bless) => {
                   return bless.spellName === 'Bless';

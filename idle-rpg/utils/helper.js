@@ -107,10 +107,10 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-      return item.str + item.dex + item.end + item.int;
+      return Math.abs(item.str + item.dex + item.end + item.int);
     }
 
-    return item.str + item.dex + item.end + item.int + item.luk;
+    return Math.abs(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
