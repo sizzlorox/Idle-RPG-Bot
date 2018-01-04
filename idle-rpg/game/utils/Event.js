@@ -278,6 +278,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
     if (selectedPlayer.inventory.equipment.length > 0) {
       let profit = 0;
       selectedPlayer.inventory.equipment.forEach((equipment) => {
+        console.log(equipment);
         selectedPlayer.gold += equipment.gold;
         profit += equipment.gold;
       });
@@ -322,7 +323,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
   stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomBetween(0, 100);
-      if (luckStealChance > 80 || randomPlayer.health <= 0) {
+      if (luckStealChance > 90) {
         const luckItem = helper.randomBetween(0, 2);
         switch (luckItem) {
           case 0:
@@ -450,7 +451,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
             break;
         }
       } else if (victimPlayer.gold > 0) {
-        const goldStolen = Math.floor(victimPlayer.gold / 4);
+        const goldStolen = Math.abs(victimPlayer.gold / 4);
         stealingPlayer.gold += goldStolen;
         victimPlayer.gold -= goldStolen;
 
