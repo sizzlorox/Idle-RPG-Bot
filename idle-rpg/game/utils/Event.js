@@ -550,7 +550,7 @@ class Event {
       const luckGoldChance = helper.randomBetween(0, 100);
       if (luckGoldChance >= 75) {
         const luckGoldDice = helper.randomBetween(5, 100);
-        const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed()) * multiplier;
+        const goldAmount = Math.abs((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
         selectedPlayer.gold += goldAmount;
 
         const eventMsg = `${helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`;
@@ -615,7 +615,7 @@ class Event {
       }
 
       const luckGambleChance = helper.randomBetween(0, 100);
-      const luckGambleGold = Math.round(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3)) * multiplier;
+      const luckGambleGold = Math.round(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3));
       selectedPlayer.gambles++;
 
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 2)) {

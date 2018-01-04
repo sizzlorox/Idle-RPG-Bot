@@ -22,7 +22,8 @@ class helper {
   }
 
   capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    return string.charAt(0).toUpperCase()
+      .concat(string.slice(1));
   }
 
   getTimePassed(timeStamp) {
@@ -30,6 +31,19 @@ class helper {
   }
 
   toTimeFormat(duration) {
+    const date = new Date(duration);
+    const seconds = date.getUTCSeconds();
+    const minutes = date.getUTCMinutes();
+    const hours = date.getUTCHours();
+    const days = (date.getUTCDate() - 1);
+
+    const dayString = (date.getUTCDate() - 1) === 0 ? '' : `${days}d `;
+    const hourString = date.getUTCHours() === 0 ? '' : `${hours}h `;
+    const minuteString = date.getUTCMinutes() === 0 ? '' : `${minutes}m `;
+    const secondString = date.getUTCSeconds() === 0 ? '' : `${seconds}s`;
+
+    return `${dayString}${hourString}${minuteString}${secondString}`;
+    /*
     const seconds = ((duration / 1000) % 60).toFixed();
     const minutes = ((duration / (1000 * 60)) % 60).toFixed();
     const hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
@@ -41,6 +55,7 @@ class helper {
     const secondString = Number(seconds) === 0 || Number(seconds) === 60 ? '' : `${seconds}s`;
 
     return `${dayString}${hourString}${minuteString}${secondString}`;
+    */
   }
 
   logEvent(selectedPlayer, msg) {
@@ -185,7 +200,7 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold /= 2;
+      selectedPlayer.gold = Math.abs(selectedPlayer.gold / 2);
       switch (this.randomBetween(0, 2)) {
         case 0:
           this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);

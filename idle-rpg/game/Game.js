@@ -127,19 +127,19 @@ class Game {
   }
 
   // Event
-  powerHourWarn() {
-    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
-  }
-
   powerHourBegin() {
-    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
-    this.multiplier += 1;
-  }
+    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
 
-  powerHourEnd() {
-    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
-    this.multiplier -= 1;
-    this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
+    setTimeout(() => {
+      helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+      this.multiplier += 1;
+    }, 1800000); // 30 minutes
+
+    setTimeout(() => {
+      helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+      this.multiplier -= 1;
+      this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
+    }, 5400000); // 1hr 30 minutes
   }
 
   /**
