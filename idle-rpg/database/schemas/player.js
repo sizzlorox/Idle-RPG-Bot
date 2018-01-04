@@ -42,6 +42,10 @@ const newPlayerObj = (discordId, name) => {
         previousOwners: []
       }
     },
+    inventory: {
+      equipment: [],
+      items: []
+    },
     stats: {
       str: 1,
       dex: 1,
@@ -126,6 +130,16 @@ const playerSchema = mongoose.Schema({
         type: Array,
         default: []
       }
+    }
+  },
+  inventory: {
+    equipment: {
+      type: Array,
+      default: []
+    },
+    items: {
+      type: Array,
+      default: []
     }
   },
   stats: {

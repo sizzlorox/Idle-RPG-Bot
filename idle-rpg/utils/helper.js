@@ -109,11 +109,7 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-<<<<<<< HEAD
       return item.power;
-=======
-      return Math.abs(item.str + item.dex + item.end + item.int);
->>>>>>> 98b2a81402b3d01275739e0969dad6b56dc83dd3
     }
 
     return Math.abs(item.str + item.dex + item.end + item.int + item.luk);

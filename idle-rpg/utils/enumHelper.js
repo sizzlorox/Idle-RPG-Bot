@@ -5,6 +5,11 @@ const enumHelper = {
     }
   },
 
+  inventory: {
+    maxEquipmentAmount: 5,
+    maxItemAmount: 15
+  },
+
   equipment: {
     empty: {
       helmet: {

@@ -113,22 +113,18 @@ class Item {
       }
 
       let itemObj;
-      let itemStr;
-      let itemDex;
-      let itemEnd;
-      let itemInt;
 
       if (itemType.position === 'relic') {
-        itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
+        const itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4);
 
-        itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
+        const itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
           + itemType.stats.dex) / 4);
 
-        itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
+        const itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
           + itemType.stats.end) / 4);
 
-        itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
+        const itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
           + itemType.stats.int) / 4);
 
         const itemLuk = itemType.stats.luk;
@@ -151,24 +147,6 @@ class Item {
             * itemType.gold).toFixed()) * itemType.power
         };
       } else {
-        itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
-          * (itemMaterialList[randomMaterialIndex].stats.str
-            + itemType.stats.str)) / 4);
-
-        itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
-          * (itemMaterialList[randomMaterialIndex].stats.dex
-            + itemType.stats.dex)) / 4);
-
-        itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
-          * (itemMaterialList[randomMaterialIndex].stats.end
-            + itemType.stats.end)) / 4);
-
-        itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
-          * (itemMaterialList[randomMaterialIndex].stats.int
-            + itemType.stats.int)) / 4);
-
-        itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt);
-
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
           position: itemType.position,
