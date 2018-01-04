@@ -16,7 +16,7 @@ class helper {
 
     do {
       result = (Math.random() * (max - min)) + min;
-      result = Math.round(result * factor) / factor;
+      result = Math.trunc(result * factor) / factor;
     } while (result === exclude);
     return result;
   }
@@ -122,10 +122,10 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-      return Math.abs(item.str + item.dex + item.end + item.int);
+      return Math.trunc(item.str + item.dex + item.end + item.int);
     }
 
-    return Math.abs(item.str + item.dex + item.end + item.int + item.luk);
+    return Math.trunc(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -200,18 +200,7 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold = Math.abs(selectedPlayer.gold / 2);
-      switch (this.randomBetween(0, 2)) {
-        case 0:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
-          break;
-        case 1:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
-          break;
-        case 2:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
-          break;
-      }
+      selectedPlayer.gold = Math.trunc(selectedPlayer.gold / 2);
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
