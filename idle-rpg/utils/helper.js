@@ -22,7 +22,8 @@ class helper {
   }
 
   capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    return string.charAt(0).toUpperCase()
+      .concat(string.slice(1));
   }
 
   getTimePassed(timeStamp) {
@@ -30,15 +31,16 @@ class helper {
   }
 
   toTimeFormat(duration) {
-    const seconds = ((duration / 1000) % 60).toFixed();
-    const minutes = ((duration / (1000 * 60)) % 60).toFixed();
-    const hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
-    const days = (duration / (1000 * 60 * 60 * 24)).toFixed();
+    const date = new Date(duration);
+    const seconds = date.getUTCSeconds();
+    const minutes = date.getUTCMinutes();
+    const hours = date.getUTCHours();
+    const days = (date.getUTCDate() - 1);
 
-    const dayString = Number(days) === 0 ? '' : `${days}d `;
-    const hourString = Number(hours) === 0 || Number(hours) === 24 ? '' : `${hours}h `;
-    const minuteString = Number(minutes) === 0 || Number(minutes) === 60 ? '' : `${minutes}m `;
-    const secondString = Number(seconds) === 0 || Number(seconds) === 60 ? '' : `${seconds}s`;
+    const dayString = (date.getUTCDate() - 1) === 0 ? '' : `${days}d `;
+    const hourString = date.getUTCHours() === 0 ? '' : `${hours}h `;
+    const minuteString = date.getUTCMinutes() === 0 ? '' : `${minutes}m `;
+    const secondString = date.getUTCSeconds() === 0 ? '' : `${seconds}s`;
 
     return `${dayString}${hourString}${minuteString}${secondString}`;
   }
@@ -107,10 +109,14 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
+<<<<<<< HEAD
       return item.power;
+=======
+      return Math.abs(item.str + item.dex + item.end + item.int);
+>>>>>>> 98b2a81402b3d01275739e0969dad6b56dc83dd3
     }
 
-    return item.str + item.dex + item.end + item.int + item.luk;
+    return Math.abs(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -179,7 +185,7 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold /= 2;
+      selectedPlayer.gold = Math.abs(selectedPlayer.gold / 2);
       switch (this.randomBetween(0, 2)) {
         case 0:
           this.setPlayerEquipment(selectedPlayer,

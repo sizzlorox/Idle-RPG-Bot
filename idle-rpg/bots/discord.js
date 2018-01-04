@@ -53,8 +53,6 @@ const hook = {
 const game = new Game(hook);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
-const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
-const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
 
 const timeZone = 'America/Los_Angeles';
 
@@ -143,27 +141,7 @@ setInterval(heartBeat, 60000 * process.env.NODE_ENV === 'production' ? tickInMin
 new CronJob({
   cronTime: powerHourWarnTime,
   onTick: () => {
-    game.powerHourWarn();
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-new CronJob({
-  cronTime: powerHourBeginTime,
-  onTick: () => {
     game.powerHourBegin();
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-new CronJob({
-  cronTime: powerHourEndTime,
-  onTick: () => {
-    game.powerHourEnd();
   },
   start: false,
   timeZone,

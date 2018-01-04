@@ -19,6 +19,18 @@ class Event {
     this.isBlizzardActive = false;
   }
 
+  regenItem(selectedPlayer) {
+    const regeneratedHelmet = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.helmet, 'helmet');
+    selectedPlayer.equipment.helmet = regeneratedHelmet;
+
+    const regeneratedArmor = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.armor, 'armor');
+    selectedPlayer.equipment.armor = regeneratedArmor;
+
+    const regeneratedWeapon = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.weapon, 'weapon');
+    selectedPlayer.equipment.weapon = regeneratedWeapon;
+    return selectedPlayer;
+  }
+
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
@@ -162,28 +174,28 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) >= item.rating) {
                   return resolve(selectedPlayer);
                 }
 
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
                 break;
               case enumHelper.equipment.types.armor.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.armor) >= item.rating) {
                   return resolve(selectedPlayer);
                 }
 
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
                 break;
               case enumHelper.equipment.types.weapon.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) >= item.rating) {
                   return resolve(selectedPlayer);
                 }
 
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
                 break;
               case enumHelper.equipment.types.relic.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.relic) > item.rating) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.relic) >= item.rating) {
                   return resolve(selectedPlayer);
                 }
 
@@ -221,7 +233,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
           switch (item.position) {
             case enumHelper.equipment.types.helmet.position:
-              if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+              if (helper.calculateItemRating(selectedPlayer.equipment.helmet) >= item.rating) {
                 return resolve(selectedPlayer);
               }
 
@@ -230,7 +242,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
               break;
 
             case enumHelper.equipment.types.armor.position:
-              if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+              if (helper.calculateItemRating(selectedPlayer.equipment.armor) >= item.rating) {
                 return resolve(selectedPlayer);
               }
 
@@ -239,7 +251,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
               break;
 
             case enumHelper.equipment.types.weapon.position:
-              if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+              if (helper.calculateItemRating(selectedPlayer.equipment.weapon) >= item.rating) {
                 return resolve(selectedPlayer);
               }
 
@@ -288,7 +300,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
   stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomBetween(0, 100);
-      if (luckStealChance > 50) {
+      if (luckStealChance > 80 || randomPlayer.health <= 0) {
         const luckItem = helper.randomBetween(0, 2);
         switch (luckItem) {
           case 0:
@@ -592,7 +604,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
       const luckGoldChance = helper.randomBetween(0, 100);
       if (luckGoldChance >= 75) {
         const luckGoldDice = helper.randomBetween(5, 100);
-        const goldAmount = Number(((luckGoldDice * selectedPlayer.stats.luk) / 2).toFixed()) * multiplier;
+        const goldAmount = Math.abs((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
         selectedPlayer.gold += goldAmount;
 
         const eventMsg = `${helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`;
@@ -652,14 +664,14 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.rating) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) >= item.rating) {
                   return resolve(selectedPlayer);
                 }
 
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
                 break;
               case enumHelper.equipment.types.armor.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.rating) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.armor) >= item.rating) {
                   return resolve(selectedPlayer);
                 }
 
@@ -667,7 +679,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                 selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
                 break;
               case enumHelper.equipment.types.weapon.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.rating) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) >= item.rating) {
                   return resolve(selectedPlayer);
                 }
 
@@ -692,7 +704,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
       }
 
       const luckGambleChance = helper.randomBetween(0, 100);
-      const luckGambleGold = Math.round(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3)) * multiplier;
+      const luckGambleGold = Math.round(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3));
       selectedPlayer.gambles++;
 
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 2)) {
@@ -702,7 +714,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
         }
 
         const eventMsgLoseGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, ${helper.generateGenderString(selectedPlayer, 'he')} lost ${luckGambleGold} gold!`;
-        const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} by gambling in a tavern.`;
+        const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} gold by gambling in a tavern.`;
 
         helper.sendMessage(discordHook, 'twitch', false, eventMsgLoseGamble);
         selectedPlayer = helper.logEvent(selectedPlayer, eventLogLoseGamble);
@@ -713,7 +725,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
       selectedPlayer.gold += luckGambleGold;
 
       const eventMsgWinGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern. Fortunately, ${helper.generateGenderString(selectedPlayer, 'he')} won ${luckGambleGold} gold!`;
-      const eventLogWinGamble = `Congrats! You won ${luckGambleGold} by gambling in a tavern.`;
+      const eventLogWinGamble = `Congrats! You won ${luckGambleGold} gold by gambling in a tavern.`;
 
       helper.sendMessage(discordHook, 'twitch', false, eventMsgWinGamble);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLogWinGamble);
@@ -751,7 +763,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
       const snowFlakeDice = helper.randomBetween(0, 100);
       if (snowFlakeDice <= 15) {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
-        if (helper.calculateItemRating(selectedPlayer.equipment.relic) < helper.calculateItemRating(snowFlake)) {
+        if (helper.calculateItemRating(selectedPlayer.equipment.relic) < snowFlake.rating) {
           selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
           const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
           const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';

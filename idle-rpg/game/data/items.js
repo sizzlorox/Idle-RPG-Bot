@@ -123,6 +123,17 @@ const items = {
       gold: 13,
       rarity: 50
     },
+    gold = {
+      name: 'Gold',
+      stats: {
+        str: 1,
+        dex: 0,
+        end: 0,
+        int: 4
+      },
+      gold: 15,
+      rarity: 20
+    },
     bone = {
       name: 'Bone',
       power: 3,

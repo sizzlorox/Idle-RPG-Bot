@@ -4,6 +4,78 @@ const enumHelper = require('../../utils/enumHelper');
 
 class Item {
 
+  regenerateItemByName(item, position) {
+    const itemName = item.name;
+    console.log(itemName);
+    const splitItemName = itemName.split(' ');
+    let rarity;
+    let material;
+    let type;
+    if (itemName === 'Fists' || itemName === 'Fist') {
+      item.str = 1;
+      item.dex = 1;
+      item.end = 1;
+      item.int = 0;
+      item.position = position;
+      return item;
+    } else if (itemName === 'Nothing') {
+      item.str = 0;
+      item.dex = 0;
+      item.end = 0;
+      item.int = 0;
+      item.position = position;
+      return item;
+    }
+    splitItemName.forEach((thing) => {
+      if (!rarity) {
+        rarity = items.rarity.find(obj => obj.name.includes(thing));
+      }
+
+      if (!material) {
+        material = items.material.find(obj => obj.name.includes(thing));
+      }
+
+      if (!type) {
+        switch (position) {
+          case 'helmet':
+            type = items.type[0].find(obj => obj.name.includes(thing));
+            break;
+          case 'armor':
+            type = items.type[2].find(obj => obj.name.includes(thing));
+            break;
+          case 'weapon':
+            type = items.type[1].find(obj => obj.name.includes(thing));
+            break;
+        }
+      }
+    });
+
+    const itemStr = (rarity.stats.str
+      * (material.stats.str
+        + type.stats.str)) / 4;
+
+    const itemDex = (rarity.stats.dex
+      * (material.stats.dex
+        + type.stats.dex)) / 4;
+
+    const itemEnd = (rarity.stats.end
+      * (material.stats.end
+        + type.stats.end)) / 4;
+
+    const itemInt = (rarity.stats.int
+      * (material.stats.int
+        + type.stats.int)) / 4;
+
+    const itemPosition = position;
+
+    item.str = itemStr;
+    item.dex = itemDex;
+    item.end = itemEnd;
+    item.int = itemInt;
+    item.position = itemPosition;
+    return item;
+  }
+
   generateItem(selectedPlayer, mob) {
     return new Promise((resolve) => {
       const randomRarityChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
@@ -41,23 +113,27 @@ class Item {
       }
 
       let itemObj;
+      let itemStr;
+      let itemDex;
+      let itemEnd;
+      let itemInt;
 
       if (itemType.position === 'relic') {
-        const itemStr = (itemRarityList[randomRarityIndex].stats.str
-          + itemType.stats.str) / 4;
+        itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
+          + itemType.stats.str) / 4);
 
-        const itemDex = (itemRarityList[randomRarityIndex].stats.dex
-          + itemType.stats.dex) / 4;
+        itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
+          + itemType.stats.dex) / 4);
 
-        const itemEnd = (itemRarityList[randomRarityIndex].stats.end
-          + itemType.stats.end) / 4;
+        itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
+          + itemType.stats.end) / 4);
 
-        const itemInt = (itemRarityList[randomRarityIndex].stats.int
-          + itemType.stats.int) / 4;
+        itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
+          + itemType.stats.int) / 4);
 
         const itemLuk = itemType.stats.luk;
 
-        itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
+        itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
@@ -75,6 +151,24 @@ class Item {
             * itemType.gold).toFixed()) * itemType.power
         };
       } else {
+        itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
+          * (itemMaterialList[randomMaterialIndex].stats.str
+            + itemType.stats.str)) / 4);
+
+        itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
+          * (itemMaterialList[randomMaterialIndex].stats.dex
+            + itemType.stats.dex)) / 4);
+
+        itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
+          * (itemMaterialList[randomMaterialIndex].stats.end
+            + itemType.stats.end)) / 4);
+
+        itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
+          * (itemMaterialList[randomMaterialIndex].stats.int
+            + itemType.stats.int)) / 4);
+
+        itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt);
+
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
           position: itemType.position,
@@ -97,21 +191,21 @@ class Item {
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = helper.randomBetween(0, itemRarityList.length - 1);
 
-    const itemStr = (itemRarityList[randomRarityIndex].stats.str
-      + snowFlake.stats.str) / 4;
+    const itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
+      + snowFlake.stats.str) / 4);
 
-    const itemDex = (itemRarityList[randomRarityIndex].stats.dex
-      + snowFlake.stats.dex) / 4;
+    const itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
+      + snowFlake.stats.dex) / 4);
 
-    const itemEnd = (itemRarityList[randomRarityIndex].stats.end
-      + snowFlake.stats.end) / 4;
+    const itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
+      + snowFlake.stats.end) / 4);
 
-    const itemInt = (itemRarityList[randomRarityIndex].stats.int
-      + snowFlake.stats.int) / 4;
+    const itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
+      + snowFlake.stats.int) / 4);
 
     const itemLuk = snowFlake.stats.luk;
 
-    const itemRating = itemStr + itemDex + itemEnd + itemInt + itemLuk;
+    const itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
     const itemObj = {
       name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,
