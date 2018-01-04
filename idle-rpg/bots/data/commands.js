@@ -13,7 +13,7 @@ const commands = [
     function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
-        !top10 <gold, spells, level, stolen, stole, gambles> - Retrieves top 10 highest of selected section
+        !top10 <gold, spells, level, stolen, stole, gambles, events> - Retrieves top 10 highest of selected section
         !stats - Sends a PM with your stats
         !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
         !equip - Sends a PM with your equipment
@@ -25,6 +25,7 @@ const commands = [
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
         !gender <male|female|neutral> - Change your character's gender
+        !lore <Map Name> - Retrieves the lore of map selected
         \`\`\``;
       /*
 
@@ -149,7 +150,7 @@ const commands = [
     function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitMessage = message.content.split(/ (.+)/)[1].toLowerCase();
-        const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage.toLowerCase())
+        const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage)
           .map(map => map.lore);
 
         if (requestedMap.length === 0) {
@@ -183,6 +184,9 @@ const commands = [
         case 'spells':
           game.top10(message.author, { spells: -1 });
           break;
+        case 'events':
+          game.top10(message.author, { events: -1 });
+          break;
         default:
           game.top10(message.author, { level: -1 });
           break;
@@ -195,10 +199,10 @@ const commands = [
     operatorOnly: true,
     function: (game, message) => {
       if (message.content.includes(' ')) {
-        const splitArray = message.content.split(/ (.+)/);
+        const splitArray = message.content.split(' ');
         const playerId = splitArray[1];
         const position = splitArray[2];
-        const equipment = JSON.parse(splitArray[3]);
+        const equipment = JSON.parse(splitArray.slice(3, splitArray.length).join(' '));
         game.loadPlayer(playerId)
           .then((player) => {
             player.equipment[position] = equipment;
@@ -358,8 +362,8 @@ const commands = [
     operatorOnly: true,
     channelOnlyId: commandChannel,
     function: (game, message) => {
-      if (message.content.includes(' ') && message.content.split(/ (.+)/).length > 2) {
-        const splitCommand = message.content.split(/ (.+)/);
+      if (message.content.includes(' ') && message.content.split(' ').length > 2) {
+        const splitCommand = message.content.split(' ');
         game.giveGold(splitCommand[1], splitCommand[2])
           .then(() => {
             message.author.send('Done.');

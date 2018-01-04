@@ -22,7 +22,8 @@ class helper {
   }
 
   capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    return string.charAt(0).toUpperCase()
+      .concat(string.slice(1));
   }
 
   getTimePassed(timeStamp) {
@@ -30,6 +31,19 @@ class helper {
   }
 
   toTimeFormat(duration) {
+    const date = new Date(duration);
+    const seconds = date.getUTCSeconds();
+    const minutes = date.getUTCMinutes();
+    const hours = date.getUTCHours();
+    const days = (date.getUTCDate() - 1);
+
+    const dayString = (date.getUTCDate() - 1) === 0 ? '' : `${days}d `;
+    const hourString = date.getUTCHours() === 0 ? '' : `${hours}h `;
+    const minuteString = date.getUTCMinutes() === 0 ? '' : `${minutes}m `;
+    const secondString = date.getUTCSeconds() === 0 ? '' : `${seconds}s`;
+
+    return `${dayString}${hourString}${minuteString}${secondString}`;
+    /*
     const seconds = ((duration / 1000) % 60).toFixed();
     const minutes = ((duration / (1000 * 60)) % 60).toFixed();
     const hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
@@ -41,6 +55,7 @@ class helper {
     const secondString = Number(seconds) === 0 || Number(seconds) === 60 ? '' : `${seconds}s`;
 
     return `${dayString}${hourString}${minuteString}${secondString}`;
+    */
   }
 
   logEvent(selectedPlayer, msg) {
@@ -58,15 +73,24 @@ class helper {
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
       discordHook.movementHook.send(msg)
-        .then(debugMsg => logger.log('move', debugMsg))
+        .then(debugMsg => logger.log('move', this.formatLog(debugMsg)))
         .catch(err => logger.error(err));
     } else {
       discordHook.actionHook.send(msg)
-        .then(debugMsg => logger.log('action', debugMsg))
+        .then(debugMsg => logger.log('action', this.formatLog(debugMsg)))
     }
 
     // Add if to check if channel is streaming
     // twitchBot.say(msg.replace('/\*/g', ''));
+  }
+
+  formatLog(json) {
+    const formattedLog = {
+      timeStamp: json.timestamp,
+      content: json.content,
+      mentions: json.mentions,
+    };
+    return formattedLog;
   }
 
   setImportantMessage(message) {
@@ -96,7 +120,12 @@ class helper {
   }
 
   calculateItemRating(item) {
-    return item.str + item.dex + item.end + item.int;
+    if (item.position !== enumHelper.equipment.types.relic.position) {
+
+      return Math.abs(item.str + item.dex + item.end + item.int);
+    }
+
+    return Math.abs(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -159,6 +188,10 @@ class helper {
     selectedPlayer.equipment[equipment].dex = item.stats.dex;
     selectedPlayer.equipment[equipment].end = item.stats.end;
     selectedPlayer.equipment[equipment].int = item.stats.int;
+    if (equipment === enumHelper.equipment.types.relic.position) {
+      selectedPlayer.equipment[equipment].luk = item.stats.luk;
+    }
+    selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
     return selectedPlayer;
   }
 
@@ -167,16 +200,16 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold /= 2;
+      selectedPlayer.gold = Math.abs(selectedPlayer.gold / 2);
       switch (this.randomBetween(0, 2)) {
         case 0:
-          this.setPlayerEquipment(selectedPlayer, 'helmet', enumHelper.equipment.empty.helmet);
+          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
           break;
         case 1:
-          this.setPlayerEquipment(selectedPlayer, 'armor', enumHelper.equipment.empty.armor);
+          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
           break;
         case 2:
-          this.setPlayerEquipment(selectedPlayer, 'weapon', enumHelper.equipment.empty.weapon);
+          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
           break;
       }
 

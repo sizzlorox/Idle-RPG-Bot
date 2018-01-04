@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const { playerSchema, newPlayerObj } = require('./schemas/player');
 const { mongoDBUri } = require('../../settings');
+const maps = require('../game/data/maps');
+const { starterTown } = require('../../settings');
+const moment = require('moment');
 
 const Player = mongoose.model('Player', playerSchema);
 
@@ -104,6 +107,7 @@ class Database {
 
     if (Object.keys(type)[0] === 'level') {
       select.experience = 1;
+      type.experience = -1;
     }
 
     return new Promise((resolve, reject) => {
@@ -185,6 +189,82 @@ class Database {
         disconnect();
         return resolve(result);
       })
+    });
+  }
+
+  resetAllPlayers() {
+    connect();
+    return new Promise((resolve, reject) => {
+      return Player.update({},
+        {
+          $set: {
+            health: 105,
+            experience: 0,
+            map: maps[starterTown],
+            level: 1,
+            gold: 0,
+            isMentionInDiscord: true,
+            gender: 'neutral',
+            'equipment.helmet': {
+              name: 'Nothing',
+              str: 0,
+              dex: 0,
+              end: 0,
+              int: 0,
+              previousOwners: []
+            },
+            'equipment.armor': {
+              name: 'Nothing',
+              str: 0,
+              dex: 0,
+              end: 0,
+              int: 0,
+              previousOwners: []
+            },
+            'equipment.weapon': {
+              name: 'Fist',
+              str: 1,
+              dex: 1,
+              end: 1,
+              int: 0,
+              previousOwners: []
+            },
+            stats: {
+              str: 1,
+              dex: 1,
+              end: 1,
+              int: 1,
+              luk: 1
+            },
+            isOnline: true,
+            createdAt: moment().toISOString(),
+            events: 0,
+            gambles: 0,
+            stole: 0,
+            stolen: 0,
+            spells: 0,
+            kills: {
+              mob: 0,
+              player: 0
+            },
+            battles: {
+              won: 0,
+              lost: 0
+            },
+            deaths: {
+              mob: 0,
+              player: 0
+            },
+            pastEvents: []
+          }
+        }, (err, result) => {
+          if (err) {
+            disconnect();
+            return reject(err);
+          }
+          disconnect();
+          return resolve(result);
+        });
     });
   }
 
