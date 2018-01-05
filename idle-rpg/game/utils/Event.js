@@ -147,7 +147,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                   });
               }
 
-              battleResults.mobChance = Math.abs(battleResults.mobChance);
+              battleResults.mobChance = Math.round(battleResults.mobChance);
 
               selectedPlayer.health -= battleResults.mobChance;
               selectedPlayer.gold -= mob.gold;
@@ -230,7 +230,9 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
     return new Promise((resolve) => {
       return this.ItemManager.generateItem(selectedPlayer)
         .then((item) => {
-          if (selectedPlayer.gold <= item.gold || item.name.startsWith('Cracked')) {
+          const itemCost = Math.round(item.gold);
+
+          if (selectedPlayer.gold <= itemCost || item.name.startsWith('Cracked')) {
             return resolve(selectedPlayer);
           }
 
@@ -240,7 +242,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                 return resolve(selectedPlayer);
               }
 
-              selectedPlayer.gold -= item.gold;
+              selectedPlayer.gold -= itemCost;
               helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
               break;
 
@@ -249,7 +251,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                 return resolve(selectedPlayer);
               }
 
-              selectedPlayer.gold -= item.gold;
+              selectedPlayer.gold -= itemCost;
               helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
               break;
 
@@ -258,13 +260,13 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                 return resolve(selectedPlayer);
               }
 
-              selectedPlayer.gold -= item.gold;
+              selectedPlayer.gold -= itemCost;
               helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
               break;
           }
 
-          const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` from Town for ${item.gold} gold!`;
-          const eventLog = `Purchased ${item.name} from Town for ${item.gold} Gold`;
+          const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` from Town for ${itemCost} gold!`;
+          const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsg);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -451,7 +453,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
             break;
         }
       } else if (victimPlayer.gold > 0) {
-        const goldStolen = Math.abs(victimPlayer.gold / 4);
+        const goldStolen = Math.round(victimPlayer.gold / 4);
         stealingPlayer.gold += goldStolen;
         victimPlayer.gold -= goldStolen;
 
@@ -597,7 +599,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
             .then((spell) => {
-              const eventMsgEris = `**Eris has given ${helper.generatePlayerName(selectedPlayer)} a scroll containing ${spell.name} to add to ${helper.generateGenderString(selectedPlayer, 'his')} spellbook!**`;
+              const eventMsgEris = `Eris has given ${helper.generatePlayerName(selectedPlayer)} a scroll containing \`${spell.name}\` to add to ${helper.generateGenderString(selectedPlayer, 'his')} spellbook!`;
               const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
               if (selectedPlayer.spells.length > 0) {
                 let shouldAddToList = false;
@@ -639,7 +641,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
       const luckGoldChance = helper.randomBetween(0, 100);
       if (luckGoldChance >= 75) {
         const luckGoldDice = helper.randomBetween(5, 100);
-        const goldAmount = Math.abs((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
+        const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
         selectedPlayer.gold += goldAmount;
 
         const eventMsg = `${helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`;

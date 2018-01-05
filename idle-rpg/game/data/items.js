@@ -2,91 +2,91 @@ const items = {
   rarity: [
     crack = {
       name: 'Cracked',
-      power: 0.5,
+      power: 0.25,
       gold: 1,
       rarity: 100
     },
     crude = {
       name: 'Crude',
-      power: 1,
+      power: 0.5,
       gold: 1,
       rarity: 75
     },
     battered = {
       name: 'Battered',
-      power: 1.5,
+      power: 0.75,
       gold: 1,
       rarity: 75
     },
     common = {
       name: 'Common',
-      power: 2,
+      power: 1,
       gold: 2,
       rarity: 100
     },
     uncommon = {
       name: 'Uncommon',
-      power: 2.5,
+      power: 1.25,
       gold: 3,
       rarity: 50
     },
     sturdy = {
       name: 'Sturdy',
-      power: 3,
+      power: 1.5,
       gold: 4,
       rarity: 40
     },
     reinforced = {
       name: 'Reinforced',
-      power: 3.5,
+      power: 1.75,
       gold: 4,
       rarity: 30
     },
     unique = {
       name: 'Unique',
-      power: 4,
+      power: 2,
       gold: 5,
       rarity: 25
     },
     hardened = {
       name: 'Hardened',
-      power: 4.5,
+      power: 2.25,
       gold: 6,
       rarity: 20
     },
     rare = {
       name: 'Rare',
-      power: 5,
+      power: 2.5,
       gold: 7,
       rarity: 15
     },
     magic = {
       name: 'Magic',
-      power: 5.5,
+      power: 2.75,
       gold: 10,
       rarity: 10
     },
     legendary = {
       name: 'Legendary',
-      power: 6,
+      power: 3,
       gold: 15,
       rarity: 5
     },
     mythical = {
       name: 'Mythical',
-      power: 6.5,
+      power: 3.25,
       gold: 20,
       rarity: 3
     },
     ancient = {
       name: 'Ancient',
-      power: 7,
+      power: 3.5,
       gold: 25,
       rarity: 2,
     },
     godly = {
       name: 'Godly',
-      power: 7.5,
+      power: 3.75,
       gold: 30,
       rarity: 1
     }
@@ -95,38 +95,38 @@ const items = {
   material: [
     wood = {
       name: 'Wooden',
-      power: 0.5,
+      power: 0.25,
       gold: 5,
       rarity: 100
     },
     stone = {
       name: 'Stone',
-      power: 1,
+      power: 0.5,
       gold: 5,
       rarity: 100
     },
     copper = {
       name: 'Copper',
-      power: 1.5,
+      power: 0.75,
       gold: 8,
       rarity: 90
     },
     iron = {
       name: 'Iron',
-      power: 2,
+      power: 1,
       gold: 10,
       rarity: 70
     },
     bronze = {
       name: 'Bronze',
-      power: 2.5,
+      power: 1.25,
       gold: 13,
       rarity: 50
     },
     gold = {
       name: 'Gold',
       stats: {
-        str: 1,
+        str: 1.5,
         dex: 0,
         end: 0,
         int: 4
@@ -136,31 +136,31 @@ const items = {
     },
     bone = {
       name: 'Bone',
-      power: 3,
+      power: 1.75,
       gold: 15,
       rarity: 40
     },
     steel = {
       name: 'Steel',
-      power: 3.5,
+      power: 2,
       gold: 15,
       rarity: 30
     },
     diamond = {
       name: 'Diamond',
-      power: 4,
+      power: 2.25,
       gold: 22,
       rarity: 10
     },
     mithril = {
       name: 'Mithril',
-      power: 4.5,
+      power: 2.5,
       gold: 25,
       rarity: 5
     },
     adamant = {
       name: 'Adamantine',
-      power: 5,
+      power: 2.75,
       gold: 30,
       rarity: 3
     },
@@ -171,61 +171,61 @@ const items = {
       helm = {
         name: 'Helm',
         position: 'helmet',
-        power: 0.5,
+        power: 0.25,
         gold: 1
       },
       hornedHelmet = {
         name: 'Horned Helmet',
         position: 'helmet',
-        power: 1,
+        power: 0.5,
         gold: 2
       },
       greatHelmet = {
         name: 'Great Helmet',
         position: 'helmet',
-        power: 1.5,
+        power: 0.75,
         gold: 3
       },
       spikedHelmet = {
         name: 'Spiked Helmet',
         position: 'helmet',
-        power: 2,
+        power: 1,
         gold: 3
       },
       minerHelmet = {
         name: 'Miners Helmet',
         position: 'helmet',
-        power: 2.5,
+        power: 1.25,
         gold: 3
       },
       kettleHelm = {
         name: 'Kettle Helm',
         position: 'helmet',
-        power: 3,
+        power: 1.5,
         gold: 3
       },
       chainHood = {
         name: 'Chainmail Hood',
         position: 'helmet',
-        power: 3.5,
+        power: 1.75,
         gold: 3
       },
       basinet = {
         name: 'Basinet',
         position: 'helmet',
-        power: 4,
+        power: 2,
         gold: 3
       },
       bucketHelm = {
         name: 'Bucket Helm',
         position: 'helmet',
-        power: 4.5,
+        power: 2.25,
         gold: 3
       },
       nasalHelmet = {
         name: 'Nasal Helmet',
         position: 'helmet',
-        power: 10,
+        power: 2.5,
         gold: 3
       },
       bucket = {
@@ -425,42 +425,42 @@ const items = {
       chainMail = {
         name: 'Chain Mail',
         position: 'armor',
-        power: 0.5,
+        power: 0.25,
         gold: 1,
         rarity: 80
       },
       thinBody = {
         name: 'Cheap Plate Armour',
         position: 'armor',
-        power: 1,
+        power: 0.5,
         gold: 2,
         rarity: 50
       },
       fullBody = {
         name: 'Highend Plate Armor',
         position: 'armor',
-        power: 1.5,
+        power: 0.75,
         gold: 3,
         rarity: 25
       },
       scale = {
         name: 'Scale Armor',
         position: 'armor',
-        power: 2,
+        power: 1,
         gold: 3,
         rarity: 30
       },
       studded = {
         name: 'Studded Armor',
         position: 'armor',
-        power: 2.5,
+        power: 1.25,
         gold: 3,
         rarity: 60
       },
       segmented = {
         name: 'Segmented Armor',
         position: 'armor',
-        power: 3,
+        power: 1.5,
         gold: 3,
         rarity: 50
       },

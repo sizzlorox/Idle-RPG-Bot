@@ -78,8 +78,8 @@ class Item {
 
   generateItem(selectedPlayer, mob) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomMaterialChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomRarityChance = Math.round(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomMaterialChance = Math.round(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
       const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
       const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
 
@@ -115,21 +115,21 @@ class Item {
       let itemObj;
 
       if (itemType.position === 'relic') {
-        const itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
+        const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4);
 
-        const itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
+        const itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
           + itemType.stats.dex) / 4);
 
-        const itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
+        const itemEnd = Math.round((itemRarityList[randomRarityIndex].stats.end
           + itemType.stats.end) / 4);
 
-        const itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
+        const itemInt = Math.round((itemRarityList[randomRarityIndex].stats.int
           + itemType.stats.int) / 4);
 
         const itemLuk = itemType.stats.luk;
 
-        itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt + itemLuk);
+        itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
@@ -151,7 +151,7 @@ class Item {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
           position: itemType.position,
           isXmasEvent: itemType.isXmasEvent,
-          power: itemRarityList[randomRarityIndex].power + itemType.power,
+          power: itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power,
           attackType: itemType.attackType,
           gold: Number((itemRarityList[randomRarityIndex].gold
             * itemMaterialList[randomMaterialIndex].gold
@@ -165,25 +165,25 @@ class Item {
   // EVENT ITEM
   generateSnowflake(selectedPlayer) {
     const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
-    const randomRarityChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const randomRarityChance = Math.round(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = helper.randomBetween(0, itemRarityList.length - 1);
 
-    const itemStr = Math.abs((itemRarityList[randomRarityIndex].stats.str
+    const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
       + snowFlake.stats.str) / 4);
 
-    const itemDex = Math.abs((itemRarityList[randomRarityIndex].stats.dex
+    const itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
       + snowFlake.stats.dex) / 4);
 
-    const itemEnd = Math.abs((itemRarityList[randomRarityIndex].stats.end
+    const itemEnd = Math.round((itemRarityList[randomRarityIndex].stats.end
       + snowFlake.stats.end) / 4);
 
-    const itemInt = Math.abs((itemRarityList[randomRarityIndex].stats.int
+    const itemInt = Math.round((itemRarityList[randomRarityIndex].stats.int
       + snowFlake.stats.int) / 4);
 
     const itemLuk = snowFlake.stats.luk;
 
-    const itemRating = Math.abs(itemStr + itemDex + itemEnd + itemInt + itemLuk);
+    const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
     const itemObj = {
       name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,

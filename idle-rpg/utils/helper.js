@@ -112,7 +112,7 @@ class helper {
       return item.power;
     }
 
-    return Math.abs(item.str + item.dex + item.end + item.int + item.luk);
+    return Math.round(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -181,7 +181,7 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold = Math.abs(selectedPlayer.gold / 2);
+      selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
       switch (this.randomBetween(0, 2)) {
         case 0:
           this.setPlayerEquipment(selectedPlayer,

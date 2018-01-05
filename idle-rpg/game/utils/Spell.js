@@ -5,8 +5,8 @@ class Spell {
 
   generateSpell(selectedPlayer) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomSpellChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomRarityChance = Math.round(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomSpellChance = Math.round(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
       const spellRarityList = spells.strength.filter(spellRarity => spellRarity.rarity >= randomRarityChance);
       const spellSpellList = spells.spell.filter(spell => spell.rarity >= randomSpellChance);
       const randomRarityIndex = helper.randomBetween(0, spellRarityList.length - 1);

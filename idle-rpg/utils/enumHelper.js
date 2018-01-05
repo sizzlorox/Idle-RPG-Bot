@@ -14,17 +14,17 @@ const enumHelper = {
     empty: {
       helmet: {
         name: 'Nothing',
-        power: 0.5,
+        power: 0.25,
         previousOwners: []
       },
       armor: {
         name: 'Nothing',
-        power: 0.5,
+        power: 0.25,
         previousOwners: []
       },
       weapon: {
-        name: 'Fists',
-        power: 0.5,
+        name: 'Fist',
+        power: 0.25,
         attackType: 'melee',
         previousOwners: []
       },
@@ -69,44 +69,44 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'castspells1',
-    discordId: 'castspells1'
+    name: 'testeeeee1',
+    discordId: 'testeeeee1'
   },
   {
-    name: 'castspells2',
-    discordId: 'castspells2'
+    name: 'testeeeee2',
+    discordId: 'testeeeee2'
   },
   {
-    name: 'castspells3',
-    discordId: 'castspells3'
+    name: 'testeeeee3',
+    discordId: 'testeeeee3'
   },
   {
-    name: 'castspells4',
-    discordId: 'castspells4'
+    name: 'testeeeee4',
+    discordId: 'testeeeee4'
   },
   {
-    name: 'castspells5',
-    discordId: 'castspells5'
+    name: 'testeeeee5',
+    discordId: 'testeeeee5'
   },
   {
-    name: 'castspells6',
-    discordId: 'castspells6'
+    name: 'testeeeee6',
+    discordId: 'testeeeee6'
   },
   {
-    name: 'castspells7',
-    discordId: 'castspells7'
+    name: 'testeeeee7',
+    discordId: 'testeeeee7'
   },
   {
-    name: 'castspells8',
-    discordId: 'castspells8'
+    name: 'testeeeee8',
+    discordId: 'testeeeee8'
   },
   {
-    name: 'castspells9',
-    discordId: 'castspells9'
+    name: 'testeeeee9',
+    discordId: 'testeeeee9'
   },
   {
-    name: 'castspells10',
-    discordId: 'castspells10'
+    name: 'testeeeee10',
+    discordId: 'testeeeee10'
   }]
 };
 module.exports = enumHelper;

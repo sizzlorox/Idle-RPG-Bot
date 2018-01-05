@@ -12,8 +12,8 @@ class Battle {
       const mobEvasive = mobObj.stats.dex;
       const mobDefense = mobObj.stats.end;
 
-      const playerChance = Math.ceil((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
-      const mobChance = Math.ceil((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
+      const playerChance = Math.round((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
+      const mobChance = Math.round((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
 
       return resolve({ playerChance, mobChance });
     });
@@ -30,8 +30,8 @@ class Battle {
       + (helper.sumPlayerTotalIntelligence(otherPlayer) / 2);
     const otherPlayerDefense = helper.sumPlayerTotalEndurance(otherPlayer);
 
-    const playerChance = Math.ceil((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + helper.randomBetween(1, 5 + helper.sumPlayerTotalLuck(selectedPlayer));
-    const otherPlayerChance = Math.ceil((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + helper.randomBetween(1, 5 + helper.sumPlayerTotalLuck(otherPlayer));
+    const playerChance = Math.round((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + helper.randomBetween(1, 5 + helper.sumPlayerTotalLuck(selectedPlayer));
+    const otherPlayerChance = Math.round((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + helper.randomBetween(1, 5 + helper.sumPlayerTotalLuck(otherPlayer));
     console.log(`PlayerChance: ${playerChance} - OtherPlayerChance: ${otherPlayerChance}`);
 
     return { playerChance, otherPlayerChance };
@@ -95,7 +95,7 @@ class Battle {
       if (initiative.name === attacker.name) {
         console.log('Battle Initiative is Attacker');
         if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-          attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower);
+          attackerDamage = Math.round(battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower);
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -103,7 +103,7 @@ class Battle {
           defender.health -= attackerDamage;
           console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
-          attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
+          attackerDamage = Math.round(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -118,7 +118,7 @@ class Battle {
         }
 
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-          defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower);
+          defenderDamage = Math.round(battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower);
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -126,7 +126,7 @@ class Battle {
           attacker.health -= defenderDamage;
           console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
-          defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
+          defenderDamage = Math.round(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -139,7 +139,7 @@ class Battle {
       } else if (initiative.name === defender.name) {
         console.log('Battle Initiative is Defender');
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-          defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower);
+          defenderDamage = Math.round(battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower);
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -147,7 +147,7 @@ class Battle {
           attacker.health -= defenderDamage;
           console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
-          defenderDamage = Math.ceil(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
+          defenderDamage = Math.round(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -162,7 +162,7 @@ class Battle {
         }
 
         if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-          attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower);
+          attackerDamage = Math.round(battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower);
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -170,7 +170,7 @@ class Battle {
           defender.health -= attackerDamage;
           console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
-          attackerDamage = Math.ceil(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
+          attackerDamage = Math.round(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -207,7 +207,7 @@ class Battle {
               break;
             case 'target':
               if (attackerSpellToCast.name.toLowerCase().includes('fireball')) {
-                let spellDamage = Math.ceil((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
+                let spellDamage = Math.round((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
@@ -234,7 +234,7 @@ class Battle {
               break;
             case 'target':
               if (defenderSpellToCast.name.toLowerCase().includes('fireball')) {
-                let spellDamage = Math.ceil((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
+                let spellDamage = Math.round((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
@@ -263,7 +263,7 @@ class Battle {
               break;
             case 'target':
               if (defenderSpellToCast.name.toLowerCase().includes('fireball')) {
-                let spellDamage = Math.ceil((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
+                let spellDamage = Math.round((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
@@ -290,7 +290,7 @@ class Battle {
               break;
             case 'target':
               if (attackerSpellToCast.name.toLowerCase().includes('fireball')) {
-                let spellDamage = Math.ceil((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
+                let spellDamage = Math.round((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
