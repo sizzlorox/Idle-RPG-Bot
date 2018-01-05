@@ -170,14 +170,12 @@ const playerSchema = mongoose.Schema({
     type: Number,
     default: 0
   },
-<<<<<<< HEAD
+
   currentBounty: {
     type: Number,
     default: 0
   },
-=======
-  currentBounty: number,
->>>>>>> 5ebf60e2f50f9d5a61cc49fe1e842d4cc0eb8e99
+
   kills: {
     mob: Number,
     player: Number
