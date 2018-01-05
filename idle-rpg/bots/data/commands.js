@@ -26,7 +26,10 @@ const commands = [
         !mention <on|off> - Change if events relating to you will @Mention you
         !gender <male|female|neutral> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
+<<<<<<< HEAD
         !bounty <@Mention of player> Puts a bounty on the death of a player
+=======
+>>>>>>> 5ebf60e2f50f9d5a61cc49fe1e842d4cc0eb8e99
         \`\`\``;
       /*
 
@@ -221,10 +224,33 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
+<<<<<<< HEAD
         game.castSpell(message.author, discordHook, message.content.split(/ (.+)/)[1].toLowerCase());
+=======
+        const splitArray = message.content.split(' ');
+        const playerId = splitArray[1];
+        const amount = splitArray[2];
+        game.giveGold(message.author, discordHook, message.content.split(/ (.+)/)[1].toLowerCase());
+>>>>>>> 5ebf60e2f50f9d5a61cc49fe1e842d4cc0eb8e99
       } else {
         message.reply(`\`\`\`List of spells:
         bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
+        \`\`\``);
+      }
+    }
+  },
+  //places a bounty on a specific player for a specific amount should work with @playername and then a gold amount
+  placeBounty = {
+    command: '!bounty',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const splitArray = message.content.split(' ');
+        const playerId = splitArray[1];
+        const amount = splitArray[2];
+        game.placeBounty(message.author, playerID, amount );
+      } else {
+        message.reply(`\`\`\` Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head 
         \`\`\``);
       }
     }
