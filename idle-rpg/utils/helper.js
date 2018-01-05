@@ -219,11 +219,7 @@ class helper {
         selectedPlayer.deaths.player++;
         attackerObj.kills.player++;
         attackerObj.gold += selectedPlayer.currentBounty; 
-<<<<<<< HEAD
        selectedPlayer.currentBounty = 0; 
-=======
-        selectedPlayer.currentBounty = 0; 
->>>>>>> 5ebf60e2f50f9d5a61cc49fe1e842d4cc0eb8e99
         Database.savePlayer(selectedPlayer);
       }
 
