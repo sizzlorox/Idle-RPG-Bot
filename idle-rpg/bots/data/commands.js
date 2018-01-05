@@ -26,10 +26,7 @@ const commands = [
         !mention <on|off> - Change if events relating to you will @Mention you
         !gender <male|female|neutral> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
-<<<<<<< HEAD
         !bounty <@Mention of player> Puts a bounty on the death of a player
-=======
->>>>>>> 5ebf60e2f50f9d5a61cc49fe1e842d4cc0eb8e99
         \`\`\``;
       /*
 
