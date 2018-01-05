@@ -26,6 +26,7 @@ const commands = [
         !mention <on|off> - Change if events relating to you will @Mention you
         !gender <male|female|neutral> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
+        !bounty <@Mention of player> Puts a bounty on the death of a player
         \`\`\``;
       /*
 
@@ -229,6 +230,23 @@ const commands = [
     }
   },
 
+  //places a bounty on a specific player for a specific amount should work with @playername and then a gold amount
+  placeBounty = {
+    command: '!bounty',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const splitArray = message.content.split(' ');
+        const playerId = splitArray[1];
+        const amount = splitArray[2];
+        game.placeBounty(message.author, playerID, amount );
+      } else {
+        message.reply(`\`\`\` Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head 
+        \`\`\``);
+      }
+    }
+  },
+  
   eventLog = {
     command: '!eventlog',
     channelOnlyId: commandChannel,
