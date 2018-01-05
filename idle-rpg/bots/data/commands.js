@@ -13,18 +13,19 @@ const commands = [
     function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
-        !top10 <gold, spells, level, stolen, stole, gambles> - Retrives top 10 highest of selected section
+        !top10 <gold, spells, level, stolen, stole, gambles, events> - Retrieves top 10 highest of selected section
         !stats - Sends a PM with your stats
-        !stats <@Mention of player> - Sends a PM with the players stats. (without < > and case-senstive).
+        !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
         !equip - Sends a PM with your equipment
-        !equip <@Mention of player> - Sends a PM with the players equipment. (without < > and case-senstive).
-        !map - Displays the worlds locations.
-        !castspell - Lists spells available to cast.
-        !castspell <spell> - Casts a global spell onto Idle-RPG.
-        !eventlog - Lists up to 15 past events.
-        !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player.
+        !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-senstive)
+        !map - Displays the worlds locations
+        !castspell - Lists spells available to cast
+        !castspell <spell> - Casts a global spell onto Idle-RPG
+        !eventlog - Lists up to 15 past events
+        !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
         !gender <male|female|neutral> - Change your character's gender
+        !lore <Map Name> - Retrieves the lore of map selected
         \`\`\``;
       /*
 
@@ -43,7 +44,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message, discordBot) => {
       if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(' ')[1];
+        let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
         const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
@@ -80,7 +81,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message, discordBot) => {
       if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(' ')[1];
+        let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
         const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
@@ -142,11 +143,32 @@ const commands = [
     }
   },
 
+  lore = {
+    command: '!lore',
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        const splitMessage = message.content.split(/ (.+)/)[1].toLowerCase();
+        const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage)
+          .map(map => map.lore);
+
+        if (requestedMap.length === 0) {
+          return message.author.send(`${splitMessage} was not found. Did you type the map correctly?`);
+        }
+
+        return message.author.send(`\`\`\`${helper.capitalizeFirstLetter(splitMessage)}: ${requestedMap[0]}\`\`\``);
+      }
+
+      return message.author.send('You must enter a map to retrieve its lore. Check `!help` for more info.');
+    }
+  },
+
   top10 = {
     command: '!top10',
     channelOnlyId: commandChannel,
     function: (game, message) => {
-      switch ((message.content.split(' ')[1] === undefined) ? 'level' : message.content.split(' ')[1].toLowerCase()) {
+      switch ((message.content.split(/ (.+)/)[1] === undefined) ? 'level' : message.content.split(/ (.+)/)[1].toLowerCase()) {
         case 'gambles':
           game.top10(message.author, { gambles: -1 });
           break;
@@ -161,6 +183,9 @@ const commands = [
           break;
         case 'spells':
           game.top10(message.author, { spells: -1 });
+          break;
+        case 'events':
+          game.top10(message.author, { events: -1 });
           break;
         default:
           game.top10(message.author, { level: -1 });
@@ -177,7 +202,7 @@ const commands = [
         const splitArray = message.content.split(' ');
         const playerId = splitArray[1];
         const position = splitArray[2];
-        const equipment = JSON.parse(splitArray[3]);
+        const equipment = JSON.parse(splitArray.slice(3, splitArray.length).join(' '));
         game.loadPlayer(playerId)
           .then((player) => {
             player.equipment[position] = equipment;
@@ -195,10 +220,29 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
-        game.castSpell(message.author, discordHook, message.content.split(' ')[1].toLowerCase());
+        const splitArray = message.content.split(' ');
+        const playerId = splitArray[1];
+        const amount = splitArray[2];
+        game.giveGold(message.author, discordHook, message.content.split(/ (.+)/)[1].toLowerCase());
       } else {
         message.reply(`\`\`\`List of spells:
         bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
+        \`\`\``);
+      }
+    }
+  },
+  //places a bounty on a specific player for a specific amount should work with @playername and then a gold amount
+  placeBounty = {
+    command: '!bounty',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const splitArray = message.content.split(' ');
+        const playerId = splitArray[1];
+        const amount = splitArray[2];
+        game.placeBounty(message.author, playerID, amount );
+      } else {
+        message.reply(`\`\`\` Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head 
         \`\`\``);
       }
     }
@@ -209,7 +253,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(' ');
+        const splitCommand = message.content.split(/ (.+)/);
         return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
           .then((result) => {
             return message.author.send(`\`\`\`${result}\`\`\``);
@@ -232,7 +276,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(' ');
+        const splitCommand = message.content.split(/ (.+)/);
 
         // Use switch to validate the value
         switch (splitCommand[1]) {
@@ -257,7 +301,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(' ');
+        const splitCommand = message.content.split(/ (.+)/);
 
         // Use switch to validate the value
         switch (splitCommand[1].toLowerCase()) {
@@ -302,7 +346,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       if (message.content.includes(' ')) {
-        switch (message.content.split(' ')[1].toLowerCase()) {
+        switch (message.content.split(/ (.+)/)[1].toLowerCase()) {
           case 'true':
             return game.updateChristmasEvent(true);
           case 'false':
@@ -318,7 +362,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(' ');
+        const splitCommand = message.content.split(/ (.+)/);
         const blizzardBoolean = game.blizzardSwitch(splitCommand[1]);
         switch (splitCommand) {
           case 'on':
@@ -353,7 +397,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       if (message.content.includes(' ')) {
-        game.deletePlayer(message.content.split(' ')[1])
+        game.deletePlayer(message.content.split(/ (.+)/)[1])
           .then(() => {
             message.author.send('Done.');
           });
@@ -429,7 +473,7 @@ const commands = [
     function: (game, message) => {
       let currency = 'BRL';
       if (message.content.includes(' ')) {
-        currency = message.content.split(' ')[1];
+        currency = message.content.split(/ (.+)/)[1];
       }
 
       Crypto.top5(currency)

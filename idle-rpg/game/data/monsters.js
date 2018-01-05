@@ -88,8 +88,8 @@ const monsters = {
       gold: 6,
       rarity: 6
     },
-    beserk = {
-      name: 'Beserk',
+    berserk = {
+      name: 'Berserk',
       stats: {
         str: 4,
         dex: 2,

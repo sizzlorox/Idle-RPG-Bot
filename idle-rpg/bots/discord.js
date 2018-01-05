@@ -53,13 +53,7 @@ const hook = {
 const game = new Game(hook);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
-const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
-const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
 
-// Christmas Event times
-const christmasEventPre = '00 00 4 14 11 *';
-const christmasEventStart = '00 00 13 24 11 *';
-const christmasEventEnd = '00 00 13 6 1 *';
 const timeZone = 'America/Los_Angeles';
 
 const minTimer = (minimalTimer * 1000) * 60;
@@ -99,8 +93,8 @@ discordBot.login(botLoginToken);
 console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
 
 const heartBeat = () => {
+  const discordUsers = discordBot.users;
   if (process.env.NODE_ENV.includes('production')) {
-    const discordUsers = discordBot.users;
 
     const discordOfflinePlayers = discordUsers
       .filter(player => player.presence.status === 'offline' && !player.bot)
@@ -147,60 +141,7 @@ setInterval(heartBeat, 60000 * tickInMinutes);
 new CronJob({
   cronTime: powerHourWarnTime,
   onTick: () => {
-    game.powerHourWarn();
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-new CronJob({
-  cronTime: powerHourBeginTime,
-  onTick: () => {
     game.powerHourBegin();
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-new CronJob({
-  cronTime: powerHourEndTime,
-  onTick: () => {
-    game.powerHourEnd();
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-/**
- * EVENT CRONS
- */
-new CronJob({
-  cronTime: christmasEventPre,
-  onTick: () => {
-    game.sendChristmasPreEventMessage();
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-new CronJob({
-  cronTime: christmasEventStart,
-  onTick: () => {
-    game.updateChristmasEvent(true);
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-new CronJob({
-  cronTime: christmasEventEnd,
-  onTick: () => {
-    game.updateChristmasEvent(false);
   },
   start: false,
   timeZone,

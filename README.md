@@ -17,7 +17,7 @@ DISCORD_BOT_OPERATOR_ID=<Discord bot operator ID here>
 DISCORD_RPG_WELCOME_CHANNEL_ID=<Discord welcome channel ID here>
 DISCORD_RPG_CHANNEL_ID=<Discord action channel ID here>
 DISCORD_RPG_COMMAND_CHANNEL_ID=<Discord command channel ID here>
-DISCORD_RPQ_FAQ_CHANNEL=<Discord FAQ channel ID here>
+DISCORD_RPG_FAQ_CHANNEL=<Discord FAQ channel ID here>
 DISCORD_BOT_LOGIN_TOKEN=<Discord bot login token here>
 
 MIN_TIMER=<Minimal timer in minutes here>

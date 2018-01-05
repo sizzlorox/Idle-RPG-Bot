@@ -36,6 +36,7 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
+        //selectedPlayer = Event.regenItem(selectedPlayer);
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
         if (selectedPlayer.gender === 'boy')
@@ -126,18 +127,19 @@ class Game {
   }
 
   // Event
-  powerHourWarn() {
-    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
-  }
-
   powerHourBegin() {
-    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
-    this.multiplier += 1;
-  }
+    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
 
-  powerHourEnd() {
-    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
-    this.multiplier -= 1;
+    setTimeout(() => {
+      helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+      this.multiplier += 1;
+    }, 1800000); // 30 minutes
+
+    setTimeout(() => {
+      helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+      this.multiplier -= 1;
+      this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
+    }, 5400000); // 1hr 30 minutes
   }
 
   /**
@@ -243,6 +245,7 @@ ${rankString}
               hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               setTimeout(() => {
                 this.multiplier -= 1;
+                this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
                 this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
                 activeBlessCount = this.activeSpells.filter((bless) => {
                   return bless.spellName === 'Bless';
@@ -260,6 +263,26 @@ ${rankString}
             break;
         }
       });
+  }
+//places a bounty on specific player
+  placeBounty(playerId, recipient, amount) {
+    return Database.loadPlayer(playerId)
+      .then((bplacer) => {
+        if(bplacer.gold >= amount){
+          bplacer.gold -= amount;
+          Database.savePlayer(bplacer)
+          let target = loadPlayer(recipient);
+          target.currentBounty += amount;
+          Database.savePlayer(target); 
+          return commandAuthor.send('Bounty has been placed')
+        }
+        else{
+          return commandAuthor.send('You need more gold to place this bounty')
+        }
+        break;
+      }
+
+    )
   }
 
   /**
@@ -326,7 +349,7 @@ ${rankString}
    * Deletes all players in database
    */
   deleteAllPlayers() {
-    return Database.deleteAllPlayers();
+    return Database.resetAllPlayers();
   }
 
   /**
@@ -354,7 +377,7 @@ ${rankString}
    */
   updateChristmasEvent(isStarting) {
     if (isStarting) {
-      helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      // helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
       Event.MonsterClass.monsters.forEach((mob) => {
         if (mob.isXmasEvent) {
           mob.isSpawnable = true;
