@@ -295,13 +295,13 @@ ${rankString}
 
                   return Database.savePlayer(bountyRecipient)
                     .then(() => {
-                      return commandAuthor.send(`Bounty of ${amount} gold has been placed`);
+                      return bountyPlacer.send(`Bounty of ${amount} gold has been placed`);
                     });
                 });
             });
         }
 
-        return commandAuthor.send('You need more gold to place this bounty');
+        return bountyPlacer.send('You need more gold to place this bounty');
       });
   }
 
