@@ -235,7 +235,7 @@ const commands = [
     function: (game, message, discordBot, discordHook) => {
       const splitArray = message.content.split(' ');
       if (message.content.includes(' ') && splitArray.length === 3) {
-        const recipient = splitArray[1];
+        const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
         const amount = splitArray[2];
 
         return game.placeBounty(discordHook, message.author, recipient, amount);
