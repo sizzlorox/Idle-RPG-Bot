@@ -78,8 +78,8 @@ class Item {
 
   generateItem(selectedPlayer, mob) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.trunc(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomMaterialChance = Math.trunc(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomRarityChance = Math.floor(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomMaterialChance = Math.floor(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
       const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
       const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
 
@@ -121,21 +121,21 @@ class Item {
       let itemRating;
 
       if (itemType.position === 'relic') {
-        itemStr = Math.trunc((itemRarityList[randomRarityIndex].stats.str
+        itemStr = Math.floor((itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4);
 
-        itemDex = Math.trunc((itemRarityList[randomRarityIndex].stats.dex
+        itemDex = Math.floor((itemRarityList[randomRarityIndex].stats.dex
           + itemType.stats.dex) / 4);
 
-        itemEnd = Math.trunc((itemRarityList[randomRarityIndex].stats.end
+        itemEnd = Math.floor((itemRarityList[randomRarityIndex].stats.end
           + itemType.stats.end) / 4);
 
-        itemInt = Math.trunc((itemRarityList[randomRarityIndex].stats.int
+        itemInt = Math.floor((itemRarityList[randomRarityIndex].stats.int
           + itemType.stats.int) / 4);
 
         itemLuk = itemType.stats.luk;
 
-        itemRating = Math.trunc(itemStr + itemDex + itemEnd + itemInt + itemLuk);
+        itemRating = Math.floor(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
@@ -153,23 +153,23 @@ class Item {
             * itemType.gold).toFixed()) * itemRating
         };
       } else {
-        itemStr = Math.trunc((itemRarityList[randomRarityIndex].stats.str
+        itemStr = Math.floor((itemRarityList[randomRarityIndex].stats.str
           * (itemMaterialList[randomMaterialIndex].stats.str
             + itemType.stats.str)) / 4);
 
-        itemDex = Math.trunc((itemRarityList[randomRarityIndex].stats.dex
+        itemDex = Math.floor((itemRarityList[randomRarityIndex].stats.dex
           * (itemMaterialList[randomMaterialIndex].stats.dex
             + itemType.stats.dex)) / 4);
 
-        itemEnd = Math.trunc((itemRarityList[randomRarityIndex].stats.end
+        itemEnd = Math.floor((itemRarityList[randomRarityIndex].stats.end
           * (itemMaterialList[randomMaterialIndex].stats.end
             + itemType.stats.end)) / 4);
 
-        itemInt = Math.trunc((itemRarityList[randomRarityIndex].stats.int
+        itemInt = Math.floor((itemRarityList[randomRarityIndex].stats.int
           * (itemMaterialList[randomMaterialIndex].stats.int
             + itemType.stats.int)) / 4);
 
-        itemRating = Math.trunc(itemStr + itemDex + itemEnd + itemInt);
+        itemRating = Math.floor(itemStr + itemDex + itemEnd + itemInt);
 
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
@@ -194,25 +194,25 @@ class Item {
   // EVENT ITEM
   generateSnowflake(selectedPlayer) {
     const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
-    const randomRarityChance = Math.trunc(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const randomRarityChance = Math.floor(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = helper.randomBetween(0, itemRarityList.length - 1);
 
-    const itemStr = Math.trunc((itemRarityList[randomRarityIndex].stats.str
+    const itemStr = Math.floor((itemRarityList[randomRarityIndex].stats.str
       + snowFlake.stats.str) / 4);
 
-    const itemDex = Math.trunc((itemRarityList[randomRarityIndex].stats.dex
+    const itemDex = Math.floor((itemRarityList[randomRarityIndex].stats.dex
       + snowFlake.stats.dex) / 4);
 
-    const itemEnd = Math.trunc((itemRarityList[randomRarityIndex].stats.end
+    const itemEnd = Math.floor((itemRarityList[randomRarityIndex].stats.end
       + snowFlake.stats.end) / 4);
 
-    const itemInt = Math.trunc((itemRarityList[randomRarityIndex].stats.int
+    const itemInt = Math.floor((itemRarityList[randomRarityIndex].stats.int
       + snowFlake.stats.int) / 4);
 
     const itemLuk = snowFlake.stats.luk;
 
-    const itemRating = Math.trunc(itemStr + itemDex + itemEnd + itemInt + itemLuk);
+    const itemRating = Math.floor(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
     const itemObj = {
       name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,

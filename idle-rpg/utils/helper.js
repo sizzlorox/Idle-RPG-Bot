@@ -16,7 +16,7 @@ class helper {
 
     do {
       result = (Math.random() * (max - min)) + min;
-      result = Math.trunc(result * factor) / factor;
+      result = Math.floor(result * factor) / factor;
     } while (result === exclude);
     return result;
   }
@@ -109,10 +109,10 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-      return Math.trunc(item.str + item.dex + item.end + item.int);
+      return Math.floor(item.str + item.dex + item.end + item.int);
     }
 
-    return Math.trunc(item.str + item.dex + item.end + item.int + item.luk);
+    return Math.floor(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -187,14 +187,16 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold = Math.trunc(selectedPlayer.gold / 2);
+      selectedPlayer.gold = Math.floor(selectedPlayer.gold / 2);
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
       } else {
         if (selectedPlayer.currentBounty > 0) {
           attackerObj.gold += selectedPlayer.currentBounty;
-          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name} just redeemed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
+          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
+          const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
+          attackerObj = this.logEvent(attackerObj, bountyEventLog);
           selectedPlayer.currentBounty = 0;
         }
 
