@@ -64,6 +64,7 @@ const newPlayerObj = (discordId, name) => {
     stole: 0,
     stolen: 0,
     spells: 0,
+    currentBounty: 0,
     kills: {
       mob: 0,
       player: 0
@@ -169,6 +170,12 @@ const playerSchema = mongoose.Schema({
     type: Number,
     default: 0
   },
+
+  currentBounty: {
+    type: Number,
+    default: 0
+  },
+
   kills: {
     mob: Number,
     player: Number
