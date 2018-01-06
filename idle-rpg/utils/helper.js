@@ -43,19 +43,6 @@ class helper {
     const secondString = date.getUTCSeconds() === 0 ? '' : `${seconds}s`;
 
     return `${dayString}${hourString}${minuteString}${secondString}`;
-    /*
-    const seconds = ((duration / 1000) % 60).toFixed();
-    const minutes = ((duration / (1000 * 60)) % 60).toFixed();
-    const hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
-    const days = (duration / (1000 * 60 * 60 * 24)).toFixed();
-
-    const dayString = Number(days) === 0 ? '' : `${days}d `;
-    const hourString = Number(hours) === 0 || Number(hours) === 24 ? '' : `${hours}h `;
-    const minuteString = Number(minutes) === 0 || Number(minutes) === 60 ? '' : `${minutes}m `;
-    const secondString = Number(seconds) === 0 || Number(seconds) === 60 ? '' : `${seconds}s`;
-
-    return `${dayString}${hourString}${minuteString}${secondString}`;
-    */
   }
 
   logEvent(selectedPlayer, msg) {
@@ -205,10 +192,14 @@ class helper {
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
       } else {
+        if (selectedPlayer.currentBounty > 0) {
+          attackerObj.gold += selectedPlayer.currentBounty;
+          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name} just redeemed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
+          selectedPlayer.currentBounty = 0;
+        }
+
         selectedPlayer.deaths.player++;
         attackerObj.kills.player++;
-        attackerObj.gold += selectedPlayer.currentBounty; 
-       selectedPlayer.currentBounty = 0; 
         Database.savePlayer(selectedPlayer);
       }
 
@@ -228,6 +219,7 @@ class helper {
     Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}
+    Bounty: ${player.currentBounty}
 
     Stats (Sum of stats with equipment):
       Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})

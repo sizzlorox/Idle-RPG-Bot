@@ -164,7 +164,13 @@ class Game {
     return Database.loadTop10(type)
       .then((top10) => {
         const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
-          .sort((player1, player2) => player2.experience - player1.experience && player2.level - player2.level)
+          .sort((player1, player2) => {
+            if (Object.keys(type)[0] === 'level') {
+              return player2.experience - player1.experience && player2.level - player2.level;
+            }
+
+            return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+          })
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`)
           .join('\n')}`;
 
@@ -264,28 +270,40 @@ ${rankString}
         }
       });
   }
-//places a bounty on specific player
-  placeBounty(playerId, recipient, amount) {
-    return Database.loadPlayer(playerId)
-      .then((bplacer) => {
-        if(bplacer.gold >= amount){
-          bplacer.gold -= amount;
-          Database.savePlayer(bplacer)
-          let target = loadPlayer(recipient);
-          target.currentBounty += amount;
-          Database.savePlayer(target); 
-          return commandAuthor.send('Bounty has been placed')
-        }
-        else{
-          return commandAuthor.send('You need more gold to place this bounty')
-        }
-        break;
-      }
 
-    )
+  /**
+   * places a bounty on specific player
+   * @param {*} discordHook 
+   * @param {*} playerId 
+   * @param {*} recipient 
+   * @param {*} amount 
+   */
+  placeBounty(discordHook, bountyPlacer, recipient, amount) {
+    return Database.loadPlayer(bountyPlacer.id)
+      .then((placer) => {
+        if (placer.gold >= amount) {
+          placer.gold -= amount;
+
+          return Database.savePlayer(placer)
+            .then(() => {
+              return Database.loadPlayer(recipient)
+                .then((bountyRecipient) => {
+                  bountyRecipient.currentBounty += amount;
+                  discordHook.actionHook.send(
+                    helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
+                  );
+
+                  return Database.savePlayer(bountyRecipient)
+                    .then(() => {
+                      return commandAuthor.send(`Bounty of ${amount} gold has been placed`);
+                    });
+                });
+            });
+        }
+
+        return commandAuthor.send('You need more gold to place this bounty');
+      });
   }
-
- 
 
   /**
    * Returns player eventlog by <count> amount

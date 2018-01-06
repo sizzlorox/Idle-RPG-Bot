@@ -6,7 +6,8 @@ const logger = winston.createLogger({
     info: 0,
     welcome: 1,
     action: 2,
-    move: 3
+    move: 3,
+    error: 4
   },
   format: winston.format.json(),
   transports: [
