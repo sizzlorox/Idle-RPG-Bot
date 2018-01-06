@@ -218,6 +218,8 @@ class helper {
       } else {
         selectedPlayer.deaths.player++;
         attackerObj.kills.player++;
+        attackerObj.gold += selectedPlayer.currentBounty; 
+       selectedPlayer.currentBounty = 0; 
         Database.savePlayer(selectedPlayer);
       }
 

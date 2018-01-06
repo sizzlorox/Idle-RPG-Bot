@@ -264,6 +264,28 @@ ${rankString}
         }
       });
   }
+//places a bounty on specific player
+  placeBounty(playerId, recipient, amount) {
+    return Database.loadPlayer(playerId)
+      .then((bplacer) => {
+        if(bplacer.gold >= amount){
+          bplacer.gold -= amount;
+          Database.savePlayer(bplacer)
+          let target = loadPlayer(recipient);
+          target.currentBounty += amount;
+          Database.savePlayer(target); 
+          return commandAuthor.send('Bounty has been placed')
+        }
+        else{
+          return commandAuthor.send('You need more gold to place this bounty')
+        }
+        break;
+      }
+
+    )
+  }
+
+ 
 
   /**
    * Returns player eventlog by <count> amount
