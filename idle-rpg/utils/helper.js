@@ -65,6 +65,7 @@ class helper {
     } else {
       discordHook.actionHook.send(msg)
         .then(debugMsg => logger.log('action', this.formatLog(debugMsg)))
+        .catch(err => logger.error(err));
     }
 
     // Add if to check if channel is streaming

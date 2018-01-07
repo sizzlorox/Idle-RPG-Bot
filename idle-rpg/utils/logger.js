@@ -7,7 +7,8 @@ const logger = winston.createLogger({
     welcome: 1,
     action: 2,
     move: 3,
-    error: 4
+    error: 4,
+    command: 5
   },
   format: winston.format.json(),
   transports: [
@@ -21,7 +22,8 @@ const logger = winston.createLogger({
     new winston.transports.File({ filename: './logs/welcome.log', level: 'welcome', silent: false, timestamp: true }),
     new winston.transports.File({ filename: './logs/action.log', level: 'action', silent: true, timestamp: true }),
     new winston.transports.File({ filename: './logs/move.log', level: 'move', silent: true, timestamp: true }),
-    new winston.transports.File({ filename: './logs/error.log', level: 'error', silent: false, timestamp: true })
+    new winston.transports.File({ filename: './logs/error.log', level: 'error', silent: false, timestamp: true }),
+    new winston.transports.File({ filename: './logs/command.log', level: 'command', silent: false, timestamp: true })
   ],
   exceptionHandlers: [
     new winston.transports.File({ filename: './logs/exceptions.log', silent: false })
