@@ -315,14 +315,6 @@ const commands = [
           case 'female':
           case 'neutral':
           case 'neuter':
-          case 'yo':
-          case 'elverson':
-          case 'spivak':
-          case 'hir':
-          case 'per':
-          case 'xe':
-          case 'helicopter':
-          case 'ghost':
             return game.modifyGender(message.author, discordHook, splitCommand[1]);
         }
       }
@@ -332,14 +324,6 @@ const commands = [
         female
         neutral
         neuter
-        yo
-        elverson
-        spivak
-        hir
-        per
-        xe
-        helicopter
-        ghost
         \`\`\``);
     }
   },

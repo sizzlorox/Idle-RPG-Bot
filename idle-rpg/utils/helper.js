@@ -16,7 +16,7 @@ class helper {
 
     do {
       result = (Math.random() * (max - min)) + min;
-      result = Math.floor(result * factor) / factor;
+      result = Math.round(result * factor) / factor;
     } while (result === exclude);
     return result;
   }
@@ -110,10 +110,10 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-      return Math.floor(item.str + item.dex + item.end + item.int);
+      return Math.round(item.str + item.dex + item.end + item.int);
     }
 
-    return Math.floor(item.str + item.dex + item.end + item.int + item.luk);
+    return Math.round(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -188,7 +188,7 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold = Math.floor(selectedPlayer.gold / 2);
+      selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
@@ -277,17 +277,12 @@ class helper {
 
   /**
    * Based on player setting, transform into the correct gender
-   * source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
    * @param player
    * @param word
    * @returns String
    */
   generateGenderString(player, word) {
-    if (enumHelper.genders[player.gender] && enumHelper.genders[player.gender][word]) {
-      return enumHelper.genders[player.gender][word];
-    }
-
-    return word;
+    return enumHelper.genders[player.gender] ? enumHelper.genders[player.gender][word] : word;
   }
 
   generateEquipmentsString(player) {

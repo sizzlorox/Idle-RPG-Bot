@@ -61,13 +61,13 @@ class Event {
           console.log(`GAME: Attacking Player: ${playerChance} - Random Defending Player: ${otherPlayerChance}`);
 
           if (playerChance >= otherPlayerChance) {
-            randomPlayer.health -= Math.floor(playerChance);
+            randomPlayer.health -= Math.round(playerChance);
             selectedPlayer.battles.won++;
             randomPlayer.battles.lost++;
 
-            const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} in \`${selectedPlayer.map.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.floor(playerChance)} damage!`;
-            const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${Math.floor(playerChance)} damage`;
-            const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and lost ${Math.floor(playerChance)} health`;
+            const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} in \`${selectedPlayer.map.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` dealing ${Math.round(playerChance)} damage!`;
+            const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${Math.round(playerChance)} damage`;
+            const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and lost ${Math.round(playerChance)} health`;
 
             helper.sendMessage(discordHook, 'twitch', false, eventMsg);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -84,18 +84,18 @@ class Event {
               .catch(err => console.log(err));
           }
 
-          selectedPlayer.health -= Math.floor(otherPlayerChance);
+          selectedPlayer.health -= Math.round(otherPlayerChance);
           randomPlayer.battles.won++;
           selectedPlayer.battles.lost++;
 
           const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` but failed!
-          ${helper.generatePlayerName(randomPlayer)}s \`${randomPlayer.equipment.weapon.name}\` dealt ${Math.floor(otherPlayerChance)} damage!`;
+          ${helper.generatePlayerName(randomPlayer)}s \`${randomPlayer.equipment.weapon.name}\` dealt ${Math.round(otherPlayerChance)} damage!`;
 
           const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and failed.
-          ${randomPlayer.name} did ${Math.floor(otherPlayerChance)} damage with ${randomPlayer.equipment.weapon.name}`;
+          ${randomPlayer.name} did ${Math.round(otherPlayerChance)} damage with ${randomPlayer.equipment.weapon.name}`;
 
           const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} but ${helper.generateGenderString(selectedPlayer, 'he')} failed.
-          You did ${Math.floor(otherPlayerChance)} damage with ${randomPlayer.equipment.weapon.name}`;
+          You did ${Math.round(otherPlayerChance)} damage with ${randomPlayer.equipment.weapon.name}`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsg);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
@@ -149,7 +149,7 @@ class Event {
                   });
               }
 
-              battleResults.mobChance = Math.floor(battleResults.mobChance);
+              battleResults.mobChance = Math.round(battleResults.mobChance);
 
               selectedPlayer.health -= battleResults.mobChance;
               selectedPlayer.gold -= mob.gold;
@@ -512,7 +512,7 @@ class Event {
           const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
 
           if (healthDeficit) {
-            const healAmount = Math.floor(healthDeficit / 3);
+            const healAmount = Math.round(healthDeficit / 3);
 
             const eventMsgAseco = `Fortune smiles upon ${helper.generatePlayerName(selectedPlayer)} as Aseco cured his sickness and restored ${helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
             const eventLogAseco = `Aseco healed you for ${healAmount}`;
@@ -544,7 +544,7 @@ class Event {
             return resolve(selectedPlayer);
           }
 
-          const goldTaken = Math.floor(selectedPlayer.gold / 20);
+          const goldTaken = Math.round(selectedPlayer.gold / 20);
 
           const eventMsgHermes = `Hermes took ${goldTaken} gold from ${helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
           const eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
@@ -580,7 +580,7 @@ class Event {
       const luckGoldChance = helper.randomBetween(0, 100);
       if (luckGoldChance >= 75) {
         const luckGoldDice = helper.randomBetween(5, 100);
-        const goldAmount = Math.floor((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
+        const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
         selectedPlayer.gold += goldAmount;
 
         const eventMsg = `${helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`;
@@ -645,7 +645,7 @@ class Event {
       }
 
       const luckGambleChance = helper.randomBetween(0, 100);
-      const luckGambleGold = Math.floor(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3));
+      const luckGambleGold = Math.round(helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3));
       selectedPlayer.gambles++;
 
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 2)) {

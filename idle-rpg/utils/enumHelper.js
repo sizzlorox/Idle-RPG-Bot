@@ -118,6 +118,7 @@ const enumHelper = {
     discordId: 'Tester 10'
   }],
 
+  // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
   genders: {
     male: {
       he: 'he',
@@ -142,54 +143,6 @@ const enumHelper = {
       his: 'its',
       him: 'it',
       himself: 'itself',
-    },
-    yo: {
-      he: 'yo',
-      his: 'yos',
-      him: 'yo',
-      himself: 'yoself',
-    },
-    elverson: {
-      he: 'ey',
-      his: 'eir',
-      him: 'em',
-      himself: 'emself',
-    },
-    spivak: {
-      he: 'e',
-      his: 'eir',
-      him: 'em',
-      himself: 'emself',
-    },
-    hir: {
-      he: 'ze',
-      his: 'hir',
-      him: 'hir',
-      himself: 'hirself',
-    },
-    per: {
-      he: 'per',
-      his: 'pers',
-      him: 'per',
-      himself: 'perself',
-    },
-    xe: {
-      he: 'xe',
-      his: 'xyr',
-      him: 'xem',
-      himself: 'xemself',
-    },
-    helicopter: {
-      he: 'heli',
-      his: 'helis',
-      him: 'helim',
-      himself: 'heliself',
-    },
-    ghost: {
-      he: '',
-      his: '',
-      him: '',
-      himself: '',
     }
   }
 };
