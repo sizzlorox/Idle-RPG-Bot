@@ -277,98 +277,16 @@ class helper {
 
   /**
    * Based on player setting, transform into the correct gender
+   * source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
    * @param player
    * @param word
    * @returns String
    */
-
-   //source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
   generateGenderString(player, word) {
-    const wordMapping = {
-      male: {
-        he: 'he',
-        his: 'his',
-        him: 'him',
-        himself: 'himself',
-      },
-      female: {
-        he: 'she',
-        his: 'her',
-        him: 'her',
-        himself: 'herself',
-      },
-      neutral: {
-        he: 'they',
-        his: 'their',
-        him: 'them',
-        himself: 'themself',
-      },
-      neuter: {
-        he: 'it',
-        his: 'its',
-        him: 'it',
-        himself: 'itself',
-      },
-      yo: {
-        he: 'yo',
-        his: 'yos',
-        him: 'yo',
-        himself: 'yoself',
-      },
-      Elverson: {
-        he: 'ey',
-        his: 'eir',
-        him: 'em',
-        himself: 'emself',
-      },
-      Spivak: {
-        he: 'e',
-        his: 'eir',
-        him: 'em',
-        himself: 'emself',
-      },
-      hir: {
-        he: 'ze',
-        his: 'hir',
-        him: 'hir',
-        himself: 'hirself',
-      },
-      per: {
-        he: 'per',
-        his: 'pers',
-        him: 'per',
-        himself: 'perself',
-      },
-      xe: {
-        he: 'xe',
-        his: 'xyr',
-        him: 'xem',
-        himself: 'xemself',
-      },
-      sorrybutidontsubscribetogenderpolitics: {
-        he: 'noreally',
-        his: 'notkidding',
-        him: 'forsure',
-        himself: 'icantbelieveipickedthisgender',
-      },
-      helicopter: {
-        he: 'heli',
-        his: 'helis',
-        him: 'helim',
-        himself: 'heliself',
-      },
-      ghost: {
-        he: '',
-        his: '',
-        him: '',
-        himself: '',
-      }
-
-    };
-
-    if (wordMapping[player.gender] && wordMapping[player.gender][word]) {
-      return wordMapping[player.gender][word];
+    if (enumHelper.genders[player.gender] && enumHelper.genders[player.gender][word]) {
+      return enumHelper.genders[player.gender][word];
     }
+
     return word;
   }
 

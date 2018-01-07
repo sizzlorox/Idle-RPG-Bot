@@ -311,12 +311,12 @@ class Event {
         };
       case 6:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} catches a glint out of the corner of ${helper.generateGenderString(selectedPlayer, 'his')} eye. Brushing aside some leaves ${helper.generatePlayerName(selectedPlayer)} finds \`${item.name}\` left here by the last person to camp at this spot`,
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} catches a glint out of the corner of ${helper.generateGenderString(selectedPlayer, 'his')} eye. Brushing aside some leaves ${helper.generatePlayerName(selectedPlayer)} finds \`${item.name}\` left here by the last person to camp at this spot.`,
           eventLog: `Near your camp in ${selectedPlayer.map.name} there was ${item.name}`
         };
       case 7:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} a finds \`${item.name}\` resting against a wall`,
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} a finds \`${item.name}\` resting against a wall.`,
           eventLog: `While exploring a cave in ${selectedPlayer.map.name} you found ${item.name}`
         };
       case 8:
@@ -326,7 +326,7 @@ class Event {
         };
       case 9:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} looks around a derlict building and find \`${item.name}\`  in one of the corners. `,
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} looks around a derlict building and finds \`${item.name}\` in one of the corners.`,
           eventLog: `Found ${item.name} while looking around a derlict building in ${selectedPlayer.map.name}`
         };
     }
@@ -343,7 +343,7 @@ class Event {
               selectedPlayer.equipment.helmet = randomPlayer.equipment.helmet;
               if (randomPlayer.equipment.helmet.previousOwners.length > 0) {
                 const lastOwnerInList = randomPlayer.equipment.helmet.previousOwners[randomPlayer.equipment.helmet.previousOwners.length - 1];
-                const removePreviousOwnerName = randomPlayer.equipment.helmet.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}s`);
+                const removePreviousOwnerName = randomPlayer.equipment.helmet.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}'s`);
                 selectedPlayer.equipment.helmet.name = removePreviousOwnerName;
 
                 const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${removePreviousOwnerName}!`);
@@ -353,7 +353,7 @@ class Event {
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
               } else {
                 selectedPlayer.equipment.helmet.name = `${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}`;
-                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}!`);
+                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}'s ${randomPlayer.equipment.helmet.name}!`);
                 const eventLog = `Stole ${randomPlayer.name}s ${randomPlayer.equipment.helmet.name}`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -376,7 +376,7 @@ class Event {
               selectedPlayer.equipment.armor = randomPlayer.equipment.armor;
               if (randomPlayer.equipment.armor.previousOwners.length > 0) {
                 const lastOwnerInList = randomPlayer.equipment.armor.previousOwners[randomPlayer.equipment.armor.previousOwners.length - 1];
-                const removePreviousOwnerName = randomPlayer.equipment.armor.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}s`);
+                const removePreviousOwnerName = randomPlayer.equipment.armor.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}'s`);
                 selectedPlayer.equipment.armor.name = removePreviousOwnerName;
 
                 const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${removePreviousOwnerName}!`);
@@ -386,7 +386,7 @@ class Event {
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
               } else {
                 selectedPlayer.equipment.armor.name = `${randomPlayer.name}s ${randomPlayer.equipment.armor.name}`;
-                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.armor.name}!`);
+                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}'s ${randomPlayer.equipment.armor.name}!`);
                 const eventLog = `Stole ${randomPlayer.name}s ${randomPlayer.equipment.armor.name}`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -409,7 +409,7 @@ class Event {
               selectedPlayer.equipment.weapon = randomPlayer.equipment.weapon;
               if (randomPlayer.equipment.weapon.previousOwners.length > 0) {
                 const lastOwnerInList = randomPlayer.equipment.weapon.previousOwners[randomPlayer.equipment.weapon.previousOwners.length - 1];
-                const removePreviousOwnerName = randomPlayer.equipment.weapon.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}s`);
+                const removePreviousOwnerName = randomPlayer.equipment.weapon.name.replace(`${lastOwnerInList}s`, `${randomPlayer.name}'s`);
                 selectedPlayer.equipment.weapon.name = removePreviousOwnerName;
 
                 const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${removePreviousOwnerName}!`);
@@ -419,7 +419,7 @@ class Event {
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
               } else {
                 selectedPlayer.equipment.weapon.name = `${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}`;
-                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}!`);
+                const eventMsg = helper.setImportantMessage(`${selectedPlayer.name} just stole ${randomPlayer.name}'s ${randomPlayer.equipment.weapon.name}!`);
                 const eventLog = `Stole ${randomPlayer.name}s ${randomPlayer.equipment.weapon.name}`;
 
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);

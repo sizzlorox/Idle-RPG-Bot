@@ -234,7 +234,7 @@ ${rankString}
         switch (spell) {
           case 'bless':
             if (castingPlayer.gold >= spells.bless.spellCost) {
-              castingPlayer.spells++;
+              castingPlayer.spells += 1;
               castingPlayer.gold -= spells.bless.spellCost;
               this.multiplier += 1;
               const blessLogObj = {
