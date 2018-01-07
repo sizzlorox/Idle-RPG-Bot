@@ -299,6 +299,36 @@ class Event {
           eventMsg: `${helper.generatePlayerName(selectedPlayer)} a bird just dropped \`${item.name}\` infront of ${helper.generateGenderString(selectedPlayer, 'him')} in \`${selectedPlayer.map.name}\`!`,
           eventLog: `A bird just dropped ${item.name} infront of you in ${selectedPlayer.map.name}`
         };
+      case 4:
+        return {
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} stumbles upon a grizzly scene. One of the corpses has \`${item.name}\` next to it! Seems like it is in good enough condition to use.`,
+          eventLog: `You found ${item.name} on a corpse in ${selectedPlayer.map.name}`
+        };
+      case 5:
+        return {
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} found an alter. \`${item.name}\` is sitting on the center, ready to be used!`,
+          eventLog: `On an alter in ${selectedPlayer.map.name} you found ${item.name}`
+        };
+      case 6:
+        return {
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} catches a glint out of the corner of ${helper.generateGenderString(selectedPlayer, 'his')} eye. Brushing aside some leaves ${helper.generatePlayerName(selectedPlayer)} finds \`${item.name}\` left here by the last person to camp at this spot`,
+          eventLog: `Near your camp in ${selectedPlayer.map.name} there was ${item.name}`
+        };
+      case 7:
+        return {
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} a finds \`${item.name}\` resting against a wall`,
+          eventLog: `While exploring a cave in ${selectedPlayer.map.name} you found ${item.name}`
+        };
+      case 8:
+        return {
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} finds a grave with \`${item.name}\` sitting on it. The dead do not need equipment so it's yours for the taking`,
+          eventLog: `You stole ${item.name} from a grave in ${selectedPlayer.map.name}`
+        };
+      case 9:
+        return {
+          eventMsg: `${helper.generatePlayerName(selectedPlayer)} looks around a derlict building and find \`${item.name}\`  in one of the corners. `,
+          eventLog: `Found ${item.name} while looking around a derlict building in ${selectedPlayer.map.name}`
+        };
     }
   }
 
