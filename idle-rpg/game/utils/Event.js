@@ -277,7 +277,7 @@ class Event {
   }
 
   generateItemEventMessage(selectedPlayer, item) {
-    const randomEventMessage = helper.randomBetween(0, 3);
+    const randomEventMessage = helper.randomBetween(0, 9);
     switch (randomEventMessage) {
       case 0:
         return {
