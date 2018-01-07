@@ -238,11 +238,14 @@ const commands = [
         const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
         const amount = splitArray[2];
 
-        if (Number(amount) <= 0 || Number(amount) % 1 !== 0) {
+        if (Number(amount) <= 0 || Number(amount) % 1 !== 0 || !amount.match(/^\d+$/)) {
           return message.author.send('Please use a regular amount of gold.');
         }
         if (Number(amount) < 100) {
           return message.author.send('You must place a bounty higher or equal to 100');
+        }
+        if (!recipient.match(/^\d+$/)) {
+          return message.author.send('Please add a bounty to a player.');
         }
         return game.placeBounty(discordHook, message.author, recipient, Number(amount));
       }

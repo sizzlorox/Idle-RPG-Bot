@@ -304,6 +304,9 @@ ${rankString}
             .then(() => {
               return Database.loadPlayer(recipient)
                 .then((bountyRecipient) => {
+                  if (!bountyRecipient) {
+                    return bountyPlacer.send('This player does not exist.');
+                  }
                   bountyRecipient.currentBounty += amount;
                   discordHook.actionHook.send(
                     helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
