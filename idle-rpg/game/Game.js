@@ -271,6 +271,22 @@ ${rankString}
       });
   }
 
+  setPlayerBounty(recipient, amount) {
+    return Database.loadPlayer(recipient)
+      .then((player) => {
+        player.currentBounty = amount;
+        return Database.savePlayer(player);
+      });
+  }
+
+  setPlayerGold(recipient, amount) {
+    return Database.loadPlayer(recipient)
+      .then((player) => {
+        player.gold = amount;
+        return Database.savePlayer(player);
+      });
+  }
+
   /**
    * places a bounty on specific player
    * @param {*} discordHook 
@@ -288,6 +304,9 @@ ${rankString}
             .then(() => {
               return Database.loadPlayer(recipient)
                 .then((bountyRecipient) => {
+                  if (!bountyRecipient) {
+                    return bountyPlacer.send('This player does not exist.');
+                  }
                   bountyRecipient.currentBounty += amount;
                   discordHook.actionHook.send(
                     helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
