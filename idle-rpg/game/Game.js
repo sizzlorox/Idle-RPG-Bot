@@ -271,6 +271,22 @@ ${rankString}
       });
   }
 
+  setPlayerBounty(recipient, amount) {
+    return Database.loadPlayer(recipient)
+      .then((player) => {
+        player.currentBounty = amount;
+        return Database.savePlayer(player);
+      });
+  }
+
+  setPlayerGold(recipient, amount) {
+    return Database.loadPlayer(recipient)
+      .then((player) => {
+        player.gold = amount;
+        return Database.savePlayer(player);
+      });
+  }
+
   /**
    * places a bounty on specific player
    * @param {*} discordHook 
