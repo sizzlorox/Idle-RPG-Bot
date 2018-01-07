@@ -118,7 +118,7 @@ const enumHelper = {
     discordId: 'Tester 10'
   }],
 
-  genders = {
+  genders: {
     male: {
       he: 'he',
       his: 'his',
