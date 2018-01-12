@@ -19,7 +19,7 @@ class CommandParser {
       if (!commandObj) {
         return;
       }
-      logger.log('command', { author: messageObj.author.username, command: messageContent, time: moment().utc().toISOString() });
+      logger.command({ author: messageObj.author.username, command: messageContent, time: moment().utc().toISOString() });
 
       if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId && messageObj.channel.type !== 'dm') {
         return messageObj.author.send(`Please send this to <#${commandObj.channelOnlyId}> or PM me.`);

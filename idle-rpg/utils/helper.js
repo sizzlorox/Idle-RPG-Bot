@@ -60,11 +60,11 @@ class helper {
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
       discordHook.movementHook.send(msg)
-        .then(debugMsg => logger.log('move', this.formatLog(debugMsg)))
+        .then(debugMsg => logger.move(this.formatLog(debugMsg)))
         .catch(err => logger.error(err));
     } else {
       discordHook.actionHook.send(msg)
-        .then(debugMsg => logger.log('action', this.formatLog(debugMsg)))
+        .then(debugMsg => logger.action(this.formatLog(debugMsg)))
         .catch(err => logger.error(err));
     }
 
@@ -180,6 +180,7 @@ class helper {
       selectedPlayer.equipment[equipment].luk = item.stats.luk;
     }
     selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
+
     return selectedPlayer;
   }
 
@@ -334,6 +335,7 @@ class helper {
       logResult = logResult.concat(`${player.pastEvents[i].event} [${this.getTimePassed(player.pastEvents[i].timeStamp)} ago]\n      `);
       logCount++;
     }
+
     return logResult;
   }
 }
