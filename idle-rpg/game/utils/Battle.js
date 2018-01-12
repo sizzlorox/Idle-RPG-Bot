@@ -41,30 +41,11 @@ class Battle {
     return new Promise((resolve) => {
       const maxRounds = 10;
       const battleResults = [];
-      let escaped = false;
       for (let round = 1; round <= maxRounds; round++) {
         battleResults.push(
           this.round(attacker, defender)
-            .then((roundResults) => {
-              if (roundResults.attackerDamage === 0) {
-                const attackerEscapeDice = helper.randomBetween(0, 100);
-                console.log(`${attacker.name} tried running away with ${attackerEscapeDice}.`);
-                if (attackerEscapeDice >= 50) {
-                  console.log(`${attacker.name} did 0 damage and escaped!`);
-                  escaped = true;
-                }
-              } else if (roundResults.defenderDamage === 0) {
-                const defenderEscapeDice = helper.randomBetween(0, 100);
-                console.log(`${defender.name} tried running away with ${defenderEscapeDice}.`);
-                if (defenderEscapeDice >= 50) {
-                  console.log(`${defender.name} did 0 damage and escaped!`);
-                  escaped = true;
-                }
-              }
-              return roundResults;
-            })
         );
-        if (attacker.health <= 0 || defender.health <= 0 || escaped) {
+        if (attacker.health <= 0 || defender.health <= 0) {
           break;
         }
       }
@@ -323,6 +304,7 @@ class Battle {
           }
         }
       }
+
       return resolve(this.inventoryTurn(attacker, defender, battleStats, attackerDamage, defenderDamage));
     });
   }
@@ -379,6 +361,7 @@ class Battle {
           console.log(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
       }
+
       return resolve({ attacker, defender, attackerDamage, defenderDamage });
     });
   }
