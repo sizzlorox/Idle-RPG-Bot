@@ -60,11 +60,12 @@ class helper {
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
       discordHook.movementHook.send(msg)
-        .then(debugMsg => logger.log('move', this.formatLog(debugMsg)))
-        .catch(err => logger.log('error', err));
+        .then(debugMsg => logger.move(this.formatLog(debugMsg)))
+        .catch(err => logger.error(err));
     } else {
       discordHook.actionHook.send(msg)
-        .then(debugMsg => logger.log('action', this.formatLog(debugMsg)))
+        .then(debugMsg => logger.action(this.formatLog(debugMsg)))
+        .catch(err => logger.error(err));
     }
 
     // Add if to check if channel is streaming
@@ -109,7 +110,11 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
+<<<<<<< HEAD
       return item.power;
+=======
+      return Math.round(item.str + item.dex + item.end + item.int);
+>>>>>>> 98e2bb8105d51bcdda0a3f48e148b022db97f976
     }
 
     return Math.round(item.str + item.dex + item.end + item.int + item.luk);
@@ -182,6 +187,7 @@ class helper {
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
+<<<<<<< HEAD
       switch (this.randomBetween(0, 2)) {
         case 0:
           this.setPlayerEquipment(selectedPlayer,
@@ -202,10 +208,20 @@ class helper {
 
           break;
       }
+=======
+>>>>>>> 98e2bb8105d51bcdda0a3f48e148b022db97f976
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
       } else {
+        if (selectedPlayer.currentBounty > 0) {
+          attackerObj.gold += selectedPlayer.currentBounty;
+          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
+          const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
+          attackerObj = this.logEvent(attackerObj, bountyEventLog);
+          selectedPlayer.currentBounty = 0;
+        }
+
         selectedPlayer.deaths.player++;
         attackerObj.kills.player++;
         Database.savePlayer(selectedPlayer);
@@ -236,6 +252,7 @@ class helper {
     Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}
+    Bounty: ${player.currentBounty}
 
     Stats (Sum of stats with equipment):
       Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})
@@ -295,31 +312,7 @@ class helper {
    * @returns String
    */
   generateGenderString(player, word) {
-    const wordMapping = {
-      male: {
-        he: 'he',
-        his: 'his',
-        him: 'him',
-        himself: 'himself',
-      },
-      female: {
-        he: 'she',
-        his: 'her',
-        him: 'her',
-        himself: 'herself',
-      },
-      neutral: {
-        he: 'they',
-        his: 'their',
-        him: 'them',
-        himself: 'themself',
-      }
-    };
-
-    if (wordMapping[player.gender] && wordMapping[player.gender][word]) {
-      return wordMapping[player.gender][word];
-    }
-    return word;
+    return enumHelper.genders[player.gender] ? enumHelper.genders[player.gender][word] : word;
   }
 
   generateEquipmentsString(player) {
@@ -360,6 +353,7 @@ class helper {
       logResult = logResult.concat(`${player.pastEvents[i].event} [${this.getTimePassed(player.pastEvents[i].timeStamp)} ago]\n      `);
       logCount++;
     }
+
     return logResult;
   }
 }

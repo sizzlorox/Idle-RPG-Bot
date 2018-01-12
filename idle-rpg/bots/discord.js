@@ -66,9 +66,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 discordBot.on('ready', () => {
-  discordBot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'), (err) => {
-    if (err) logger.error(err);
-  });
+  discordBot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
   discordBot.user.setGame('Idle-RPG Game Master');
   discordBot.user.setStatus('idle');
   console.log('Idle RPG has been loaded!');
