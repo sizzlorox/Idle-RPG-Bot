@@ -110,11 +110,7 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-<<<<<<< HEAD
       return item.power;
-=======
-      return Math.round(item.str + item.dex + item.end + item.int);
->>>>>>> 98e2bb8105d51bcdda0a3f48e148b022db97f976
     }
 
     return Math.round(item.str + item.dex + item.end + item.int + item.luk);
@@ -187,7 +183,6 @@ class helper {
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
-<<<<<<< HEAD
       switch (this.randomBetween(0, 2)) {
         case 0:
           this.setPlayerEquipment(selectedPlayer,
@@ -208,8 +203,6 @@ class helper {
 
           break;
       }
-=======
->>>>>>> 98e2bb8105d51bcdda0a3f48e148b022db97f976
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;

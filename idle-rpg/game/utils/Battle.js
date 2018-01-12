@@ -46,6 +46,17 @@ class Battle {
         if (attacker.health <= 0 || defender.health <= 0) {
           break;
         }
+        if (battleResults[battleResults.length - 1].attackerDamage === 0) {
+          if (helper.randomBetween(0, 100) >= 75) {
+            console.log(`${attacker.name} did 0 damage and escaped!`);
+            break;
+          }
+        } else if (battleResults[battleResults.length - 1].defenderDamage === 0) {
+          if (helper.randomBetween(0, 100) >= 75) {
+            console.log(`${defender.name} did 0 damage and escaped!`);
+            break;
+          }
+        }
       }
 
       return Promise.all(battleResults)
@@ -302,14 +313,63 @@ class Battle {
           }
         }
       }
-      return resolve({ attacker, defender, attackerDamage, defenderDamage });
+      return resolve(this.inventoryTurn(attacker, defender, battleStats, attackerDamage, defenderDamage));
     });
   }
 
-  inventoryTurn(attacker, defender, battleStats) {
+  inventoryTurn(attacker, defender, battleStats, attackerDamage, defenderDamage) {
     return new Promise((resolve) => {
+      const initiative = this.initialAttack(attacker, defender);
+      if (initiative.name === attacker.name) {
+        console.log('Inventory Initiative is Attacker');
+        if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
+          const potion = attacker.inventory.items.find({ name: 'Health Potion' });
+          let healAmount = potion.power * (attacker.level / 2);
+          if ((healAmount + attacker.health) > 100 + (attacker.level * 5)) {
+            healAmount -= 100 + (attacker.level * 5);
+          }
+          attacker.health += healAmount;
+          attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
 
-      return resolve({ attacker, defender });
+          console.log(`${attacker.name} drank a health potion and healed ${healAmount} health`);
+        }
+        if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
+          const potion = defender.inventory.items.find({ name: 'Health Potion' });
+          let healAmount = potion.power * (defender.level / 2);
+          if ((healAmount + defender.health) > 100 + (defender.level * 5)) {
+            healAmount -= 100 + (defender.level * 5);
+          }
+          defender.health += healAmount;
+          defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
+
+          console.log(`${defender.name} drank a health potion and healed ${healAmount} health`);
+        }
+      } else if (initiative.name === defender.name) {
+        console.log('Inventory Initiative is defender');
+        if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
+          const potion = defender.inventory.items.find({ name: 'Health Potion' });
+          let healAmount = potion.power * (defender.level / 2);
+          if ((healAmount + defender.health) > 100 + (defender.level * 5)) {
+            healAmount -= 100 + (defender.level * 5);
+          }
+          defender.health += healAmount;
+          defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
+
+          console.log(`${defender.name} drank a health potion and healed ${healAmount} health`);
+        }
+        if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
+          const potion = attacker.inventory.items.find({ name: 'Health Potion' });
+          let healAmount = potion.power * (attacker.level / 2);
+          if ((healAmount + attacker.health) > 100 + (attacker.level * 5)) {
+            healAmount -= 100 + (attacker.level * 5);
+          }
+          attacker.health += healAmount;
+          attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
+
+          console.log(`${defender.name} drank a health potion and healed ${healAmount} health`);
+        }
+      }
+      return resolve({ attacker, defender, attackerDamage, defenderDamage });
     });
   }
 

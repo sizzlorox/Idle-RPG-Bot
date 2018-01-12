@@ -10,5 +10,13 @@ class Inventory {
     return selectedPlayer;
   }
 
+  addItemIntoInventory(selectedPlayer, item) {
+    if (selectedPlayer.inventory.items.length < inventory.maxItemAmount) {
+      selectedPlayer.inventory.items.push(item);
+    }
+
+    return selectedPlayer;
+  }
+
 }
 module.exports = Inventory;

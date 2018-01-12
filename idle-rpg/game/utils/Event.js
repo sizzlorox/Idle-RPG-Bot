@@ -50,65 +50,71 @@ class Event {
   attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers, multiplier) {
     return Database.getSameMapPlayers(selectedPlayer.map.name)
       .then((mappedPlayers) => {
-        const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
-          && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
-          && player.level <= selectedPlayer.level + 5 && player.level >= selectedPlayer.level - 5);
+        if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+          const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
+            && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
+            && player.level <= selectedPlayer.level + 5 && player.level >= selectedPlayer.level - 5);
 
-        if (sameMapPlayers.length > 0) {
-          const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
-          let randomPlayer = sameMapPlayers[randomPlayerIndex];
+          if (sameMapPlayers.length > 0) {
+            const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
+            let randomPlayer = sameMapPlayers[randomPlayerIndex];
 
-          return Battle.newSimulateBattleWithPlayer(
-            selectedPlayer,
-            randomPlayer
-          ).then(({ attacker, defender, attackerDamage, defenderDamage }) => {
-            selectedPlayer = attacker;
-            randomPlayer = defender;
+            if (randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+              return Battle.newSimulateBattleWithPlayer(
+                selectedPlayer,
+                randomPlayer
+              ).then(({
+                attacker, defender, attackerDamage, defenderDamage
+              }) => {
+                selectedPlayer = attacker;
+                randomPlayer = defender;
 
-            const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} in \`${selectedPlayer.map.name}\`!
-Battle Results:
-${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
-${helper.generatePlayerName(randomPlayer)}'s \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
-${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
+                const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} in \`${selectedPlayer.map.name}\`!
+    Battle Results:
+    ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+    ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+    ${helper.generatePlayerName(randomPlayer)}'s \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
+    ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
-            const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and failed.
-            ${randomPlayer.name} did ${defenderDamage} damage with ${randomPlayer.equipment.weapon.name}`;
+                const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and failed.
+                ${randomPlayer.name} did ${defenderDamage} damage with ${randomPlayer.equipment.weapon.name}`;
 
-            const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} but ${helper.generateGenderString(selectedPlayer, 'he')} failed.
-            You did ${defenderDamage} damage with ${randomPlayer.equipment.weapon.name}`;
+                const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} but ${helper.generateGenderString(selectedPlayer, 'he')} failed.
+                You did ${defenderDamage} damage with ${randomPlayer.equipment.weapon.name}`;
 
-            helper.sendMessage(discordHook, 'twitch', false, eventMsg);
-            selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
-            randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
+                helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+                selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
+                randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
 
-            if (selectedPlayer.health <= 0) {
-              return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
-                .then((stealResult) => {
-                  //  TODO: inverted because of how I set the stealPlayerItem function (think of a way to make this better!)
-                  helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook);
-                  return Database.savePlayer(stealResult.stealingPlayer)
-                    .then(() => {
-                      return stealResult.victimPlayer;
-                    });
-                })
-                .catch(err => console.log(err));
+                if (selectedPlayer.health <= 0) {
+                  return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
+                    .then((stealResult) => {
+                      //  TODO: inverted because of how I set the stealPlayerItem function (think of a way to make this better!)
+                      helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook);
+                      return Database.savePlayer(stealResult.stealingPlayer)
+                        .then(() => {
+                          return stealResult.victimPlayer;
+                        });
+                    })
+                    .catch(err => console.log(err));
+                }
+
+                if (randomPlayer.health <= 0) {
+                  return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
+                    .then((stealResult) => {
+                      helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook);
+                      return Database.savePlayer(stealResult.victimPlayer)
+                        .then(() => {
+                          return stealResult.stealingPlayer;
+                        });
+                    })
+                    .catch(err => console.log(err));
+                }
+
+                return selectedPlayer;
+              });
             }
-
-            if (randomPlayer.health <= 0) {
-              return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
-                .then((stealResult) => {
-                  helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook);
-                  return Database.savePlayer(stealResult.victimPlayer)
-                    .then(() => {
-                      return stealResult.stealingPlayer;
-                    });
-                })
-                .catch(err => console.log(err));
-            }
-
-            return selectedPlayer;
-          });
+          }
         }
 
         return this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
@@ -289,7 +295,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
       const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just sold what they found adventuring for ${profit} gold!`;
       const eventLog = `Made ${profit} gold selling what you found adventuring`;
 
-      helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+      helper.sendMessage(discordHook, 'twitch', false, `**${eventMsg}**`);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
     }
 
@@ -355,7 +361,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
   stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomBetween(0, 100);
-      if (luckStealChance > 90 - (selectedPlayer.currentBounty / 100)) {
+      if (luckStealChance > 90 - (victimPlayer.currentBounty / 100)) {
         const luckItem = helper.randomBetween(0, 2);
         switch (luckItem) {
           case 0:
@@ -483,15 +489,17 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
             break;
         }
       } else if (victimPlayer.gold > 0) {
-        const goldStolen = Math.round(victimPlayer.gold / 4);
-        stealingPlayer.gold += goldStolen;
-        victimPlayer.gold -= goldStolen;
+        const goldStolen = Math.round(victimPlayer.gold / 6);
+        if (goldStolen === 0) {
+          stealingPlayer.gold += goldStolen;
+          victimPlayer.gold -= goldStolen;
 
-        const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`);
-        const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
+          const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`);
+          const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
 
-        helper.sendMessage(discordHook, 'twitch', false, eventMsg);
-        stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
+          helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+          stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
+        }
       }
 
       return resolve({ stealingPlayer, victimPlayer });
@@ -647,7 +655,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                 });
 
                 if (shouldAddToList) {
-                  helper.sendMessage(discordHook, 'twitch', false, `**${eventMsgEris}**`);
+                  helper.sendMessage(discordHook, 'twitch', false, `${eventMsgEris}`);
                   selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
                   if (tempArray) {
                     selectedPlayer.spells = tempArray;
@@ -655,7 +663,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                   selectedPlayer.spells.push(spell);
                 }
               } else {
-                helper.sendMessage(discordHook, 'twitch', false, `**${eventMsgEris}**`);
+                helper.sendMessage(discordHook, 'twitch', false, `${eventMsgEris}`);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
                 selectedPlayer.spells.push(spell);
               }
@@ -711,7 +719,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
               });
 
               if (shouldAddToList) {
-                helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
+                helper.sendMessage(discordHook, 'twitch', false, `${spellEventResult.eventMsg}`);
                 selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
                 if (tempArray) {
                   selectedPlayer.spells = tempArray;
@@ -719,7 +727,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                 selectedPlayer.spells.push(spell);
               }
             } else {
-              helper.sendMessage(discordHook, 'twitch', false, `**${spellEventResult.eventMsg}**`);
+              helper.sendMessage(discordHook, 'twitch', false, `${spellEventResult.eventMsg}`);
               selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
               selectedPlayer.spells.push(spell);
             }
@@ -737,6 +745,7 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
                 }
                 break;
+
               case enumHelper.equipment.types.armor.position:
                 if (helper.calculateItemRating(selectedPlayer.equipment.armor) >= item.rating) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
@@ -744,12 +753,17 @@ ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
                 }
                 break;
+
               case enumHelper.equipment.types.weapon.position:
                 if (helper.calculateItemRating(selectedPlayer.equipment.weapon) >= item.rating) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
                 }
+                break;
+
+              case enumHelper.inventory.position:
+                selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
                 break;
             }
 

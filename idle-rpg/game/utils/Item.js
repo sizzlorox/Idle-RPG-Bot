@@ -114,7 +114,7 @@ class Item {
 
       let itemObj;
 
-      if (itemType.position === 'relic') {
+      if (itemType.position === enumHelper.equipment.types.relic.position) {
         const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4);
 
@@ -144,6 +144,16 @@ class Item {
           isXmasEvent: itemType.isXmasEvent,
           rating: itemRating,
           gold: Number((itemRarityList[randomRarityIndex].gold
+            * itemType.gold).toFixed()) * itemType.power
+        };
+      } else if (itemType.position === enumHelper.inventory.position) {
+        itemObj = {
+          name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
+          position: itemType.position,
+          isXmasEvent: itemType.isXmasEvent,
+          power: itemRarityList[randomRarityIndex].power + itemType.power,
+          gold: Number((itemRarityList[randomRarityIndex].gold
+            * itemMaterialList[randomMaterialIndex].gold
             * itemType.gold).toFixed()) * itemType.power
         };
       } else {

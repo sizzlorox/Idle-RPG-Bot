@@ -515,6 +515,16 @@ const items = {
         gold: 3,
         rarity: 90
       }
+    ],
+
+    inventory = [
+      potion = {
+        name: 'Health Potion',
+        position: 'inventory',
+        power: 0.25,
+        gold: 0.5,
+        rarity: 75
+      }
     ]
   ]
 };

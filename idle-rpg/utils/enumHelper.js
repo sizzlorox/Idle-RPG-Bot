@@ -7,7 +7,9 @@ const enumHelper = {
 
   inventory: {
     maxEquipmentAmount: 5,
-    maxItemAmount: 15
+    maxItemAmount: 15,
+    name: 'Inventory',
+    position: 'inventory'
   },
 
   equipment: {
@@ -69,44 +71,44 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'testeeeee1',
-    discordId: 'testeeeee1'
+    name: 'Victim_1',
+    discordId: 'Victim_1'
   },
   {
-    name: 'testeeeee2',
-    discordId: 'testeeeee2'
+    name: 'Victim_2',
+    discordId: 'Victim_2'
   },
   {
-    name: 'testeeeee3',
-    discordId: 'testeeeee3'
+    name: 'Victim_3',
+    discordId: 'Victim_3'
   },
   {
-    name: 'testeeeee4',
-    discordId: 'testeeeee4'
+    name: 'Victim_4',
+    discordId: 'Victim_4'
   },
   {
-    name: 'testeeeee5',
-    discordId: 'testeeeee5'
+    name: 'Victim_5',
+    discordId: 'Victim_5'
   },
   {
-    name: 'testeeeee6',
-    discordId: 'testeeeee6'
+    name: 'Victim_6',
+    discordId: 'Victim_6'
   },
   {
-    name: 'testeeeee7',
-    discordId: 'testeeeee7'
+    name: 'Victim_7',
+    discordId: 'Victim_7'
   },
   {
-    name: 'testeeeee8',
-    discordId: 'testeeeee8'
+    name: 'Victim_8',
+    discordId: 'Victim_8'
   },
   {
-    name: 'testeeeee9',
-    discordId: 'testeeeee9'
+    name: 'Victim_9',
+    discordId: 'Victim_9'
   },
   {
-    name: 'Tester 10',
-    discordId: 'Tester 10'
+    name: 'Victiem_10',
+    discordId: 'Victiem_10'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
