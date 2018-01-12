@@ -285,10 +285,11 @@ class Event {
   sellInTown(discordHook, twitchBot, selectedPlayer) {
     if (selectedPlayer.inventory.equipment.length > 0) {
       let profit = 0;
+      console.log(selectedPlayer.inventory.equipment);
       selectedPlayer.inventory.equipment.forEach((equipment) => {
-        console.log(equipment);
-        selectedPlayer.gold += equipment.gold;
-        profit += equipment.gold;
+        console.log(`Equipment selling: ${equipment.name}`);
+        selectedPlayer.gold += Number(equipment.gold);
+        profit += Number(equipment.gold);
       });
       selectedPlayer.inventory.equipment.length = 0;
 
@@ -402,7 +403,7 @@ class Event {
             if (helper.calculateItemRating(stealingPlayer.equipment.helmet) < helper.calculateItemRating(victimPlayer.equipment.helmet)) {
               victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
             } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenHelmet);
+              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, item);
             }
             break;
           case 1:
@@ -443,7 +444,7 @@ class Event {
             if (helper.calculateItemRating(stealingPlayer.equipment.armor) < helper.calculateItemRating(victimPlayer.equipment.armor)) {
               victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
             } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenArmor);
+              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, item);
             }
             break;
           case 2:
@@ -484,7 +485,7 @@ class Event {
             if (helper.calculateItemRating(stealingPlayer.equipment.weapon) < helper.calculateItemRating(victimPlayer.equipment.weapon)) {
               victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
             } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenWeapon);
+              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, item);
             }
             break;
         }

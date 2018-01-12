@@ -12,8 +12,8 @@ class Battle {
       const mobEvasive = mobObj.stats.dex;
       const mobDefense = mobObj.stats.end;
 
-      const playerChance = Math.round((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
-      const mobChance = Math.round((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
+      const playerChance = Math.ceil((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
+      const mobChance = Math.ceil((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
 
       return resolve({ playerChance, mobChance });
     });
@@ -41,21 +41,31 @@ class Battle {
     return new Promise((resolve) => {
       const maxRounds = 10;
       const battleResults = [];
+      let escaped = false;
       for (let round = 1; round <= maxRounds; round++) {
-        battleResults.push(this.round(attacker, defender));
-        if (attacker.health <= 0 || defender.health <= 0) {
+        battleResults.push(
+          this.round(attacker, defender)
+            .then((roundResults) => {
+              if (roundResults.attackerDamage === 0) {
+                const attackerEscapeDice = helper.randomBetween(0, 100);
+                console.log(`${attacker.name} tried running away with ${attackerEscapeDice}.`);
+                if (attackerEscapeDice >= 50) {
+                  console.log(`${attacker.name} did 0 damage and escaped!`);
+                  escaped = true;
+                }
+              } else if (roundResults.defenderDamage === 0) {
+                const defenderEscapeDice = helper.randomBetween(0, 100);
+                console.log(`${defender.name} tried running away with ${defenderEscapeDice}.`);
+                if (defenderEscapeDice >= 50) {
+                  console.log(`${defender.name} did 0 damage and escaped!`);
+                  escaped = true;
+                }
+              }
+              return roundResults;
+            })
+        );
+        if (attacker.health <= 0 || defender.health <= 0 || escaped) {
           break;
-        }
-        if (battleResults[battleResults.length - 1].attackerDamage === 0) {
-          if (helper.randomBetween(0, 100) >= 75) {
-            console.log(`${attacker.name} did 0 damage and escaped!`);
-            break;
-          }
-        } else if (battleResults[battleResults.length - 1].defenderDamage === 0) {
-          if (helper.randomBetween(0, 100) >= 75) {
-            console.log(`${defender.name} did 0 damage and escaped!`);
-            break;
-          }
         }
       }
 

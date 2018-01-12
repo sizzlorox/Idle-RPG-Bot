@@ -71,44 +71,44 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'Victim_1',
-    discordId: 'Victim_1'
+    name: 'pewpewpew1',
+    discordId: 'pewpewpew1'
   },
   {
-    name: 'Victim_2',
-    discordId: 'Victim_2'
+    name: 'pewpewpew2',
+    discordId: 'pewpewpew2'
   },
   {
-    name: 'Victim_3',
-    discordId: 'Victim_3'
+    name: 'pewpewpew3',
+    discordId: 'pewpewpew3'
   },
   {
-    name: 'Victim_4',
-    discordId: 'Victim_4'
+    name: 'pewpewpew4',
+    discordId: 'pewpewpew4'
   },
   {
-    name: 'Victim_5',
-    discordId: 'Victim_5'
+    name: 'pewpewpew5',
+    discordId: 'pewpewpew5'
   },
   {
-    name: 'Victim_6',
-    discordId: 'Victim_6'
+    name: 'pewpewpew6',
+    discordId: 'pewpewpew6'
   },
   {
-    name: 'Victim_7',
-    discordId: 'Victim_7'
+    name: 'pewpewpew7',
+    discordId: 'pewpewpew7'
   },
   {
-    name: 'Victim_8',
-    discordId: 'Victim_8'
+    name: 'pewpewpew8',
+    discordId: 'pewpewpew8'
   },
   {
-    name: 'Victim_9',
-    discordId: 'Victim_9'
+    name: 'pewpewpew9',
+    discordId: 'pewpewpew9'
   },
   {
-    name: 'Victiem_10',
-    discordId: 'Victiem_10'
+    name: 'PEWWWW',
+    discordId: 'PEWWWW'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
