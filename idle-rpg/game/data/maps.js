@@ -145,7 +145,7 @@ const maps = [
     name: 'Witchlyn',
     type: type.land,
     levelReq: 1,
-    lore: 'No matter what warnings are given there are always those who find themselves attracted to this closely packed dark forest. Trees do not look healthy but grow dense enough to obscure much of the light. The forest floor is home to a number creatures that hate the light. Many stories use this as a location of evil. Grows to the lake of Rosepond on one side and the walls of the Kingdom of Olohaseth.'
+    lore: 'No matter what warnings are given there are always those who find themselves attracted to this closely packed dark forest. Trees do not look healthy but grow dense enough to obscure much of the light. The forest round is home to a number creatures that hate the light. Many stories use this as a location of evil. Grows to the lake of Rosepond on one side and the walls of the Kingdom of Olohaseth.'
   },
   {
     id: 19,

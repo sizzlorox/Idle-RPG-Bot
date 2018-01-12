@@ -13,7 +13,7 @@ const commands = [
     function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
-        !top10 <gold, spells, level, stolen, stole, gambles, events> - Retrieves top 10 highest of selected section
+        !top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
         !stats - Sends a PM with your stats
         !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
         !equip - Sends a PM with your equipment
@@ -24,16 +24,10 @@ const commands = [
         !eventlog - Lists up to 15 past events
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
-        !gender <male|female|neutral> - Change your character's gender
+        !gender <male|female|neutral|neuter|yo|elverson|spivak|hir|per|xe|helicopter|ghost> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
+        !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         \`\`\``;
-      /*
-
-      !crypto - Displays some crypto currencies info.
-      !nextlaunch - Displays next rocket launch info.
-      !nextstreamlaunch - Displayes next rocket launch that will have a stream.
-
-      */
       message.author.send(helpMsg);
     }
   },
@@ -187,6 +181,9 @@ const commands = [
         case 'events':
           game.top10(message.author, { events: -1 });
           break;
+        case 'bounty':
+          game.top10(message.author, { currentBounty: -1 });
+          break;
         default:
           game.top10(message.author, { level: -1 });
           break;
@@ -220,12 +217,40 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
-        game.castSpell(message.author, discordHook, message.content.split(/ (.+)/)[1].toLowerCase());
-      } else {
-        message.reply(`\`\`\`List of spells:
+        return game.castSpell(message.author, discordHook, message.content.split(/ (.+)/)[1].toLowerCase());
+      }
+
+      return message.reply(`\`\`\`List of spells:
         bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
         \`\`\``);
+    }
+  },
+
+  /**
+   * places a bounty on a specific player for a specific amount should work with @playername and then a gold amount
+   */
+  placeBounty = {
+    command: '!bounty',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      const splitArray = message.content.split(' ');
+      if (message.content.includes(' ') && splitArray.length === 3) {
+        const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
+        const amount = splitArray[2];
+
+        if (Number(amount) <= 0 || Number(amount) % 1 !== 0 || !amount.match(/^\d+$/)) {
+          return message.author.send('Please use a regular amount of gold.');
+        }
+        if (Number(amount) < 100) {
+          return message.author.send('You must place a bounty higher or equal to 100');
+        }
+        if (!recipient.match(/^\d+$/)) {
+          return message.author.send('Please add a bounty to a player.');
+        }
+        return game.placeBounty(discordHook, message.author, recipient, Number(amount));
       }
+
+      return message.author.send('Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head');
     }
   },
 
@@ -289,20 +314,51 @@ const commands = [
           case 'male':
           case 'female':
           case 'neutral':
+          case 'neuter':
             return game.modifyGender(message.author, discordHook, splitCommand[1]);
         }
-
       }
 
       return message.reply(`\`\`\`Possible options:
         male
         female
         neutral
+        neuter
         \`\`\``);
     }
   },
 
   // Bot Operator commands
+  setPlayerBounty = {
+    command: '!setbounty',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      const splitArray = message.content.split(' ');
+      if (message.content.includes(' ') && splitArray.length === 3) {
+        const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
+        const amount = splitArray[2];
+        game.setPlayerBounty(recipient, Number(amount));
+        return message.author.send('Done');
+      }
+    }
+  },
+
+  setPlayerGold = {
+    command: '!setgold',
+    operatorOnly: true,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      const splitArray = message.content.split(' ');
+      if (message.content.includes(' ') && splitArray.length === 3) {
+        const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
+        const amount = splitArray[2];
+        game.setPlayerGold(recipient, Number(amount));
+        return message.author.send('Done');
+      }
+    }
+  },
+
   sendChristmasFirstPreMessage = {
     command: '!xmasfirst',
     operatorOnly: true,

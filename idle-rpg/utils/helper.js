@@ -43,19 +43,6 @@ class helper {
     const secondString = date.getUTCSeconds() === 0 ? '' : `${seconds}s`;
 
     return `${dayString}${hourString}${minuteString}${secondString}`;
-    /*
-    const seconds = ((duration / 1000) % 60).toFixed();
-    const minutes = ((duration / (1000 * 60)) % 60).toFixed();
-    const hours = ((duration / (1000 * 60 * 60)) % 24).toFixed();
-    const days = (duration / (1000 * 60 * 60 * 24)).toFixed();
-
-    const dayString = Number(days) === 0 ? '' : `${days}d `;
-    const hourString = Number(hours) === 0 || Number(hours) === 24 ? '' : `${hours}h `;
-    const minuteString = Number(minutes) === 0 || Number(minutes) === 60 ? '' : `${minutes}m `;
-    const secondString = Number(seconds) === 0 || Number(seconds) === 60 ? '' : `${seconds}s`;
-
-    return `${dayString}${hourString}${minuteString}${secondString}`;
-    */
   }
 
   logEvent(selectedPlayer, msg) {
@@ -73,11 +60,12 @@ class helper {
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
       discordHook.movementHook.send(msg)
-        .then(debugMsg => logger.log('move', this.formatLog(debugMsg)))
+        .then(debugMsg => logger.move(this.formatLog(debugMsg)))
         .catch(err => logger.error(err));
     } else {
       discordHook.actionHook.send(msg)
-        .then(debugMsg => logger.log('action', this.formatLog(debugMsg)))
+        .then(debugMsg => logger.action(this.formatLog(debugMsg)))
+        .catch(err => logger.error(err));
     }
 
     // Add if to check if channel is streaming
@@ -122,10 +110,10 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-      return Math.abs(item.str + item.dex + item.end + item.int);
+      return Math.round(item.str + item.dex + item.end + item.int);
     }
 
-    return Math.abs(item.str + item.dex + item.end + item.int + item.luk);
+    return Math.round(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -192,6 +180,7 @@ class helper {
       selectedPlayer.equipment[equipment].luk = item.stats.luk;
     }
     selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
+
     return selectedPlayer;
   }
 
@@ -200,22 +189,19 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
-      selectedPlayer.gold = Math.abs(selectedPlayer.gold / 2);
-      switch (this.randomBetween(0, 2)) {
-        case 0:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
-          break;
-        case 1:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
-          break;
-        case 2:
-          this.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
-          break;
-      }
+      selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
       } else {
+        if (selectedPlayer.currentBounty > 0) {
+          attackerObj.gold += selectedPlayer.currentBounty;
+          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
+          const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
+          attackerObj = this.logEvent(attackerObj, bountyEventLog);
+          selectedPlayer.currentBounty = 0;
+        }
+
         selectedPlayer.deaths.player++;
         attackerObj.kills.player++;
         Database.savePlayer(selectedPlayer);
@@ -237,6 +223,7 @@ class helper {
     Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}
+    Bounty: ${player.currentBounty}
 
     Stats (Sum of stats with equipment):
       Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})
@@ -296,31 +283,7 @@ class helper {
    * @returns String
    */
   generateGenderString(player, word) {
-    const wordMapping = {
-      male: {
-        he: 'he',
-        his: 'his',
-        him: 'him',
-        himself: 'himself',
-      },
-      female: {
-        he: 'she',
-        his: 'her',
-        him: 'her',
-        himself: 'herself',
-      },
-      neutral: {
-        he: 'they',
-        his: 'their',
-        him: 'them',
-        himself: 'themself',
-      }
-    };
-
-    if (wordMapping[player.gender] && wordMapping[player.gender][word]) {
-      return wordMapping[player.gender][word];
-    }
-    return word;
+    return enumHelper.genders[player.gender] ? enumHelper.genders[player.gender][word] : word;
   }
 
   generateEquipmentsString(player) {
@@ -372,6 +335,7 @@ class helper {
       logResult = logResult.concat(`${player.pastEvents[i].event} [${this.getTimePassed(player.pastEvents[i].timeStamp)} ago]\n      `);
       logCount++;
     }
+
     return logResult;
   }
 }

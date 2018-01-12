@@ -5,8 +5,8 @@ class Monster {
 
   generateMonster(selectedPlayer) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.ceil(helper.randomBetween(0, 100));
-      const randomTypeChance = Math.ceil(helper.randomBetween(0, 100));
+      const randomRarityChance = Math.round(helper.randomBetween(0, 100));
+      const randomTypeChance = Math.round(helper.randomBetween(0, 100));
       const randomMonsterType = randomTypeChance + randomRarityChance > 100 ? 100 : randomTypeChance + randomRarityChance;
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType

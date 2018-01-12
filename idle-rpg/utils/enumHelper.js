@@ -116,6 +116,34 @@ const enumHelper = {
   {
     name: 'Tester 10',
     discordId: 'Tester 10'
-  }]
+  }],
+
+  // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
+  genders: {
+    male: {
+      he: 'he',
+      his: 'his',
+      him: 'him',
+      himself: 'himself',
+    },
+    female: {
+      he: 'she',
+      his: 'her',
+      him: 'her',
+      himself: 'herself',
+    },
+    neutral: {
+      he: 'they',
+      his: 'their',
+      him: 'them',
+      himself: 'themself',
+    },
+    neuter: {
+      he: 'it',
+      his: 'its',
+      him: 'it',
+      himself: 'itself',
+    }
+  }
 };
 module.exports = enumHelper;

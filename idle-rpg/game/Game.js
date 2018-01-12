@@ -164,11 +164,17 @@ class Game {
     return Database.loadTop10(type)
       .then((top10) => {
         const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
-          .sort((player1, player2) => player2.experience - player1.experience && player2.level - player2.level)
-          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0]}: ${player[Object.keys(type)[0]]}`)
+          .sort((player1, player2) => {
+            if (Object.keys(type)[0] === 'level') {
+              return player2.experience - player1.experience && player2.level - player2.level;
+            }
+
+            return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+          })
+          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`)
           .join('\n')}`;
 
-        commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0]}:
+        commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0].replace('currentBounty', 'Bounty')}:
 ${rankString}
         \`\`\``);
       });
@@ -228,7 +234,7 @@ ${rankString}
         switch (spell) {
           case 'bless':
             if (castingPlayer.gold >= spells.bless.spellCost) {
-              castingPlayer.spells++;
+              castingPlayer.spells += 1;
               castingPlayer.gold -= spells.bless.spellCost;
               this.multiplier += 1;
               const blessLogObj = {
@@ -262,6 +268,59 @@ ${rankString}
             }
             break;
         }
+      });
+  }
+
+  setPlayerBounty(recipient, amount) {
+    return Database.loadPlayer(recipient)
+      .then((player) => {
+        player.currentBounty = amount;
+        return Database.savePlayer(player);
+      });
+  }
+
+  setPlayerGold(recipient, amount) {
+    return Database.loadPlayer(recipient)
+      .then((player) => {
+        player.gold = amount;
+        return Database.savePlayer(player);
+      });
+  }
+
+  /**
+   * places a bounty on specific player
+   * @param {*} discordHook 
+   * @param {*} playerId 
+   * @param {*} recipient 
+   * @param {*} amount 
+   */
+  placeBounty(discordHook, bountyPlacer, recipient, amount) {
+    return Database.loadPlayer(bountyPlacer.id)
+      .then((placer) => {
+        if (placer.gold >= amount) {
+          placer.gold -= amount;
+
+          return Database.savePlayer(placer)
+            .then(() => {
+              return Database.loadPlayer(recipient)
+                .then((bountyRecipient) => {
+                  if (!bountyRecipient) {
+                    return bountyPlacer.send('This player does not exist.');
+                  }
+                  bountyRecipient.currentBounty += amount;
+                  discordHook.actionHook.send(
+                    helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
+                  );
+
+                  return Database.savePlayer(bountyRecipient)
+                    .then(() => {
+                      return bountyPlacer.send(`Bounty of ${amount} gold has been placed`);
+                    });
+                });
+            });
+        }
+
+        return bountyPlacer.send('You need more gold to place this bounty');
       });
   }
 
