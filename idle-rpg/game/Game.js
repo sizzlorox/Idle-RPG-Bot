@@ -292,9 +292,9 @@ ${rankString}
   setPlayerTitles(discordBot, selectedPlayer) {
     const playerDiscordObj = discordBot.guilds.array()[0].members
       .filterArray(member => member.id === selectedPlayer.discordId)[0];
-    const goldTitleRole = 401819910671433729;
-    const thiefTitleRole = 401821609075277824;
-    const veteranTitleRole = 401822640278470656;
+    const goldTitleRole = '401819910671433729';
+    const thiefTitleRole = '401821609075277824';
+    const veteranTitleRole = '401822640278470656';
 
     const hasGoldTitle = playerDiscordObj.roles.array().includes({ id: goldTitleRole });
     if (selectedPlayer.gold >= 10000 && !hasGoldTitle) {
