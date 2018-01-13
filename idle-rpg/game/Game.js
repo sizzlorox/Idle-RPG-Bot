@@ -23,7 +23,7 @@ class Game {
    * @param {*} onlinePlayers 
    * @param {*} twitchBot 
    */
-  selectEvent(player, onlinePlayers, twitchBot) {
+  selectEvent(discordBot, player, onlinePlayers, twitchBot) {
     const randomEvent = helper.randomBetween(0, 2);
 
     Database.loadPlayer(player.discordId)
@@ -38,6 +38,7 @@ class Game {
       })
       .then((selectedPlayer) => {
         // selectedPlayer = Event.regenItem(selectedPlayer);
+        this.setPlayerTitles(discordBot, selectedPlayer);
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
         if (selectedPlayer.gender === 'boy')
@@ -286,6 +287,41 @@ ${rankString}
         player.gold = amount;
         return Database.savePlayer(player);
       });
+  }
+
+  setPlayerTitles(discordBot, selectedPlayer) {
+    const playerDiscordObj = discordBot.guilds.array()[0].members
+      .filterArray(member => member.id === selectedPlayer.discordId)[0];
+    const goldTitleRole = 401819910671433729;
+    const thiefTitleRole = 401821609075277824;
+    const veteranTitleRole = 401822640278470656;
+
+    const hasGoldTitle = playerDiscordObj.roles.array().includes({ id: goldTitleRole });
+    if (selectedPlayer.gold >= 10000 && !hasGoldTitle) {
+      playerDiscordObj.addRole(goldTitleRole);
+      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
+    } else if (hasGoldTitle) {
+      playerDiscordObj.removeRole(goldTitleRole);
+      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
+    }
+
+    const hasThiefTitle = playerDiscordObj.roles.array().includes({ id: thiefTitleRole });
+    if (selectedPlayer.stole >= 50 && !hasThiefTitle) {
+      playerDiscordObj.addRole(thiefTitleRole);
+      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Thief title!`));
+    } else if (hasThiefTitle) {
+      playerDiscordObj.removeRole(thiefTitleRole);
+      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} lost the Thief title!`));
+    }
+
+    const hasVeteranTitle = playerDiscordObj.roles.array().includes({ id: veteranTitleRole });
+    if (selectedPlayer.events >= 10000 && !hasVeteranTitle) {
+      playerDiscordObj.addRole(veteranTitleRole);
+      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Veteran Idler title!`));
+    } else if (hasVeteranTitle) {
+      playerDiscordObj.removeRole(veteranTitleRole);
+      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
+    }
   }
 
   /**
