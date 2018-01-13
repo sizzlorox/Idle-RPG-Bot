@@ -299,28 +299,28 @@ ${rankString}
     const hasGoldTitle = playerDiscordObj.roles.array().includes({ id: goldTitleRole });
     if (selectedPlayer.gold >= 10000 && !hasGoldTitle) {
       playerDiscordObj.addRole(goldTitleRole);
-      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
     } else if (hasGoldTitle) {
       playerDiscordObj.removeRole(goldTitleRole);
-      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
     }
 
     const hasThiefTitle = playerDiscordObj.roles.array().includes({ id: thiefTitleRole });
     if (selectedPlayer.stole >= 50 && !hasThiefTitle) {
       playerDiscordObj.addRole(thiefTitleRole);
-      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Thief title!`));
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Thief title!`));
     } else if (hasThiefTitle) {
       playerDiscordObj.removeRole(thiefTitleRole);
-      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} lost the Thief title!`));
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Thief title!`));
     }
 
     const hasVeteranTitle = playerDiscordObj.roles.array().includes({ id: veteranTitleRole });
     if (selectedPlayer.events >= 10000 && !hasVeteranTitle) {
       playerDiscordObj.addRole(veteranTitleRole);
-      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Veteran Idler title!`));
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Veteran Idler title!`));
     } else if (hasVeteranTitle) {
       playerDiscordObj.removeRole(veteranTitleRole);
-      this.discordHook.actionHook(helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
     }
   }
 
