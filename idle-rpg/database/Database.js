@@ -126,7 +126,7 @@ class Database {
     });
   }
 
-  loadPlayer(discordId) {
+  loadPlayer(discordId, selectFields = {}) {
     connect();
     return new Promise((resolve, reject) => {
       return Player.findOne({ discordId }, (err, result) => {
@@ -137,7 +137,8 @@ class Database {
         // console.log(`DATABASE: ${discordId} has been loaded from the Database.`);
         disconnect();
         return resolve(result);
-      });
+      })
+        .select(selectFields);
     });
   }
 

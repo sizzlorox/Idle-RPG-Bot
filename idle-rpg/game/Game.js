@@ -1,5 +1,6 @@
 const helper = require('../utils/helper');
 const Database = require('../database/Database');
+const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
 const spells = require('./data/spells');
 const moment = require('moment');
@@ -338,23 +339,23 @@ ${rankString}
 
   /**
    * Loads player stats by dicordId
-   * @param {*} commandAuthor 
+   * @param {Number} commandAuthor
    */
   playerStats(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id);
+    return Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
   }
 
   /**
    * Loads player equipment by discordId
-   * @param {*} commandAuthor 
+   * @param {Number} commandAuthor
    */
   playerEquipment(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id);
+    return Database.loadPlayer(commandAuthor.id, enumHelper.equipSelectFields);
   }
 
   /**
    * Get online players maps by an array of discordIds
-   * @param {*} onlinePlayers 
+   * @param {Map} onlinePlayers
    */
   getOnlinePlayerMaps(onlinePlayers) {
     return Database.loadOnlinePlayerMaps(onlinePlayers);
