@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const mapSchema = require('./map');
 const maps = require('../../game/data/maps');
-const moment = require('moment');
 const { starterTown } = require('../../../settings');
 
 const newPlayerObj = (discordId, name) => {
@@ -55,7 +54,7 @@ const newPlayerObj = (discordId, name) => {
     },
     spells: [],
     isOnline: true,
-    createdAt: moment().toISOString(),
+    createdAt: new Date().getTime(),
     events: 0,
     gambles: 0,
     stole: 0,
@@ -155,7 +154,7 @@ const playerSchema = mongoose.Schema({
     default: []
   },
   isOnline: Boolean,
-  createdAt: Date,
+  createdAt: String,
   events: Number,
   gambles: {
     type: Number,

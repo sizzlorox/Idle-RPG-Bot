@@ -2,7 +2,6 @@ const helper = require('../utils/helper');
 const Database = require('../database/Database');
 const Event = require('./utils/Event');
 const globalSpells = require('./data/globalSpells');
-const moment = require('moment');
 const { multiplier } = require('../../settings');
 
 /**
@@ -18,9 +17,9 @@ class Game {
 
   /**
    * Loads player by discordID and rolls a dice to select which type of event to activate
-   * @param {*} player 
-   * @param {*} onlinePlayers 
-   * @param {*} twitchBot 
+   * @param {Number} player
+   * @param {Array} onlinePlayers
+   * @param {*} twitchBot
    */
   selectEvent(player, onlinePlayers, twitchBot) {
     const randomEvent = helper.randomBetween(0, 2);
@@ -45,8 +44,6 @@ class Game {
         }
 
         helper.passiveHeal(selectedPlayer);
-        console.log(`\nGAME: Random Event ID: ${randomEvent} ${moment().utc('br')}`);
-
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
@@ -74,9 +71,9 @@ class Game {
 
   /**
    * Rolls dice to select which type of attack event is activated for the player
-   * @param {*} selectedPlayer 
-   * @param {*} onlinePlayers 
-   * @param {*} twitchBot 
+   * @param {Player} selectedPlayer
+   * @param {Array} onlinePlayers
+   * @param {*} twitchBot
    */
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
@@ -98,12 +95,11 @@ class Game {
 
   /**
    * Rolls dice to select which type of luck event is activated for the player
-   * @param {*} selectedPlayer 
-   * @param {*} twitchBot 
+   * @param {Player} selectedPlayer
+   * @param {*} twitchBot
    */
   luckEvent(selectedPlayer, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
-    console.log(`Player: ${selectedPlayer.name} - Dice: ${luckDice}`);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
     }
@@ -141,8 +137,8 @@ class Game {
 
   /**
    * Gives gold amount to player
-   * @param {*} playerId 
-   * @param {*} amount 
+   * @param {Number} playerId
+   * @param {Number} amount
    */
   giveGold(playerId, amount) {
     return Database.loadPlayer(playerId)
@@ -154,8 +150,8 @@ class Game {
 
   /**
    * Returns top10 of a certain attribute
-   * @param {*} commandAuthor 
-   * @param {*} type 
+   * @param {Number} commandAuthor
+   * @param {String} type
    */
   top10(commandAuthor, type = { level: -1 }) {
     return Database.loadTop10(type)
@@ -179,15 +175,16 @@ ${rankString}
 
   /**
    * Modify player preference for being @mentionned in events
-   * @param Player commandAuthor
-   * @param DiscordHook hook
-   * @param Boolean isMentionInDiscord
+   * @param {Number} commandAuthor
+   * @param {DiscordHook} hook
+   * @param {Boolean} isMentionInDiscord
    */
   modifyMention(commandAuthor, hook, isMentionInDiscord) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (castingPlayer.isMentionInDiscord !== isMentionInDiscord) {
           castingPlayer.isMentionInDiscord = isMentionInDiscord;
+
           return Database.savePlayer(castingPlayer)
             .then(() => {
               return commandAuthor.send('Preference for being @mention has been updated.');
@@ -221,9 +218,9 @@ ${rankString}
 
   /**
    * Casts spell
-   * @param {*} commandAuthor 
-   * @param {*} hook 
-   * @param {*} spell 
+   * @param {Number} commandAuthor
+   * @param {DiscordHook} hook
+   * @param {String} spell
    */
   castSpell(commandAuthor, hook, spell) {
     return Database.loadPlayer(commandAuthor.id)
@@ -268,6 +265,11 @@ ${rankString}
       });
   }
 
+  /**
+   * Sets player bounty
+   * @param {Number} recipient
+   * @param {Number} amount
+   */
   setPlayerBounty(recipient, amount) {
     return Database.loadPlayer(recipient)
       .then((player) => {
@@ -276,6 +278,11 @@ ${rankString}
       });
   }
 
+  /**
+   * Sets player gold
+   * @param {Number} recipient
+   * @param {Number} amount
+   */
   setPlayerGold(recipient, amount) {
     return Database.loadPlayer(recipient)
       .then((player) => {
@@ -286,10 +293,10 @@ ${rankString}
 
   /**
    * places a bounty on specific player
-   * @param {*} discordHook 
-   * @param {*} playerId 
-   * @param {*} recipient 
-   * @param {*} amount 
+   * @param {DiscordHook} discordHook
+   * @param {Number} playerId
+   * @param {Number} recipient
+   * @param {Number} amount
    */
   placeBounty(discordHook, bountyPlacer, recipient, amount) {
     return Database.loadPlayer(bountyPlacer.id)
@@ -323,8 +330,8 @@ ${rankString}
 
   /**
    * Returns player eventlog by <count> amount
-   * @param {*} playerId 
-   * @param {*} count 
+   * @param {Mumber} playerId
+   * @param {Number} count
    */
   playerEventLog(playerId, count) {
     return Database.loadPlayer(playerId)
@@ -335,7 +342,7 @@ ${rankString}
 
   /**
    * Loads player stats by dicordId
-   * @param {*} commandAuthor 
+   * @param {Number} commandAuthor
    */
   playerStats(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
@@ -343,7 +350,7 @@ ${rankString}
 
   /**
    * Loads player equipment by discordId
-   * @param {*} commandAuthor 
+   * @param {Number} commandAuthor
    */
   playerEquipment(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id);
@@ -351,7 +358,7 @@ ${rankString}
 
   /**
    * Get online players maps by an array of discordIds
-   * @param {*} onlinePlayers 
+   * @param {Array} onlinePlayers
    */
   getOnlinePlayerMaps(onlinePlayers) {
     return Database.loadOnlinePlayerMaps(onlinePlayers);
@@ -359,7 +366,7 @@ ${rankString}
 
   /**
    * Saves player into database
-   * @param {*} player 
+   * @param {Number} player
    */
   savePlayer(player) {
     return Database.savePlayer(player);
@@ -367,7 +374,7 @@ ${rankString}
 
   /**
    * Loads player by discordId
-   * @param {*} playerId 
+   * @param {Number} playerId
    */
   loadPlayer(playerId) {
     return Database.loadPlayer(playerId);
@@ -375,7 +382,7 @@ ${rankString}
 
   /**
    * Deletes player by discordId
-   * @param {*} playerId 
+   * @param {Number} playerId
    */
   deletePlayer(playerId) {
     return Database.deletePlayer(playerId);

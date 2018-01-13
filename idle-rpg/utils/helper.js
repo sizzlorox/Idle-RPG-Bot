@@ -234,6 +234,7 @@ class helper {
       spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
     });
     spellBookString = spellBookString.concat('\`\`\`');
+
     return spellBookString;
   }
 
@@ -254,7 +255,7 @@ class helper {
       Intelligence: ${player.stats.int} (${this.sumPlayerTotalIntelligence(player)})
       Luck: ${player.stats.luk} (${this.sumPlayerTotalLuck(player)})
 
-    Born: ${player.createdAt}
+    Born: ${this.toTimeFormat(Number(player.createdAt))}
     Events: ${player.events}
     Gambles: ${player.gambles}
     Items Stolen: ${player.stole}
