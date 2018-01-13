@@ -37,6 +37,21 @@ class Battle {
     return { playerChance, otherPlayerChance };
   }
 
+  newSimulateBattleWithMob(selectedPlayer, mobObj) {
+    return new Promise((resolve) => {
+      const maxRounds = 10;
+      const battleResults = [];
+      for (let round = 1; round <= maxRounds; round++) {
+        
+      }
+
+      return Promise.all(battleResults)
+        .then((result) => {
+
+        });
+    });
+  }
+
   newSimulateBattleWithPlayer(attacker, defender) {
     return new Promise((resolve) => {
       const maxRounds = 10;

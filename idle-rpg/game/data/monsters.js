@@ -1,11 +1,48 @@
 const monsters = {
   rarity: [
+    starving = {
+      name: 'Starving',
+      power: 0.05,
+      stats: {
+        str: 0.05,
+        dex: 0.05,
+        end: 0.05,
+        int: 0.05,
+        luk: 0.05
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.05
+        },
+        armor: {
+          name: '',
+          power: 0.05
+        }
+      },
+      experience: 1,
+      gold: 0.25,
+      rarity: 75
+    },
     normal = {
       name: 'Normal',
+      power: 0.25,
       stats: {
-        str: 1,
-        dex: 1,
-        end: 1
+        str: 0.25,
+        dex: 0.25,
+        end: 0.25,
+        int: 0.25,
+        luk: 0.25
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.25
+        },
+        armor: {
+          name: '',
+          power: 0.25
+        }
       },
       experience: 1,
       gold: 1,
@@ -13,10 +50,23 @@ const monsters = {
     },
     veteran = {
       name: 'Veteran',
+      power: 0.5,
       stats: {
-        str: 2,
-        dex: 2,
-        end: 2
+        str: 0.5,
+        dex: 0.5,
+        end: 0.5,
+        int: 0.5,
+        luk: 0.5
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.5
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
       },
       experience: 2,
       gold: 2,
@@ -24,10 +74,23 @@ const monsters = {
     },
     elite = {
       name: 'Elite',
+      power: 0.75,
       stats: {
-        str: 3,
-        dex: 3,
-        end: 3
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
       },
       experience: 3,
       gold: 3,
@@ -35,10 +98,23 @@ const monsters = {
     },
     champion = {
       name: 'Champion',
+      power: 1,
       stats: {
-        str: 4,
-        dex: 4,
-        end: 4
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 1,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
       },
       experience: 4,
       gold: 4,
@@ -46,10 +122,23 @@ const monsters = {
     },
     legendary = {
       name: 'Legendary',
+      power: 1.25,
       stats: {
-        str: 5,
-        dex: 5,
-        end: 5
+        str: 1.25,
+        dex: 1.25,
+        end: 1.25,
+        int: 1.25,
+        luk: 1.25
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.25
+        },
+        armor: {
+          name: '',
+          power: 1.25
+        }
       },
       experience: 5,
       gold: 5,
@@ -57,10 +146,23 @@ const monsters = {
     },
     omega = {
       name: 'Omega',
+      power: 1.5,
       stats: {
-        str: 6,
-        dex: 6,
-        end: 6
+        str: 1.5,
+        dex: 1.5,
+        end: 1.5,
+        int: 1.5,
+        luk: 1.5
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.5
+        },
+        armor: {
+          name: '',
+          power: 1.5
+        }
       },
       experience: 6,
       gold: 6,
@@ -68,10 +170,23 @@ const monsters = {
     },
     undead = {
       name: 'Undead',
+      power: 0.25,
       stats: {
-        str: 1,
-        dex: 1,
-        end: 1
+        str: 0.25,
+        dex: 0.25,
+        end: 0.25,
+        int: 0.25,
+        luk: 0.25
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.25
+        },
+        armor: {
+          name: '',
+          power: 0.25
+        }
       },
       experience: 1,
       gold: 1,
@@ -79,10 +194,23 @@ const monsters = {
     },
     deadly = {
       name: 'Deadly',
+      power: 0.75,
       stats: {
-        str: 6,
-        dex: 3,
-        end: 6
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
       },
       experience: 6,
       gold: 6,
@@ -90,10 +218,23 @@ const monsters = {
     },
     berserk = {
       name: 'Berserk',
+      power: 1,
       stats: {
-        str: 4,
-        dex: 2,
-        end: 3
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 1,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
       },
       experience: 3,
       gold: 1,
@@ -101,25 +242,27 @@ const monsters = {
     },
     corrupted = {
       name: 'Corrupted',
+      power: 0.75,
       stats: {
-        str: 2,
-        dex: 1,
-        end: 2
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
       },
       experience: 1.5,
       gold: 1.5,
       rarity: 71
-    },
-    starving = {
-      name: 'Starving',
-      stats: {
-        str: 1,
-        dex: 1,
-        end: 0.5
-      },
-      experience: 1,
-      gold: 0.25,
-      rarity: 75
     },
   ],
 
@@ -128,11 +271,28 @@ const monsters = {
       name: 'Rat',
       isSpawnable: true,
       spawnableMapType: ['Land'],
+      power: 0.05,
       stats: {
-        str: 1,
-        dex: 1,
-        end: 1,
+        str: 0.05,
+        dex: 0.05,
+        end: 0.05,
+        int: 0.05,
+        luk: 0.05
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.05
+        },
+        armor: {
+          name: '',
+          power: 0.05
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 4,
       gold: 2,
       rarity: 100
@@ -141,11 +301,28 @@ const monsters = {
       name: 'Crab',
       isSpawnable: true,
       spawnableMapType: ['Land'],
+      power: 0.1,
       stats: {
-        str: 1,
-        dex: 1,
-        end: 1,
+        str: 0.1,
+        dex: 0.1,
+        end: 0.1,
+        int: 0.1,
+        luk: 0.1
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.1
+        },
+        armor: {
+          name: '',
+          power: 0.1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 2,
       gold: 1,
       rarity: 100
@@ -154,11 +331,28 @@ const monsters = {
       name: 'Slime',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
+      power: 0.25,
       stats: {
-        str: 2,
-        dex: 2,
-        end: 1,
+        str: 0.25,
+        dex: 0.25,
+        end: 0.25,
+        int: 0.25,
+        luk: 0.25
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.25
+        },
+        armor: {
+          name: '',
+          power: 0.25
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 5,
       gold: 2,
       rarity: 100
@@ -167,10 +361,23 @@ const monsters = {
       name: 'Goblin',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
+      power: 0.5,
       stats: {
-        str: 2,
-        dex: 1,
-        end: 2,
+        str: 0.5,
+        dex: 0.5,
+        end: 0.5,
+        int: 0.5,
+        luk: 0.5
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.5
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
       },
       experience: 6,
       gold: 2,
@@ -180,11 +387,28 @@ const monsters = {
       name: 'Bandit',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
+      power: 0.75,
       stats: {
-        str: 5,
-        dex: 2,
-        end: 5,
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 10,
       gold: 3,
       rarity: 80
@@ -193,10 +417,23 @@ const monsters = {
       name: 'Bat',
       isSpawnable: true,
       spawnableMapType: ['Land'],
+      power: 0.5,
       stats: {
-        str: 2,
-        dex: 5,
-        end: 1,
+        str: 0.5,
+        dex: 0.5,
+        end: 0.5,
+        int: 0.5,
+        luk: 0.5
+      },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.5
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
       },
       experience: 7,
       gold: 4,
@@ -206,11 +443,28 @@ const monsters = {
       name: 'Dragon',
       isSpawnable: true,
       spawnableMapType: ['Land'],
+      power: 1.75,
       stats: {
-        str: 10,
-        dex: 7,
-        end: 10,
+        str: 1.75,
+        dex: 1.75,
+        end: 1.75,
+        int: 1.75,
+        luk: 1.75
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.75
+        },
+        armor: {
+          name: '',
+          power: 1.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 35,
       gold: 5,
       rarity: 65
@@ -219,11 +473,28 @@ const monsters = {
       name: 'Knight',
       isSpawnable: true,
       spawnableMapType: ['Land'],
+      power: 0.75,
       stats: {
-        str: 7,
-        dex: 3,
-        end: 17,
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 25,
       gold: 6,
       rarity: 50
@@ -232,11 +503,28 @@ const monsters = {
       name: 'Necromancer',
       isSpawnable: true,
       spawnableMapType: ['Land'],
+      power: 1,
       stats: {
-        str: 19,
-        dex: 2,
-        end: 4,
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 1,
+        luk: 1
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 30,
       gold: 7,
       rarity: 50
@@ -245,11 +533,28 @@ const monsters = {
       name: 'Zombie',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Undead Land'],
+      power: 0.75,
       stats: {
-        str: 4,
-        dex: 1,
-        end: 12,
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 15,
       gold: 3,
       rarity: 75
@@ -258,11 +563,28 @@ const monsters = {
       name: 'Orc',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains', 'Forest'],
+      power: 1.25,
       stats: {
-        str: 17,
-        dex: 1,
-        end: 7,
+        str: 1.25,
+        dex: 1.25,
+        end: 1.25,
+        int: 1.25,
+        luk: 1.25
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.25
+        },
+        armor: {
+          name: '',
+          power: 1.25
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 20,
       gold: 8,
       rarity: 50
@@ -271,11 +593,28 @@ const monsters = {
       name: 'Elf',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
+      power: 1.5,
       stats: {
-        str: 4,
-        dex: 29,
-        end: 3,
+        str: 1.5,
+        dex: 1.5,
+        end: 1.5,
+        int: 1.5,
+        luk: 1.5
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.5
+        },
+        armor: {
+          name: '',
+          power: 1.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 20,
       gold: 9,
       rarity: 15
@@ -285,11 +624,28 @@ const monsters = {
       isXmasEvent: true,
       isSpawnable: false,
       spawnableMapType: ['Snow'],
+      power: 1.75,
       stats: {
-        str: 12,
-        dex: 2,
-        end: 9
+        str: 1.75,
+        dex: 1.75,
+        end: 1.75,
+        int: 1.75,
+        luk: 1.75
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.75
+        },
+        armor: {
+          name: '',
+          power: 1.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 25,
       gold: 12,
       rarity: 60
@@ -299,11 +655,28 @@ const monsters = {
       isXmasEvent: true,
       isSpawnable: false,
       spawnableMapType: ['Snow'],
+      power: 0.75,
       stats: {
-        str: 5,
-        dex: 2,
-        end: 9
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 5,
       gold: 9,
       rarity: 95
@@ -312,11 +685,28 @@ const monsters = {
       name: 'Basilisk',
       isSpawnable: true,
       spawnableMapType: ['Mountains'],
+      power: 1.5,
       stats: {
-        str: 30,
-        dex: 10,
-        end: 20,
+        str: 1.5,
+        dex: 1.5,
+        end: 1.5,
+        int: 1.5,
+        luk: 1.5
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.5
+        },
+        armor: {
+          name: '',
+          power: 1.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 27,
       gold: 9,
       rarity: 10
@@ -325,11 +715,28 @@ const monsters = {
       name: 'Bugbear',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains'],
+      power: 0.85,
       stats: {
-        str: 3,
-        dex: 3,
-        end: 3,
+        str: 0.85,
+        dex: 0.85,
+        end: 0.85,
+        int: 0.85,
+        luk: 0.85
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.85
+        },
+        armor: {
+          name: '',
+          power: 0.85
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 5,
       gold: 3,
       rarity: 75
@@ -338,11 +745,28 @@ const monsters = {
       name: 'Gargoyle',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
+      power: 0.75,
       stats: {
-        str: 10,
-        dex: 2,
-        end: 10,
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 20,
       gold: 6,
       rarity: 25
@@ -351,11 +775,28 @@ const monsters = {
       name: 'Griffin',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains'],
+      power: 1.1,
       stats: {
-        str: 8,
-        dex: 8,
-        end: 8,
+        str: 1.1,
+        dex: 1.1,
+        end: 1.1,
+        int: 1.1,
+        luk: 1.1
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.1
+        },
+        armor: {
+          name: '',
+          power: 1.1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 8,
       gold: 8,
       rarity: 48
@@ -364,11 +805,28 @@ const monsters = {
       name: 'Werewolf',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
+      power: 1,
       stats: {
-        str: 9,
-        dex: 7,
-        end: 7,
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 1,
+        luk: 1
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 11,
       gold: 11,
       rarity: 35
@@ -377,11 +835,28 @@ const monsters = {
       name: 'Pixie',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
+      power: 0.5,
       stats: {
-        str: 2,
-        dex: 2,
-        end: 1,
+        str: 0.5,
+        dex: 0.5,
+        end: 0.5,
+        int: 0.5,
+        luk: 0.5
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.5
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 2,
       gold: 2,
       rarity: 75
@@ -390,11 +865,28 @@ const monsters = {
       name: 'Unicorn',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
+      power: 0.75,
       stats: {
-        str: 4,
-        dex: 4,
-        end: 4,
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 5,
       gold: 4,
       rarity: 50
@@ -403,11 +895,28 @@ const monsters = {
       name: 'Wraith',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Undead Land'],
+      power: 1.5,
       stats: {
-        str: 1,
-        dex: 4,
-        end: 4,
+        str: 1.5,
+        dex: 1.5,
+        end: 1.5,
+        int: 1.5,
+        luk: 1.5
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.5
+        },
+        armor: {
+          name: '',
+          power: 1.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 4,
       gold: 5,
       rarity: 80
@@ -416,11 +925,28 @@ const monsters = {
       name: 'Giant Spider',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
+      power: 0.85,
       stats: {
-        str: 6,
-        dex: 6,
-        end: 1,
+        str: 0.85,
+        dex: 0.85,
+        end: 0.85,
+        int: 0.85,
+        luk: 0.85
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.85
+        },
+        armor: {
+          name: '',
+          power: 0.85
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 7,
       gold: 7,
       rarity: 50
@@ -429,11 +955,28 @@ const monsters = {
       name: 'Killer Bee',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
+      power: 0.5,
       stats: {
-        str: 1,
-        dex: 5,
-        end: 1,
+        str: 0.5,
+        dex: 0.5,
+        end: 0.5,
+        int: 0.5,
+        luk: 0.5
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.5
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 2,
       gold: 1,
       rarity: 90
@@ -442,11 +985,28 @@ const monsters = {
       name: 'Golem',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Mountains', 'Plains'],
+      power: 1.5,
       stats: {
-        str: 7,
-        dex: 2,
-        end: 7,
+        str: 1.5,
+        dex: 1.5,
+        end: 1.5,
+        int: 1.5,
+        luk: 1.5
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.5
+        },
+        armor: {
+          name: '',
+          power: 1.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 8,
       gold: 8,
       rarity: 60
@@ -455,11 +1015,28 @@ const monsters = {
       name: 'Centaur',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains'],
+      power: 1,
       stats: {
-        str: 3,
-        dex: 3,
-        end: 3,
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 1,
+        luk: 1
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 3,
       gold: 3,
       rarity: 71
@@ -468,11 +1045,28 @@ const monsters = {
       name: 'Cyclops',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Mountains', 'Plains'],
+      power: 0.95,
       stats: {
-        str: 4,
-        dex: 2,
-        end: 4,
+        str: 0.95,
+        dex: 0.95,
+        end: 0.95,
+        int: 0.95,
+        luk: 0.95
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.95
+        },
+        armor: {
+          name: '',
+          power: 0.95
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 5,
       gold: 3,
       rarity: 63
@@ -481,11 +1075,28 @@ const monsters = {
       name: 'Demon',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Undead Land'],
+      power: 1.3,
       stats: {
-        str: 6,
-        dex: 6,
-        end: 6,
+        str: 1.3,
+        dex: 1.3,
+        end: 1.3,
+        int: 1.3,
+        luk: 1.3
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1.3
+        },
+        armor: {
+          name: '',
+          power: 1.3
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 6,
       gold: 6,
       rarity: 66.6
@@ -494,11 +1105,28 @@ const monsters = {
       name: 'Elemental',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains', 'Forest', 'Mountains'],
+      power: 1,
       stats: {
-        str: 3,
-        dex: 3,
-        end: 3,
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 1,
+        luk: 1
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 3,
       gold: 5,
       rarity: 73
@@ -507,11 +1135,28 @@ const monsters = {
       name: 'Sphinx',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Desert'],
+      power: 1,
       stats: {
-        str: 2,
-        dex: 2,
-        end: 10,
+        str: 1,
+        dex: 1,
+        end: 1,
+        int: 1,
+        luk: 1
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 1
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 10,
       gold: 15,
       rarity: 41
@@ -520,11 +1165,28 @@ const monsters = {
       name: 'Tribal Warrior',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest', 'Plains'],
+      power: 0.95,
       stats: {
-        str: 6,
-        dex: 6,
-        end: 6,
+        str: 0.95,
+        dex: 0.95,
+        end: 0.95,
+        int: 0.95,
+        luk: 0.95
       },
+      equipment: {
+        weapon: {
+          name: '',
+          power: 0.95
+        },
+        armor: {
+          name: '',
+          power: 0.95
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 15,
       gold: 5,
       rarity: 33
