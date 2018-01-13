@@ -24,7 +24,7 @@ const commands = [
         !eventlog - Lists up to 15 past events
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
-        !gender <male|female|neutral|neuter|yo|elverson|spivak|hir|per|xe|helicopter|ghost> - Change your character's gender
+        !gender <male|female|neutral|neuter> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
         !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         \`\`\``;
