@@ -36,7 +36,7 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
-        //selectedPlayer = Event.regenItem(selectedPlayer);
+        // selectedPlayer = Event.regenItem(selectedPlayer);
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
 
