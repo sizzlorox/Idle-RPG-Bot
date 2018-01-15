@@ -1,5 +1,6 @@
 const helper = require('../utils/helper');
 const Database = require('../database/Database');
+const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
 const globalSpells = require('./data/globalSpells');
 const { multiplier } = require('../../settings');
@@ -21,7 +22,7 @@ class Game {
    * @param {Array} onlinePlayers
    * @param {*} twitchBot
    */
-  selectEvent(player, onlinePlayers, twitchBot) {
+  selectEvent(discordBot, player, onlinePlayers, twitchBot) {
     const randomEvent = helper.randomBetween(0, 2);
 
     Database.loadPlayer(player.discordId)
@@ -36,6 +37,9 @@ class Game {
       })
       .then((selectedPlayer) => {
         // selectedPlayer = Event.regenItem(selectedPlayer);
+
+        this.setPlayerTitles(discordBot, selectedPlayer);
+
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
 
@@ -291,6 +295,42 @@ ${rankString}
       });
   }
 
+  setPlayerTitles(discordBot, selectedPlayer) {
+    const currentGuild = discordBot.guilds.array()[0];
+    const playerDiscordObj = currentGuild.members
+      .filterArray(member => member.id === selectedPlayer.discordId)[0];
+    const goldTitleRole = currentGuild.roles.filterArray(role => role.name === 'Gold Hoarder')[0];
+    const thiefTitleRole = currentGuild.roles.filterArray(role => role.name === 'Thief')[0];
+    const veteranTitleRole = currentGuild.roles.filterArray(role => role.name === 'Veteran Idler')[0];
+
+    const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
+    if (selectedPlayer.gold >= 10000 && !hasGoldTitle) {
+      playerDiscordObj.addRole(goldTitleRole);
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
+    } else if (selectedPlayer.gold < 10000 && hasGoldTitle) {
+      playerDiscordObj.removeRole(goldTitleRole);
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
+    }
+
+    const hasThiefTitle = playerDiscordObj.roles.array().includes(thiefTitleRole);
+    if (selectedPlayer.stole >= 50 && !hasThiefTitle) {
+      playerDiscordObj.addRole(thiefTitleRole);
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Thief title!`));
+    } else if (selectedPlayer.stole < 50 && hasThiefTitle) {
+      playerDiscordObj.removeRole(thiefTitleRole);
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Thief title!`));
+    }
+
+    const hasVeteranTitle = playerDiscordObj.roles.array().includes(veteranTitleRole);
+    if (selectedPlayer.events >= 10000 && !hasVeteranTitle) {
+      playerDiscordObj.addRole(veteranTitleRole);
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Veteran Idler title!`));
+    } else if (selectedPlayer.events < 10000 && hasVeteranTitle) {
+      playerDiscordObj.removeRole(veteranTitleRole);
+      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
+    }
+  }
+
   /**
    * places a bounty on specific player
    * @param {DiscordHook} discordHook
@@ -345,7 +385,7 @@ ${rankString}
    * @param {Number} commandAuthor
    */
   playerStats(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id);
+    return Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
   }
 
   /**
@@ -353,7 +393,7 @@ ${rankString}
    * @param {Number} commandAuthor
    */
   playerEquipment(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id);
+    return Database.loadPlayer(commandAuthor.id, enumHelper.equipSelectFields);
   }
 
   /**

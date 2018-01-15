@@ -127,7 +127,7 @@ const heartBeat = () => {
     if (!player.timer) {
       const playerTimer = randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
-        game.selectEvent(player, onlinePlayerList, 'twitchBot');
+        game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
         delete player.timer;
       }, playerTimer);
     }

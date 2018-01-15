@@ -137,6 +137,34 @@ const enumHelper = {
       him: 'it',
       himself: 'itself',
     }
+  },
+
+  statsSelectFields: {
+    name: 1,
+    health: 1,
+    level: 1,
+    experience: 1,
+    gender: 1,
+    events: 1,
+    gold: 1,
+    equipment: 1,
+    map: 1,
+    currentBounty: 1,
+    stats: 1,
+    createdAt: 1,
+    pastEvents: 1,
+    gambles: 1,
+    stole: 1,
+    stolen: 1,
+    spells: 1,
+    kills: 1,
+    battles: 1,
+    deaths: 1
+  },
+
+  equipSelectFields: {
+    name: 1,
+    equipment: 1
   }
 };
 module.exports = enumHelper;
