@@ -71,44 +71,44 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'testingmob1',
-    discordId: 'testingmob1'
+    name: 'balancingMobs1',
+    discordId: 'balancingMobs1'
   },
   {
-    name: 'testingmob2',
-    discordId: 'testingmob2'
+    name: 'balancingMobs2',
+    discordId: 'balancingMobs2'
   },
   {
-    name: 'testingmob3',
-    discordId: 'testingmob3'
+    name: 'balancingMobs3',
+    discordId: 'balancingMobs3'
   },
   {
-    name: 'testingmob4',
-    discordId: 'testingmob4'
+    name: 'balancingMobs4',
+    discordId: 'balancingMobs4'
   },
   {
-    name: 'testingmob5',
-    discordId: 'testingmob5'
+    name: 'balancingMobs5',
+    discordId: 'balancingMobs5'
   },
   {
-    name: 'testingmob6',
-    discordId: 'testingmob6'
+    name: 'balancingMobs6',
+    discordId: 'balancingMobs6'
   },
   {
-    name: 'testingmob7',
-    discordId: 'testingmob7'
+    name: 'balancingMobs7',
+    discordId: 'balancingMobs7'
   },
   {
-    name: 'testingmob8',
-    discordId: 'testingmob8'
+    name: 'balancingMobs8',
+    discordId: 'balancingMobs8'
   },
   {
-    name: 'testingmob9',
-    discordId: 'testingmob9'
+    name: 'balancingMobs9',
+    discordId: 'balancingMobs9'
   },
   {
-    name: 'WWWW',
-    discordId: 'WWWW'
+    name: 'balancingMobs10',
+    discordId: 'balancingMobs10'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns

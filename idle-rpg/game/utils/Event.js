@@ -127,12 +127,23 @@ class Event {
       selectedPlayer.map = this.MapClass.getMapByName(selectedPlayer.map.name);
       return this.MonsterManager.generateNewMonster(selectedPlayer)
         .then((mob) => {
+          const mobMaxHealth = mob.health;
           return Battle.newSimulateBattle(selectedPlayer, mob)
             .then(({
               attacker, defender, attackerDamage, defenderDamage
             }) => {
               selectedPlayer = attacker;
               if (selectedPlayer.health <= 0) {
+                const eventMsg = `\`${defender.name}\` just killed ${helper.generatePlayerName(selectedPlayer)} in \`${selectedPlayer.map.name}\`!
+                Battle Results:
+                  ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+                  ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+                  ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
+                  ${defender.name} has ${defender.health} / ${mobMaxHealth} HP left.`;
+
+                const eventLog = `\`${defender.name}\` just killed you in \`${selectedPlayer.map.name}\`!`;
+                helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+                selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
 
                 return resolve(selectedPlayer);
@@ -144,7 +155,7 @@ class Event {
                   ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
                   ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
                   ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
-                  ${defender.name} has ${defender.health} / ${mob.health} HP left.`;
+                  ${defender.name} has ${defender.health} / ${mobMaxHealth} HP left.`;
 
                 const eventLog = `\`${defender.name}\` just fled from you in \`${selectedPlayer.map.name}\`!`;
 
@@ -153,7 +164,7 @@ class Event {
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
-                return resolve(updatedPlayer);
+                return resolve(selectedPlayer);
               }
 
               const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${defender.name}\` in \`${selectedPlayer.map.name}\`!
@@ -179,6 +190,7 @@ class Event {
 
   generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob) {
     return new Promise((resolve) => {
+      return resolve(selectedPlayer);
       const dropitemChance = helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
@@ -239,6 +251,7 @@ class Event {
     return new Promise((resolve) => {
       return this.ItemManager.generateItem(selectedPlayer)
         .then((item) => {
+          return resolve(selectedPlayer);
           const itemCost = Math.round(item.gold);
 
           if (selectedPlayer.gold <= itemCost || item.name.startsWith('Cracked')) {
@@ -707,6 +720,7 @@ class Event {
 
   generateLuckItemEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
+      return resolve(selectedPlayer);
       const luckItemDice = helper.randomBetween(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {

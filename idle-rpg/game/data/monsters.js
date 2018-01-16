@@ -32,14 +32,14 @@ const monsters = {
     },
     veteran = {
       name: 'Veteran',
-      power: 1.5,
+      power: 1.25,
       health: 15,
       stats: {
-        str: 1.5,
-        dex: 1.5,
-        end: 1.5,
-        int: 1.5,
-        luk: 1.5
+        str: 1.25,
+        dex: 1.25,
+        end: 1.25,
+        int: 1.25,
+        luk: 1.25
       },
       experience: 2,
       gold: 2,
@@ -47,14 +47,14 @@ const monsters = {
     },
     elite = {
       name: 'Elite',
-      power: 2,
+      power: 1.5,
       health: 20,
       stats: {
-        str: 2,
-        dex: 2,
-        end: 2,
-        int: 2,
-        luk: 2
+        str: 1.5,
+        dex: 1.5,
+        end: 1.5,
+        int: 1.5,
+        luk: 1.5
       },
       experience: 3,
       gold: 3,
@@ -62,6 +62,51 @@ const monsters = {
     },
     champion = {
       name: 'Champion',
+      power: 1.75,
+      health: 25,
+      stats: {
+        str: 1.75,
+        dex: 1.75,
+        end: 1.75,
+        int: 1.75,
+        luk: 1.75
+      },
+      experience: 4,
+      gold: 4,
+      rarity: 25
+    },
+    legendary = {
+      name: 'Legendary',
+      power: 2,
+      health: 30,
+      stats: {
+        str: 2,
+        dex: 2,
+        end: 2,
+        int: 2,
+        luk: 2
+      },
+      experience: 5,
+      gold: 5,
+      rarity: 5
+    },
+    omega = {
+      name: 'Omega',
+      power: 2.25,
+      health: 40,
+      stats: {
+        str: 2.25,
+        dex: 2.25,
+        end: 2.25,
+        int: 2.25,
+        luk: 2.25
+      },
+      experience: 6,
+      gold: 6,
+      rarity: 2
+    },
+    undead = {
+      name: 'Undead',
       power: 2.5,
       health: 25,
       stats: {
@@ -71,65 +116,20 @@ const monsters = {
         int: 2.5,
         luk: 2.5
       },
-      experience: 4,
-      gold: 4,
-      rarity: 25
-    },
-    legendary = {
-      name: 'Legendary',
-      power: 3,
-      health: 30,
-      stats: {
-        str: 3,
-        dex: 3,
-        end: 3,
-        int: 3,
-        luk: 3
-      },
-      experience: 5,
-      gold: 5,
-      rarity: 5
-    },
-    omega = {
-      name: 'Omega',
-      power: 3.5,
-      health: 40,
-      stats: {
-        str: 3.5,
-        dex: 3.5,
-        end: 3.5,
-        int: 3.5,
-        luk: 3.5
-      },
-      experience: 6,
-      gold: 6,
-      rarity: 2
-    },
-    undead = {
-      name: 'Undead',
-      power: 4,
-      health: 25,
-      stats: {
-        str: 4,
-        dex: 4,
-        end: 4,
-        int: 4,
-        luk: 4
-      },
       experience: 1,
       gold: 1,
       rarity: 50
     },
     deadly = {
       name: 'Deadly',
-      power: 4.5,
+      power: 2.75,
       health: 35,
       stats: {
-        str: 4.5,
-        dex: 4.5,
-        end: 4.5,
-        int: 4.5,
-        luk: 4.5
+        str: 2.75,
+        dex: 2.75,
+        end: 2.75,
+        int: 2.75,
+        luk: 2.75
       },
       experience: 6,
       gold: 6,
@@ -137,14 +137,14 @@ const monsters = {
     },
     berserk = {
       name: 'Berserk',
-      power: 5,
+      power: 3,
       health: 45,
       stats: {
-        str: 5,
-        dex: 5,
-        end: 5,
-        int: 5,
-        luk: 5
+        str: 3,
+        dex: 3,
+        end: 3,
+        int: 3,
+        luk: 3
       },
       experience: 3,
       gold: 1,
@@ -152,14 +152,14 @@ const monsters = {
     },
     corrupted = {
       name: 'Corrupted',
-      power: 6,
+      power: 3.25,
       health: 30,
       stats: {
-        str: 6,
-        dex: 6,
-        end: 6,
-        int: 6,
-        luk: 6
+        str: 3.25,
+        dex: 3.25,
+        end: 3.25,
+        int: 3.25,
+        luk: 3.25
       },
       experience: 1.5,
       gold: 1.5,
@@ -172,24 +172,24 @@ const monsters = {
       name: 'Rat',
       isSpawnable: true,
       spawnableMapType: ['Land'],
-      power: 0.05,
+      power: 1,
       health: 25,
       stats: {
-        str: 0.05,
-        dex: 0.05,
-        end: 0.05,
-        int: 0.05,
-        luk: 0.05
+        str: 1,
+        dex: 0.5,
+        end: 0.25,
+        int: 1,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'Rat Claw',
-          power: 0.05
+          power: 1
         },
         armor: {
           name: 'Fur',
-          power: 0.05
+          power: 0.01
         }
       },
       inventory: {
@@ -204,24 +204,24 @@ const monsters = {
       name: 'Crab',
       isSpawnable: true,
       spawnableMapType: ['Land'],
-      power: 0.1,
+      power: 1.25,
       health: 30,
       stats: {
-        str: 0.1,
-        dex: 0.1,
-        end: 0.1,
-        int: 0.1,
-        luk: 0.1
+        str: 1.5,
+        dex: 0.25,
+        end: 0.5,
+        int: 1,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'Pinchers',
-          power: 0.1
+          power: 1
         },
         armor: {
           name: 'Crab Shell',
-          power: 0.1
+          power: 0.02,
         }
       },
       inventory: {
@@ -236,24 +236,24 @@ const monsters = {
       name: 'Slime',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
-      power: 0.25,
+      power: 0.15,
       health: 35,
       stats: {
-        str: 0.25,
-        dex: 0.25,
-        end: 0.25,
-        int: 0.25,
-        luk: 0.25
+        str: 1.25,
+        dex: 1.25,
+        end: 1.25,
+        int: 1.25,
+        luk: 1.25
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'Slime',
-          power: 0.25
+          power: 0.10
         },
         armor: {
           name: 'Slime',
-          power: 0.25
+          power: 0.75
         }
       },
       inventory: {
