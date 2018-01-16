@@ -37,22 +37,7 @@ class Battle {
     return { playerChance, otherPlayerChance };
   }
 
-  newSimulateBattleWithMob(selectedPlayer, mobObj) {
-    return new Promise((resolve) => {
-      const maxRounds = 10;
-      const battleResults = [];
-      for (let round = 1; round <= maxRounds; round++) {
-        
-      }
-
-      return Promise.all(battleResults)
-        .then((result) => {
-
-        });
-    });
-  }
-
-  newSimulateBattleWithPlayer(attacker, defender) {
+  newSimulateBattle(attacker, defender) {
     return new Promise((resolve) => {
       const maxRounds = 10;
       const battleResults = [];
@@ -86,8 +71,12 @@ class Battle {
   }
 
   initialAttack(attacker, defender) {
-    const attackerInitialAttackChance = helper.sumPlayerTotalDexterity(attacker) + (helper.sumPlayerTotalLuck(attacker) / 2);
-    const defenderInitialAttackChance = helper.sumPlayerTotalDexterity(defender) + (helper.sumPlayerTotalLuck(defender) / 2);
+    const attackerInitialAttackChance = this.isMonster(attacker)
+      ? attacker.stats.dex + (attacker.stats.luk / 2)
+      : helper.sumPlayerTotalDexterity(attacker) + (helper.sumPlayerTotalLuck(attacker) / 2);
+    const defenderInitialAttackChance = this.isMonster(defender)
+      ? defender.stats.dex + (defender.stats.luk / 2)
+      : helper.sumPlayerTotalDexterity(defender) + (helper.sumPlayerTotalLuck(defender) / 2);
     if (attackerInitialAttackChance >= defenderInitialAttackChance) {
       return attacker;
     }
@@ -394,19 +383,25 @@ class Battle {
     console.log(`${player.name} - ${player.equipment.weapon.name} - ${player.equipment.weapon.attackType} - ${player.equipment.weapon.power}`);
     switch (player.equipment.weapon.attackType) {
       case 'melee':
-        attackPower = (helper.sumPlayerTotalStrength(player) + player.equipment.weapon.power)
+        attackPower = this.isMonster(player)
+          ? (player.stats.str + player.equipment.weapon.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.str) / 2)))
+          : (helper.sumPlayerTotalStrength(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
               + helper.randomBetween(1, helper.sumPlayerTotalStrength(player))) / 2));
         break;
       case 'range':
-        attackPower = (helper.sumPlayerTotalDexterity(player) + player.equipment.weapon.power)
+        attackPower = this.isMonster(player)
+          ? (player.stats.dex + player.equipment.weapon.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.dex) / 2)))
+          : (helper.sumPlayerTotalDexterity(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
               + helper.randomBetween(1, helper.sumPlayerTotalDexterity(player))) / 2));
         break;
       case 'magic':
-        attackPower = (helper.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power)
+        attackPower = this.isMonster(player)
+          ? (player.stats.int + player.equipment.weapon.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.int) / 2)))
+          : (helper.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
               + helper.randomBetween(1, helper.sumPlayerTotalIntelligence(player))) / 2));
@@ -418,15 +413,23 @@ class Battle {
   }
 
   calculateDefense(player) {
-    const physicalDefensePower = (helper.sumPlayerTotalEndurance(player)
-      + (player.equipment.armor.power / 2))
+    const physicalDefensePower = this.isMonster(player)
+      ? (player.stats.end + (player.equipment.armor.power / 2)) * (player.stats.dex + (player.stats.luk / 2))
+      : (helper.sumPlayerTotalEndurance(player)
+        + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
-    const magicDefensePower = (helper.sumPlayerTotalIntelligence(player)
-      + (player.equipment.armor.power / 2))
+    const magicDefensePower = this.isMonster(player)
+      ? (player.stats.int + (player.equipment.armor.power / 2)) * (player.stats.dex + (player.stats.luk / 2))
+      : (helper.sumPlayerTotalIntelligence(player)
+        + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
     console.log(`${player.name} - ${physicalDefensePower} - ${magicDefensePower}`);
 
     return { physicalDefensePower, magicDefensePower };
+  }
+
+  isMonster(obj) {
+    return obj.power !== undefined;
   }
 
 }

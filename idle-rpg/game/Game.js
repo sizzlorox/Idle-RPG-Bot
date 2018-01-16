@@ -38,7 +38,9 @@ class Game {
       .then((selectedPlayer) => {
         // selectedPlayer = Event.regenItem(selectedPlayer);
 
-        this.setPlayerTitles(discordBot, selectedPlayer);
+        if (process.env.NODE_ENV === 'production') {
+          this.setPlayerTitles(discordBot, selectedPlayer);
+        }
 
         selectedPlayer.name = player.name;
         selectedPlayer.events++;

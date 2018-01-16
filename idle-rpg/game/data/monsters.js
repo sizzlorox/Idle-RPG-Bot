@@ -2,55 +2,8 @@ const monsters = {
   rarity: [
     starving = {
       name: 'Starving',
-      power: 0.05,
-      stats: {
-        str: 0.05,
-        dex: 0.05,
-        end: 0.05,
-        int: 0.05,
-        luk: 0.05
-      },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 0.05
-        },
-        armor: {
-          name: '',
-          power: 0.05
-        }
-      },
-      experience: 1,
-      gold: 0.25,
-      rarity: 75
-    },
-    normal = {
-      name: 'Normal',
-      power: 0.25,
-      stats: {
-        str: 0.25,
-        dex: 0.25,
-        end: 0.25,
-        int: 0.25,
-        luk: 0.25
-      },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 0.25
-        },
-        armor: {
-          name: '',
-          power: 0.25
-        }
-      },
-      experience: 1,
-      gold: 1,
-      rarity: 100
-    },
-    veteran = {
-      name: 'Veteran',
       power: 0.5,
+      health: 5,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -58,47 +11,14 @@ const monsters = {
         int: 0.5,
         luk: 0.5
       },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 0.5
-        },
-        armor: {
-          name: '',
-          power: 0.5
-        }
-      },
-      experience: 2,
-      gold: 2,
-      rarity: 65
+      experience: 1,
+      gold: 0.25,
+      rarity: 75
     },
-    elite = {
-      name: 'Elite',
-      power: 0.75,
-      stats: {
-        str: 0.75,
-        dex: 0.75,
-        end: 0.75,
-        int: 0.75,
-        luk: 0.75
-      },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 0.75
-        },
-        armor: {
-          name: '',
-          power: 0.75
-        }
-      },
-      experience: 3,
-      gold: 3,
-      rarity: 45
-    },
-    champion = {
-      name: 'Champion',
+    normal = {
+      name: 'Normal',
       power: 1,
+      health: 10,
       stats: {
         str: 1,
         dex: 1,
@@ -106,47 +26,14 @@ const monsters = {
         int: 1,
         luk: 1
       },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 1
-        },
-        armor: {
-          name: '',
-          power: 1
-        }
-      },
-      experience: 4,
-      gold: 4,
-      rarity: 25
+      experience: 1,
+      gold: 1,
+      rarity: 100
     },
-    legendary = {
-      name: 'Legendary',
-      power: 1.25,
-      stats: {
-        str: 1.25,
-        dex: 1.25,
-        end: 1.25,
-        int: 1.25,
-        luk: 1.25
-      },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 1.25
-        },
-        armor: {
-          name: '',
-          power: 1.25
-        }
-      },
-      experience: 5,
-      gold: 5,
-      rarity: 5
-    },
-    omega = {
-      name: 'Omega',
+    veteran = {
+      name: 'Veteran',
       power: 1.5,
+      health: 15,
       stats: {
         str: 1.5,
         dex: 1.5,
@@ -154,15 +41,65 @@ const monsters = {
         int: 1.5,
         luk: 1.5
       },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 1.5
-        },
-        armor: {
-          name: '',
-          power: 1.5
-        }
+      experience: 2,
+      gold: 2,
+      rarity: 65
+    },
+    elite = {
+      name: 'Elite',
+      power: 2,
+      health: 20,
+      stats: {
+        str: 2,
+        dex: 2,
+        end: 2,
+        int: 2,
+        luk: 2
+      },
+      experience: 3,
+      gold: 3,
+      rarity: 45
+    },
+    champion = {
+      name: 'Champion',
+      power: 2.5,
+      health: 25,
+      stats: {
+        str: 2.5,
+        dex: 2.5,
+        end: 2.5,
+        int: 2.5,
+        luk: 2.5
+      },
+      experience: 4,
+      gold: 4,
+      rarity: 25
+    },
+    legendary = {
+      name: 'Legendary',
+      power: 3,
+      health: 30,
+      stats: {
+        str: 3,
+        dex: 3,
+        end: 3,
+        int: 3,
+        luk: 3
+      },
+      experience: 5,
+      gold: 5,
+      rarity: 5
+    },
+    omega = {
+      name: 'Omega',
+      power: 3.5,
+      health: 40,
+      stats: {
+        str: 3.5,
+        dex: 3.5,
+        end: 3.5,
+        int: 3.5,
+        luk: 3.5
       },
       experience: 6,
       gold: 6,
@@ -170,23 +107,14 @@ const monsters = {
     },
     undead = {
       name: 'Undead',
-      power: 0.25,
+      power: 4,
+      health: 25,
       stats: {
-        str: 0.25,
-        dex: 0.25,
-        end: 0.25,
-        int: 0.25,
-        luk: 0.25
-      },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 0.25
-        },
-        armor: {
-          name: '',
-          power: 0.25
-        }
+        str: 4,
+        dex: 4,
+        end: 4,
+        int: 4,
+        luk: 4
       },
       experience: 1,
       gold: 1,
@@ -194,23 +122,14 @@ const monsters = {
     },
     deadly = {
       name: 'Deadly',
-      power: 0.75,
+      power: 4.5,
+      health: 35,
       stats: {
-        str: 0.75,
-        dex: 0.75,
-        end: 0.75,
-        int: 0.75,
-        luk: 0.75
-      },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 0.75
-        },
-        armor: {
-          name: '',
-          power: 0.75
-        }
+        str: 4.5,
+        dex: 4.5,
+        end: 4.5,
+        int: 4.5,
+        luk: 4.5
       },
       experience: 6,
       gold: 6,
@@ -218,23 +137,14 @@ const monsters = {
     },
     berserk = {
       name: 'Berserk',
-      power: 1,
+      power: 5,
+      health: 45,
       stats: {
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 1,
-        luk: 1
-      },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 1
-        },
-        armor: {
-          name: '',
-          power: 1
-        }
+        str: 5,
+        dex: 5,
+        end: 5,
+        int: 5,
+        luk: 5
       },
       experience: 3,
       gold: 1,
@@ -242,23 +152,14 @@ const monsters = {
     },
     corrupted = {
       name: 'Corrupted',
-      power: 0.75,
+      power: 6,
+      health: 30,
       stats: {
-        str: 0.75,
-        dex: 0.75,
-        end: 0.75,
-        int: 0.75,
-        luk: 0.75
-      },
-      equipment: {
-        weapon: {
-          name: '',
-          power: 0.75
-        },
-        armor: {
-          name: '',
-          power: 0.75
-        }
+        str: 6,
+        dex: 6,
+        end: 6,
+        int: 6,
+        luk: 6
       },
       experience: 1.5,
       gold: 1.5,
@@ -272,6 +173,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land'],
       power: 0.05,
+      health: 25,
       stats: {
         str: 0.05,
         dex: 0.05,
@@ -281,11 +183,12 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'melee',
+          name: 'Rat Claw',
           power: 0.05
         },
         armor: {
-          name: '',
+          name: 'Fur',
           power: 0.05
         }
       },
@@ -302,6 +205,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land'],
       power: 0.1,
+      health: 30,
       stats: {
         str: 0.1,
         dex: 0.1,
@@ -311,11 +215,12 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'melee',
+          name: 'Pinchers',
           power: 0.1
         },
         armor: {
-          name: '',
+          name: 'Crab Shell',
           power: 0.1
         }
       },
@@ -332,6 +237,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
       power: 0.25,
+      health: 35,
       stats: {
         str: 0.25,
         dex: 0.25,
@@ -341,11 +247,12 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'melee',
+          name: 'Slime',
           power: 0.25
         },
         armor: {
-          name: '',
+          name: 'Slime',
           power: 0.25
         }
       },
@@ -362,6 +269,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
       power: 0.5,
+      health: 50,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -371,14 +279,19 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'melee',
+          name: 'Dagger',
           power: 0.5
         },
         armor: {
-          name: '',
+          name: 'Rusty Chailmail',
           power: 0.5
         }
       },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 6,
       gold: 2,
       rarity: 90
@@ -388,6 +301,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
       power: 0.75,
+      health: 75,
       stats: {
         str: 0.75,
         dex: 0.75,
@@ -397,11 +311,12 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'melee',
+          name: 'Dagger',
           power: 0.75
         },
         armor: {
-          name: '',
+          name: 'Leather Armor',
           power: 0.75
         }
       },
@@ -418,6 +333,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land'],
       power: 0.5,
+      health: 45,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -427,14 +343,19 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'melee',
+          name: 'Bat Claws',
           power: 0.5
         },
         armor: {
-          name: '',
+          name: 'Fur',
           power: 0.5
         }
       },
+      inventory: {
+        items: []
+      },
+      spells: [],
       experience: 7,
       gold: 4,
       rarity: 90
@@ -444,6 +365,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land'],
       power: 1.75,
+      health: 145,
       stats: {
         str: 1.75,
         dex: 1.75,
@@ -453,11 +375,12 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'melee',
+          name: 'Dragon Claw',
           power: 1.75
         },
         armor: {
-          name: '',
+          name: 'Dragon Scales',
           power: 1.75
         }
       },
@@ -474,6 +397,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land'],
       power: 0.75,
+      health: 100,
       stats: {
         str: 0.75,
         dex: 0.75,
@@ -483,11 +407,12 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'melee',
+          name: 'Claymore',
           power: 0.75
         },
         armor: {
-          name: '',
+          name: 'Iron Full Armor',
           power: 0.75
         }
       },
@@ -504,6 +429,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land'],
       power: 1,
+      health: 85,
       stats: {
         str: 1,
         dex: 1,
@@ -513,11 +439,12 @@ const monsters = {
       },
       equipment: {
         weapon: {
-          name: '',
+          attackType: 'magic',
+          name: 'Staff',
           power: 1
         },
         armor: {
-          name: '',
+          name: 'Robe',
           power: 1
         }
       },
@@ -534,6 +461,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Undead Land'],
       power: 0.75,
+      health: 65,
       stats: {
         str: 0.75,
         dex: 0.75,
@@ -543,6 +471,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.75
         },
@@ -564,6 +493,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains', 'Forest'],
       power: 1.25,
+      health: 125,
       stats: {
         str: 1.25,
         dex: 1.25,
@@ -573,6 +503,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1.25
         },
@@ -594,6 +525,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
       power: 1.5,
+      health: 90,
       stats: {
         str: 1.5,
         dex: 1.5,
@@ -603,6 +535,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'range',
           name: '',
           power: 1.5
         },
@@ -625,6 +558,7 @@ const monsters = {
       isSpawnable: false,
       spawnableMapType: ['Snow'],
       power: 1.75,
+      health: 150,
       stats: {
         str: 1.75,
         dex: 1.75,
@@ -634,6 +568,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1.75
         },
@@ -656,6 +591,7 @@ const monsters = {
       isSpawnable: false,
       spawnableMapType: ['Snow'],
       power: 0.75,
+      health: 45,
       stats: {
         str: 0.75,
         dex: 0.75,
@@ -665,6 +601,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.75
         },
@@ -686,6 +623,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Mountains'],
       power: 1.5,
+      health: 190,
       stats: {
         str: 1.5,
         dex: 1.5,
@@ -695,6 +633,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1.5
         },
@@ -716,6 +655,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains'],
       power: 0.85,
+      health: 175,
       stats: {
         str: 0.85,
         dex: 0.85,
@@ -725,6 +665,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.85
         },
@@ -746,6 +687,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
       power: 0.75,
+      health: 160,
       stats: {
         str: 0.75,
         dex: 0.75,
@@ -755,6 +697,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.75
         },
@@ -776,6 +719,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains'],
       power: 1.1,
+      health: 120,
       stats: {
         str: 1.1,
         dex: 1.1,
@@ -785,6 +729,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1.1
         },
@@ -806,6 +751,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
       power: 1,
+      health: 115,
       stats: {
         str: 1,
         dex: 1,
@@ -815,6 +761,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1
         },
@@ -836,6 +783,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
       power: 0.5,
+      health: 35,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -845,6 +793,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.5
         },
@@ -866,6 +815,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
       power: 0.75,
+      health: 45,
       stats: {
         str: 0.75,
         dex: 0.75,
@@ -875,6 +825,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.75
         },
@@ -896,6 +847,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Undead Land'],
       power: 1.5,
+      health: 95,
       stats: {
         str: 1.5,
         dex: 1.5,
@@ -905,6 +857,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1.5
         },
@@ -926,6 +879,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
       power: 0.85,
+      health: 75,
       stats: {
         str: 0.85,
         dex: 0.85,
@@ -935,6 +889,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.85
         },
@@ -956,6 +911,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
       power: 0.5,
+      health: 50,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -965,6 +921,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.5
         },
@@ -986,6 +943,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Mountains', 'Plains'],
       power: 1.5,
+      health: 200,
       stats: {
         str: 1.5,
         dex: 1.5,
@@ -995,6 +953,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1.5
         },
@@ -1016,6 +975,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains'],
       power: 1,
+      health: 135,
       stats: {
         str: 1,
         dex: 1,
@@ -1025,6 +985,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1
         },
@@ -1046,6 +1007,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Mountains', 'Plains'],
       power: 0.95,
+      health: 160,
       stats: {
         str: 0.95,
         dex: 0.95,
@@ -1055,6 +1017,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.95
         },
@@ -1076,6 +1039,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Undead Land'],
       power: 1.3,
+      health: 185,
       stats: {
         str: 1.3,
         dex: 1.3,
@@ -1085,6 +1049,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1.3
         },
@@ -1106,6 +1071,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Plains', 'Forest', 'Mountains'],
       power: 1,
+      health: 150,
       stats: {
         str: 1,
         dex: 1,
@@ -1115,6 +1081,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'magic',
           name: '',
           power: 1
         },
@@ -1136,6 +1103,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Desert'],
       power: 1,
+      health: 210,
       stats: {
         str: 1,
         dex: 1,
@@ -1145,6 +1113,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 1
         },
@@ -1166,6 +1135,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest', 'Plains'],
       power: 0.95,
+      health: 110,
       stats: {
         str: 0.95,
         dex: 0.95,
@@ -1175,6 +1145,7 @@ const monsters = {
       },
       equipment: {
         weapon: {
+          attackType: 'melee',
           name: '',
           power: 0.95
         },

@@ -60,7 +60,7 @@ class Event {
             let randomPlayer = sameMapPlayers[randomPlayerIndex];
 
             if (randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-              return Battle.newSimulateBattleWithPlayer(
+              return Battle.newSimulateBattle(
                 selectedPlayer,
                 randomPlayer
               ).then(({
@@ -71,10 +71,10 @@ class Event {
 
                 const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just attacked ${helper.generatePlayerName(randomPlayer)} in \`${selectedPlayer.map.name}\`!
     Battle Results:
-    ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-    ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
-    ${helper.generatePlayerName(randomPlayer)}'s \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
-    ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
+      ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+      ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+      ${helper.generatePlayerName(randomPlayer)}'s \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
+      ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
                 const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and failed.
                 ${randomPlayer.name} did ${defenderDamage} damage with ${randomPlayer.equipment.weapon.name}`;
@@ -125,46 +125,49 @@ class Event {
   attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
     return new Promise((resolve) => {
       selectedPlayer.map = this.MapClass.getMapByName(selectedPlayer.map.name);
-      return this.MonsterManager.generateMonster(selectedPlayer)
+      return this.MonsterManager.generateNewMonster(selectedPlayer)
         .then((mob) => {
-          return Battle.simulateBattleWithMob(selectedPlayer, mob)
-            .then((battleResults) => {
-              console.log(`GAME: PlayerChance: ${battleResults.playerChance} - MobChance: ${battleResults.mobChance}`);
-              if (battleResults.playerChance >= battleResults.mobChance) {
-                selectedPlayer.experience += mob.experience * multiplier;
-                selectedPlayer.gold += mob.gold * multiplier;
-                selectedPlayer.kills.mob++;
+          return Battle.newSimulateBattle(selectedPlayer, mob)
+            .then(({
+              attacker, defender, attackerDamage, defenderDamage
+            }) => {
+              selectedPlayer = attacker;
+              if (selectedPlayer.health <= 0) {
+                helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
+
+                return resolve(selectedPlayer);
+              }
+
+              if (defender.health > 0 && selectedPlayer.health > 0) {
+                const eventMsg = `\`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)} in \`${selectedPlayer.map.name}\`!
+                Battle Results:
+                  ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+                  ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+                  ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
+                  ${defender.name} has ${defender.health} / ${mob.health} HP left.`;
+
+                const eventLog = `\`${defender.name}\` just fled from you in \`${selectedPlayer.map.name}\`!`;
+
+                selectedPlayer.experience += Math.floor((defender.experience * multiplier) / 2);
                 helper.checkExperience(selectedPlayer, discordHook);
-
-                let eventMsg;
-                if (!mob.isXmasEvent) {
-                  eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!`;
-                } else {
-                  eventMsg = `**${helper.generatePlayerName(selectedPlayer)} just killed \`${mob.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\` gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold!**`;
-                }
-                const eventLog = `Killed ${mob.name} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name} gaining ${mob.experience * multiplier} exp and ${mob.gold * multiplier} gold`;
-
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
-                return this.generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob)
-                  .then((updatedPlayer) => {
-                    return resolve(updatedPlayer);
-                  });
+                return resolve(updatedPlayer);
               }
 
-              battleResults.mobChance = Math.round(battleResults.mobChance);
+              const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${defender.name}\` in \`${selectedPlayer.map.name}\`!
+              Battle Results:
+                ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+                ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+                ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.`;
 
-              selectedPlayer.health -= battleResults.mobChance;
-              selectedPlayer.gold -= mob.gold;
-              if (selectedPlayer.gold <= 0) {
-                selectedPlayer.gold = 0;
-              }
-              helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
+              const eventLog = `Killed ${defender.name} in ${selectedPlayer.map.name}.`;
 
-              const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just lost a battle to \`${mob.name}\` in \`${selectedPlayer.map.name}\` losing ${battleResults.mobChance} health and ${mob.gold} gold!`;
-              const eventLog = `Lost a battle to ${mob.name} in ${selectedPlayer.map.name} losing ${battleResults.mobChance} health and ${mob.gold} gold`;
-
+              selectedPlayer.experience += defender.experience * multiplier;
+              selectedPlayer.gold += defender.gold * multiplier;
+              selectedPlayer.kills.mob++;
+              helper.checkExperience(selectedPlayer, discordHook);
               helper.sendMessage(discordHook, 'twitch', false, eventMsg);
               selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
