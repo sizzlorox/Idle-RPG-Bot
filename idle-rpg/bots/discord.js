@@ -78,9 +78,17 @@ discordBot.on('message', (message) => {
   if (message.attachments && message.attachments.size > 0) {
     const attachment = message.attachments.array()[0];
     const url = attachment.url;
+
     return VirusTotal.scanUrl(url)
-      .then((results) => {
-        message.reply(results.permalink, { embed: new Discord.RichEmbed({ title: 'Attachment scanned via VirusTotal', url: results.url }) });
+      .then(VirusTotal.retrieveReport)
+      .then((reportResults) => {
+        console.log(reportResults.verbose_msg);
+        message.reply(`VirusTotal scan completed: ${reportResults.positives}/${reportResults.total}
+${reportResults.permalink}`);
+        if (reportResults.positives > 0) {
+          message.delete();
+          message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');
+        }
       });
   }
 
