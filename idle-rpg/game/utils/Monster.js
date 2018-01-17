@@ -53,15 +53,18 @@ class Monster {
         || mobType.name === 'Slime'
         || mobType.name === 'Goblin'
         || mobType.name === 'Bandit'
+        || mobType.name === 'Zombie'
         || mobType.name === 'Knight'
-        || mobType.name === 'Necromancer');
+        || mobType.name === 'Necromancer'
+        || mobType.name === 'Orc'
+        || mobType.name === 'Elf');
 
       const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);
 
       const monsterObj = {
         name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
-        health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].power,
+        health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
           str: (monsterRarityList[randomRarityIndex].stats.str
             * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.level / 2),

@@ -200,6 +200,7 @@ const monsters = {
       gold: 2,
       rarity: 100
     },
+
     crab = {
       name: 'Crab',
       isSpawnable: true,
@@ -232,6 +233,7 @@ const monsters = {
       gold: 1,
       rarity: 100
     },
+
     bat = {
       name: 'Bat',
       isSpawnable: true,
@@ -264,6 +266,7 @@ const monsters = {
       gold: 4,
       rarity: 90
     },
+
     slime = {
       name: 'Slime',
       isSpawnable: true,
@@ -296,6 +299,7 @@ const monsters = {
       gold: 2,
       rarity: 100
     },
+
     goblin = {
       name: 'Goblin',
       isSpawnable: true,
@@ -328,6 +332,7 @@ const monsters = {
       gold: 2,
       rarity: 90
     },
+
     bandit = {
       name: 'Bandit',
       isSpawnable: true,
@@ -359,6 +364,39 @@ const monsters = {
       experience: 10,
       gold: 3,
       rarity: 80
+    },
+
+    zombie = {
+      name: 'Zombie',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Undead Land'],
+      power: 1.5,
+      health: 65,
+      stats: {
+        str: 1.25,
+        dex: 0.5,
+        end: 2,
+        int: 2,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'Undeadly hands ewwww',
+          power: 1.25
+        },
+        armor: {
+          name: '',
+          power: 0.25
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 15,
+      gold: 3,
+      rarity: 75
     },
 
     knight = {
@@ -427,6 +465,72 @@ const monsters = {
       rarity: 50
     },
 
+    orc = {
+      name: 'Orc',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Plains', 'Forest'],
+      power: 2.5,
+      health: 125,
+      stats: {
+        str: 2.5,
+        dex: 0.5,
+        end: 2,
+        int: 0.25,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'Rusty Broadsword',
+          power: 1.5
+        },
+        armor: {
+          name: '',
+          power: 0.25
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 20,
+      gold: 8,
+      rarity: 50
+    },
+
+    elf = {
+      name: 'Elf',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Forest'],
+      power: 2,
+      health: 90,
+      stats: {
+        str: 1.75,
+        dex: 3,
+        end: 1.75,
+        int: 1.25,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'range',
+          name: 'Bow',
+          power: 1.5
+        },
+        armor: {
+          name: '',
+          power: 0.25
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 20,
+      gold: 9,
+      rarity: 15
+    },
+
     dragon = {
       name: 'Dragon',
       isSpawnable: true,
@@ -460,102 +564,6 @@ const monsters = {
       rarity: 65
     },
 
-    zombie = {
-      name: 'Zombie',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Undead Land'],
-      power: 0.75,
-      health: 65,
-      stats: {
-        str: 0.75,
-        dex: 0.75,
-        end: 0.75,
-        int: 0.75,
-        luk: 0.75
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 0.75
-        },
-        armor: {
-          name: '',
-          power: 0.75
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 15,
-      gold: 3,
-      rarity: 75
-    },
-    orc = {
-      name: 'Orc',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains', 'Forest'],
-      power: 1.25,
-      health: 125,
-      stats: {
-        str: 1.25,
-        dex: 1.25,
-        end: 1.25,
-        int: 1.25,
-        luk: 1.25
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 1.25
-        },
-        armor: {
-          name: '',
-          power: 1.25
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 20,
-      gold: 8,
-      rarity: 50
-    },
-    elf = {
-      name: 'Elf',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
-      power: 1.5,
-      health: 90,
-      stats: {
-        str: 1.5,
-        dex: 1.5,
-        end: 1.5,
-        int: 1.5,
-        luk: 1.5
-      },
-      equipment: {
-        weapon: {
-          attackType: 'range',
-          name: '',
-          power: 1.5
-        },
-        armor: {
-          name: '',
-          power: 1.5
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 20,
-      gold: 9,
-      rarity: 15
-    },
     yeti = {
       name: 'Yeti',
       isXmasEvent: true,
