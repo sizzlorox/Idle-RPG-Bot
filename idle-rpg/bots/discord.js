@@ -5,6 +5,7 @@ const { randomBetween } = require('../utils/helper');
 const logger = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
+const VirusTotal = require('../bots/modules/VirusTotal');
 const { CronJob } = require('cron');
 const {
   actionWebHookId,
@@ -74,6 +75,15 @@ discordBot.on('message', (message) => {
     message.reply('┬─┬ノ(ಠ_ಠノ)');
   }
 
+  if (message.attachments && message.attachments.size > 0) {
+    const attachment = message.attachments.array()[0];
+    const url = attachment.url;
+    return VirusTotal.scanUrl(url)
+      .then((results) => {
+        message.reply(results.permalink, { embed: new Discord.RichEmbed({ title: 'Attachment scanned via VirusTotal', url: results.url }) });
+      });
+  }
+
   CommandParser.parseUserCommand(game, discordBot, hook, message);
 });
 
@@ -127,7 +137,7 @@ const heartBeat = () => {
     if (!player.timer) {
       const playerTimer = randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
-        game.selectEvent(player, onlinePlayerList, 'twitchBot');
+        game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
         delete player.timer;
       }, playerTimer);
     }
