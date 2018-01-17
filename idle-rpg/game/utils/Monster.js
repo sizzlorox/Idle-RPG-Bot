@@ -42,9 +42,19 @@ class Monster {
       const randomTypeChance = Math.round(helper.randomBetween(0, 100));
       const randomMonsterType = randomTypeChance + randomRarityChance > 100 ? 100 : randomTypeChance + randomRarityChance;
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
+      /*
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
         && mobType.spawnableMapType.includes(selectedPlayer.map.type.name));
+        */
+      const monsterTypeList = monsters.type.filter(mobType => mobType.name === 'Rat'
+        || mobType.name === 'Crab'
+        || mobType.name === 'Bat'
+        || mobType.name === 'Slime'
+        || mobType.name === 'Goblin'
+        || mobType.name === 'Bandit'
+        || mobType.name === 'Knight'
+        || mobType.name === 'Necromancer');
 
       const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);
@@ -54,15 +64,15 @@ class Monster {
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].power,
         stats: {
           str: (monsterRarityList[randomRarityIndex].stats.str
-            * monsterTypeList[randomTypeIndex].stats.str),
+            * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.level / 2),
           dex: (monsterRarityList[randomRarityIndex].stats.dex
-            * monsterTypeList[randomTypeIndex].stats.dex),
+            * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.level / 2),
           end: (monsterRarityList[randomRarityIndex].stats.end
-            * monsterTypeList[randomTypeIndex].stats.end),
+            * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.level / 2),
           int: (monsterRarityList[randomRarityIndex].stats.int
-            * monsterTypeList[randomTypeIndex].stats.int),
+            * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.level / 2),
           luk: (monsterRarityList[randomRarityIndex].stats.luk
-            * monsterTypeList[randomTypeIndex].stats.luk)
+            * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 2)
         },
         power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power,
         equipment: monsterTypeList[randomTypeIndex].equipment,

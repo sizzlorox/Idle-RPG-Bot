@@ -190,7 +190,6 @@ class Event {
 
   generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob) {
     return new Promise((resolve) => {
-      return resolve(selectedPlayer);
       const dropitemChance = helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
@@ -251,7 +250,6 @@ class Event {
     return new Promise((resolve) => {
       return this.ItemManager.generateItem(selectedPlayer)
         .then((item) => {
-          return resolve(selectedPlayer);
           const itemCost = Math.round(item.gold);
 
           if (selectedPlayer.gold <= itemCost || item.name.startsWith('Cracked')) {
@@ -720,7 +718,6 @@ class Event {
 
   generateLuckItemEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      return resolve(selectedPlayer);
       const luckItemDice = helper.randomBetween(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {

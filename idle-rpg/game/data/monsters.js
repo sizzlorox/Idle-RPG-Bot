@@ -13,7 +13,7 @@ const monsters = {
       },
       experience: 1,
       gold: 0.25,
-      rarity: 75
+      rarity: 100
     },
     normal = {
       name: 'Normal',
@@ -43,7 +43,7 @@ const monsters = {
       },
       experience: 2,
       gold: 2,
-      rarity: 65
+      rarity: 50
     },
     elite = {
       name: 'Elite',
@@ -58,7 +58,7 @@ const monsters = {
       },
       experience: 3,
       gold: 3,
-      rarity: 45
+      rarity: 30
     },
     champion = {
       name: 'Champion',
@@ -73,7 +73,7 @@ const monsters = {
       },
       experience: 4,
       gold: 4,
-      rarity: 25
+      rarity: 15
     },
     legendary = {
       name: 'Legendary',
@@ -88,7 +88,7 @@ const monsters = {
       },
       experience: 5,
       gold: 5,
-      rarity: 5
+      rarity: 10
     },
     omega = {
       name: 'Omega',
@@ -118,7 +118,7 @@ const monsters = {
       },
       experience: 1,
       gold: 1,
-      rarity: 50
+      rarity: 5
     },
     deadly = {
       name: 'Deadly',
@@ -133,7 +133,7 @@ const monsters = {
       },
       experience: 6,
       gold: 6,
-      rarity: 6
+      rarity: 4
     },
     berserk = {
       name: 'Berserk',
@@ -148,7 +148,7 @@ const monsters = {
       },
       experience: 3,
       gold: 1,
-      rarity: 44
+      rarity: 3
     },
     corrupted = {
       name: 'Corrupted',
@@ -163,7 +163,7 @@ const monsters = {
       },
       experience: 1.5,
       gold: 1.5,
-      rarity: 71
+      rarity: 2
     },
   ],
 
@@ -175,9 +175,9 @@ const monsters = {
       power: 1,
       health: 25,
       stats: {
-        str: 1,
+        str: 0.5,
         dex: 0.5,
-        end: 0.25,
+        end: 0.10,
         int: 1,
         luk: 1
       },
@@ -185,7 +185,7 @@ const monsters = {
         weapon: {
           attackType: 'melee',
           name: 'Rat Claw',
-          power: 1
+          power: 0.25
         },
         armor: {
           name: 'Fur',
@@ -207,9 +207,9 @@ const monsters = {
       power: 1.25,
       health: 30,
       stats: {
-        str: 1.5,
+        str: 1,
         dex: 0.25,
-        end: 0.5,
+        end: 0.25,
         int: 1,
         luk: 1
       },
@@ -217,7 +217,7 @@ const monsters = {
         weapon: {
           attackType: 'melee',
           name: 'Pinchers',
-          power: 1
+          power: 0.5
         },
         armor: {
           name: 'Crab Shell',
@@ -232,28 +232,60 @@ const monsters = {
       gold: 1,
       rarity: 100
     },
+    bat = {
+      name: 'Bat',
+      isSpawnable: true,
+      spawnableMapType: ['Land'],
+      power: 1.25,
+      health: 45,
+      stats: {
+        str: 1,
+        dex: 0.25,
+        end: 0.5,
+        int: 1,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'Bat Claws',
+          power: 0.5
+        },
+        armor: {
+          name: 'Fur',
+          power: 0.02
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 7,
+      gold: 4,
+      rarity: 90
+    },
     slime = {
       name: 'Slime',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
-      power: 0.15,
+      power: 1.5,
       health: 35,
       stats: {
         str: 1.25,
-        dex: 1.25,
-        end: 1.25,
+        dex: 0.5,
+        end: 0.5,
         int: 1.25,
-        luk: 1.25
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'Slime',
-          power: 0.10
+          power: 0.5
         },
         armor: {
           name: 'Slime',
-          power: 0.75
+          power: 0.05
         }
       },
       inventory: {
@@ -268,24 +300,24 @@ const monsters = {
       name: 'Goblin',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
-      power: 0.5,
+      power: 1.75,
       health: 50,
       stats: {
-        str: 0.5,
+        str: 1.25,
         dex: 0.5,
-        end: 0.5,
-        int: 0.5,
-        luk: 0.5
+        end: 1.5,
+        int: 1.25,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'Dagger',
-          power: 0.5
+          power: 0.75
         },
         armor: {
           name: 'Rusty Chailmail',
-          power: 0.5
+          power: 0.10
         }
       },
       inventory: {
@@ -300,24 +332,24 @@ const monsters = {
       name: 'Bandit',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Snow'],
-      power: 0.75,
+      power: 1.75,
       health: 75,
       stats: {
-        str: 0.75,
-        dex: 0.75,
-        end: 0.75,
-        int: 0.75,
-        luk: 0.75
+        str: 1.25,
+        dex: 2,
+        end: 1.5,
+        int: 1,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'Dagger',
-          power: 0.75
+          power: 1
         },
         armor: {
           name: 'Leather Armor',
-          power: 0.75
+          power: 0.10
         }
       },
       inventory: {
@@ -328,38 +360,73 @@ const monsters = {
       gold: 3,
       rarity: 80
     },
-    bat = {
-      name: 'Bat',
+
+    knight = {
+      name: 'Knight',
       isSpawnable: true,
       spawnableMapType: ['Land'],
-      power: 0.5,
-      health: 45,
+      power: 1.75,
+      health: 100,
       stats: {
-        str: 0.5,
-        dex: 0.5,
-        end: 0.5,
-        int: 0.5,
-        luk: 0.5
+        str: 1.25,
+        dex: 2,
+        end: 1.5,
+        int: 1,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Bat Claws',
-          power: 0.5
+          name: 'Claymore',
+          power: 1.25
         },
         armor: {
-          name: 'Fur',
-          power: 0.5
+          name: 'Iron Full Armor',
+          power: 0.15
         }
       },
       inventory: {
         items: []
       },
       spells: [],
-      experience: 7,
-      gold: 4,
-      rarity: 90
+      experience: 25,
+      gold: 6,
+      rarity: 50
     },
+
+    necromancer = {
+      name: 'Necromancer',
+      isSpawnable: true,
+      spawnableMapType: ['Land'],
+      power: 2,
+      health: 85,
+      stats: {
+        str: 1.25,
+        dex: 2.5,
+        end: 1,
+        int: 2,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'Staff',
+          power: 1.25
+        },
+        armor: {
+          name: 'Robe',
+          power: 0.10
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 30,
+      gold: 7,
+      rarity: 50
+    },
+
     dragon = {
       name: 'Dragon',
       isSpawnable: true,
@@ -392,70 +459,7 @@ const monsters = {
       gold: 5,
       rarity: 65
     },
-    knight = {
-      name: 'Knight',
-      isSpawnable: true,
-      spawnableMapType: ['Land'],
-      power: 0.75,
-      health: 100,
-      stats: {
-        str: 0.75,
-        dex: 0.75,
-        end: 0.75,
-        int: 0.75,
-        luk: 0.75
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: 'Claymore',
-          power: 0.75
-        },
-        armor: {
-          name: 'Iron Full Armor',
-          power: 0.75
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 25,
-      gold: 6,
-      rarity: 50
-    },
-    necromancer = {
-      name: 'Necromancer',
-      isSpawnable: true,
-      spawnableMapType: ['Land'],
-      power: 1,
-      health: 85,
-      stats: {
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 1,
-        luk: 1
-      },
-      equipment: {
-        weapon: {
-          attackType: 'magic',
-          name: 'Staff',
-          power: 1
-        },
-        armor: {
-          name: 'Robe',
-          power: 1
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 30,
-      gold: 7,
-      rarity: 50
-    },
+
     zombie = {
       name: 'Zombie',
       isSpawnable: true,

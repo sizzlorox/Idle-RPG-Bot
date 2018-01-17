@@ -217,6 +217,7 @@ class Battle {
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
+                defenderDamage += spellDamage;
                 defender.health -= spellDamage;
                 console.log(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
@@ -244,6 +245,7 @@ class Battle {
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
+                attackerDamage += spellDamage;
                 attacker.health -= spellDamage;
                 console.log(`${attacker.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
@@ -273,6 +275,7 @@ class Battle {
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
+                defenderDamage += spellDamage;
                 attacker.health -= spellDamage;
                 console.log(`${attacker.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
@@ -300,6 +303,7 @@ class Battle {
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
+                attackerDamage += spellDamage;
                 defender.health -= spellDamage;
                 console.log(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
