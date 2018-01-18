@@ -300,6 +300,39 @@ const monsters = {
       rarity: 100
     },
 
+    pixie = {
+      name: 'Pixie',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Forest'],
+      power: 1.5,
+      health: 35,
+      stats: {
+        str: 1.25,
+        dex: 1,
+        end: 0.5,
+        int: 1.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.05
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 2,
+      gold: 2,
+      rarity: 75
+    },
+
     goblin = {
       name: 'Goblin',
       isSpawnable: true,
@@ -465,6 +498,105 @@ const monsters = {
       rarity: 50
     },
 
+    gargoyle = {
+      name: 'Gargoyle',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Forest'],
+      power: 2,
+      health: 160,
+      stats: {
+        str: 1.5,
+        dex: 2,
+        end: 2,
+        int: 1,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '',
+          power: 0.90
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 20,
+      gold: 6,
+      rarity: 25
+    },
+
+    bugbear = {
+      name: 'Bugbear',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Plains'],
+      power: 2.25,
+      health: 175,
+      stats: {
+        str: 1.75,
+        dex: 1.5,
+        end: 1.75,
+        int: 1,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '',
+          power: 1.25
+        },
+        armor: {
+          name: '',
+          power: 0.40
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 5,
+      gold: 3,
+      rarity: 75
+    },
+
+    griffin = {
+      name: 'Griffin',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Plains'],
+      power: 2,
+      health: 120,
+      stats: {
+        str: 1.75,
+        dex: 2.25,
+        end: 1.5,
+        int: 1.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '',
+          power: 1.25
+        },
+        armor: {
+          name: '',
+          power: 0.25
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 8,
+      gold: 8,
+      rarity: 48
+    },
+
     orc = {
       name: 'Orc',
       isSpawnable: true,
@@ -529,6 +661,72 @@ const monsters = {
       experience: 20,
       gold: 9,
       rarity: 15
+    },
+
+    wereWolf = {
+      name: 'Werewolf',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Forest'],
+      power: 2,
+      health: 115,
+      stats: {
+        str: 3,
+        dex: 2,
+        end: 2,
+        int: 0.75,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '',
+          power: 1.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 11,
+      gold: 11,
+      rarity: 35
+    },
+
+    basilisk = {
+      name: 'Basilisk',
+      isSpawnable: true,
+      spawnableMapType: ['Mountains'],
+      power: 2.25,
+      health: 190,
+      stats: {
+        str: 2.5,
+        dex: 1.5,
+        end: 2.25,
+        int: 1,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '',
+          power: 1.75
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 27,
+      gold: 9,
+      rarity: 10
     },
 
     dragon = {
@@ -630,198 +828,7 @@ const monsters = {
       gold: 9,
       rarity: 95
     },
-    basilisk = {
-      name: 'Basilisk',
-      isSpawnable: true,
-      spawnableMapType: ['Mountains'],
-      power: 1.5,
-      health: 190,
-      stats: {
-        str: 1.5,
-        dex: 1.5,
-        end: 1.5,
-        int: 1.5,
-        luk: 1.5
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 1.5
-        },
-        armor: {
-          name: '',
-          power: 1.5
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 27,
-      gold: 9,
-      rarity: 10
-    },
-    bugbear = {
-      name: 'Bugbear',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains'],
-      power: 0.85,
-      health: 175,
-      stats: {
-        str: 0.85,
-        dex: 0.85,
-        end: 0.85,
-        int: 0.85,
-        luk: 0.85
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 0.85
-        },
-        armor: {
-          name: '',
-          power: 0.85
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 5,
-      gold: 3,
-      rarity: 75
-    },
-    gargoyle = {
-      name: 'Gargoyle',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
-      power: 0.75,
-      health: 160,
-      stats: {
-        str: 0.75,
-        dex: 0.75,
-        end: 0.75,
-        int: 0.75,
-        luk: 0.75
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 0.75
-        },
-        armor: {
-          name: '',
-          power: 0.75
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 20,
-      gold: 6,
-      rarity: 25
-    },
-    griffin = {
-      name: 'Griffin',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains'],
-      power: 1.1,
-      health: 120,
-      stats: {
-        str: 1.1,
-        dex: 1.1,
-        end: 1.1,
-        int: 1.1,
-        luk: 1.1
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 1.1
-        },
-        armor: {
-          name: '',
-          power: 1.1
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 8,
-      gold: 8,
-      rarity: 48
-    },
-    wereWolf = {
-      name: 'Werewolf',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
-      power: 1,
-      health: 115,
-      stats: {
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 1,
-        luk: 1
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 1
-        },
-        armor: {
-          name: '',
-          power: 1
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 11,
-      gold: 11,
-      rarity: 35
-    },
-    pixie = {
-      name: 'Pixie',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
-      power: 0.5,
-      health: 35,
-      stats: {
-        str: 0.5,
-        dex: 0.5,
-        end: 0.5,
-        int: 0.5,
-        luk: 0.5
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 0.5
-        },
-        armor: {
-          name: '',
-          power: 0.5
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 2,
-      gold: 2,
-      rarity: 75
-    },
+
     unicorn = {
       name: 'Unicorn',
       isSpawnable: true,

@@ -128,6 +128,8 @@ class Event {
       return this.MonsterManager.generateNewMonster(selectedPlayer)
         .then((mob) => {
           const mobMaxHealth = mob.health;
+          const playerBeforeBattleHealth = selectedPlayer.health;
+          const playerMaxHealth = 100 + (selectedPlayer.level * 5);
           return Battle.newSimulateBattle(selectedPlayer, mob)
             .then(({
               attacker, defender, attackerDamage, defenderDamage
@@ -137,7 +139,7 @@ class Event {
                 const eventMsg = `\`${defender.name}\` just killed ${helper.generatePlayerName(selectedPlayer)} in \`${selectedPlayer.map.name}\`!
                 Battle Results:
                   ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                  ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+                  ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} / ${playerBeforeBattleHealth} / ${playerMaxHealth} HP left.
                   ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
                   ${defender.name} has ${defender.health} / ${mobMaxHealth} HP left.`;
 
@@ -153,7 +155,7 @@ class Event {
                 const eventMsg = `\`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)} in \`${selectedPlayer.map.name}\`!
                 Battle Results:
                   ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                  ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+                  ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} / ${playerBeforeBattleHealth} / ${playerMaxHealth} HP left.
                   ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
                   ${defender.name} has ${defender.health} / ${mobMaxHealth} HP left.`;
 
@@ -170,7 +172,7 @@ class Event {
               const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${defender.name}\` in \`${selectedPlayer.map.name}\`!
               Battle Results:
                 ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+                ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} / ${playerBeforeBattleHealth} / ${playerMaxHealth} HP left.
                 ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.`;
 
               const eventLog = `Killed ${defender.name} in ${selectedPlayer.map.name}.`;

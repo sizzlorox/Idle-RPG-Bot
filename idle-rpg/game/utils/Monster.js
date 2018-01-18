@@ -51,13 +51,19 @@ class Monster {
         || mobType.name === 'Crab'
         || mobType.name === 'Bat'
         || mobType.name === 'Slime'
+        || mobType.name === 'Pixie'
         || mobType.name === 'Goblin'
         || mobType.name === 'Bandit'
         || mobType.name === 'Zombie'
         || mobType.name === 'Knight'
         || mobType.name === 'Necromancer'
         || mobType.name === 'Orc'
-        || mobType.name === 'Elf');
+        || mobType.name === 'Elf'
+        || mobType.name === 'Basilisk'
+        || mobType.name === 'Bugbear'
+        || mobType.name === 'Gargoyle'
+        || mobType.name === 'Griffin'
+        || mobType.name === 'Werewolf');
 
       const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);
