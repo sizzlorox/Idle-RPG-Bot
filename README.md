@@ -23,6 +23,7 @@ DISCORD_BOT_LOGIN_TOKEN=<Discord bot login token here>
 MIN_TIMER=<Minimal timer in minutes here>
 MAX_TIMER=<Maximum timer in minutes here>
 
+VIRUS_TOTAL_APIKEY=<api key for your virus total account (not required)>
 MONGODB_URI=<mongodb connection URI>
 ```
 
