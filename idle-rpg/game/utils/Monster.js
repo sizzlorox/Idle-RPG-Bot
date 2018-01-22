@@ -41,29 +41,11 @@ class Monster {
       const randomRarityChance = Math.round(helper.randomBetween(0, 100));
       const randomTypeChance = Math.round(helper.randomBetween(0, 100));
       const randomMonsterType = randomTypeChance + randomRarityChance > 100 ? 100 : randomTypeChance + randomRarityChance;
+      console.log(`MOB RT: ${randomTypeChance} - AFTER BALANCE: ${randomMonsterType}`);
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
-      /*
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
         && mobType.spawnableMapType.includes(selectedPlayer.map.type.name));
-        */
-      const monsterTypeList = monsters.type.filter(mobType => mobType.name === 'Rat'
-        || mobType.name === 'Crab'
-        || mobType.name === 'Bat'
-        || mobType.name === 'Slime'
-        || mobType.name === 'Pixie'
-        || mobType.name === 'Goblin'
-        || mobType.name === 'Bandit'
-        || mobType.name === 'Zombie'
-        || mobType.name === 'Knight'
-        || mobType.name === 'Necromancer'
-        || mobType.name === 'Orc'
-        || mobType.name === 'Elf'
-        || mobType.name === 'Basilisk'
-        || mobType.name === 'Bugbear'
-        || mobType.name === 'Gargoyle'
-        || mobType.name === 'Griffin'
-        || mobType.name === 'Werewolf');
 
       const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);

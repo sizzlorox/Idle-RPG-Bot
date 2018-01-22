@@ -185,21 +185,27 @@ class helper {
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
       switch (this.randomBetween(0, 2)) {
         case 0:
-          this.setPlayerEquipment(selectedPlayer,
+          this.setPlayerEquipment(
+            selectedPlayer,
             enumHelper.equipment.types.helmet.position,
-            enumHelper.equipment.empty.helmet);
+            enumHelper.equipment.empty.helmet
+          );
 
           break;
         case 1:
-          this.setPlayerEquipment(selectedPlayer,
+          this.setPlayerEquipment(
+            selectedPlayer,
             enumHelper.equipment.types.armor.position,
-            enumHelper.equipment.empty.armor);
+            enumHelper.equipment.empty.armor
+          );
 
           break;
         case 2:
-          this.setPlayerEquipment(selectedPlayer,
+          this.setPlayerEquipment(
+            selectedPlayer,
             enumHelper.equipment.types.weapon.position,
-            enumHelper.equipment.empty.weapon);
+            enumHelper.equipment.empty.weapon
+          );
 
           break;
       }

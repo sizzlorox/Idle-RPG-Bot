@@ -1,4 +1,5 @@
 const winston = require('winston');
+require('winston-daily-rotate-file');
 
 const logger = winston.createLogger({
   level: 'info',
@@ -18,12 +19,66 @@ const logger = winston.createLogger({
       silent: false,
       timestamp: true
     }),
-    new winston.transports.File({ filename: './logs/info.log', level: 'info', silent: false, timestamp: true }),
-    new winston.transports.File({ filename: './logs/welcome.log', level: 'welcome', silent: false, timestamp: true }),
-    new winston.transports.File({ filename: './logs/action.log', level: 'action', silent: true, timestamp: true }),
-    new winston.transports.File({ filename: './logs/move.log', level: 'move', silent: true, timestamp: true }),
-    new winston.transports.File({ filename: './logs/error.log', level: 'error', silent: false, timestamp: true }),
-    new winston.transports.File({ filename: './logs/command.log', level: 'command', silent: false, timestamp: true })
+
+    new winston.transports.DailyRotateFile({
+      filename: './logs/info.log',
+      level: 'info',
+      silent: false,
+      datePattern: 'yyyy-MM-dd.',
+      prepend: true,
+      maxDays: 30,
+      timestamp: true
+    }),
+
+    new winston.transports.DailyRotateFile({
+      filename: './logs/welcome.log',
+      level: 'welcome',
+      silent: false,
+      datePattern: 'yyyy-MM-dd.',
+      prepend: true,
+      maxDays: 30,
+      timestamp: true
+    }),
+
+    new winston.transports.DailyRotateFile({
+      filename: './logs/action.log',
+      level: 'action',
+      silent: true,
+      datePattern: 'yyyy-MM-dd.',
+      prepend: true,
+      maxDays: 30,
+      timestamp: true
+    }),
+
+    new winston.transports.DailyRotateFile({
+      filename: './logs/move.log',
+      level: 'move',
+      silent: true,
+      datePattern: 'yyyy-MM-dd.',
+      prepend: true,
+      maxDays: 30,
+      timestamp: true
+    }),
+
+    new winston.transports.DailyRotateFile({
+      filename: './logs/error.log',
+      level: 'error',
+      silent: false,
+      datePattern: 'yyyy-MM-dd.',
+      prepend: true,
+      maxDays: 30,
+      timestamp: true
+    }),
+
+    new winston.transports.DailyRotateFile({
+      filename: './logs/command.log',
+      level: 'command',
+      silent: false,
+      datePattern: 'yyyy-MM-dd.',
+      prepend: true,
+      maxDays: 30,
+      timestamp: true
+    })
   ],
   exceptionHandlers: [
     new winston.transports.File({ filename: './logs/exceptions.log', silent: false })

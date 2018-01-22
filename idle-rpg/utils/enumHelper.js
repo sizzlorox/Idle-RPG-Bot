@@ -71,44 +71,8 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'balancingMobs1',
-    discordId: 'balancingMobs1'
-  },
-  {
-    name: 'balancingMobs2',
-    discordId: 'balancingMobs2'
-  },
-  {
-    name: 'balancingMobs3',
-    discordId: 'balancingMobs3'
-  },
-  {
-    name: 'balancingMobs4',
-    discordId: 'balancingMobs4'
-  },
-  {
-    name: 'balancingMobs5',
-    discordId: 'balancingMobs5'
-  },
-  {
-    name: 'balancingMobs6',
-    discordId: 'balancingMobs6'
-  },
-  {
-    name: 'balancingMobs7',
-    discordId: 'balancingMobs7'
-  },
-  {
-    name: 'balancingMobs8',
-    discordId: 'balancingMobs8'
-  },
-  {
-    name: 'balancingMobs9',
-    discordId: 'balancingMobs9'
-  },
-  {
-    name: 'balancingMobs10',
-    discordId: 'balancingMobs10'
+    name: 'LoneTester',
+    discordId: 'LoneTester'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns

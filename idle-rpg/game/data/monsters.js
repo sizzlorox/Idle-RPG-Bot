@@ -729,24 +729,90 @@ const monsters = {
       rarity: 10
     },
 
+    unicorn = {
+      name: 'Unicorn',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Forest'],
+      power: 0.90,
+      health: 45,
+      stats: {
+        str: 1,
+        dex: 1.85,
+        end: 0.9,
+        int: 1,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 5,
+      gold: 4,
+      rarity: 50
+    },
+
+    wraith = {
+      name: 'Wraith',
+      isSpawnable: true,
+      spawnableMapType: ['Land', 'Undead Land'],
+      power: 1.2,
+      health: 95,
+      stats: {
+        str: 1,
+        dex: 1.75,
+        end: 1.2,
+        int: 1.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '',
+          power: 1.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 4,
+      gold: 5,
+      rarity: 80
+    },
+
     dragon = {
       name: 'Dragon',
       isSpawnable: true,
       spawnableMapType: ['Land'],
-      power: 1.75,
+      power: 3,
       health: 145,
       stats: {
-        str: 1.75,
+        str: 2.75,
         dex: 1.75,
-        end: 1.75,
-        int: 1.75,
-        luk: 1.75
+        end: 3,
+        int: 2,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: 'Dragon Claw',
-          power: 1.75
+          power: 2.5
         },
         armor: {
           name: 'Dragon Scales',
@@ -829,92 +895,28 @@ const monsters = {
       rarity: 95
     },
 
-    unicorn = {
-      name: 'Unicorn',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
-      power: 0.75,
-      health: 45,
-      stats: {
-        str: 0.75,
-        dex: 0.75,
-        end: 0.75,
-        int: 0.75,
-        luk: 0.75
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 0.75
-        },
-        armor: {
-          name: '',
-          power: 0.75
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 5,
-      gold: 4,
-      rarity: 50
-    },
-    wraith = {
-      name: 'Wraith',
-      isSpawnable: true,
-      spawnableMapType: ['Land', 'Undead Land'],
-      power: 1.5,
-      health: 95,
-      stats: {
-        str: 1.5,
-        dex: 1.5,
-        end: 1.5,
-        int: 1.5,
-        luk: 1.5
-      },
-      equipment: {
-        weapon: {
-          attackType: 'melee',
-          name: '',
-          power: 1.5
-        },
-        armor: {
-          name: '',
-          power: 1.5
-        }
-      },
-      inventory: {
-        items: []
-      },
-      spells: [],
-      experience: 4,
-      gold: 5,
-      rarity: 80
-    },
     giantSpider = {
       name: 'Giant Spider',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
-      power: 0.85,
+      power: 1,
       health: 75,
       stats: {
         str: 0.85,
-        dex: 0.85,
-        end: 0.85,
-        int: 0.85,
-        luk: 0.85
+        dex: 2,
+        end: 0.75,
+        int: 0.5,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '',
-          power: 0.85
+          power: 0.55
         },
         armor: {
           name: '',
-          power: 0.85
+          power: 0.5
         }
       },
       inventory: {
@@ -925,24 +927,25 @@ const monsters = {
       gold: 7,
       rarity: 50
     },
+
     killerBee = {
       name: 'Killer Bee',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest'],
-      power: 0.5,
+      power: 0.2,
       health: 50,
       stats: {
-        str: 0.5,
-        dex: 0.5,
-        end: 0.5,
-        int: 0.5,
-        luk: 0.5
+        str: 1,
+        dex: 2,
+        end: 0.2,
+        int: 1,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '',
-          power: 0.5
+          power: 0.75
         },
         armor: {
           name: '',
@@ -957,28 +960,29 @@ const monsters = {
       gold: 1,
       rarity: 90
     },
+
     golem = {
       name: 'Golem',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Mountains', 'Plains'],
-      power: 1.5,
+      power: 2,
       health: 200,
       stats: {
-        str: 1.5,
-        dex: 1.5,
-        end: 1.5,
-        int: 1.5,
-        luk: 1.5
+        str: 1.75,
+        dex: 0.2,
+        end: 3,
+        int: 1.2,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '',
-          power: 1.5
+          power: 0.75
         },
         armor: {
           name: '',
-          power: 1.5
+          power: 2
         }
       },
       inventory: {
@@ -989,6 +993,7 @@ const monsters = {
       gold: 8,
       rarity: 60
     },
+
     centaur = {
       name: 'Centaur',
       isSpawnable: true,
@@ -1021,28 +1026,29 @@ const monsters = {
       gold: 3,
       rarity: 71
     },
+
     cyclops = {
       name: 'Cyclops',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Mountains', 'Plains'],
-      power: 0.95,
+      power: 1,
       health: 160,
       stats: {
-        str: 0.95,
-        dex: 0.95,
-        end: 0.95,
-        int: 0.95,
-        luk: 0.95
+        str: 1.65,
+        dex: 0.5,
+        end: 1.2,
+        int: 1,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '',
-          power: 0.95
+          power: 1.75
         },
         armor: {
           name: '',
-          power: 0.95
+          power: 0.75
         }
       },
       inventory: {
@@ -1053,18 +1059,19 @@ const monsters = {
       gold: 3,
       rarity: 63
     },
+
     demon = {
       name: 'Demon',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Undead Land'],
-      power: 1.3,
+      power: 2,
       health: 185,
       stats: {
-        str: 1.3,
-        dex: 1.3,
-        end: 1.3,
-        int: 1.3,
-        luk: 1.3
+        str: 1.5,
+        dex: 1.2,
+        end: 2,
+        int: 1.75,
+        luk: 1
       },
       equipment: {
         weapon: {
@@ -1074,7 +1081,7 @@ const monsters = {
         },
         armor: {
           name: '',
-          power: 1.3
+          power: 0.75
         }
       },
       inventory: {
@@ -1085,6 +1092,7 @@ const monsters = {
       gold: 6,
       rarity: 66.6
     },
+
     elemental = {
       name: 'Elemental',
       isSpawnable: true,
@@ -1093,9 +1101,9 @@ const monsters = {
       health: 150,
       stats: {
         str: 1,
-        dex: 1,
+        dex: 1.2,
         end: 1,
-        int: 1,
+        int: 2.5,
         luk: 1
       },
       equipment: {
@@ -1117,28 +1125,29 @@ const monsters = {
       gold: 5,
       rarity: 73
     },
+
     sphinx = {
       name: 'Sphinx',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Desert'],
-      power: 1,
+      power: 1.45,
       health: 210,
       stats: {
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 1,
+        str: 1.95,
+        dex: 2,
+        end: 1.25,
+        int: 1.75,
         luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '',
-          power: 1
+          power: 1.25
         },
         armor: {
           name: '',
-          power: 1
+          power: 0.75
         }
       },
       inventory: {
@@ -1149,24 +1158,25 @@ const monsters = {
       gold: 15,
       rarity: 41
     },
+
     tribalWarrior = {
       name: 'Tribal Warrior',
       isSpawnable: true,
       spawnableMapType: ['Land', 'Forest', 'Plains'],
-      power: 0.95,
+      power: 1,
       health: 110,
       stats: {
-        str: 0.95,
-        dex: 0.95,
-        end: 0.95,
-        int: 0.95,
-        luk: 0.95
+        str: 2.15,
+        dex: 0.5,
+        end: 1.15,
+        int: 0.5,
+        luk: 1
       },
       equipment: {
         weapon: {
           attackType: 'melee',
           name: '',
-          power: 0.95
+          power: 1
         },
         armor: {
           name: '',
