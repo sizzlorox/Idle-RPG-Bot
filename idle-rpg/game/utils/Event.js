@@ -335,7 +335,9 @@ class Event {
   stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer) {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomBetween(0, 100);
-      if (luckStealChance > 90 - (selectedPlayer.currentBounty / 100)) {
+      const chance = Math.floor((selectedPlayer.currentBounty * Math.log(1.2)) / 100);
+
+      if (luckStealChance > 90 - !Number.isFinite(chance) ? 0 : chance) {
         const luckItem = helper.randomBetween(0, 2);
         switch (luckItem) {
           case 0:
