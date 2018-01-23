@@ -73,6 +73,10 @@ const enumHelper = {
   mockPlayers: [{
     name: 'LoneTester',
     discordId: 'LoneTester'
+  },
+  {
+    name: 'LoneTester01',
+    discordId: 'LoneTester01'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns

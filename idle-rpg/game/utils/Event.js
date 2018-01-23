@@ -89,7 +89,6 @@ class Event {
                 if (selectedPlayer.health <= 0) {
                   return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
                     .then((stealResult) => {
-                      //  TODO: inverted because of how I set the stealPlayerItem function (think of a way to make this better!)
                       helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook);
                       return Database.savePlayer(stealResult.stealingPlayer)
                         .then(() => {

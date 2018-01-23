@@ -3,13 +3,70 @@ const type = {
     id: 0,
     name: 'Land'
   },
-  snow: {
+
+  tundra: {
     id: 1,
-    name: 'Snow'
+    name: 'Tundra'
   },
+
   town: {
     id: 2,
     name: 'Town'
+  },
+
+  forest: {
+    id: 3,
+    name: 'Forest'
+  },
+
+  plains: {
+    id: 4,
+    name: 'Plains'
+  },
+
+  beach: {
+    id: 5,
+    name: 'Beach'
+  },
+
+  barrows: {
+    id: 6,
+    name: 'Barrows'
+  },
+
+  mountain: {
+    id: 7,
+    name: 'Mountains'
+  },
+
+  swamp: {
+    id: 8,
+    name: 'Swamp'
+  },
+
+  desert: {
+    id: 9,
+    name: 'Desert'
+  },
+
+  cave: {
+    id: 10,
+    name: 'Caves'
+  },
+
+  barren: {
+    id: 11,
+    name: 'Barren'
+  },
+
+  graveyard: {
+    id: 12,
+    name: 'Graveyard'
+  },
+
+  sacred: {
+    id: 13,
+    name: 'Sacred'
   }
 };
 

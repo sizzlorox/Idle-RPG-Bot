@@ -204,7 +204,7 @@ const monsters = {
     crab = {
       name: 'Crab',
       isSpawnable: true,
-      spawnableMapType: ['Land'],
+      spawnableMapType: ['Land', 'Shores', 'Swamp'],
       power: 1.25,
       health: 30,
       stats: {
@@ -237,7 +237,7 @@ const monsters = {
     bat = {
       name: 'Bat',
       isSpawnable: true,
-      spawnableMapType: ['Land'],
+      spawnableMapType: ['Land', 'Forest', 'Swamp', ],
       power: 1.25,
       health: 45,
       stats: {
@@ -270,7 +270,7 @@ const monsters = {
     slime = {
       name: 'Slime',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Snow'],
+      spawnableMapType: ['Land', 'Swamp', 'Plains', 'Forest', 'Barrows'],
       power: 1.5,
       health: 35,
       stats: {
@@ -303,7 +303,7 @@ const monsters = {
     pixie = {
       name: 'Pixie',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
+      spawnableMapType: ['Land', 'Forest', 'Sacred'],
       power: 1.5,
       health: 35,
       stats: {
@@ -336,7 +336,7 @@ const monsters = {
     goblin = {
       name: 'Goblin',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Snow'],
+      spawnableMapType: ['Land', 'Barrows', 'Forest', 'Swamp', 'Plains'],
       power: 1.75,
       health: 50,
       stats: {
@@ -369,7 +369,7 @@ const monsters = {
     bandit = {
       name: 'Bandit',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Snow'],
+      spawnableMapType: ['Land', 'Barrows', 'Forest', 'Plains'],
       power: 1.75,
       health: 75,
       stats: {
@@ -402,7 +402,7 @@ const monsters = {
     zombie = {
       name: 'Zombie',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Undead Land'],
+      spawnableMapType: ['Land', 'Forest', 'Barren', 'Graveyard'],
       power: 1.5,
       health: 65,
       stats: {
@@ -435,7 +435,7 @@ const monsters = {
     knight = {
       name: 'Knight',
       isSpawnable: true,
-      spawnableMapType: ['Land'],
+      spawnableMapType: ['Land', 'Forest', 'Plains', 'Beach', 'Barrows', 'Mountains', 'Sacred'],
       power: 1.75,
       health: 100,
       stats: {
@@ -468,7 +468,7 @@ const monsters = {
     necromancer = {
       name: 'Necromancer',
       isSpawnable: true,
-      spawnableMapType: ['Land'],
+      spawnableMapType: ['Land', 'Forest', 'Barrows', 'Mountains', 'Graveyard'],
       power: 2,
       health: 85,
       stats: {
@@ -501,7 +501,7 @@ const monsters = {
     gargoyle = {
       name: 'Gargoyle',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
+      spawnableMapType: ['Graveyard'],
       power: 2,
       health: 160,
       stats: {
@@ -534,7 +534,7 @@ const monsters = {
     bugbear = {
       name: 'Bugbear',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains'],
+      spawnableMapType: ['Land', 'Plains', 'Forest', 'Barrows', 'Mountains', 'Barren', 'Caves'],
       power: 2.25,
       health: 175,
       stats: {
@@ -832,7 +832,7 @@ const monsters = {
       name: 'Yeti',
       isXmasEvent: true,
       isSpawnable: false,
-      spawnableMapType: ['Snow'],
+      spawnableMapType: ['Tundra'],
       power: 1.75,
       health: 150,
       stats: {
@@ -865,7 +865,7 @@ const monsters = {
       name: 'Christmas Gnome',
       isXmasEvent: true,
       isSpawnable: false,
-      spawnableMapType: ['Snow'],
+      spawnableMapType: ['Tundra'],
       power: 0.75,
       health: 45,
       stats: {
