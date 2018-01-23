@@ -3,6 +3,7 @@ const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
 const spells = require('./data/spells');
+const { errorLog } = require('../utils/logger');
 const moment = require('moment');
 const { multiplier } = require('../../settings');
 
@@ -69,7 +70,7 @@ class Game {
             break;
         }
       })
-      .catch(err => console.log(err));
+      .catch(err => errorLog.error(err));
   }
 
   moveEvent(selectedPlayer) {
