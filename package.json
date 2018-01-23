@@ -19,7 +19,7 @@
     "mongoose": "^4.13.7",
     "querystring": "^0.2.0",
     "twitch-bot": "^1.0.9",
-    "winston": "^3.0.0-rc1",
+    "winston": "2.4.0",
     "winston-daily-rotate-file": "^1.7.2"
   },
   "devDependencies": {

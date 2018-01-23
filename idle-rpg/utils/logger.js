@@ -2,7 +2,6 @@ const winston = require('winston');
 require('winston-daily-rotate-file');
 
 const logger = winston.createLogger({
-  level: 'info',
   levels: {
     info: 0,
     welcome: 1,
@@ -25,6 +24,7 @@ const logger = winston.createLogger({
       level: 'info',
       silent: false,
       datePattern: 'yyyy-MM-dd.',
+      localTime: true,
       prepend: true,
       maxDays: 30,
       timestamp: true
@@ -35,6 +35,7 @@ const logger = winston.createLogger({
       level: 'welcome',
       silent: false,
       datePattern: 'yyyy-MM-dd.',
+      localTime: true,
       prepend: true,
       maxDays: 30,
       timestamp: true
@@ -45,6 +46,7 @@ const logger = winston.createLogger({
       level: 'action',
       silent: true,
       datePattern: 'yyyy-MM-dd.',
+      localTime: true,
       prepend: true,
       maxDays: 30,
       timestamp: true
@@ -55,6 +57,7 @@ const logger = winston.createLogger({
       level: 'move',
       silent: true,
       datePattern: 'yyyy-MM-dd.',
+      localTime: true,
       prepend: true,
       maxDays: 30,
       timestamp: true
@@ -65,6 +68,7 @@ const logger = winston.createLogger({
       level: 'error',
       silent: false,
       datePattern: 'yyyy-MM-dd.',
+      localTime: true,
       prepend: true,
       maxDays: 30,
       timestamp: true
@@ -75,13 +79,22 @@ const logger = winston.createLogger({
       level: 'command',
       silent: false,
       datePattern: 'yyyy-MM-dd.',
+      localTime: true,
       prepend: true,
       maxDays: 30,
       timestamp: true
     })
   ],
   exceptionHandlers: [
-    new winston.transports.File({ filename: './logs/exceptions.log', silent: false })
+    new winston.transports.DailyRotateFile({
+      filename: './logs/exceptions.log',
+      silent: false,
+      datePattern: 'yyyy-MM-dd.',
+      localTime: true,
+      prepend: true,
+      maxDays: 30,
+      timestamp: true
+    })
   ]
 });
 
