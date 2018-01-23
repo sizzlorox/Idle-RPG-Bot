@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
-const logger = require('../utils/logger');
+const { moveLog, actionLog, errorLog } = require('../utils/logger');
 
 class helper {
   randomBetween(min, max, decimal, exclude) {
@@ -60,12 +60,12 @@ class helper {
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (isMovement) {
       discordHook.movementHook.send(msg)
-        .then(debugMsg => logger.move(this.formatLog(debugMsg)))
-        .catch(err => logger.error(err));
+        .then(debugMsg => moveLog.move(this.formatLog(debugMsg)))
+        .catch(err => errorLog.error(err));
     } else {
       discordHook.actionHook.send(msg)
-        .then(debugMsg => logger.action(this.formatLog(debugMsg)))
-        .catch(err => logger.error(err));
+        .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
+        .catch(err => errorLog.error(err));
     }
 
     // Add if to check if channel is streaming

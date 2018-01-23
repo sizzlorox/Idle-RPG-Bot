@@ -1,6 +1,6 @@
 const commands = require('../data/commands');
 const { botOperator } = require('../../../settings');
-const logger = require('../../utils/logger');
+const { commandLog } = require('../../utils/logger');
 const moment = require('moment');
 
 const commandList = commands.map(c => c.command).join('|');
@@ -19,7 +19,7 @@ class CommandParser {
       if (!commandObj) {
         return;
       }
-      logger.command({ author: messageObj.author.username, command: messageContent, time: moment().utc().toISOString() });
+      commandLog.command({ author: messageObj.author.username, command: messageContent, time: moment().utc().toISOString() });
 
       if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId && messageObj.channel.type !== 'dm') {
         return messageObj.author.send(`Please send this to <#${commandObj.channelOnlyId}> or PM me.`);
