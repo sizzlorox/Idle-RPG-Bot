@@ -99,7 +99,7 @@ class Battle {
       let attackerDamage;
       let defenderDamage;
       if (initiative.name === attacker.name) {
-        console.log('Battle Initiative is Attacker');
+        console.log('\nBattle Initiative is Attacker');
         if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
           attackerDamage = Math.round(battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower);
           if (attackerDamage < 0) {
@@ -143,7 +143,7 @@ class Battle {
 
         console.log(`Defender Damage: ${defenderDamage}`);
       } else if (initiative.name === defender.name) {
-        console.log('Battle Initiative is Defender');
+        console.log('\nBattle Initiative is Defender');
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
           defenderDamage = Math.round(battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower);
           if (defenderDamage < 0) {
@@ -196,7 +196,7 @@ class Battle {
     return new Promise((resolve) => {
       const initiative = this.initialAttack(attacker, defender);
       if (initiative.name === attacker.name) {
-        console.log('Spell Initiative is Attacker');
+        console.log('\nSpell Initiative is Attacker');
         if (attacker.spells.length > 0) {
           const attackerRandomSpell = helper.randomBetween(0, attacker.spells.length - 1);
           const attackerSpellToCast = attacker.spells[attackerRandomSpell];
@@ -254,7 +254,7 @@ class Battle {
           }
         }
       } else if (initiative.name === defender.name) {
-        console.log('Spell Initiative is Defender');
+        console.log('\nSpell Initiative is Defender');
         if (defender.spells.length > 0) {
           const defenderRandomSpell = helper.randomBetween(0, defender.spells.length - 1);
           const defenderSpellToCast = defender.spells[defenderRandomSpell];
@@ -321,7 +321,7 @@ class Battle {
     return new Promise((resolve) => {
       const initiative = this.initialAttack(attacker, defender);
       if (initiative.name === attacker.name) {
-        console.log('Inventory Initiative is Attacker');
+        console.log('\nInventory Initiative is Attacker');
         if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = attacker.inventory.items.find({ name: 'Health Potion' });
           let healAmount = potion.power * (attacker.level / 2);
@@ -345,7 +345,7 @@ class Battle {
           console.log(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
       } else if (initiative.name === defender.name) {
-        console.log('Inventory Initiative is defender');
+        console.log('\nInventory Initiative is defender');
         if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = defender.inventory.items.find({ name: 'Health Potion' });
           let healAmount = potion.power * (defender.level / 2);

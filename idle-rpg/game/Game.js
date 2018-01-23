@@ -260,12 +260,29 @@ ${rankString}
 
                 hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               }, 1800000); // 30 minutes
+
               Database.savePlayer(castingPlayer)
                 .then(() => {
                   commandAuthor.send('Spell has been casted!');
                 });
             } else {
               commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold} gold.`);
+            }
+            break;
+
+          case 'home':
+            if (castingPlayer.gold >= globalSpells.home.spellCost) {
+              castingPlayer.gold -= globalSpells.bless.spellCost;
+              const Kindale = Event.MapClass.getMapByIndex(4);
+              castingPlayer.map = Kindale;
+              hook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
+
+              Database.savePlayer(castingPlayer)
+                .then(() => {
+                  commandAuthor.send('Spell has been casted!');
+                });
+            } else {
+              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold} gold.`);
             }
             break;
         }

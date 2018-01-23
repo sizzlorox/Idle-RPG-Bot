@@ -667,15 +667,15 @@ class Event {
               if (selectedPlayer.spells.length > 0) {
                 let shouldAddToList = false;
                 let tempArray;
-                selectedPlayer.spells.forEach((ownedSpell) => {
-                  const spellName = ownedSpell.name.split(/ (.+)/);
-                  if (spell.name.includes(spellName)) {
-                    if (spell.power > ownedSpell.power) {
-                      selectedPlayer.spells.splice(index, 1, spell);
+                selectedPlayer.spells.forEach((ownedSpell, index) => {
+                  const spellName = ownedSpell.name.split(/ (.+)/)[1];
+                  if (spell.power > ownedSpell.power) {
+                    if (spell.name.includes(spellName)) {
+                      tempArray = selectedPlayer.spells.splice(index, 1, spell);
+                      shouldAddToList = true;
+                    } else {
                       shouldAddToList = true;
                     }
-                  } else {
-                    shouldAddToList = true;
                   }
                 });
 
@@ -731,15 +731,15 @@ class Event {
             if (selectedPlayer.spells.length > 0) {
               let shouldAddToList = false;
               let tempArray;
-              selectedPlayer.spells.forEach((ownedSpell) => {
-                const spellName = ownedSpell.name.split(/ (.+)/);
-                if (spell.name.includes(spellName)) {
-                  if (spell.power > ownedSpell.power) {
+              selectedPlayer.spells.forEach((ownedSpell, index) => {
+                const spellName = ownedSpell.name.split(/ (.+)/)[1];
+                if (spell.power > ownedSpell.power) {
+                  if (spell.name.includes(spellName)) {
                     tempArray = selectedPlayer.spells.splice(index, 1, spell);
                     shouldAddToList = true;
+                  } else {
+                    shouldAddToList = true;
                   }
-                } else {
-                  shouldAddToList = true;
                 }
               });
 
@@ -818,7 +818,8 @@ class Event {
           selectedPlayer.gold = 0;
         }
 
-        const eventMsgLoseGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern. Unfortunately, ${helper.generateGenderString(selectedPlayer, 'he')} lost ${luckGambleGold} gold!`;
+        const eventMsgLoseGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern.
+        Unfortunately, ${helper.generateGenderString(selectedPlayer, 'he')} lost ${luckGambleGold} gold!`;
         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} gold by gambling in a tavern.`;
 
         helper.sendMessage(discordHook, 'twitch', false, eventMsgLoseGamble);
@@ -829,7 +830,8 @@ class Event {
 
       selectedPlayer.gold += luckGambleGold;
 
-      const eventMsgWinGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern. Fortunately, ${helper.generateGenderString(selectedPlayer, 'he')} won ${luckGambleGold} gold!`;
+      const eventMsgWinGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern.
+      Fortunately, ${helper.generateGenderString(selectedPlayer, 'he')} won ${luckGambleGold} gold!`;
       const eventLogWinGamble = `Congrats! You won ${luckGambleGold} gold by gambling in a tavern.`;
 
       helper.sendMessage(discordHook, 'twitch', false, eventMsgWinGamble);
