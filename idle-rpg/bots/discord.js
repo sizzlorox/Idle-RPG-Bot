@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
 const { randomBetween } = require('../utils/helper');
-const logger = require('../utils/logger');
+const { welcomeLog } = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
 const VirusTotal = require('../bots/modules/VirusTotal');
@@ -105,7 +105,7 @@ discordBot.on('guildMemberAdd', (member) => {
   }
 
   channel.send(`Welcome ${member}! This channel has an Idle-RPG bot! If you have any questions check the <#${faqChannelId}> or PM me !help.`);
-  logger.log('welcome', member);
+  welcomeLog.welcome(member);
 });
 
 discordBot.login(botLoginToken);

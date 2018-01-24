@@ -1,101 +1,163 @@
 const winston = require('winston');
+const path = require('path');
+const { rootPath } = require('../../settings');
 require('winston-daily-rotate-file');
 
-const logger = winston.createLogger({
-  levels: {
-    info: 0,
-    welcome: 1,
-    action: 2,
-    move: 3,
-    error: 4,
-    command: 5
-  },
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.Console({
-      prettyPrint: true,
-      colorize: true,
-      silent: false,
-      timestamp: true
-    }),
+const logger = {
+  infoLog: new winston.Logger({
+    // format: winston.format.json(),
+    levels: {
+      info: 0,
+    },
+    transports: [
+      new winston.transports.DailyRotateFile({
+        name: 'info',
+        level: 'info',
+        filename: 'info.log',
+        dirname: path.join(`${rootPath}`, 'logs'),
+        datePattern: path.normalize('/yyyy-MM-dd/'),
+        localTime: true,
+        prepend: true,
+        maxDays: 30,
+        timestamp: true,
+        prettyPrint: true,
+        createTree: true,
+        json: true
+      })
+    ],
+    exceptionHandlers: [
+      new winston.transports.DailyRotateFile({
+        name: 'exceptions',
+        filename: 'exceptions.log',
+        dirname: path.join(`${rootPath}`, 'logs'),
+        silent: false,
+        datePattern: path.normalize('/yyyy-MM-dd/'),
+        localTime: true,
+        prepend: true,
+        prepend: true,
+        maxDays: 30,
+        timestamp: true,
+        prettyPrint: true,
+        createTree: true,
+        json: true
+      })
+    ]
+  }),
 
-    new winston.transports.DailyRotateFile({
-      filename: './logs/info.log',
-      level: 'info',
-      silent: false,
-      datePattern: 'yyyy-MM-dd.',
-      localTime: true,
-      prepend: true,
-      maxDays: 30,
-      timestamp: true
-    }),
+  welcomeLog: new winston.Logger({
+    // format: winston.format.json(),
+    levels: {
+      welcome: 0,
+    },
+    transports: [
+      new winston.transports.DailyRotateFile({
+        name: 'welcome',
+        level: 'welcome',
+        filename: 'welcome.log',
+        dirname: path.join(`${rootPath}`, 'logs'),
+        datePattern: path.normalize('/yyyy-MM-dd/'),
+        localTime: true,
+        prepend: true,
+        maxDays: 30,
+        timestamp: true,
+        prettyPrint: true,
+        createTree: true,
+        json: true
+      })
+    ]
+  }),
 
-    new winston.transports.DailyRotateFile({
-      filename: './logs/welcome.log',
-      level: 'welcome',
-      silent: false,
-      datePattern: 'yyyy-MM-dd.',
-      localTime: true,
-      prepend: true,
-      maxDays: 30,
-      timestamp: true
-    }),
+  actionLog: new winston.Logger({
+    // format: winston.format.json(),
+    levels: {
+      action: 0,
+    },
+    transports: [
+      new winston.transports.DailyRotateFile({
+        name: 'action',
+        level: 'action',
+        filename: 'action.log',
+        dirname: path.join(`${rootPath}`, 'logs'),
+        datePattern: path.normalize('/yyyy-MM-dd/'),
+        localTime: true,
+        prepend: true,
+        maxDays: 30,
+        timestamp: true,
+        prettyPrint: true,
+        createTree: true,
+        json: true
+      })
+    ]
+  }),
 
-    new winston.transports.DailyRotateFile({
-      filename: './logs/action.log',
-      level: 'action',
-      silent: true,
-      datePattern: 'yyyy-MM-dd.',
-      localTime: true,
-      prepend: true,
-      maxDays: 30,
-      timestamp: true
-    }),
+  moveLog: new winston.Logger({
+    // format: winston.format.json(),
+    levels: {
+      move: 0,
+    },
+    transports: [
+      new winston.transports.DailyRotateFile({
+        name: 'move',
+        level: 'move',
+        filename: 'move.log',
+        dirname: path.join(`${rootPath}`, 'logs'),
+        datePattern: path.normalize('/yyyy-MM-dd/'),
+        localTime: true,
+        prepend: true,
+        maxDays: 30,
+        timestamp: true,
+        prettyPrint: true,
+        createTree: true,
+        json: true
+      })
+    ]
+  }),
 
-    new winston.transports.DailyRotateFile({
-      filename: './logs/move.log',
-      level: 'move',
-      silent: true,
-      datePattern: 'yyyy-MM-dd.',
-      localTime: true,
-      prepend: true,
-      maxDays: 30,
-      timestamp: true
-    }),
+  errorLog: new winston.Logger({
+    // format: winston.format.json(),
+    levels: {
+      error: 0,
+    },
+    transports: [
+      new winston.transports.DailyRotateFile({
+        name: 'error',
+        level: 'error',
+        filename: 'error.log',
+        dirname: path.join(`${rootPath}`, 'logs'),
+        datePattern: path.normalize('/yyyy-MM-dd/'),
+        localTime: true,
+        prepend: true,
+        maxDays: 30,
+        timestamp: true,
+        prettyPrint: true,
+        createTree: true,
+        json: true
+      })
+    ]
+  }),
 
-    new winston.transports.DailyRotateFile({
-      filename: './logs/error.log',
-      level: 'error',
-      silent: false,
-      datePattern: 'yyyy-MM-dd.',
-      localTime: true,
-      prepend: true,
-      maxDays: 30,
-      timestamp: true
-    }),
-
-    new winston.transports.DailyRotateFile({
-      filename: './logs/command.log',
-      level: 'command',
-      silent: false,
-      datePattern: 'yyyy-MM-dd.',
-      localTime: true,
-      prepend: true,
-      maxDays: 30,
-      timestamp: true
-    })
-  ],
-  exceptionHandlers: [
-    new winston.transports.DailyRotateFile({
-      filename: './logs/exceptions.log',
-      silent: false,
-      datePattern: 'yyyy-MM-dd.',
-      localTime: true,
-      prepend: true,
-      maxDays: 30,
-      timestamp: true
-    })
-  ]
-});
+  commandLog: new winston.Logger({
+    // format: winston.format.json(),
+    levels: {
+      command: 0,
+    },
+    transports: [
+      new winston.transports.DailyRotateFile({
+        name: 'command',
+        level: 'command',
+        filename: 'command.log',
+        dirname: path.join(`${rootPath}`, 'logs'),
+        datePattern: path.normalize('/yyyy-MM-dd/'),
+        localTime: true,
+        prepend: true,
+        maxDays: 30,
+        timestamp: true,
+        prettyPrint: true,
+        createTree: true,
+        json: true
+      })
+    ]
+  }),
+};
 
 module.exports = logger;

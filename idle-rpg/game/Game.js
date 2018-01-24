@@ -2,8 +2,9 @@ const helper = require('../utils/helper');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
-const logger = require('../utils/logger');
-const globalSpells = require('./data/globalSpells');
+const spells = require('./data/spells');
+const { errorLog } = require('../utils/logger');
+const moment = require('moment');
 const { multiplier } = require('../../settings');
 
 /**
@@ -69,7 +70,11 @@ class Game {
             break;
         }
       })
+<<<<<<< HEAD
       .catch(err => logger.error(err));
+=======
+      .catch(err => errorLog.error(err));
+>>>>>>> baf5b3b8277df24276e20b2a95d65c7501c8e156
   }
 
   moveEvent(selectedPlayer) {

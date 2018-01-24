@@ -18,6 +18,8 @@ const commands = [
         !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
         !equip - Sends a PM with your equipment
         !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-senstive)
+        !character - Sends PM with your stats and equipment
+        !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-senstive)
         !map - Displays the worlds locations
         !castspell - Lists spells available to cast
         !castspell <spell> - Casts a global spell onto Idle-RPG
@@ -29,6 +31,47 @@ const commands = [
         !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         \`\`\``;
       message.author.send(helpMsg);
+    }
+  },
+
+  character = {
+    command: '!character',
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot) => {
+      if (message.content.includes(' ')) {
+        let checkPlayer = message.content.split(/ (.+)/)[1];
+        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
+        if (playerObj.size === 0) {
+          message.author.send(`${checkPlayer} was not found!`);
+          return;
+        }
+
+        return game.playerStats(playerObj.array()[0])
+          .then((playerStats) => {
+            if (!playerStats) {
+              return message.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+            }
+
+            const stats = helper.generateStatsString(playerStats);
+            const equip = helper.generateEquipmentsString(playerStats);
+            message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`)
+              .concat('\n')
+              .concat(equip).replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`));
+          });
+      }
+
+      return game.playerStats(message.author)
+        .then((playerStats) => {
+          if (!playerStats) {
+            return message.author.send('Your character were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+          }
+
+          const stats = helper.generateStatsString(playerStats);
+          const equip = helper.generateEquipmentsString(playerStats);
+          message.author.send(stats.concat('\n').concat(equip));
+        });
     }
   },
 

@@ -1,4 +1,6 @@
 const settings = {
+  rootPath: __dirname,
+
   actionWebHookId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_ACTION_WEBHOOK_ID
     : process.env.TEST_DISCORD_ACTION_WEBHOOK_ID,
