@@ -270,7 +270,7 @@ const monsters = {
     slime = {
       name: 'Slime',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Swamp', 'Plains', 'Forest', 'Barrows'],
+      spawnableMapType: ['Land', 'Tundra', 'Swamp', 'Plains', 'Forest', 'Barrows'],
       power: 1.5,
       health: 35,
       stats: {
