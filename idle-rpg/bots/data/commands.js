@@ -1,6 +1,7 @@
 const moment = require('moment');
 const Space = require('../modules/Space');
 const Crypto = require('../modules/Crypto');
+const Urban = require('../modules/Urban');
 const maps = require('../../game/data/maps');
 const helper = require('../../utils/helper');
 const { commandChannel } = require('../../../settings');
@@ -573,6 +574,29 @@ const commands = [
           info = info.concat(codeBlock);
           message.reply(info);
         });
+    }
+  },
+
+  urban = {
+    command: '!urban',
+    operatorOnly: false,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        const word = message.content.split(/ (.+)/)[1].toLowerCase();
+
+        return Urban.searchUrbanDictionary(word)
+          .then((result) => {
+            let definition = 'Urban Dictionary Definition of ****\n```';
+            const wordDefinition = result.list.sort((item1, item2) => {
+              return item1.thumbs_up - item2.thumbs_up;
+            })[0];
+            definition = definition.replace('****', `\`${helper.capitalizeFirstLetter(wordDefinition.word)}\``);
+
+            return message.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`));
+          });
+      }
+
+      return message.reply('Please specify a word to look up.');
     }
   }
 ];
