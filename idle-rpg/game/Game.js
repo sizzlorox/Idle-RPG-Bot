@@ -402,11 +402,19 @@ ${rankString}
   }
 
   /**
-   * Loads player stats by dicordId
+   * Loads player stats by discordId
    * @param {Number} commandAuthor
    */
   playerStats(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
+  }
+
+  /**
+   * Loads player inventory by discordId
+   * @param {Number} commandAuthor
+   */
+  playerInventory(commandAuthor) {
+    return Database.loadPlayer(commandAuthor.id, enumHelper.inventorySelectFields);
   }
 
   /**

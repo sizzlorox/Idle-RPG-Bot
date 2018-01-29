@@ -151,14 +151,22 @@ class Event {
               }
 
               if (defender.health > 0 && selectedPlayer.health > 0) {
-                const eventMsg = `\`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)} in \`${selectedPlayer.map.name}\`!
-                Battle Results:
-                  ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                  ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} / ${playerBeforeBattleHealth} / ${playerMaxHealth} HP left.
-                  ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
-                  ${defender.name} has ${defender.health} / ${mobMaxHealth} HP left.`;
+                let eventMsg = attackerDamage > defenderDamage
+                  ? `\`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)} in \`${selectedPlayer.map.name}\`!`
+                  : `${helper.generatePlayerName(selectedPlayer)} just fled from \`${defender.name}\` in \`${selectedPlayer.map.name}\`!`;
 
-                const eventLog = `\`${defender.name}\` just fled from you in \`${selectedPlayer.map.name}\`!`;
+                // TODO: Find a way of making this visible some other method
+                const battleResult = `Battle Results:
+                ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+                ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} / ${playerBeforeBattleHealth} / ${playerMaxHealth} HP left.
+                ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
+                ${defender.name} has ${defender.health} / ${mobMaxHealth} HP left.`;
+
+                eventMsg = eventMsg.concat(battleResult);
+
+                const eventLog = attackerDamage > defenderDamage
+                  ? `\`${defender.name}\` fled from you in \`${selectedPlayer.map.name}\`!`
+                  : `You fled from \`${defender.name}\` in \`${selectedPlayer.map.name}\`!`;
 
                 selectedPlayer.experience += Math.floor((defender.experience * multiplier) / 2);
                 helper.checkExperience(selectedPlayer, discordHook);

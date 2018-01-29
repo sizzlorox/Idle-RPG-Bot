@@ -1,6 +1,7 @@
 const moment = require('moment');
 const Space = require('../modules/Space');
 const Crypto = require('../modules/Crypto');
+const Urban = require('../modules/Urban');
 const maps = require('../../game/data/maps');
 const helper = require('../../utils/helper');
 const { commandChannel } = require('../../../settings');
@@ -29,6 +30,8 @@ const commands = [
         !gender <male|female|neutral|neuter> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
         !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
+        !spellbook - Returns list of spells your character has learned
+        !invenotry - Displays what your character has in his/her inventory
         \`\`\``;
       message.author.send(helpMsg);
     }
@@ -71,6 +74,43 @@ const commands = [
           const stats = helper.generateStatsString(playerStats);
           const equip = helper.generateEquipmentsString(playerStats);
           message.author.send(stats.concat('\n').concat(equip));
+        });
+    }
+  },
+
+  inventory = {
+    command: '!inventory',
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        let checkPlayer = message.content.split(/ (.+)/)[1];
+        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
+        if (playerObj.size === 0) {
+          message.author.send(`${checkPlayer} was not found!`);
+          return;
+        }
+
+        return game.playerInventory(playerObj.array()[0])
+          .then((playerInventory) => {
+            if (!playerInventory) {
+              return message.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+            }
+
+            const inv = helper.generateInventoryString(playerInventory);
+            message.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`));
+          });
+      }
+
+      game.playerInventory(message.author)
+        .then((playerInventory) => {
+          if (!playerInventory) {
+            return message.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+          }
+
+          const inv = helper.generateInventoryString(playerInventory);
+          message.author.send(inv);
         });
     }
   },
@@ -610,6 +650,29 @@ const commands = [
           info = info.concat(codeBlock);
           message.reply(info);
         });
+    }
+  },
+
+  urban = {
+    command: '!urban',
+    operatorOnly: false,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        const word = message.content.split(/ (.+)/)[1].toLowerCase();
+
+        return Urban.searchUrbanDictionary(word)
+          .then((result) => {
+            let definition = 'Urban Dictionary Definition of ****\n```';
+            const wordDefinition = result.list.sort((item1, item2) => {
+              return item1.thumbs_up - item2.thumbs_up;
+            })[0];
+            definition = definition.replace('****', `\`${helper.capitalizeFirstLetter(wordDefinition.word)}\``);
+
+            return message.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`));
+          });
+      }
+
+      return message.reply('Please specify a word to look up.');
     }
   }
 ];

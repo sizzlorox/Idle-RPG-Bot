@@ -40,8 +40,8 @@ class Monster {
     return new Promise((resolve) => {
       const randomRarityChance = Math.round(helper.randomBetween(0, 100));
       const randomTypeChance = Math.round(helper.randomBetween(0, 100));
-      const randomMonsterType = randomTypeChance + randomRarityChance > 100 ? 100 : randomTypeChance + randomRarityChance;
-      console.log(`MOB RT: ${randomTypeChance} - AFTER BALANCE: ${randomMonsterType}`);
+      const randomMonsterType = ((randomTypeChance + randomRarityChance) - selectedPlayer.level) > 100 ? 100 : (randomTypeChance + randomRarityChance) - selectedPlayer.level;
+      console.log(`\n\n\nMOB RT: ${randomTypeChance} - MOB RC: ${randomRarityChance} - LEVEL: ${selectedPlayer.level} - MOB MT: ${randomMonsterType}`);
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
@@ -51,7 +51,7 @@ class Monster {
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);
 
       const monsterObj = {
-        name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
+        name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name} `,
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
           str: (monsterRarityList[randomRarityIndex].stats.str
@@ -70,10 +70,10 @@ class Monster {
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,
         isXmasEvent: monsterTypeList[randomTypeIndex].isXmasEvent,
-        experience: Number((monsterRarityList[randomRarityIndex].experience
-          * monsterTypeList[randomTypeIndex].experience) / 2).toFixed(),
-        gold: Number((monsterRarityList[randomRarityIndex].gold
-          * monsterTypeList[randomTypeIndex].gold)).toFixed()
+        experience: Math.round((monsterRarityList[randomRarityIndex].experience
+          * monsterTypeList[randomTypeIndex].experience) / 2),
+        gold: Math.round((monsterRarityList[randomRarityIndex].gold
+          * monsterTypeList[randomTypeIndex].gold))
       };
 
       return resolve(monsterObj);

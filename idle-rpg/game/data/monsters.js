@@ -237,7 +237,7 @@ const monsters = {
     bat = {
       name: 'Bat',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest', 'Swamp', ],
+      spawnableMapType: ['Land', 'Forest', 'Swamp',],
       power: 1.25,
       health: 45,
       stats: {
@@ -316,11 +316,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Wand',
           power: 0.75
         },
         armor: {
-          name: '',
+          name: 'Pixie Stuff',
           power: 0.05
         }
       },
@@ -514,7 +514,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Claws',
           power: 0.90
         },
         armor: {
@@ -547,7 +547,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Mouth',
           power: 1.25
         },
         armor: {
@@ -580,7 +580,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Claws',
           power: 1.25
         },
         armor: {
@@ -679,7 +679,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Claws',
           power: 1.75
         },
         armor: {
@@ -712,7 +712,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Attacks',
           power: 1.75
         },
         armor: {
@@ -745,7 +745,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Horn',
           power: 0.75
         },
         armor: {
@@ -765,7 +765,7 @@ const monsters = {
     wraith = {
       name: 'Wraith',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Undead Land'],
+      spawnableMapType: ['Land', 'Graveyard'],
       power: 1.2,
       health: 95,
       stats: {
@@ -778,7 +778,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Something',
           power: 1.75
         },
         armor: {
@@ -911,7 +911,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Fangs',
           power: 0.55
         },
         armor: {
@@ -944,7 +944,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Stinger',
           power: 0.75
         },
         armor: {
@@ -977,7 +977,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Hands',
           power: 0.75
         },
         armor: {
@@ -1010,7 +1010,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Sword',
           power: 1
         },
         armor: {
@@ -1043,7 +1043,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Sword',
           power: 1.75
         },
         armor: {
@@ -1063,7 +1063,7 @@ const monsters = {
     demon = {
       name: 'Demon',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Undead Land'],
+      spawnableMapType: ['Land', 'Graveyard'],
       power: 2,
       health: 185,
       stats: {
@@ -1076,7 +1076,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Club',
           power: 1.3
         },
         armor: {
@@ -1109,7 +1109,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'magic',
-          name: '',
+          name: 'Magic',
           power: 1
         },
         armor: {
@@ -1142,7 +1142,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Claws',
           power: 1.25
         },
         armor: {
@@ -1175,7 +1175,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: '',
+          name: 'Sword',
           power: 1
         },
         armor: {

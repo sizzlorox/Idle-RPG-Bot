@@ -315,8 +315,18 @@ class helper {
     return enumHelper.genders[player.gender] ? enumHelper.genders[player.gender][word] : word;
   }
 
+  generateInventoryString(player) {
+    return `\`\`\`Here is your inventory!
+    Equipment:
+      ${player.inventory.equipment.map(equip => equip.name).join('\n')}
+    
+    Items:
+      ${player.inventory.items.map(item => item.name).join('\n')}
+      \`\`\``;
+  }
+
   generateEquipmentsString(player) {
-    return `\`\`\`Heres your equipment!
+    return `\`\`\`Here is your inventory!
     Helmet: ${player.equipment.helmet.name}
       Defense: ${player.equipment.helmet.power}
         ${this.generatePreviousOwnerString(player.equipment.helmet)}
