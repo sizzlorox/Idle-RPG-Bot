@@ -1,5 +1,7 @@
 const settings = {
   rootPath: __dirname,
+  battleDebug: true,
+  eventDebug: true,
 
   actionWebHookId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_ACTION_WEBHOOK_ID

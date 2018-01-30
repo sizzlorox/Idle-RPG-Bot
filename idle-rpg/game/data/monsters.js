@@ -184,11 +184,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Rat Claw',
+          name: 'claws',
           power: 0.25
         },
         armor: {
-          name: 'Fur',
+          name: 'fur',
           power: 0.01
         }
       },
@@ -217,11 +217,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Pinchers',
+          name: 'pinchers',
           power: 0.5
         },
         armor: {
-          name: 'Crab Shell',
+          name: 'shell',
           power: 0.02,
         }
       },
@@ -250,11 +250,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Bat Claws',
+          name: 'claws',
           power: 0.5
         },
         armor: {
-          name: 'Fur',
+          name: 'fur',
           power: 0.02
         }
       },
@@ -283,11 +283,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Slime',
+          name: 'slime',
           power: 0.5
         },
         armor: {
-          name: 'Slime',
+          name: 'slime',
           power: 0.05
         }
       },
@@ -316,11 +316,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Wand',
+          name: 'wand',
           power: 0.75
         },
         armor: {
-          name: 'Pixie Stuff',
+          name: 'stuff',
           power: 0.05
         }
       },
@@ -349,11 +349,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Dagger',
+          name: 'dagger',
           power: 0.75
         },
         armor: {
-          name: 'Rusty Chailmail',
+          name: 'rusty chainmail',
           power: 0.10
         }
       },
@@ -382,11 +382,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Dagger',
+          name: 'dagger',
           power: 1
         },
         armor: {
-          name: 'Leather Armor',
+          name: 'leather armor',
           power: 0.10
         }
       },
@@ -415,7 +415,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Undeadly hands ewwww',
+          name: 'undeadly hands ewwww',
           power: 1.25
         },
         armor: {
@@ -448,11 +448,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Claymore',
+          name: 'claymore',
           power: 1.25
         },
         armor: {
-          name: 'Iron Full Armor',
+          name: 'iron full armor',
           power: 0.15
         }
       },
@@ -481,11 +481,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'magic',
-          name: 'Staff',
+          name: 'staff',
           power: 1.25
         },
         armor: {
-          name: 'Robe',
+          name: 'robe',
           power: 0.10
         }
       },
@@ -514,7 +514,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Claws',
+          name: 'claws',
           power: 0.90
         },
         armor: {
@@ -547,7 +547,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Mouth',
+          name: 'mouth',
           power: 1.25
         },
         armor: {
@@ -580,7 +580,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Claws',
+          name: 'claws',
           power: 1.25
         },
         armor: {
@@ -613,7 +613,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Rusty Broadsword',
+          name: 'rusty broadsword',
           power: 1.5
         },
         armor: {
@@ -646,7 +646,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'range',
-          name: 'Bow',
+          name: 'bow',
           power: 1.5
         },
         armor: {
@@ -679,7 +679,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Claws',
+          name: 'claws',
           power: 1.75
         },
         armor: {
@@ -712,7 +712,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Attacks',
+          name: 'mouth',
           power: 1.75
         },
         armor: {
@@ -745,7 +745,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Horn',
+          name: 'horn',
           power: 0.75
         },
         armor: {
@@ -778,7 +778,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Something',
+          name: 'something',
           power: 1.75
         },
         armor: {
@@ -811,11 +811,11 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Dragon Claw',
+          name: 'claws',
           power: 2.5
         },
         armor: {
-          name: 'Dragon Scales',
+          name: 'scales',
           power: 1.75
         }
       },
@@ -911,7 +911,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Fangs',
+          name: 'fangs',
           power: 0.55
         },
         armor: {
@@ -944,7 +944,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Stinger',
+          name: 'stinger',
           power: 0.75
         },
         armor: {
@@ -977,7 +977,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Hands',
+          name: 'hands',
           power: 0.75
         },
         armor: {
@@ -1010,7 +1010,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Sword',
+          name: 'sword',
           power: 1
         },
         armor: {
@@ -1043,7 +1043,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Sword',
+          name: 'sword',
           power: 1.75
         },
         armor: {
@@ -1076,7 +1076,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Club',
+          name: 'club',
           power: 1.3
         },
         armor: {
@@ -1109,7 +1109,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'magic',
-          name: 'Magic',
+          name: 'magic',
           power: 1
         },
         armor: {
@@ -1142,7 +1142,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Claws',
+          name: 'claws',
           power: 1.25
         },
         armor: {
@@ -1175,7 +1175,7 @@ const monsters = {
       equipment: {
         weapon: {
           attackType: 'melee',
-          name: 'Sword',
+          name: 'sword',
           power: 1
         },
         armor: {

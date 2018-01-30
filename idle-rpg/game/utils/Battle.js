@@ -32,7 +32,7 @@ class Battle {
 
     const playerChance = Math.round((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + helper.randomBetween(1, 5 + helper.sumPlayerTotalLuck(selectedPlayer));
     const otherPlayerChance = Math.round((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + helper.randomBetween(1, 5 + helper.sumPlayerTotalLuck(otherPlayer));
-    console.log(`PlayerChance: ${playerChance} - OtherPlayerChance: ${otherPlayerChance}`);
+    helper.printBattleDebug(`PlayerChance: ${playerChance} - OtherPlayerChance: ${otherPlayerChance}`);
 
     return { playerChance, otherPlayerChance };
   }
@@ -99,7 +99,7 @@ class Battle {
       let attackerDamage;
       let defenderDamage;
       if (initiative.name === attacker.name) {
-        console.log('\nBattle Initiative is Attacker');
+        helper.printBattleDebug('\nBattle Initiative is Attacker');
         if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
           attackerDamage = Math.round(battleStats.attacker.attackPower - battleStats.defender.defensePower.physicalDefensePower);
           if (attackerDamage < 0) {
@@ -107,7 +107,7 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
-          console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
+          helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
           attackerDamage = Math.round(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
           if (attackerDamage < 0) {
@@ -115,10 +115,10 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
-          console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
+          helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         }
 
-        console.log(`Attacker Damage: ${attackerDamage}`);
+        helper.printBattleDebug(`Attacker Damage: ${attackerDamage}`);
         if (defender.health <= 0) {
           return resolve({ attacker, defender, attackerDamage, defenderDamage });
         }
@@ -130,7 +130,7 @@ class Battle {
           }
 
           attacker.health -= defenderDamage;
-          console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
+          helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
           defenderDamage = Math.round(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
           if (defenderDamage < 0) {
@@ -138,12 +138,12 @@ class Battle {
           }
 
           attacker.health -= defenderDamage;
-          console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
+          helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         }
 
-        console.log(`Defender Damage: ${defenderDamage}`);
+        helper.printBattleDebug(`Defender Damage: ${defenderDamage}`);
       } else if (initiative.name === defender.name) {
-        console.log('\nBattle Initiative is Defender');
+        helper.printBattleDebug('\nBattle Initiative is Defender');
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
           defenderDamage = Math.round(battleStats.defender.attackPower - battleStats.attacker.defensePower.physicalDefensePower);
           if (defenderDamage < 0) {
@@ -151,7 +151,7 @@ class Battle {
           }
 
           attacker.health -= defenderDamage;
-          console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
+          helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
           defenderDamage = Math.round(battleStats.defender.attackPower - battleStats.attacker.defensePower.magicDefensePower);
           if (defenderDamage < 0) {
@@ -159,10 +159,10 @@ class Battle {
           }
 
           attacker.health -= defenderDamage;
-          console.log(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
+          helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         }
 
-        console.log(`Defender Damage: ${defenderDamage}`);
+        helper.printBattleDebug(`Defender Damage: ${defenderDamage}`);
         if (attacker.health <= 0) {
           return resolve({ attacker, defender, attackerDamage, defenderDamage });
         }
@@ -174,7 +174,7 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
-          console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
+          helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
           attackerDamage = Math.round(battleStats.attacker.attackPower - battleStats.defender.defensePower.magicDefensePower);
           if (attackerDamage < 0) {
@@ -182,10 +182,10 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
-          console.log(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
+          helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         }
 
-        console.log(`Attacker Damage: ${attackerDamage}`);
+        helper.printBattleDebug(`Attacker Damage: ${attackerDamage}`);
       }
 
       return resolve(this.spellTurn(attacker, defender, battleStats, attackerDamage, defenderDamage));
@@ -196,7 +196,7 @@ class Battle {
     return new Promise((resolve) => {
       const initiative = this.initialAttack(attacker, defender);
       if (initiative.name === attacker.name) {
-        console.log('\nSpell Initiative is Attacker');
+        helper.printBattleDebug('\nSpell Initiative is Attacker');
         if (attacker.spells.length > 0) {
           const attackerRandomSpell = helper.randomBetween(0, attacker.spells.length - 1);
           const attackerSpellToCast = attacker.spells[attackerRandomSpell];
@@ -204,7 +204,7 @@ class Battle {
             case 'self':
               if (attackerSpellToCast.name.toLowerCase().includes('heal')) {
                 attacker.health += attackerSpellToCast.power * 2;
-                console.log(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
+                helper.printBattleDebug(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
                 HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
                 if (attacker.health >= 100 + (attacker.level * 5)) {
                   attacker.health = 100 + (attacker.level * 5);
@@ -219,7 +219,7 @@ class Battle {
                 }
                 defenderDamage += spellDamage;
                 defender.health -= spellDamage;
-                console.log(`${defender.name} took a fireball to the face for ${spellDamage} damage
+                helper.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
               }
               break;
@@ -232,7 +232,7 @@ class Battle {
             case 'self':
               if (defenderSpellToCast.name.toLowerCase().includes('heal')) {
                 defender.health += defenderSpellToCast.power * 2;
-                console.log(`${defender.name} healed for ${defenderSpellToCast.power * 2}
+                helper.printBattleDebug(`${defender.name} healed for ${defenderSpellToCast.power * 2}
                 HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
                 if (defender.health >= 100 + (defender.level * 5)) {
                   defender.health = 100 + (defender.level * 5);
@@ -247,14 +247,14 @@ class Battle {
                 }
                 attackerDamage += spellDamage;
                 attacker.health -= spellDamage;
-                console.log(`${attacker.name} took a fireball to the face for ${spellDamage} damage
+                helper.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
               }
               break;
           }
         }
       } else if (initiative.name === defender.name) {
-        console.log('\nSpell Initiative is Defender');
+        helper.printBattleDebug('\nSpell Initiative is Defender');
         if (defender.spells.length > 0) {
           const defenderRandomSpell = helper.randomBetween(0, defender.spells.length - 1);
           const defenderSpellToCast = defender.spells[defenderRandomSpell];
@@ -262,7 +262,7 @@ class Battle {
             case 'self':
               if (defenderSpellToCast.name.toLowerCase().includes('heal')) {
                 defender.health += defenderSpellToCast.power * 2;
-                console.log(`${defender.name} healed for ${defenderSpellToCast.power * 2}
+                helper.printBattleDebug(`${defender.name} healed for ${defenderSpellToCast.power * 2}
                 HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
                 if (defender.health >= 100 + (defender.level * 5)) {
                   defender.health = 100 + (defender.level * 5);
@@ -277,7 +277,7 @@ class Battle {
                 }
                 defenderDamage += spellDamage;
                 attacker.health -= spellDamage;
-                console.log(`${attacker.name} took a fireball to the face for ${spellDamage} damage
+                helper.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
               }
               break;
@@ -290,7 +290,7 @@ class Battle {
             case 'self':
               if (attackerSpellToCast.name.toLowerCase().includes('heal')) {
                 attacker.health += attackerSpellToCast.power * 2;
-                console.log(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
+                helper.printBattleDebug(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
                 HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
                 if (attacker.health >= 100 + (attacker.level * 5)) {
                   attacker.health = 100 + (attacker.level * 5);
@@ -305,7 +305,7 @@ class Battle {
                 }
                 attackerDamage += spellDamage;
                 defender.health -= spellDamage;
-                console.log(`${defender.name} took a fireball to the face for ${spellDamage} damage
+                helper.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
               }
               break;
@@ -321,7 +321,7 @@ class Battle {
     return new Promise((resolve) => {
       const initiative = this.initialAttack(attacker, defender);
       if (initiative.name === attacker.name) {
-        console.log('\nInventory Initiative is Attacker');
+        helper.printBattleDebug('\nInventory Initiative is Attacker');
         if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = attacker.inventory.items.find({ name: 'Health Potion' });
           let healAmount = potion.power * (attacker.level / 2);
@@ -331,7 +331,7 @@ class Battle {
           attacker.health += healAmount;
           attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
 
-          console.log(`${attacker.name} drank a health potion and healed ${healAmount} health`);
+          helper.printBattleDebug(`${attacker.name} drank a health potion and healed ${healAmount} health`);
         }
         if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = defender.inventory.items.find({ name: 'Health Potion' });
@@ -342,10 +342,10 @@ class Battle {
           defender.health += healAmount;
           defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
 
-          console.log(`${defender.name} drank a health potion and healed ${healAmount} health`);
+          helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
       } else if (initiative.name === defender.name) {
-        console.log('\nInventory Initiative is defender');
+        helper.printBattleDebug('\nInventory Initiative is defender');
         if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = defender.inventory.items.find({ name: 'Health Potion' });
           let healAmount = potion.power * (defender.level / 2);
@@ -355,7 +355,7 @@ class Battle {
           defender.health += healAmount;
           defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
 
-          console.log(`${defender.name} drank a health potion and healed ${healAmount} health`);
+          helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
         if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = attacker.inventory.items.find({ name: 'Health Potion' });
@@ -366,7 +366,7 @@ class Battle {
           attacker.health += healAmount;
           attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
 
-          console.log(`${defender.name} drank a health potion and healed ${healAmount} health`);
+          helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
       }
 
@@ -384,7 +384,7 @@ class Battle {
 
   calculateAttack(player) {
     let attackPower;
-    console.log(`${player.name} - ${player.equipment.weapon.name} - ${player.equipment.weapon.attackType} - ${player.equipment.weapon.power}`);
+    helper.printBattleDebug(`${player.name} - ${player.equipment.weapon.name} - ${player.equipment.weapon.attackType} - ${player.equipment.weapon.power}`);
     switch (player.equipment.weapon.attackType) {
       case 'melee':
         attackPower = this.isMonster(player)
@@ -427,7 +427,7 @@ class Battle {
       : (helper.sumPlayerTotalIntelligence(player)
         + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
-    console.log(`${player.name} - ${physicalDefensePower} - ${magicDefensePower}`);
+    helper.printBattleDebug(`${player.name} - ${physicalDefensePower} - ${magicDefensePower}`);
 
     return { physicalDefensePower, magicDefensePower };
   }

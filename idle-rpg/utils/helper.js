@@ -2,8 +2,21 @@ const fs = require('fs');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog } = require('../utils/logger');
+const { battleDebug, eventDebug } = require('../../settings');
 
 class helper {
+  printBattleDebug(debugMsg) {
+    if (battleDebug) {
+      console.log(debugMsg);
+    }
+  }
+
+  printEventDebug(debugMsg) {
+    if (eventDebug) {
+      console.log(debugMsg);
+    }
+  }
+
   randomBetween(min, max, decimal, exclude) {
     // https://stackoverflow.com/questions/15594332/unbiased-random-range-generator-in-javascript
     if (arguments.length < 2) return (Math.random() >= 0.5);
@@ -185,6 +198,7 @@ class helper {
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
       switch (this.randomBetween(0, 2)) {
         case 0:
+          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
           this.setPlayerEquipment(
             selectedPlayer,
             enumHelper.equipment.types.helmet.position,
@@ -193,6 +207,7 @@ class helper {
 
           break;
         case 1:
+          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
           this.setPlayerEquipment(
             selectedPlayer,
             enumHelper.equipment.types.armor.position,
@@ -201,6 +216,7 @@ class helper {
 
           break;
         case 2:
+          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
           this.setPlayerEquipment(
             selectedPlayer,
             enumHelper.equipment.types.weapon.position,
