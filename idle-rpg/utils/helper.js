@@ -196,34 +196,37 @@ class helper {
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
-      switch (this.randomBetween(0, 2)) {
-        case 0:
-          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
-          this.setPlayerEquipment(
-            selectedPlayer,
-            enumHelper.equipment.types.helmet.position,
-            enumHelper.equipment.empty.helmet
-          );
+      const dropChance = this.randomBetween(0, 100);
+      if (dropChance > 50) {
+        switch (this.randomBetween(0, 2)) {
+          case 0:
+            this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
+            this.setPlayerEquipment(
+              selectedPlayer,
+              enumHelper.equipment.types.helmet.position,
+              enumHelper.equipment.empty.helmet
+            );
 
-          break;
-        case 1:
-          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
-          this.setPlayerEquipment(
-            selectedPlayer,
-            enumHelper.equipment.types.armor.position,
-            enumHelper.equipment.empty.armor
-          );
+            break;
+          case 1:
+            this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
+            this.setPlayerEquipment(
+              selectedPlayer,
+              enumHelper.equipment.types.armor.position,
+              enumHelper.equipment.empty.armor
+            );
 
-          break;
-        case 2:
-          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
-          this.setPlayerEquipment(
-            selectedPlayer,
-            enumHelper.equipment.types.weapon.position,
-            enumHelper.equipment.empty.weapon
-          );
+            break;
+          case 2:
+            this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
+            this.setPlayerEquipment(
+              selectedPlayer,
+              enumHelper.equipment.types.weapon.position,
+              enumHelper.equipment.empty.weapon
+            );
 
-          break;
+            break;
+        }
       }
 
       if (!attackerObj.discordId) {
