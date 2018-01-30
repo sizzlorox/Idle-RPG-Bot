@@ -50,6 +50,8 @@ class Monster {
       const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);
 
+      const playerBalance = selectedPlayer.equipment.weapon.power + (selectedPlayer.level * 2);
+
       const monsterObj = {
         name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name} `,
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
@@ -65,7 +67,7 @@ class Monster {
           luk: (monsterRarityList[randomRarityIndex].stats.luk
             * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 2)
         },
-        power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power,
+        power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + (playerBalance / 4),
         equipment: monsterTypeList[randomTypeIndex].equipment,
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,
@@ -75,6 +77,7 @@ class Monster {
         gold: Math.round((monsterRarityList[randomRarityIndex].gold
           * monsterTypeList[randomTypeIndex].gold))
       };
+      console.log(`MOB POW: ${monsterObj.power} - PLAYER POW: ${playerBalance}`);
 
       return resolve(monsterObj);
     });

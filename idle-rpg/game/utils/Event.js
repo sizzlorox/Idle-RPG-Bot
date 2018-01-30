@@ -286,7 +286,7 @@ class Event {
               }
 
               selectedPlayer.gold -= itemCost;
-              helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
+              selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
               break;
 
             case enumHelper.equipment.types.armor.position:
@@ -295,7 +295,7 @@ class Event {
               }
 
               selectedPlayer.gold -= itemCost;
-              helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
+              selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
               break;
 
             case enumHelper.equipment.types.weapon.position:
@@ -304,7 +304,7 @@ class Event {
               }
 
               selectedPlayer.gold -= itemCost;
-              helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
+              selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
               break;
           }
 

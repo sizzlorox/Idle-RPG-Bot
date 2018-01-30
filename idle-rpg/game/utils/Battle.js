@@ -329,7 +329,7 @@ class Battle {
             healAmount -= 100 + (attacker.level * 5);
           }
           attacker.health += healAmount;
-          attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
+          attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
 
           helper.printBattleDebug(`${attacker.name} drank a health potion and healed ${healAmount} health`);
         }
@@ -364,7 +364,7 @@ class Battle {
             healAmount -= 100 + (attacker.level * 5);
           }
           attacker.health += healAmount;
-          attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
+          attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
 
           helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
@@ -388,7 +388,7 @@ class Battle {
     switch (player.equipment.weapon.attackType) {
       case 'melee':
         attackPower = this.isMonster(player)
-          ? (player.stats.str + player.equipment.weapon.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.str) / 2)))
+          ? (player.stats.str + player.equipment.weapon.power + (player.power / 2)) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.str) / 2)))
           : (helper.sumPlayerTotalStrength(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
@@ -396,7 +396,7 @@ class Battle {
         break;
       case 'range':
         attackPower = this.isMonster(player)
-          ? (player.stats.dex + player.equipment.weapon.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.dex) / 2)))
+          ? (player.stats.dex + player.equipment.weapon.power + (player.power / 2)) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.dex) / 2)))
           : (helper.sumPlayerTotalDexterity(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
@@ -404,7 +404,7 @@ class Battle {
         break;
       case 'magic':
         attackPower = this.isMonster(player)
-          ? (player.stats.int + player.equipment.weapon.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.int) / 2)))
+          ? (player.stats.int + player.equipment.weapon.power + (player.power / 2)) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.int) / 2)))
           : (helper.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
@@ -418,12 +418,12 @@ class Battle {
 
   calculateDefense(player) {
     const physicalDefensePower = this.isMonster(player)
-      ? (player.stats.end + (player.equipment.armor.power / 2)) * (player.stats.dex + (player.stats.luk / 2))
+      ? (player.stats.end + (player.equipment.armor.power / 2) + (player.power / 4)) * (player.stats.dex + (player.stats.luk / 2))
       : (helper.sumPlayerTotalEndurance(player)
         + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
     const magicDefensePower = this.isMonster(player)
-      ? (player.stats.int + (player.equipment.armor.power / 2)) * (player.stats.dex + (player.stats.luk / 2))
+      ? (player.stats.int + (player.equipment.armor.power / 2) + (player.power / 4)) * (player.stats.dex + (player.stats.luk / 2))
       : (helper.sumPlayerTotalIntelligence(player)
         + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
