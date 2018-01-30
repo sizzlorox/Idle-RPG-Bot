@@ -77,7 +77,7 @@ class Event {
                 helper.printEventDebug(battleResult);
 
                 if (selectedPlayer.health <= 0) {
-                  const eventMsg = `${helper.generatePlayerName(randomPlayer)} just killed ${helper.generatePlayerName(selectedPlayer)} with ${helper.generateGenderString(randomPlayer, 'his')} \`${randomPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\`!`;
+                  const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(randomPlayer)} just killed ${helper.generatePlayerName(selectedPlayer)} with ${helper.generateGenderString(randomPlayer, 'his')} \`${randomPlayer.equipment.weapon.name}\`!`;
 
                   const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
@@ -99,8 +99,8 @@ class Event {
 
                 if (defender.health > 0 && selectedPlayer.health > 0) {
                   const eventMsg = attackerDamage > defenderDamage
-                    ? `${helper.generatePlayerName(selectedPlayer)} attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${helper.generateGenderString(randomPlayer, 'he')} managed to get away!`
-                    : `${helper.generatePlayerName(selectedPlayer)} attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${helper.generatePlayerName(randomPlayer)} was too strong!`;
+                    ? `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${helper.generateGenderString(randomPlayer, 'he')} managed to get away!`
+                    : `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${helper.generatePlayerName(randomPlayer)} was too strong!`;
 
                   // TODO: Find a way of making this visible some other method
                   // eventMsg = eventMsg.concat(battleResult);
@@ -114,7 +114,7 @@ class Event {
                   return resolve(selectedPlayer);
                 }
 
-                const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just killed \`${randomPlayer.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\`!`;
+                const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just killed \`${randomPlayer.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\`!`;
 
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
@@ -164,7 +164,7 @@ class Event {
               helper.printEventDebug(battleResult);
 
               if (selectedPlayer.health <= 0) {
-                const eventMsg = `\`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${helper.generatePlayerName(selectedPlayer)} in \`${selectedPlayer.map.name}\`!`;
+                const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${helper.generatePlayerName(selectedPlayer)}!`;
 
                 const eventLog = `\`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed you in \`${selectedPlayer.map.name}\`!`;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -176,8 +176,8 @@ class Event {
 
               if (defender.health > 0 && selectedPlayer.health > 0) {
                 let eventMsg = attackerDamage > defenderDamage
-                  ? `\`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)} in \`${selectedPlayer.map.name}\`!`
-                  : `${helper.generatePlayerName(selectedPlayer)} just fled from \`${defender.name}\` in \`${selectedPlayer.map.name}\`!`;
+                  ? `[\`${selectedPlayer.map.name}\`] \`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)}!`
+                  : `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just fled from \`${defender.name}\`!`;
 
                 const eventLog = attackerDamage > defenderDamage
                   ? `\`${defender.name}\` fled from you in \`${selectedPlayer.map.name}\`!`
@@ -191,7 +191,7 @@ class Event {
                 return resolve(selectedPlayer);
               }
 
-              const eventMsg = `${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${defender.name}\` in \`${selectedPlayer.map.name}\`!`;
+              const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${defender.name}\`!`;
               const eventLog = `Killed ${defender.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
 
               selectedPlayer.experience += defender.experience * multiplier;
@@ -304,7 +304,7 @@ class Event {
               break;
           }
 
-          const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` from Town for ${itemCost} gold!`;
+          const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
           const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -326,7 +326,7 @@ class Event {
       });
       selectedPlayer.inventory.equipment.length = 0;
 
-      const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just sold what they found adventuring for ${profit} gold!`;
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just sold what they found adventuring for ${profit} gold!`;
       const eventLog = `Made ${profit} gold selling what you found adventuring`;
 
       helper.sendMessage(discordHook, 'twitch', false, `**${eventMsg}**`);
@@ -341,52 +341,52 @@ class Event {
     switch (randomEventMessage) {
       case 0:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} found a chest containing \`${item.name}\` in \`${selectedPlayer.map.name}\`!`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} found a chest containing \`${item.name}\`!`,
           eventLog: `Found a chest containing ${item.name} in ${selectedPlayer.map.name}`
         };
       case 1:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} found \`${item.name}\` on the ground in \`${selectedPlayer.map.name}\`!`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} found \`${item.name}\` on the ground!`,
           eventLog: `Found ${item.name} on the ground in ${selectedPlayer.map.name}`
         };
       case 2:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} explored an abandoned hut in \`${selectedPlayer.map.name}\` which had \`${item.name}\` inside!`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} explored an abandoned hut which had \`${item.name}\` inside!`,
           eventLog: `Explored an abandoned hut in ${selectedPlayer.map.name} which had ${item.name} inside`
         };
       case 3:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} a bird just dropped \`${item.name}\` infront of ${helper.generateGenderString(selectedPlayer, 'him')} in \`${selectedPlayer.map.name}\`!`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} a bird just dropped \`${item.name}\` infront of ${helper.generateGenderString(selectedPlayer, 'him')}!`,
           eventLog: `A bird just dropped ${item.name} infront of you in ${selectedPlayer.map.name}`
         };
       case 4:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} stumbles upon a grizzly scene. One of the corpses has \`${item.name}\` next to it! Seems like it is in good enough condition to use.`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} stumbles upon a grizzly scene. One of the corpses has \`${item.name}\` next to it! Seems like it is in good enough condition to use.`,
           eventLog: `You found ${item.name} on a corpse in ${selectedPlayer.map.name}`
         };
       case 5:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} found an alter. \`${item.name}\` is sitting on the center, ready to be used!`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} found an alter. \`${item.name}\` is sitting on the center, ready to be used!`,
           eventLog: `On an alter in ${selectedPlayer.map.name} you found ${item.name}`
         };
       case 6:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} catches a glint out of the corner of ${helper.generateGenderString(selectedPlayer, 'his')} eye. Brushing aside some leaves ${helper.generatePlayerName(selectedPlayer)} finds \`${item.name}\` left here by the last person to camp at this spot.`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} catches a glint out of the corner of ${helper.generateGenderString(selectedPlayer, 'his')} eye. Brushing aside some leaves ${helper.generatePlayerName(selectedPlayer)} finds \`${item.name}\` left here by the last person to camp at this spot.`,
           eventLog: `Near your camp in ${selectedPlayer.map.name} there was ${item.name}`
         };
       case 7:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} a finds \`${item.name}\` resting against a wall.`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} a finds \`${item.name}\` resting against a wall.`,
           eventLog: `While exploring a cave in ${selectedPlayer.map.name} you found ${item.name}`
         };
       case 8:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} finds a grave with \`${item.name}\` sitting on it. The dead do not need equipment so it's yours for the taking`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} finds a grave with \`${item.name}\` sitting on it. The dead do not need equipment so it's yours for the taking`,
           eventLog: `You stole ${item.name} from a grave in ${selectedPlayer.map.name}`
         };
       case 9:
         return {
-          eventMsg: `${helper.generatePlayerName(selectedPlayer)} looks around a derlict building and finds \`${item.name}\` in one of the corners.`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} looks around a derlict building and finds \`${item.name}\` in one of the corners.`,
           eventLog: `Found ${item.name} while looking around a derlict building in ${selectedPlayer.map.name}`
         };
     }
@@ -724,7 +724,7 @@ class Event {
         const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
         selectedPlayer.gold += goldAmount;
 
-        const eventMsg = `${helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold in \`${selectedPlayer.map.name}\`!`;
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold!`;
         const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
 
         helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -835,7 +835,7 @@ class Event {
           selectedPlayer.gold = 0;
         }
 
-        const eventMsgLoseGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern.
+        const eventMsgLoseGamble = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in a tavern.
         Unfortunately, ${helper.generateGenderString(selectedPlayer, 'he')} lost ${luckGambleGold} gold!`;
         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} gold by gambling in a tavern.`;
 
@@ -847,7 +847,7 @@ class Event {
 
       selectedPlayer.gold += luckGambleGold;
 
-      const eventMsgWinGamble = `${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in \`${selectedPlayer.map.name}\` tavern.
+      const eventMsgWinGamble = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} decided to try ${helper.generateGenderString(selectedPlayer, 'his')} luck in a tavern.
       Fortunately, ${helper.generateGenderString(selectedPlayer, 'he')} won ${luckGambleGold} gold!`;
       const eventLogWinGamble = `Congrats! You won ${luckGambleGold} gold by gambling in a tavern.`;
 

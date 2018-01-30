@@ -1,6 +1,6 @@
 const settings = {
   rootPath: __dirname,
-  battleDebug: true,
+  battleDebug: false,
   eventDebug: true,
 
   actionWebHookId: process.env.NODE_ENV.includes('production')
