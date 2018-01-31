@@ -38,9 +38,11 @@ class Monster {
 
   generateNewMonster(selectedPlayer) {
     return new Promise((resolve) => {
+      const playerBalance = ((selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4) + (selectedPlayer.level * 2);
+
       const randomRarityChance = Math.round(helper.randomBetween(0, 100));
       const randomTypeChance = Math.round(helper.randomBetween(0, 100));
-      const randomMonsterType = ((randomTypeChance + randomRarityChance) - selectedPlayer.level) > 100 ? 100 : (randomTypeChance + randomRarityChance) - selectedPlayer.level;
+      const randomMonsterType = ((randomTypeChance + randomRarityChance) - playerBalance) > 100 ? 100 : (randomTypeChance + randomRarityChance) - playerBalance;
       console.log(`\n\n\nMOB RT: ${randomTypeChance} - MOB RC: ${randomRarityChance} - LEVEL: ${selectedPlayer.level} - MOB MT: ${randomMonsterType}`);
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
@@ -49,8 +51,6 @@ class Monster {
 
       const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);
-
-      const playerBalance = selectedPlayer.equipment.weapon.power + (selectedPlayer.level * 2);
 
       const monsterObj = {
         name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name} `,

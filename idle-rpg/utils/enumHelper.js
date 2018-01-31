@@ -77,6 +77,14 @@ const enumHelper = {
   {
     name: 'LoneTester01',
     discordId: 'LoneTester01'
+  },
+  {
+    name: 'Duff',
+    discordId: 'Duff'
+  },
+  {
+    name: 'Beer',
+    discordId: 'Beer'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns

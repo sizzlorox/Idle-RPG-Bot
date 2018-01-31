@@ -16,10 +16,10 @@ const newPlayerObj = (discordId, name) => {
     isMentionInDiscord: true,
     gender: 'neutral',
     equipment: {
-      helmet: equipment.helmet.empty,
-      armor: equipment.armor.empty,
-      weapon: equipment.weapon.empty,
-      relic: equipment.relic.empty
+      helmet: equipment.empty.helmet,
+      armor: equipment.empty.armor,
+      weapon: equipment.empty.weapon,
+      relic: equipment.empty.relic
     },
     inventory: {
       equipment: [],
