@@ -32,13 +32,11 @@ const enumHelper = {
       },
       relic: {
         name: 'Nothing',
-        stats: {
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0,
-          luk: 0
-        },
+        str: 0,
+        dex: 0,
+        end: 0,
+        int: 0,
+        luk: 0,
         previousOwners: []
       }
     },
@@ -79,12 +77,12 @@ const enumHelper = {
     discordId: 'LoneTester01'
   },
   {
-    name: 'Duff',
-    discordId: 'Duff'
+    name: 'Durururu',
+    discordId: 'Durururu'
   },
   {
-    name: 'Beer',
-    discordId: 'Beer'
+    name: 'rurururu',
+    discordId: 'rurururu'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
