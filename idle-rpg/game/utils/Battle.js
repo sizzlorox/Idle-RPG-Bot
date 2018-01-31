@@ -411,9 +411,8 @@ class Battle {
               + helper.randomBetween(1, helper.sumPlayerTotalIntelligence(player))) / 2));
         break;
     }
-    attackPower = helper.randomBetween(attackPower / 2, attackPower);
 
-    return attackPower;
+    return helper.randomBetween(attackPower / 2, attackPower);
   }
 
   calculateDefense(player) {

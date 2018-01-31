@@ -16,17 +16,17 @@ const enumHelper = {
     empty: {
       helmet: {
         name: 'Nothing',
-        power: 0.25,
+        power: 0.15,
         previousOwners: []
       },
       armor: {
         name: 'Nothing',
-        power: 0.25,
+        power: 0.15,
         previousOwners: []
       },
       weapon: {
         name: 'Fist',
-        power: 0.25,
+        power: 0.15,
         attackType: 'melee',
         previousOwners: []
       },

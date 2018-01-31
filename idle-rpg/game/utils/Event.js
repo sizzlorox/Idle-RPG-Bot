@@ -60,6 +60,8 @@ class Event {
             let randomPlayer = sameMapPlayers[randomPlayerIndex];
 
             if (randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+              const randomPlayerMaxHealth = 100 + (selectedPlayer.level * 5);
+              const playerMaxHealth = 100 + (selectedPlayer.level * 5);
               return Battle.newSimulateBattle(
                 selectedPlayer,
                 randomPlayer
@@ -69,15 +71,16 @@ class Event {
                 selectedPlayer = attacker;
                 randomPlayer = defender;
                 const battleResult = `Battle Results:
-                  ${ helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                  ${ helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
-                  ${ helper.generatePlayerName(randomPlayer)} 's \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
-                  ${ helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
+                  ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+                  ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
+                  ${helper.generatePlayerName(randomPlayer)} 's \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
+                  ${helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
 
                 helper.printEventDebug(battleResult);
 
                 if (selectedPlayer.health <= 0) {
-                  const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(randomPlayer)} just killed ${helper.generatePlayerName(selectedPlayer)} with ${helper.generateGenderString(randomPlayer, 'his')} \`${randomPlayer.equipment.weapon.name}\`!`;
+                  const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(randomPlayer)} just killed ${helper.generatePlayerName(selectedPlayer)} with ${helper.generateGenderString(randomPlayer, 'his')} \`${randomPlayer.equipment.weapon.name}\`!
+    ${helper.generatePlayerName(selectedPlayer)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${helper.generatePlayerName(randomPlayer)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
 
                   const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
@@ -99,9 +102,10 @@ class Event {
 
                 if (defender.health > 0 && selectedPlayer.health > 0) {
                   const eventMsg = attackerDamage > defenderDamage
-                    ? `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${helper.generateGenderString(randomPlayer, 'he')} managed to get away!`
-                    : `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${helper.generatePlayerName(randomPlayer)} was too strong!`;
-
+                    ? `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${helper.generateGenderString(randomPlayer, 'he')} managed to get away!
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${helper.generatePlayerName(randomPlayer)} HP:${defender.health}/${randomPlayerMaxHealth}]`
+                    : `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} attacked ${helper.generatePlayerName(randomPlayer)} with ${helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${helper.generatePlayerName(randomPlayer)} was too strong!
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${helper.generatePlayerName(randomPlayer)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
                   // TODO: Find a way of making this visible some other method
                   // eventMsg = eventMsg.concat(battleResult);
                   const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${attackerDamage} damage!`;
@@ -114,8 +118,8 @@ class Event {
                   return resolve(selectedPlayer);
                 }
 
-                const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just killed \`${randomPlayer.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\`!`;
-
+                const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just killed \`${randomPlayer.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\`!
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${helper.generatePlayerName(randomPlayer)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
@@ -148,7 +152,6 @@ class Event {
       return this.MonsterManager.generateNewMonster(selectedPlayer)
         .then((mob) => {
           const mobMaxHealth = mob.health;
-          const playerBeforeBattleHealth = selectedPlayer.health;
           const playerMaxHealth = 100 + (selectedPlayer.level * 5);
           return Battle.newSimulateBattle(selectedPlayer, mob)
             .then(({
@@ -157,7 +160,7 @@ class Event {
               selectedPlayer = attacker;
               const battleResult = `Battle Results:
                 ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} / ${playerBeforeBattleHealth} / ${playerMaxHealth} HP left.
+                ${helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
                 ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
                 ${defender.name} has ${defender.health} / ${mobMaxHealth} HP left.`;
 
@@ -165,7 +168,7 @@ class Event {
 
               if (selectedPlayer.health <= 0) {
                 const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${helper.generatePlayerName(selectedPlayer)}!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg!`;
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = `\`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed you in \`${selectedPlayer.map.name}\`!`;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -178,9 +181,9 @@ class Event {
               if (defender.health > 0 && selectedPlayer.health > 0) {
                 const eventMsg = attackerDamage > defenderDamage
                   ? `[\`${selectedPlayer.map.name}\`] \`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)}!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg!`
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`
                   : `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just fled from \`${defender.name}\`!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg!`;
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = attackerDamage > defenderDamage
                   ? `\`${defender.name}\` fled from you in \`${selectedPlayer.map.name}\`!`
@@ -195,7 +198,7 @@ class Event {
               }
 
               const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${defender.name}\`!
-      ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold!`;
+      ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
               const eventLog = `Killed ${defender.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
 
               selectedPlayer.experience += defender.experience * multiplier;
@@ -399,7 +402,7 @@ class Event {
   stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomBetween(0, 100);
-      const chance = Math.floor((selectedPlayer.currentBounty * Math.log(1.2)) / 100);
+      const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
 
       if (luckStealChance > 90 - !Number.isFinite(chance) ? 0 : chance) {
         const luckItem = helper.randomBetween(0, 2);

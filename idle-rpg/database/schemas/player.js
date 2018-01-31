@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const mapSchema = require('./map');
 const maps = require('../../game/data/maps');
+const { equipment } = require('../../utils/enumHelper');
 const { starterTown } = require('../../../settings');
 
 const newPlayerObj = (discordId, name) => {
@@ -15,31 +16,10 @@ const newPlayerObj = (discordId, name) => {
     isMentionInDiscord: true,
     gender: 'neutral',
     equipment: {
-      helmet: {
-        name: 'Nothing',
-        power: 0.15,
-        previousOwners: []
-      },
-      armor: {
-        name: 'Nothing',
-        power: 0.15,
-        previousOwners: []
-      },
-      weapon: {
-        name: 'Fist',
-        power: 0.15,
-        attackType: 'melee',
-        previousOwners: []
-      },
-      relic: {
-        name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0,
-        luk: 0,
-        previousOwners: []
-      }
+      helmet: equipment.helmet.empty,
+      armor: equipment.armor.empty,
+      weapon: equipment.weapon.empty,
+      relic: equipment.relic.empty
     },
     inventory: {
       equipment: [],

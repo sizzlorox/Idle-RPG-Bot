@@ -200,7 +200,7 @@ class helper {
       if (dropChance > 50) {
         switch (this.randomBetween(0, 2)) {
           case 0:
-            if (selectedPlayer.equipment.helmet != enumHelper.equipment.empty.helmet) {
+            if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
               this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
               this.setPlayerEquipment(
                 selectedPlayer,
@@ -210,7 +210,7 @@ class helper {
             }
             break;
           case 1:
-            if (selectedPlayer.equipment.armor != enumHelper.equipment.empty.armor) {
+            if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
               this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
               this.setPlayerEquipment(
                 selectedPlayer,
@@ -220,7 +220,7 @@ class helper {
             }
             break;
           case 2:
-            if (selectedPlayer.equipment.weapon != enumHelper.equipment.empty.weapon) {
+            if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
               this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
               this.setPlayerEquipment(
                 selectedPlayer,
