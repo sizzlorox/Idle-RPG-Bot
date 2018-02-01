@@ -3,13 +3,70 @@ const type = {
     id: 0,
     name: 'Land'
   },
-  snow: {
+
+  tundra: {
     id: 1,
-    name: 'Snow'
+    name: 'Tundra'
   },
+
   town: {
     id: 2,
     name: 'Town'
+  },
+
+  forest: {
+    id: 3,
+    name: 'Forest'
+  },
+
+  plains: {
+    id: 4,
+    name: 'Plains'
+  },
+
+  beach: {
+    id: 5,
+    name: 'Beach'
+  },
+
+  barrows: {
+    id: 6,
+    name: 'Barrows'
+  },
+
+  mountain: {
+    id: 7,
+    name: 'Mountains'
+  },
+
+  swamp: {
+    id: 8,
+    name: 'Swamp'
+  },
+
+  desert: {
+    id: 9,
+    name: 'Desert'
+  },
+
+  cave: {
+    id: 10,
+    name: 'Caves'
+  },
+
+  barren: {
+    id: 11,
+    name: 'Barren'
+  },
+
+  graveyard: {
+    id: 12,
+    name: 'Graveyard'
+  },
+
+  sacred: {
+    id: 13,
+    name: 'Sacred'
   }
 };
 
@@ -66,7 +123,7 @@ const maps = [
   {
     id: 7,
     name: 'North Rendmount',
-    type: type.snow,
+    type: type.tundra,
     levelReq: 1,
     lore: 'High peeks covered in snow the majority of the year. The altitude deters most people, and the remoteness most others. Rumored to be filled with yetis and other fierce creatures. On one side is the mucks of Sludgeford and the deadly region of Skullsampton'
   },
@@ -87,7 +144,7 @@ const maps = [
   {
     id: 10,
     name: 'Wintermere',
-    type: type.snow,
+    type: type.tundra,
     levelReq: 1,
     lore: 'A tall set of snow tipped peaks, many paths have been chiseled out of the rock by unknown ancient people. Descends into Axeter on one side and the Nastihenge Moors on the other.'
   },
@@ -115,7 +172,7 @@ const maps = [
   {
     id: 14,
     name: 'Norpond',
-    type: type.snow,
+    type: type.tundra,
     levelReq: 1,
     lore: 'A nearly peramently frozen lake located high up on a plateau. Once a year it defrosts allowing the creatures that reside bellow the ice to begin their mating season. These fish are a local delicacy and sell for quite a pretty penny. Looking over the south edge of the plateau allows you to see the woods of Deerhaven and to the northeast the vast orchards of Appleview.'
   },

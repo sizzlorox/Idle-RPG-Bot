@@ -4,7 +4,6 @@ const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
 const spells = require('./data/spells');
 const { errorLog } = require('../utils/logger');
-const moment = require('moment');
 const { multiplier } = require('../../settings');
 
 /**
@@ -20,9 +19,9 @@ class Game {
 
   /**
    * Loads player by discordID and rolls a dice to select which type of event to activate
-   * @param {*} player 
-   * @param {*} onlinePlayers 
-   * @param {*} twitchBot 
+   * @param {Number} player
+   * @param {Array} onlinePlayers
+   * @param {*} twitchBot
    */
   selectEvent(discordBot, player, onlinePlayers, twitchBot) {
     const randomEvent = helper.randomBetween(0, 2);
@@ -40,7 +39,9 @@ class Game {
       .then((selectedPlayer) => {
         // selectedPlayer = Event.regenItem(selectedPlayer);
 
-        this.setPlayerTitles(discordBot, selectedPlayer);
+        if (process.env.NODE_ENV === 'production') {
+          this.setPlayerTitles(discordBot, selectedPlayer);
+        }
 
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
@@ -50,8 +51,6 @@ class Game {
         }
 
         helper.passiveHeal(selectedPlayer);
-        console.log(`\nGAME: Random Event ID: ${randomEvent} ${moment().utc('br')}`);
-
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
@@ -70,7 +69,7 @@ class Game {
             break;
         }
       })
-      .catch(err => errorLog.error(err));
+      .catch(err => console.log(err));
   }
 
   moveEvent(selectedPlayer) {
@@ -79,13 +78,15 @@ class Game {
 
   /**
    * Rolls dice to select which type of attack event is activated for the player
-   * @param {*} selectedPlayer 
-   * @param {*} onlinePlayers 
-   * @param {*} twitchBot 
+   * @param {Player} selectedPlayer
+   * @param {Array} onlinePlayers
+   * @param {*} twitchBot
    */
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
     if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
+      selectedPlayer = Event.sellInTown(this.discordHook, twitchBot, selectedPlayer);
+
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
@@ -102,12 +103,11 @@ class Game {
 
   /**
    * Rolls dice to select which type of luck event is activated for the player
-   * @param {*} selectedPlayer 
-   * @param {*} twitchBot 
+   * @param {Player} selectedPlayer
+   * @param {*} twitchBot
    */
   luckEvent(selectedPlayer, twitchBot) {
     const luckDice = helper.randomBetween(0, 100);
-    console.log(`Player: ${selectedPlayer.name} - Dice: ${luckDice}`);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
     }
@@ -145,8 +145,8 @@ class Game {
 
   /**
    * Gives gold amount to player
-   * @param {*} playerId 
-   * @param {*} amount 
+   * @param {Number} playerId
+   * @param {Number} amount
    */
   giveGold(playerId, amount) {
     return Database.loadPlayer(playerId)
@@ -158,8 +158,8 @@ class Game {
 
   /**
    * Returns top10 of a certain attribute
-   * @param {*} commandAuthor 
-   * @param {*} type 
+   * @param {Number} commandAuthor
+   * @param {String} type
    */
   top10(commandAuthor, type = { level: -1 }) {
     return Database.loadTop10(type)
@@ -183,15 +183,16 @@ ${rankString}
 
   /**
    * Modify player preference for being @mentionned in events
-   * @param Player commandAuthor
-   * @param DiscordHook hook
-   * @param Boolean isMentionInDiscord
+   * @param {Number} commandAuthor
+   * @param {DiscordHook} hook
+   * @param {Boolean} isMentionInDiscord
    */
   modifyMention(commandAuthor, hook, isMentionInDiscord) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (castingPlayer.isMentionInDiscord !== isMentionInDiscord) {
           castingPlayer.isMentionInDiscord = isMentionInDiscord;
+
           return Database.savePlayer(castingPlayer)
             .then(() => {
               return commandAuthor.send('Preference for being @mention has been updated.');
@@ -225,18 +226,18 @@ ${rankString}
 
   /**
    * Casts spell
-   * @param {*} commandAuthor 
-   * @param {*} hook 
-   * @param {*} spell 
+   * @param {Number} commandAuthor
+   * @param {DiscordHook} hook
+   * @param {String} spell
    */
   castSpell(commandAuthor, hook, spell) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
-            if (castingPlayer.gold >= spells.bless.spellCost) {
-              castingPlayer.spells += 1;
-              castingPlayer.gold -= spells.bless.spellCost;
+            if (castingPlayer.gold >= globalSpells.bless.spellCost) {
+              castingPlayer.spellCasted++;
+              castingPlayer.gold -= globalSpells.bless.spellCost;
               this.multiplier += 1;
               const blessLogObj = {
                 spellName: 'Bless',
@@ -260,18 +261,40 @@ ${rankString}
 
                 hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               }, 1800000); // 30 minutes
+
               Database.savePlayer(castingPlayer)
                 .then(() => {
                   commandAuthor.send('Spell has been casted!');
                 });
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${spells.bless.spellCost} gold. You are lacking ${spells.bless.spellCost - castingPlayer.gold} gold.`);
+              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold} gold.`);
+            }
+            break;
+
+          case 'home':
+            if (castingPlayer.gold >= globalSpells.home.spellCost) {
+              castingPlayer.gold -= globalSpells.bless.spellCost;
+              const Kindale = Event.MapClass.getMapByIndex(4);
+              castingPlayer.map = Kindale;
+              hook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
+
+              Database.savePlayer(castingPlayer)
+                .then(() => {
+                  commandAuthor.send('Spell has been casted!');
+                });
+            } else {
+              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold} gold.`);
             }
             break;
         }
       });
   }
 
+  /**
+   * Sets player bounty
+   * @param {Number} recipient
+   * @param {Number} amount
+   */
   setPlayerBounty(recipient, amount) {
     return Database.loadPlayer(recipient)
       .then((player) => {
@@ -280,6 +303,11 @@ ${rankString}
       });
   }
 
+  /**
+   * Sets player gold
+   * @param {Number} recipient
+   * @param {Number} amount
+   */
   setPlayerGold(recipient, amount) {
     return Database.loadPlayer(recipient)
       .then((player) => {
@@ -326,10 +354,10 @@ ${rankString}
 
   /**
    * places a bounty on specific player
-   * @param {*} discordHook 
-   * @param {*} playerId 
-   * @param {*} recipient 
-   * @param {*} amount 
+   * @param {DiscordHook} discordHook
+   * @param {Number} playerId
+   * @param {Number} recipient
+   * @param {Number} amount
    */
   placeBounty(discordHook, bountyPlacer, recipient, amount) {
     return Database.loadPlayer(bountyPlacer.id)
@@ -363,8 +391,8 @@ ${rankString}
 
   /**
    * Returns player eventlog by <count> amount
-   * @param {*} playerId 
-   * @param {*} count 
+   * @param {Mumber} playerId
+   * @param {Number} count
    */
   playerEventLog(playerId, count) {
     return Database.loadPlayer(playerId)
@@ -374,11 +402,19 @@ ${rankString}
   }
 
   /**
-   * Loads player stats by dicordId
+   * Loads player stats by discordId
    * @param {Number} commandAuthor
    */
   playerStats(commandAuthor) {
     return Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
+  }
+
+  /**
+   * Loads player inventory by discordId
+   * @param {Number} commandAuthor
+   */
+  playerInventory(commandAuthor) {
+    return Database.loadPlayer(commandAuthor.id, enumHelper.inventorySelectFields);
   }
 
   /**
@@ -391,7 +427,7 @@ ${rankString}
 
   /**
    * Get online players maps by an array of discordIds
-   * @param {Map} onlinePlayers
+   * @param {Array} onlinePlayers
    */
   getOnlinePlayerMaps(onlinePlayers) {
     return Database.loadOnlinePlayerMaps(onlinePlayers);
@@ -399,7 +435,7 @@ ${rankString}
 
   /**
    * Saves player into database
-   * @param {*} player 
+   * @param {Number} player
    */
   savePlayer(player) {
     return Database.savePlayer(player);
@@ -407,7 +443,7 @@ ${rankString}
 
   /**
    * Loads player by discordId
-   * @param {*} playerId 
+   * @param {Number} playerId
    */
   loadPlayer(playerId) {
     return Database.loadPlayer(playerId);
@@ -415,7 +451,7 @@ ${rankString}
 
   /**
    * Deletes player by discordId
-   * @param {*} playerId 
+   * @param {Number} playerId
    */
   deletePlayer(playerId) {
     return Database.deletePlayer(playerId);

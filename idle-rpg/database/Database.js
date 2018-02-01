@@ -6,6 +6,7 @@ const { starterTown } = require('../../settings');
 const moment = require('moment');
 
 const Player = mongoose.model('Player', playerSchema);
+const { equipment } = require('../../idle-rpg/utils/enumHelper');
 
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 
@@ -206,29 +207,12 @@ class Database {
             gold: 0,
             isMentionInDiscord: true,
             gender: 'neutral',
-            'equipment.helmet': {
-              name: 'Nothing',
-              str: 0,
-              dex: 0,
-              end: 0,
-              int: 0,
-              previousOwners: []
-            },
-            'equipment.armor': {
-              name: 'Nothing',
-              str: 0,
-              dex: 0,
-              end: 0,
-              int: 0,
-              previousOwners: []
-            },
-            'equipment.weapon': {
-              name: 'Fist',
-              str: 1,
-              dex: 1,
-              end: 1,
-              int: 0,
-              previousOwners: []
+            'equipment.helmet': equipment.empty.helmet,
+            'equipment.armor': equipment.empty.armor,
+            'equipment.weapon': equipment.empty.weapon,
+            inventory: {
+              equipment: [],
+              items: []
             },
             stats: {
               str: 1,
@@ -237,24 +221,28 @@ class Database {
               int: 1,
               luk: 1
             },
+            spells: [],
             isOnline: true,
-            createdAt: moment().toISOString(),
+            createdAt: new Date().getTime(),
             events: 0,
             gambles: 0,
             stole: 0,
             stolen: 0,
-            spells: 0,
+            spellCasted: 0,
+            currentBounty: 0,
             kills: {
               mob: 0,
               player: 0
             },
             battles: {
               won: 0,
-              lost: 0
+              lost: 0,
+              firstDeath: 0
             },
             deaths: {
               mob: 0,
-              player: 0
+              player: 0,
+              firstDeath: 'never'
             },
             pastEvents: []
           }

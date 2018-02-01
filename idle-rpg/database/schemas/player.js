@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const mapSchema = require('./map');
 const maps = require('../../game/data/maps');
-const moment = require('moment');
+const { equipment } = require('../../utils/enumHelper');
 const { starterTown } = require('../../../settings');
 
 const newPlayerObj = (discordId, name) => {
@@ -16,39 +16,14 @@ const newPlayerObj = (discordId, name) => {
     isMentionInDiscord: true,
     gender: 'neutral',
     equipment: {
-      helmet: {
-        name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0,
-        previousOwners: []
-      },
-      armor: {
-        name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0,
-        previousOwners: []
-      },
-      weapon: {
-        name: 'Fist',
-        str: 1,
-        dex: 1,
-        end: 1,
-        int: 0,
-        previousOwners: []
-      },
-      relic: {
-        name: 'Nothing',
-        str: 0,
-        dex: 0,
-        end: 0,
-        int: 0,
-        luk: 0,
-        previousOwners: []
-      }
+      helmet: equipment.empty.helmet,
+      armor: equipment.empty.armor,
+      weapon: equipment.empty.weapon,
+      relic: equipment.empty.relic
+    },
+    inventory: {
+      equipment: [],
+      items: []
     },
     stats: {
       str: 1,
@@ -57,13 +32,14 @@ const newPlayerObj = (discordId, name) => {
       int: 1,
       luk: 1
     },
+    spells: [],
     isOnline: true,
-    createdAt: moment().toISOString(),
+    createdAt: new Date().getTime(),
     events: 0,
     gambles: 0,
     stole: 0,
     stolen: 0,
-    spells: 0,
+    spellCasted: 0,
     currentBounty: 0,
     kills: {
       mob: 0,
@@ -71,11 +47,13 @@ const newPlayerObj = (discordId, name) => {
     },
     battles: {
       won: 0,
-      lost: 0
+      lost: 0,
+      firstDeath: 0
     },
     deaths: {
       mob: 0,
-      player: 0
+      player: 0,
+      firstDeath: 'never'
     },
     pastEvents: []
   };
@@ -100,10 +78,7 @@ const playerSchema = mongoose.Schema({
   equipment: {
     helmet: {
       name: String,
-      str: Number,
-      dex: Number,
-      end: Number,
-      int: Number,
+      power: Number,
       previousOwners: {
         type: Array,
         default: []
@@ -111,10 +86,7 @@ const playerSchema = mongoose.Schema({
     },
     armor: {
       name: String,
-      str: Number,
-      dex: Number,
-      end: Number,
-      int: Number,
+      power: Number,
       previousOwners: {
         type: Array,
         default: []
@@ -122,10 +94,8 @@ const playerSchema = mongoose.Schema({
     },
     weapon: {
       name: String,
-      str: Number,
-      dex: Number,
-      end: Number,
-      int: Number,
+      power: Number,
+      attackType: String,
       previousOwners: {
         type: Array,
         default: []
@@ -144,6 +114,16 @@ const playerSchema = mongoose.Schema({
       }
     }
   },
+  inventory: {
+    equipment: {
+      type: Array,
+      default: []
+    },
+    items: {
+      type: Array,
+      default: []
+    }
+  },
   stats: {
     str: Number,
     dex: Number,
@@ -151,8 +131,12 @@ const playerSchema = mongoose.Schema({
     int: Number,
     luk: Number
   },
+  spells: {
+    type: Array,
+    default: []
+  },
   isOnline: Boolean,
-  createdAt: Date,
+  createdAt: String,
   events: Number,
   gambles: {
     type: Number,
@@ -166,7 +150,7 @@ const playerSchema = mongoose.Schema({
     type: Number,
     default: 0
   },
-  spells: {
+  spellCasted: {
     type: Number,
     default: 0
   },
@@ -190,7 +174,8 @@ const playerSchema = mongoose.Schema({
   },
   deaths: {
     mob: Number,
-    player: Number
+    player: Number,
+    firstDeath: String
   },
   pastEvents: {
     type: Array,

@@ -1,5 +1,8 @@
 const settings = {
   rootPath: __dirname,
+  battleDebug: true,
+  eventDebug: false,
+  pvpLevelRestriction: 5,
 
   actionWebHookId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_ACTION_WEBHOOK_ID

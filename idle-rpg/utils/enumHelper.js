@@ -5,47 +5,38 @@ const enumHelper = {
     }
   },
 
+  inventory: {
+    maxEquipmentAmount: 5,
+    maxItemAmount: 15,
+    name: 'Inventory',
+    position: 'inventory'
+  },
+
   equipment: {
     empty: {
       helmet: {
         name: 'Nothing',
-        stats: {
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0,
-        },
+        power: 0.15,
         previousOwners: []
       },
       armor: {
         name: 'Nothing',
-        stats: {
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0,
-        },
+        power: 0.15,
         previousOwners: []
       },
       weapon: {
-        name: 'Fists',
-        stats: {
-          str: 1,
-          dex: 1,
-          end: 1,
-          int: 0,
-        },
+        name: 'Fist',
+        power: 0.15,
+        attackType: 'melee',
         previousOwners: []
       },
       relic: {
         name: 'Nothing',
-        stats: {
-          str: 0,
-          dex: 0,
-          end: 0,
-          int: 0,
-          luk: 0
-        },
+        str: 0,
+        dex: 0,
+        end: 0,
+        int: 0,
+        luk: 0,
         previousOwners: []
       }
     },
@@ -78,44 +69,20 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'Tester 1',
-    discordId: 'Tester 1'
+    name: 'LoneTester',
+    discordId: 'LoneTester'
   },
   {
-    name: 'Tester 2',
-    discordId: 'Tester 2'
+    name: 'LoneTester01',
+    discordId: 'LoneTester01'
   },
   {
-    name: 'Tester 3',
-    discordId: 'Tester 3'
+    name: 'Durururu',
+    discordId: 'Durururu'
   },
   {
-    name: 'Tester 4',
-    discordId: 'Tester 4'
-  },
-  {
-    name: 'Tester 5',
-    discordId: 'Tester 5'
-  },
-  {
-    name: 'Tester 6',
-    discordId: 'Tester 6'
-  },
-  {
-    name: 'Tester 7',
-    discordId: 'Tester 7'
-  },
-  {
-    name: 'Tester 8',
-    discordId: 'Tester 8'
-  },
-  {
-    name: 'Tester 9',
-    discordId: 'Tester 9'
-  },
-  {
-    name: 'Tester 10',
-    discordId: 'Tester 10'
+    name: 'rurururu',
+    discordId: 'rurururu'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
@@ -144,6 +111,11 @@ const enumHelper = {
       him: 'it',
       himself: 'itself',
     }
+  },
+
+  inventorySelectFields: {
+    name: 1,
+    inventory: 1
   },
 
   statsSelectFields: {

@@ -62,10 +62,13 @@ const maxTimer = (maximumTimer * 1000) * 60;
 
 const tickInMinutes = 2;
 let onlinePlayerList = [];
+if (process.env.NODE_ENV !== 'production') {
+  onlinePlayerList = mockPlayers;
+}
 
 discordBot.on('ready', () => {
   discordBot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
-  discordBot.user.setGame('Idle-RPG Game Master');
+  discordBot.user.setActivity('Idle-RPG Game Master');
   discordBot.user.setStatus('idle');
   console.log('Idle RPG has been loaded!');
 });
@@ -111,7 +114,6 @@ console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000)
 const heartBeat = () => {
   const discordUsers = discordBot.users;
   if (process.env.NODE_ENV.includes('production')) {
-
     const discordOfflinePlayers = discordUsers
       .filter(player => player.presence.status === 'offline' && !player.bot)
       .map((player) => {
@@ -137,8 +139,6 @@ const heartBeat = () => {
         index === array.findIndex(p => (
           p.discordId === player.discordId
         ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
-  } else {
-    onlinePlayerList = onlinePlayerList.push(mockPlayers);
   }
 
   onlinePlayerList.forEach((player) => {
@@ -152,7 +152,7 @@ const heartBeat = () => {
   });
 };
 
-setInterval(heartBeat, 60000 * tickInMinutes);
+setInterval(heartBeat, 60000 * process.env.NODE_ENV === 'production' ? tickInMinutes : 1);
 
 new CronJob({
   cronTime: powerHourWarnTime,

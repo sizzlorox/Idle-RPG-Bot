@@ -113,27 +113,21 @@ class Item {
       }
 
       let itemObj;
-      let itemStr;
-      let itemDex;
-      let itemEnd;
-      let itemInt;
-      let itemLuk;
-      let itemRating;
 
-      if (itemType.position === 'relic') {
-        itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
+      if (itemType.position === enumHelper.equipment.types.relic.position) {
+        const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4);
 
-        itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
+        const itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
           + itemType.stats.dex) / 4);
 
-        itemEnd = Math.round((itemRarityList[randomRarityIndex].stats.end
+        const itemEnd = Math.round((itemRarityList[randomRarityIndex].stats.end
           + itemType.stats.end) / 4);
 
-        itemInt = Math.round((itemRarityList[randomRarityIndex].stats.int
+        const itemInt = Math.round((itemRarityList[randomRarityIndex].stats.int
           + itemType.stats.int) / 4);
 
-        itemLuk = itemType.stats.luk;
+        const itemLuk = itemType.stats.luk;
 
         itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
@@ -150,41 +144,28 @@ class Item {
           isXmasEvent: itemType.isXmasEvent,
           rating: itemRating,
           gold: Number((itemRarityList[randomRarityIndex].gold
-            * itemType.gold).toFixed()) * itemRating
+            * itemType.gold).toFixed()) * itemType.power
+        };
+      } else if (itemType.position === enumHelper.inventory.position) {
+        itemObj = {
+          name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
+          position: itemType.position,
+          isXmasEvent: itemType.isXmasEvent,
+          power: itemRarityList[randomRarityIndex].power + itemType.power,
+          gold: Number((itemRarityList[randomRarityIndex].gold
+            * itemMaterialList[randomMaterialIndex].gold
+            * itemType.gold).toFixed()) * itemType.power
         };
       } else {
-        itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
-          * (itemMaterialList[randomMaterialIndex].stats.str
-            + itemType.stats.str)) / 4);
-
-        itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
-          * (itemMaterialList[randomMaterialIndex].stats.dex
-            + itemType.stats.dex)) / 4);
-
-        itemEnd = Math.round((itemRarityList[randomRarityIndex].stats.end
-          * (itemMaterialList[randomMaterialIndex].stats.end
-            + itemType.stats.end)) / 4);
-
-        itemInt = Math.round((itemRarityList[randomRarityIndex].stats.int
-          * (itemMaterialList[randomMaterialIndex].stats.int
-            + itemType.stats.int)) / 4);
-
-        itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt);
-
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
           position: itemType.position,
-          stats: {
-            str: itemStr,
-            dex: itemDex,
-            end: itemEnd,
-            int: itemInt
-          },
           isXmasEvent: itemType.isXmasEvent,
-          rating: itemRating,
+          power: itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power,
+          attackType: itemType.attackType,
           gold: Number((itemRarityList[randomRarityIndex].gold
             * itemMaterialList[randomMaterialIndex].gold
-            * itemType.gold).toFixed()) * itemRating
+            * itemType.gold).toFixed()) * itemType.power
         };
       }
       return resolve(itemObj);

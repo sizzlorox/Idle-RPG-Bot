@@ -5,7 +5,7 @@ class Map {
 
   moveToRandomMap(selectedPlayer) {
     const movement = helper.randomBetween(0, 100);
-    if (movement >= 50 && selectedPlayer.map.id !== 0 && selectedPlayer.map.id !== maps.length - 1 || selectedPlayer.map.id === 0) {
+    if (movement > 50 && selectedPlayer.map.id !== 0 && selectedPlayer.map.id !== maps.length - 1 || selectedPlayer.map.id === 0) {
       return maps[selectedPlayer.map.id + 1];
     }
     return maps[selectedPlayer.map.id - 1];

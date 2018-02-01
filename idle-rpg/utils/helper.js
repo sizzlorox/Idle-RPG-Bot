@@ -2,8 +2,21 @@ const fs = require('fs');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog } = require('../utils/logger');
+const { battleDebug, eventDebug } = require('../../settings');
 
 class helper {
+  printBattleDebug(debugMsg) {
+    if (battleDebug) {
+      console.log(debugMsg);
+    }
+  }
+
+  printEventDebug(debugMsg) {
+    if (eventDebug) {
+      console.log(debugMsg);
+    }
+  }
+
   randomBetween(min, max, decimal, exclude) {
     // https://stackoverflow.com/questions/15594332/unbiased-random-range-generator-in-javascript
     if (arguments.length < 2) return (Math.random() >= 0.5);
@@ -110,7 +123,7 @@ class helper {
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
 
-      return Math.round(item.str + item.dex + item.end + item.int);
+      return item.power;
     }
 
     return Math.round(item.str + item.dex + item.end + item.int + item.luk);
@@ -118,33 +131,21 @@ class helper {
 
   sumPlayerTotalStrength(player) {
     return player.stats.str
-      + player.equipment.helmet.str
-      + player.equipment.armor.str
-      + player.equipment.weapon.str
       + player.equipment.relic.str;
   }
 
   sumPlayerTotalDexterity(player) {
     return player.stats.dex
-      + player.equipment.helmet.dex
-      + player.equipment.armor.dex
-      + player.equipment.weapon.dex
       + player.equipment.relic.dex;
   }
 
   sumPlayerTotalEndurance(player) {
     return player.stats.end
-      + player.equipment.helmet.end
-      + player.equipment.armor.end
-      + player.equipment.weapon.end
       + player.equipment.relic.end;
   }
 
   sumPlayerTotalIntelligence(player) {
     return player.stats.int
-      + player.equipment.helmet.int
-      + player.equipment.armor.int
-      + player.equipment.weapon.int
       + player.equipment.relic.int;
   }
 
@@ -172,11 +173,16 @@ class helper {
 
   setPlayerEquipment(selectedPlayer, equipment, item) {
     selectedPlayer.equipment[equipment].name = item.name;
-    selectedPlayer.equipment[equipment].str = item.stats.str;
-    selectedPlayer.equipment[equipment].dex = item.stats.dex;
-    selectedPlayer.equipment[equipment].end = item.stats.end;
-    selectedPlayer.equipment[equipment].int = item.stats.int;
-    if (equipment === enumHelper.equipment.types.relic.position) {
+    if (equipment !== enumHelper.equipment.types.relic.position) {
+      selectedPlayer.equipment[equipment].power = item.power;
+      if (equipment === enumHelper.equipment.types.weapon.position) {
+        selectedPlayer.equipment[equipment].attackType = item.attackType;
+      }
+    } else if (equipment === enumHelper.equipment.types.relic.position) {
+      selectedPlayer.equipment[equipment].str = item.stats.str;
+      selectedPlayer.equipment[equipment].dex = item.stats.dex;
+      selectedPlayer.equipment[equipment].end = item.stats.end;
+      selectedPlayer.equipment[equipment].int = item.stats.int;
       selectedPlayer.equipment[equipment].luk = item.stats.luk;
     }
     selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
@@ -190,6 +196,45 @@ class helper {
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = 0;
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
+      const dropChance = this.randomBetween(0, 100);
+      if (dropChance < 15) {
+        switch (this.randomBetween(0, 2)) {
+          case 0:
+            if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
+              this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
+              this.setPlayerEquipment(
+                selectedPlayer,
+                enumHelper.equipment.types.helmet.position,
+                enumHelper.equipment.empty.helmet
+              );
+            }
+            break;
+          case 1:
+            if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
+              this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
+              this.setPlayerEquipment(
+                selectedPlayer,
+                enumHelper.equipment.types.armor.position,
+                enumHelper.equipment.empty.armor
+              );
+            }
+            break;
+          case 2:
+            if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+              this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
+              this.setPlayerEquipment(
+                selectedPlayer,
+                enumHelper.equipment.types.weapon.position,
+                enumHelper.equipment.empty.weapon
+              );
+            }
+            break;
+        }
+      }
+
+      if (selectedPlayer.deaths.firstDeath === 'never') {
+        selectedPlayer.deaths.firstDeath = new Date().getTime();
+      }
 
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
@@ -215,6 +260,16 @@ class helper {
     }
   }
 
+  generateSpellBookString(player) {
+    let spellBookString = '\`\`\`Here\'s your spellbook!\n';
+    player.spells.forEach((spell) => {
+      spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
+    });
+    spellBookString = spellBookString.concat('\`\`\`');
+
+    return spellBookString;
+  }
+
   generateStatsString(player) {
     return `\`\`\`Here are your stats!
     Health: ${player.health} / ${100 + (player.level * 5)}
@@ -232,12 +287,12 @@ class helper {
       Intelligence: ${player.stats.int} (${this.sumPlayerTotalIntelligence(player)})
       Luck: ${player.stats.luk} (${this.sumPlayerTotalLuck(player)})
 
-    Born: ${player.createdAt}
+    Born: ${this.toTimeFormat(Number(player.createdAt))}
     Events: ${player.events}
     Gambles: ${player.gambles}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
-    Spells Casted: ${player.spells}
+    Spells Casted: ${player.spellCasted}
     Kills:
       Monsters: ${player.kills.mob}
       Players: ${player.kills.player}
@@ -286,29 +341,28 @@ class helper {
     return enumHelper.genders[player.gender] ? enumHelper.genders[player.gender][word] : word;
   }
 
+  generateInventoryString(player) {
+    return `\`\`\`Here is your inventory!
+    Equipment:
+      ${player.inventory.equipment.map(equip => equip.name).join('\n')}
+    
+    Items:
+      ${player.inventory.items.map(item => item.name).join('\n')}
+      \`\`\``;
+  }
+
   generateEquipmentsString(player) {
-    return `\`\`\`Heres your equipment!
+    return `\`\`\`Here is your inventory!
     Helmet: ${player.equipment.helmet.name}
-      Stats:
-        Strength: ${player.equipment.helmet.str}
-        Dexterity: ${player.equipment.helmet.dex}
-        Endurance: ${player.equipment.helmet.end}
-        Intelligence: ${player.equipment.helmet.int}
-      ${this.generatePreviousOwnerString(player.equipment.helmet)}
+      Defense: ${player.equipment.helmet.power}
+        ${this.generatePreviousOwnerString(player.equipment.helmet)}
     Armor: ${player.equipment.armor.name}
-      Stats:
-        Strength: ${player.equipment.armor.str}
-        Dexterity: ${player.equipment.armor.dex}
-        Endurance: ${player.equipment.armor.end}
-        Intelligence: ${player.equipment.armor.int}
-      ${this.generatePreviousOwnerString(player.equipment.armor)}
+      Defense: ${player.equipment.armor.power}
+        ${this.generatePreviousOwnerString(player.equipment.armor)}
     Weapon: ${player.equipment.weapon.name}
-      Stats:
-        Strength: ${player.equipment.weapon.str}
-        Dexterity: ${player.equipment.weapon.dex}
-        Endurance: ${player.equipment.weapon.end}
-        Intelligence: ${player.equipment.weapon.int}
-      ${this.generatePreviousOwnerString(player.equipment.weapon)}
+      AttackPower: ${player.equipment.weapon.power}
+      AttackType: ${player.equipment.weapon.attackType}
+        ${this.generatePreviousOwnerString(player.equipment.weapon)}
     Relic: ${player.equipment.relic.name}
       Stats:
         Strength: ${player.equipment.relic.str}
