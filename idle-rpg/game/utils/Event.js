@@ -56,7 +56,7 @@ class Event {
             && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
             && player.level <= selectedPlayer.level + pvpLevelRestriction && player.level >= selectedPlayer.level - pvpLevelRestriction);
 
-          if (sameMapPlayers.length > 0) {
+          if (sameMapPlayers.length > 0 && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
             const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
             let randomPlayer = sameMapPlayers[randomPlayerIndex];
 
@@ -171,7 +171,7 @@ class Event {
                 const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${helper.generatePlayerName(selectedPlayer)}!
     ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
-                const eventLog = `\`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed you in \`${selectedPlayer.map.name}\`!`;
+                const eventLog = `${defender.name}'s ${defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
@@ -188,8 +188,8 @@ class Event {
     ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = attackerDamage > defenderDamage
-                  ? `\`${defender.name}\` fled from you in \`${selectedPlayer.map.name}\`!`
-                  : `You fled from \`${defender.name}\` in \`${selectedPlayer.map.name}\`!`;
+                  ? `${defender.name} fled from you in ${selectedPlayer.map.name}!`
+                  : `You fled from ${defender.name} in ${selectedPlayer.map.name}!`;
 
                 selectedPlayer.experience += expGain;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -385,7 +385,7 @@ class Event {
         };
       case 7:
         return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} a finds \`${item.name}\` resting against a wall.`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} find \`${item.name}\` resting against a wall.`,
           eventLog: `While exploring a cave in ${selectedPlayer.map.name} you found ${item.name}`
         };
       case 8:

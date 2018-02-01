@@ -31,7 +31,7 @@ const commands = [
         !lore <Map Name> - Retrieves the lore of map selected
         !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         !spellbook - Returns list of spells your character has learned
-        !invenotry - Displays what your character has in his/her inventory
+        !inventory - Displays what your character has in his/her inventory
         \`\`\``;
       message.author.send(helpMsg);
     }
@@ -82,7 +82,7 @@ const commands = [
     command: '!inventory',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
+    function: (game, message, discordBot) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');

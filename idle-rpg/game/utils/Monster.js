@@ -1,5 +1,6 @@
 const helper = require('../../utils/helper');
 const monsters = require('../data/monsters');
+const { equipment } = require('../../utils/enumHelper');
 
 class Monster {
 
@@ -57,17 +58,19 @@ class Monster {
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
           str: (monsterRarityList[randomRarityIndex].stats.str
-            * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.level / 2),
+            * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.level / 4),
           dex: (monsterRarityList[randomRarityIndex].stats.dex
-            * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.level / 2),
+            * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.level / 4),
           end: (monsterRarityList[randomRarityIndex].stats.end
-            * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.level / 2),
+            * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.level / 4),
           int: (monsterRarityList[randomRarityIndex].stats.int
-            * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.level / 2),
+            * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.level / 4),
           luk: (monsterRarityList[randomRarityIndex].stats.luk
-            * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 2)
+            * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 4)
         },
-        power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + (playerBalance / 6),
+        power: selectedPlayer.equipment.weapon.name === equipment.empty.weapon.name
+          ? (monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power) / 4
+          : monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + (playerBalance / 6),
         equipment: monsterTypeList[randomTypeIndex].equipment,
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,
