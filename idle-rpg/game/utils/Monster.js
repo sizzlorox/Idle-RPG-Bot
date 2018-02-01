@@ -58,15 +58,15 @@ class Monster {
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
           str: (monsterRarityList[randomRarityIndex].stats.str
-            * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.level / 2),
+            * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.level / 4),
           dex: (monsterRarityList[randomRarityIndex].stats.dex
-            * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.level / 2),
+            * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.level / 4),
           end: (monsterRarityList[randomRarityIndex].stats.end
-            * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.level / 2),
+            * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.level / 4),
           int: (monsterRarityList[randomRarityIndex].stats.int
-            * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.level / 2),
+            * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.level / 4),
           luk: (monsterRarityList[randomRarityIndex].stats.luk
-            * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 2)
+            * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 4)
         },
         power: selectedPlayer.equipment.weapon.name === equipment.empty.weapon.name
           ? (monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power) / 4

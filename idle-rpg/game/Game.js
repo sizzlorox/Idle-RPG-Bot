@@ -95,7 +95,11 @@ class Game {
     }
 
     if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-      return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
+      if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
+        return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
+      }
+
+      return Event.moveEvent(selectedPlayer, this.discordHook);
     }
 
     return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);

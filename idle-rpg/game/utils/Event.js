@@ -56,7 +56,7 @@ class Event {
             && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
             && player.level <= selectedPlayer.level + pvpLevelRestriction && player.level >= selectedPlayer.level - pvpLevelRestriction);
 
-          if (sameMapPlayers.length > 0) {
+          if (sameMapPlayers.length > 0 && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
             const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
             let randomPlayer = sameMapPlayers[randomPlayerIndex];
 

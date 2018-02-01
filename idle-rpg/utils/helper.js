@@ -122,7 +122,6 @@ class helper {
 
   calculateItemRating(item) {
     if (item.position !== enumHelper.equipment.types.relic.position) {
-
       return item.power;
     }
 
