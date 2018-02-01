@@ -522,7 +522,7 @@ const items = {
         name: 'Health Potion',
         position: 'inventory',
         power: 0.25,
-        gold: 0.5,
+        gold: 15,
         rarity: 75
       }
     ]

@@ -7,6 +7,7 @@ const Inventory = require('../utils/Inventory');
 const Spell = require('../utils/Spell');
 const Map = require('../utils/Map');
 const Database = require('../../database/Database');
+const { pvpLevelRestriction } = require('../../../settings');
 
 class Event {
 
@@ -53,7 +54,7 @@ class Event {
         if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
           const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
             && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
-            && player.level <= selectedPlayer.level + 5 && player.level >= selectedPlayer.level - 5);
+            && player.level <= selectedPlayer.level + pvpLevelRestriction && player.level >= selectedPlayer.level - pvpLevelRestriction);
 
           if (sameMapPlayers.length > 0) {
             const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);

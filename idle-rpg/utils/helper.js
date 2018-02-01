@@ -197,7 +197,7 @@ class helper {
       selectedPlayer.experience = 0;
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
       const dropChance = this.randomBetween(0, 100);
-      if (dropChance > 50) {
+      if (dropChance < 25) {
         switch (this.randomBetween(0, 2)) {
           case 0:
             if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
