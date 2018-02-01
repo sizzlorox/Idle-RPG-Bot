@@ -171,7 +171,7 @@ class Event {
                 const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${helper.generatePlayerName(selectedPlayer)}!
     ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
-                const eventLog = `\`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed you in \`${selectedPlayer.map.name}\`!`;
+                const eventLog = `${defender.name}'s ${defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
@@ -188,8 +188,8 @@ class Event {
     ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = attackerDamage > defenderDamage
-                  ? `\`${defender.name}\` fled from you in \`${selectedPlayer.map.name}\`!`
-                  : `You fled from \`${defender.name}\` in \`${selectedPlayer.map.name}\`!`;
+                  ? `${defender.name} fled from you in ${selectedPlayer.map.name}!`
+                  : `You fled from ${defender.name} in ${selectedPlayer.map.name}!`;
 
                 selectedPlayer.experience += expGain;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);

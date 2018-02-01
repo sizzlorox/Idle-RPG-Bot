@@ -1,5 +1,6 @@
 const helper = require('../../utils/helper');
 const monsters = require('../data/monsters');
+const { equipment } = require('../../utils/enumHelper');
 
 class Monster {
 
@@ -67,7 +68,9 @@ class Monster {
           luk: (monsterRarityList[randomRarityIndex].stats.luk
             * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 2)
         },
-        power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + (playerBalance / 6),
+        power: selectedPlayer.equipment.weapon.name === equipment.empty.weapon.name
+          ? (monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power) / 4
+          : monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + (playerBalance / 6),
         equipment: monsterTypeList[randomTypeIndex].equipment,
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,
