@@ -207,9 +207,22 @@ class Database {
             gold: 0,
             isMentionInDiscord: true,
             gender: 'neutral',
-            'equipment.helmet': equipment.empty.helmet,
-            'equipment.armor': equipment.empty.armor,
-            'equipment.weapon': equipment.empty.weapon,
+            'equipment.helmet': {
+              name: 'Nothing',
+              power: 0.15,
+              previousOwners: []
+            },
+            'equipment.armor': {
+              name: 'Nothing',
+              power: 0.15,
+              previousOwners: []
+            },
+            'equipment.weapon': {
+              name: 'Fist',
+              power: 0.15,
+              attackType: 'melee',
+              previousOwners: []
+            },
             inventory: {
               equipment: [],
               items: []
@@ -246,6 +259,9 @@ class Database {
             },
             pastEvents: []
           }
+        },
+        {
+          multi: true
         }, (err, result) => {
           if (err) {
             disconnect();

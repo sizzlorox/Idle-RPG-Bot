@@ -62,7 +62,9 @@ const maxTimer = (maximumTimer * 1000) * 60;
 
 const tickInMinutes = 2;
 let onlinePlayerList = [];
-if (process.env.NODE_ENV !== 'production') {
+console.log(process.env.NODE_ENV);
+if (!process.env.NODE_ENV.includes('production')) {
+  console.log('Mock Players loaded');
   onlinePlayerList = mockPlayers;
 }
 
