@@ -60,7 +60,7 @@ class Event {
             const randomPlayerIndex = helper.randomBetween(0, sameMapPlayers.length - 1);
             let randomPlayer = sameMapPlayers[randomPlayerIndex];
 
-            if (randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+            if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name && randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
               const randomPlayerMaxHealth = 100 + (selectedPlayer.level * 5);
               const playerMaxHealth = 100 + (selectedPlayer.level * 5);
               return Battle.newSimulateBattle(

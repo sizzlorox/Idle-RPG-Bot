@@ -658,7 +658,7 @@ const commands = [
     operatorOnly: false,
     function: (game, message) => {
       if (message.content.includes(' ')) {
-        const word = message.content.split(/ (.+)/)[1].toLowerCase();
+        const word = message.content.split(/ (.+)/)[1].toLowerCase().replace(' ', '+');
 
         return Urban.searchUrbanDictionary(word)
           .then((result) => {
@@ -666,7 +666,7 @@ const commands = [
             const wordDefinition = result.list.sort((item1, item2) => {
               return item1.thumbs_up - item2.thumbs_up;
             })[0];
-            definition = definition.replace('****', `\`${helper.capitalizeFirstLetter(wordDefinition.word)}\``);
+            definition = definition.replace('****', `\`${helper.capitalizeFirstLetter(wordDefinition.word).replace('+', ' ')}\``);
 
             return message.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`));
           });
