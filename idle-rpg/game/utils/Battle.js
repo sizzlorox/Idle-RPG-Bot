@@ -336,11 +336,11 @@ class Battle {
         helper.printBattleDebug('\nInventory Initiative is Attacker');
         if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = attacker.inventory.items.find({ name: 'Health Potion' });
-          let healAmount = potion.power * (attacker.level / 2);
-          if ((healAmount + attacker.health) > 100 + (attacker.level * 5)) {
-            healAmount -= 100 + (attacker.level * 5);
-          }
+          const healAmount = potion.power * (attacker.level / 2);
           attacker.health += healAmount;
+          if (attacker.health > 100 + (attacker.level * 5)) {
+            attacker.health = 100 + (attacker.level * 5);
+          }
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
           if (defenderDamage > healAmount) {
             defenderDamage -= healAmount;
@@ -350,11 +350,11 @@ class Battle {
         }
         if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = defender.inventory.items.find({ name: 'Health Potion' });
-          let healAmount = potion.power * (defender.level / 2);
-          if ((healAmount + defender.health) > 100 + (defender.level * 5)) {
-            healAmount -= 100 + (defender.level * 5);
-          }
+          const healAmount = potion.power * (defender.level / 2);
           defender.health += healAmount;
+          if (defender.health > 100 + (defender.level * 5)) {
+            defender.health = 100 + (defender.level * 5);
+          }
           defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
           if (attackerDamage > healAmount) {
             attackerDamage -= healAmount;
@@ -366,11 +366,11 @@ class Battle {
         helper.printBattleDebug('\nInventory Initiative is defender');
         if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = defender.inventory.items.find({ name: 'Health Potion' });
-          let healAmount = potion.power * (defender.level / 2);
-          if ((healAmount + defender.health) > 100 + (defender.level * 5)) {
-            healAmount -= 100 + (defender.level * 5);
-          }
+          const healAmount = potion.power * (defender.level / 2);
           defender.health += healAmount;
+          if (defender.health > 100 + (defender.level * 5)) {
+            defender.health = 100 + (defender.level * 5);
+          }
           defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
           if (attackerDamage > healAmount) {
             attackerDamage -= healAmount;
@@ -380,11 +380,11 @@ class Battle {
         }
         if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
           const potion = attacker.inventory.items.find({ name: 'Health Potion' });
-          let healAmount = potion.power * (attacker.level / 2);
-          if ((healAmount + attacker.health) > 100 + (attacker.level * 5)) {
-            healAmount -= 100 + (attacker.level * 5);
-          }
+          const healAmount = potion.power * (attacker.level / 2);
           attacker.health += healAmount;
+          if (attacker.health > 100 + (attacker.level * 5)) {
+            attacker.health = 100 + (attacker.level * 5);
+          }
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
           if (defenderDamage > healAmount) {
             defenderDamage -= healAmount;

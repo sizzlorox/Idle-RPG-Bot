@@ -541,7 +541,7 @@ class Event {
         }
       } else if (victimPlayer.gold > 0) {
         const goldStolen = Math.round(victimPlayer.gold / 6);
-        if (goldStolen === 0) {
+        if (goldStolen !== 0) {
           stealingPlayer.gold += goldStolen;
           victimPlayer.gold -= goldStolen;
 
