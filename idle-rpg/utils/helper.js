@@ -232,6 +232,10 @@ class helper {
         }
       }
 
+      if (selectedPlayer.deaths.firstDeath === 'never') {
+        selectedPlayer.deaths.firstDeath = new Date().getTime();
+      }
+
       if (!attackerObj.discordId) {
         selectedPlayer.deaths.mob++;
       } else {

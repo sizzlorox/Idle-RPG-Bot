@@ -209,6 +209,9 @@ class Battle {
                 if (attacker.health >= 100 + (attacker.level * 5)) {
                   attacker.health = 100 + (attacker.level * 5);
                 }
+                if (defenderDamage > (attackerSpellToCast.power * 2)) {
+                  defenderDamage -= (attackerSpellToCast.power * 2);
+                }
               }
               break;
             case 'target':
@@ -236,6 +239,9 @@ class Battle {
                 HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
                 if (defender.health >= 100 + (defender.level * 5)) {
                   defender.health = 100 + (defender.level * 5);
+                }
+                if (attackerDamage > (defenderSpellToCast.power * 2)) {
+                  attackerDamage -= (defenderSpellToCast.power * 2);
                 }
               }
               break;
@@ -267,6 +273,9 @@ class Battle {
                 if (defender.health >= 100 + (defender.level * 5)) {
                   defender.health = 100 + (defender.level * 5);
                 }
+                if (attackerDamage > (defenderSpellToCast.power * 2)) {
+                  attackerDamage -= (defenderSpellToCast.power * 2);
+                }
               }
               break;
             case 'target':
@@ -294,6 +303,9 @@ class Battle {
                 HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
                 if (attacker.health >= 100 + (attacker.level * 5)) {
                   attacker.health = 100 + (attacker.level * 5);
+                }
+                if (defenderDamage > (attackerSpellToCast.power * 2)) {
+                  defenderDamage -= (attackerSpellToCast.power * 2);
                 }
               }
               break;
@@ -330,6 +342,9 @@ class Battle {
           }
           attacker.health += healAmount;
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
+          if (defenderDamage > healAmount) {
+            defenderDamage -= healAmount;
+          }
 
           helper.printBattleDebug(`${attacker.name} drank a health potion and healed ${healAmount} health`);
         }
@@ -341,6 +356,9 @@ class Battle {
           }
           defender.health += healAmount;
           defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
+          if (attackerDamage > healAmount) {
+            attackerDamage -= healAmount;
+          }
 
           helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
@@ -354,6 +372,9 @@ class Battle {
           }
           defender.health += healAmount;
           defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
+          if (attackerDamage > healAmount) {
+            attackerDamage -= healAmount;
+          }
 
           helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
@@ -365,6 +386,9 @@ class Battle {
           }
           attacker.health += healAmount;
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
+          if (defenderDamage > healAmount) {
+            defenderDamage -= healAmount;
+          }
 
           helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }

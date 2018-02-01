@@ -47,11 +47,13 @@ const newPlayerObj = (discordId, name) => {
     },
     battles: {
       won: 0,
-      lost: 0
+      lost: 0,
+      firstDeath: 0
     },
     deaths: {
       mob: 0,
-      player: 0
+      player: 0,
+      firstDeath: 'never'
     },
     pastEvents: []
   };
@@ -172,7 +174,8 @@ const playerSchema = mongoose.Schema({
   },
   deaths: {
     mob: Number,
-    player: Number
+    player: Number,
+    firstDeath: String
   },
   pastEvents: {
     type: Array,

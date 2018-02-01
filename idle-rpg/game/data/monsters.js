@@ -173,7 +173,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land'],
       power: 1,
-      health: 25,
+      health: 15,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -206,7 +206,7 @@ const monsters = {
       isSpawnable: true,
       spawnableMapType: ['Land', 'Shores', 'Swamp'],
       power: 1.25,
-      health: 30,
+      health: 20,
       stats: {
         str: 1,
         dex: 0.25,
@@ -790,7 +790,7 @@ const monsters = {
         items: []
       },
       spells: [],
-      experience: 4,
+      experience: 6,
       gold: 5,
       rarity: 80
     },

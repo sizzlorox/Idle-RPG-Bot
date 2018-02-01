@@ -179,20 +179,21 @@ class Event {
               }
 
               if (defender.health > 0 && selectedPlayer.health > 0) {
+                const expGain = Math.floor((defender.experience * multiplier) / 2);
                 const eventMsg = attackerDamage > defenderDamage
                   ? `[\`${selectedPlayer.map.name}\`] \`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)}!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`
                   : `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just fled from \`${defender.name}\`!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = attackerDamage > defenderDamage
                   ? `\`${defender.name}\` fled from you in \`${selectedPlayer.map.name}\`!`
                   : `You fled from \`${defender.name}\` in \`${selectedPlayer.map.name}\`!`;
 
-                selectedPlayer.experience += Math.floor((defender.experience * multiplier) / 2);
-                helper.checkExperience(selectedPlayer, discordHook);
+                selectedPlayer.experience += expGain;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
+                helper.checkExperience(selectedPlayer, discordHook);
 
                 return resolve(selectedPlayer);
               }
@@ -204,9 +205,9 @@ class Event {
               selectedPlayer.experience += defender.experience * multiplier;
               selectedPlayer.gold += defender.gold * multiplier;
               selectedPlayer.kills.mob++;
-              helper.checkExperience(selectedPlayer, discordHook);
               helper.sendMessage(discordHook, 'twitch', false, eventMsg);
               selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
+              helper.checkExperience(selectedPlayer, discordHook);
 
               return resolve(selectedPlayer);
             });
@@ -558,39 +559,8 @@ class Event {
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = helper.randomBetween(0, 6);
+      const luckEvent = helper.randomBetween(1, 6);
       switch (luckEvent) {
-        case 0:
-          const luckStat = helper.randomBetween(0, 3);
-          const luckStatAmount = helper.randomBetween(1, 5);
-          let stat;
-          switch (luckStat) {
-            case 0:
-              stat = enumHelper.stats.str;
-              selectedPlayer.stats.str += luckStatAmount;
-              break;
-            case 1:
-              stat = enumHelper.stats.dex;
-              selectedPlayer.stats.dex += luckStatAmount;
-              break;
-            case 2:
-              stat = enumHelper.stats.end;
-              selectedPlayer.stats.end += luckStatAmount;
-              break;
-            case 3:
-              stat = enumHelper.stats.int;
-              selectedPlayer.stats.int += luckStatAmount;
-              break;
-          }
-
-          const eventMsgApollo = `Apollo has blessed ${helper.generatePlayerName(selectedPlayer)} with his music raising ${helper.generateGenderString(selectedPlayer, 'his')} \`${stat}\` by ${luckStatAmount}!`;
-          const eventLogApollo = `Apollo blessed you with his music raising your ${stat} by ${luckStatAmount}`;
-
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgApollo);
-          selectedPlayer = helper.logEvent(selectedPlayer, eventLogApollo);
-
-          return resolve(selectedPlayer);
-
         case 1:
           const luckExpAmount = helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
           selectedPlayer.experience -= luckExpAmount;
