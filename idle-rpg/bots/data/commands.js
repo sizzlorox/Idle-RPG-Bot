@@ -82,7 +82,7 @@ const commands = [
     command: '!inventory',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
+    function: (game, message, discordBot) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');

@@ -385,7 +385,7 @@ class Event {
         };
       case 7:
         return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} a finds \`${item.name}\` resting against a wall.`,
+          eventMsg: `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${helper.generateGenderString(selectedPlayer, 'he')} find \`${item.name}\` resting against a wall.`,
           eventLog: `While exploring a cave in ${selectedPlayer.map.name} you found ${item.name}`
         };
       case 8:
