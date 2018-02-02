@@ -161,8 +161,8 @@ const monsters = {
         int: 3.25,
         luk: 3.25
       },
-      experience: 1.5,
-      gold: 1.5,
+      experience: 7,
+      gold: 7,
       rarity: 2
     },
   ],
