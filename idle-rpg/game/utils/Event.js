@@ -116,7 +116,7 @@ class Event {
                   selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                   randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
 
-                  return resolve(selectedPlayer);
+                  return selectedPlayer;
                 }
 
                 const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just killed \`${randomPlayer.name}\` with ${helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\`!
