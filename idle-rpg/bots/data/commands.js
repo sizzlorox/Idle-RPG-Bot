@@ -342,6 +342,7 @@ const commands = [
 
       return message.reply(`\`\`\`List of spells:
         bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
+        home - 500 gold - Teleports you back to Kindale.
         \`\`\``);
     }
   },
