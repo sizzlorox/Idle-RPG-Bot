@@ -1,6 +1,6 @@
 const settings = {
   rootPath: __dirname,
-  battleDebug: true,
+  battleDebug: false,
   eventDebug: false,
   pvpLevelRestriction: 5,
 
