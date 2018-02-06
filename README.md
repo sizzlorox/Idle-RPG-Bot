@@ -19,6 +19,7 @@ DISCORD_RPG_CHANNEL_ID=<Discord action channel ID here>
 DISCORD_RPG_COMMAND_CHANNEL_ID=<Discord command channel ID here>
 DISCORD_RPG_FAQ_CHANNEL=<Discord FAQ channel ID here>
 DISCORD_BOT_LOGIN_TOKEN=<Discord bot login token here>
+DISCORD_STREAM_PLUGIN_CHANNEL=<Discord Stream Plugin channel (NOT NEEDED)>
 
 MIN_TIMER=<Minimal timer in minutes here>
 MAX_TIMER=<Maximum timer in minutes here>
