@@ -23,6 +23,7 @@ const settings = {
   faqChannelId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_RPG_FAQ_CHANNEL
     : process.env.TEST_DISCORD_RPG_FAQ_CHANNEL,
+  streamChannelId: process.env.DISCORD_STREAM_PLUGIN_CHANNEL,
 
   botLoginToken: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_BOT_LOGIN_TOKEN

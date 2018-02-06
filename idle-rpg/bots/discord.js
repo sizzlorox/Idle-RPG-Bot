@@ -14,6 +14,7 @@ const {
   moveWebHookToken,
   welcomeChannelId,
   faqChannelId,
+  streamChannelId,
   botLoginToken,
   minimalTimer,
   maximumTimer
@@ -100,11 +101,13 @@ ${reportResults.permalink}`);
   CommandParser.parseUserCommand(game, discordBot, hook, message);
 });
 
-discordBot.on('presenceUpdate', (oldMember, newMember) => {
-  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-  console.log(oldMember);
-  console.log(newMember);
-});
+if (streamChannelId) {
+  discordBot.on('presenceUpdate', (oldMember, newMember) => {
+    if (newMember.presence.game && newMember.presence.game.streaming) {
+      member.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n${newMember.presence.game.url}`);
+    }
+  });
+}
 
 discordBot.on('guildMemberAdd', (member) => {
   const channel = member.guild.channels.find('id', welcomeChannelId);
