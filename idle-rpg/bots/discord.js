@@ -104,7 +104,7 @@ ${reportResults.permalink}`);
 if (streamChannelId) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
     if (newMember.presence.game && newMember.presence.game.streaming) {
-      member.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n${newMember.presence.game.url}`);
+      newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n${newMember.presence.game.url}`);
     }
   });
 }
