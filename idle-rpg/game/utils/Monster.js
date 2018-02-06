@@ -39,11 +39,11 @@ class Monster {
 
   generateNewMonster(selectedPlayer) {
     return new Promise((resolve) => {
-      const playerBalance = ((selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4) + (selectedPlayer.level * 2);
+      const playerBalance = (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.helmet.power + selectedPlayer.equipment.armor.power) * (selectedPlayer.level / 4);
 
       const randomRarityChance = Math.round(helper.randomBetween(0, 100));
       const randomTypeChance = Math.round(helper.randomBetween(0, 100));
-      const randomMonsterType = ((randomTypeChance + randomRarityChance) - playerBalance) > 100 ? 100 : (randomTypeChance + randomRarityChance) - playerBalance;
+      const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
       console.log(`\n\n\nMOB RT: ${randomTypeChance} - MOB RC: ${randomRarityChance} - LEVEL: ${selectedPlayer.level} - MOB MT: ${randomMonsterType}`);
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
@@ -58,19 +58,17 @@ class Monster {
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
           str: (monsterRarityList[randomRarityIndex].stats.str
-            * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.level / 4),
+            * monsterTypeList[randomTypeIndex].stats.str) + ((selectedPlayer.level + selectedPlayer.stats.str) / 4),
           dex: (monsterRarityList[randomRarityIndex].stats.dex
-            * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.level / 4),
+            * monsterTypeList[randomTypeIndex].stats.dex) + ((selectedPlayer.level + selectedPlayer.stats.dex) / 4),
           end: (monsterRarityList[randomRarityIndex].stats.end
-            * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.level / 4),
+            * monsterTypeList[randomTypeIndex].stats.end) + ((selectedPlayer.level + selectedPlayer.stats.end) / 4),
           int: (monsterRarityList[randomRarityIndex].stats.int
-            * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.level / 4),
+            * monsterTypeList[randomTypeIndex].stats.int) + ((selectedPlayer.level + selectedPlayer.stats.int) / 4),
           luk: (monsterRarityList[randomRarityIndex].stats.luk
             * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 4)
         },
-        power: selectedPlayer.equipment.weapon.name === equipment.empty.weapon.name
-          ? (monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power) / 4
-          : monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + (playerBalance / 6),
+        power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + (playerBalance / 4),
         equipment: monsterTypeList[randomTypeIndex].equipment,
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,

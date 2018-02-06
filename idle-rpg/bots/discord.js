@@ -100,6 +100,12 @@ ${reportResults.permalink}`);
   CommandParser.parseUserCommand(game, discordBot, hook, message);
 });
 
+discordBot.on('presenceUpdate', (oldMember, newMember) => {
+  console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+  console.log(oldMember);
+  console.log(newMember);
+});
+
 discordBot.on('guildMemberAdd', (member) => {
   const channel = member.guild.channels.find('id', welcomeChannelId);
   if (!channel) {

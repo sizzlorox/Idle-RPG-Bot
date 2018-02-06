@@ -61,7 +61,7 @@ class Event {
             let randomPlayer = sameMapPlayers[randomPlayerIndex];
 
             if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name && randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-              const randomPlayerMaxHealth = 100 + (selectedPlayer.level * 5);
+              const randomPlayerMaxHealth = 100 + (randomPlayer.level * 5);
               const playerMaxHealth = 100 + (selectedPlayer.level * 5);
               return Battle.newSimulateBattle(
                 selectedPlayer,
@@ -89,6 +89,8 @@ class Event {
                   helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                   selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                   randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
+                  selectedPlayer.battles.lost++;
+                  randomPlayer.battles.won++;
 
                   return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
                     .then((stealResult) => {
@@ -127,6 +129,8 @@ class Event {
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
+                selectedPlayer.battles.won++;
+                randomPlayer.battles.lost++;
 
                 return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
                   .then((stealResult) => {
@@ -168,13 +172,14 @@ class Event {
               helper.printEventDebug(battleResult);
 
               if (selectedPlayer.health <= 0) {
-                const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${defender.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${helper.generatePlayerName(selectedPlayer)}!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
+                const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${mob.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${helper.generatePlayerName(selectedPlayer)}!
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
-                const eventLog = `${defender.name}'s ${defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
+                const eventLog = `${mob.name}'s ${defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
+                selectedPlayer.battles.lost++;
 
                 return resolve(selectedPlayer);
               }
@@ -182,14 +187,14 @@ class Event {
               if (defender.health > 0 && selectedPlayer.health > 0) {
                 const expGain = Math.floor((defender.experience * multiplier) / 2);
                 const eventMsg = attackerDamage > defenderDamage
-                  ? `[\`${selectedPlayer.map.name}\`] \`${defender.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)}!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`
-                  : `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just fled from \`${defender.name}\`!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
+                  ? `[\`${selectedPlayer.map.name}\`] \`${mob.name}\` just fled from ${helper.generatePlayerName(selectedPlayer)}!
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`
+                  : `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just fled from \`${mob.name}\`!
+    ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = attackerDamage > defenderDamage
-                  ? `${defender.name} fled from you in ${selectedPlayer.map.name}!`
-                  : `You fled from ${defender.name} in ${selectedPlayer.map.name}!`;
+                  ? `${mob.name} fled from you in ${selectedPlayer.map.name}!`
+                  : `You fled from ${mob.name} in ${selectedPlayer.map.name}!`;
 
                 selectedPlayer.experience += expGain;
                 helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -199,9 +204,9 @@ class Event {
                 return resolve(selectedPlayer);
               }
 
-              const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${defender.name}\`!
-      ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${defender.name}\` HP:${defender.health}/${mobMaxHealth}]`;
-              const eventLog = `Killed ${defender.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
+              const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
+      ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
+              const eventLog = `Killed ${mob.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
 
               selectedPlayer.experience += defender.experience * multiplier;
               selectedPlayer.gold += defender.gold * multiplier;
@@ -209,6 +214,7 @@ class Event {
               helper.sendMessage(discordHook, 'twitch', false, eventMsg);
               selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
               helper.checkExperience(selectedPlayer, discordHook);
+              selectedPlayer.battles.won++;
 
               return resolve(selectedPlayer);
             });
@@ -225,28 +231,28 @@ class Event {
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) >= item.power) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.power) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
                 }
                 break;
               case enumHelper.equipment.types.armor.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.armor) >= item.power) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.power) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
                 }
                 break;
               case enumHelper.equipment.types.weapon.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) >= item.power) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.power) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
                 }
                 break;
               case enumHelper.equipment.types.relic.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.relic) >= item.power) {
+                if (helper.calculateItemRating(selectedPlayer.equipment.relic) > item.power) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, item);
@@ -286,7 +292,7 @@ class Event {
 
           switch (item.position) {
             case enumHelper.equipment.types.helmet.position:
-              if (helper.calculateItemRating(selectedPlayer.equipment.helmet) >= item.power) {
+              if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.power) {
                 return resolve(selectedPlayer);
               }
 
@@ -295,7 +301,7 @@ class Event {
               break;
 
             case enumHelper.equipment.types.armor.position:
-              if (helper.calculateItemRating(selectedPlayer.equipment.armor) >= item.power) {
+              if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.power) {
                 return resolve(selectedPlayer);
               }
 
@@ -304,7 +310,7 @@ class Event {
               break;
 
             case enumHelper.equipment.types.weapon.position:
-              if (helper.calculateItemRating(selectedPlayer.equipment.weapon) >= item.power) {
+              if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.power) {
                 return resolve(selectedPlayer);
               }
 
@@ -330,15 +336,16 @@ class Event {
       helper.printEventDebug(selectedPlayer.inventory.equipment);
       selectedPlayer.inventory.equipment.forEach((equipment) => {
         helper.printEventDebug(`Equipment selling: ${equipment.name}`);
-        selectedPlayer.gold += Number(equipment.gold);
         profit += Number(equipment.gold);
       });
       selectedPlayer.inventory.equipment.length = 0;
+      profit = Math.floor(profit);
+      selectedPlayer.gold += profit;
 
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just sold what they found adventuring for ${profit} gold!`;
       const eventLog = `Made ${profit} gold selling what you found adventuring`;
 
-      helper.sendMessage(discordHook, 'twitch', false, `**${eventMsg}**`);
+      helper.sendMessage(discordHook, 'twitch', false, `${eventMsg}`);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
     }
 
@@ -406,6 +413,7 @@ class Event {
       const luckStealChance = helper.randomBetween(0, 100);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
 
+      console.log(`>>>>>>>>>>>>>>>>>>>> CHANCE : ${chance} - LUCKSTEALCHANCE : ${luckStealChance}`);
       if (luckStealChance > 90 - !Number.isFinite(chance) ? 0 : chance) {
         const luckItem = helper.randomBetween(0, 2);
         switch (luckItem) {
@@ -435,7 +443,6 @@ class Event {
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
-            stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.helmet.position, stolenHelmet);
 
             if (!victimPlayer.equipment.helmet.previousOwners) {
               stealingPlayer.equipment.helmet.previousOwners = [`${victimPlayer.name}`];
@@ -447,6 +454,7 @@ class Event {
             stealingPlayer.stole++;
 
             if (helper.calculateItemRating(stealingPlayer.equipment.helmet) < helper.calculateItemRating(victimPlayer.equipment.helmet)) {
+              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.helmet.position, stolenHelmet);
               victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
             } else {
               stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenHelmet);
@@ -478,7 +486,6 @@ class Event {
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
-            stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.armor.position, stolenArmor);
 
             if (!victimPlayer.equipment.armor.previousOwners) {
               stealingPlayer.equipment.armor.previousOwners = [`${victimPlayer.name}`];
@@ -490,6 +497,7 @@ class Event {
             stealingPlayer.stole++;
 
             if (helper.calculateItemRating(stealingPlayer.equipment.armor) < helper.calculateItemRating(victimPlayer.equipment.armor)) {
+              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.armor.position, stolenArmor);
               victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
             } else {
               stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenArmor);
@@ -521,7 +529,6 @@ class Event {
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
-            stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.weapon.position, stolenWeapon);
 
             if (!victimPlayer.equipment.weapon.previousOwners) {
               stealingPlayer.equipment.weapon.previousOwners = [`${victimPlayer.name}`];
@@ -533,6 +540,7 @@ class Event {
             stealingPlayer.stole++;
 
             if (helper.calculateItemRating(stealingPlayer.equipment.weapon) < helper.calculateItemRating(victimPlayer.equipment.weapon)) {
+              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.weapon.position, stolenWeapon);
               victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
             } else {
               stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenWeapon);
