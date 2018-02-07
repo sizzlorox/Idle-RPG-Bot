@@ -77,7 +77,7 @@ const heartBeat = () => {
   if (discordUsers) {
     if (process.env.NODE_ENV.includes('production')) {
       const discordOfflinePlayers = discordUsers
-        .filter(player => player.presence.status === 'offline' && !player.bot)
+        .filter(player => player.presence.status === 'offline' && !player.user.bot)
         .map((player) => {
           return {
             name: player.displayName,
@@ -86,9 +86,9 @@ const heartBeat = () => {
         });
 
       const discordOnlinePlayers = discordUsers
-        .filter(player => player.presence.status === 'online' && !player.bot
-          || player.presence.status === 'idle' && !player.bot
-          || player.presence.status === 'dnd' && !player.bot)
+        .filter(player => player.presence.status === 'online' && !player.user.bot
+          || player.presence.status === 'idle' && !player.user.bot
+          || player.presence.status === 'dnd' && !player.user.bot)
         .map((player) => {
           return {
             name: player.displayName,
