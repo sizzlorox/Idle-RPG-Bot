@@ -63,7 +63,7 @@ const maxTimer = (maximumTimer * 1000) * 60;
 
 const tickInMinutes = 2;
 let onlinePlayerList = [];
-console.log(process.env.NODE_ENV);
+console.log(`Current ENV: ${process.env.NODE_ENV}`);
 if (!process.env.NODE_ENV.includes('production')) {
   console.log('Mock Players loaded');
   onlinePlayerList = mockPlayers;
@@ -74,7 +74,7 @@ onlinePlayerList.push({
   discordId: 'pyddur'
 });
 
-const interval = process.env.NODE_ENV === 'production' ? tickInMinutes : 1;
+const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
 const heartBeat = () => {
   const discordUsers = discordBot.guilds.size > 0
     ? discordBot.guilds.find('name', 'Idle-RPG').members
@@ -127,7 +127,7 @@ discordBot.on('ready', () => {
   discordBot.user.setStatus('idle');
   console.log('Idle RPG has been loaded!');
 
-  console.log(`Interval delay: ${interval} minutes`);
+  console.log(`Interval delay: ${interval} minute(s)`);
   setInterval(heartBeat, 60000 * interval);
 });
 

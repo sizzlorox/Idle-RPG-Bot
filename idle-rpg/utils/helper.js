@@ -71,8 +71,8 @@ class helper {
   }
 
   sendMessage(discordHook, twitchBot, isMovement, msg) {
-    if (msg.includes('Pyddur')) {
-      msg.replace(/<@!pyddur>/g, 'Pyddur');
+    if (msg.toLowerCase().includes('pyddur')) {
+      msg.replace(/<@!pyddur>/g, 'Pyddur, God Of Beer');
     }
 
     if (isMovement) {
