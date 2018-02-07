@@ -72,7 +72,7 @@ class helper {
 
   sendMessage(discordHook, twitchBot, isMovement, msg) {
     if (msg.toLowerCase().includes('pyddur')) {
-      msg.replace(/<@!pyddur>/g, 'Pyddur, God Of Beer');
+      msg = msg.replace(new RegExp('<@!pyddur>', 'g'), 'Pyddur, God Of Beer');
     }
 
     if (isMovement) {
@@ -331,6 +331,7 @@ class helper {
     if (player.isMentionInDiscord === false) {
       return `\`${player.name}\``;
     }
+
     return `<@!${player.discordId}>`;
   }
 
