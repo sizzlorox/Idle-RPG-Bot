@@ -69,6 +69,12 @@ if (!process.env.NODE_ENV.includes('production')) {
   onlinePlayerList = mockPlayers;
 }
 
+onlinePlayerList.push({
+  name: 'Pyddur, God Of Beer',
+  discordId: 'pyddur'
+});
+
+const interval = process.env.NODE_ENV === 'production' ? tickInMinutes : 1;
 const heartBeat = () => {
   const discordUsers = discordBot.guilds.size > 0
     ? discordBot.guilds.find('name', 'Idle-RPG').members
@@ -103,11 +109,6 @@ const heartBeat = () => {
           ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
     }
 
-    onlinePlayerList.push({
-      name: 'Pyddur, God Of Beer',
-      discordId: 'pyddur'
-    })
-
     onlinePlayerList.forEach((player) => {
       if (!player.timer) {
         const playerTimer = randomBetween(minTimer, maxTimer);
@@ -126,7 +127,8 @@ discordBot.on('ready', () => {
   discordBot.user.setStatus('idle');
   console.log('Idle RPG has been loaded!');
 
-  setInterval(heartBeat, 60000 * process.env.NODE_ENV === 'production' ? tickInMinutes : 1);
+  console.log(`Interval delay: ${interval} minutes`);
+  setInterval(heartBeat, 60000 * interval);
 });
 
 discordBot.on('message', (message) => {
