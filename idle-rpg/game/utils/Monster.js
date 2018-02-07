@@ -39,7 +39,9 @@ class Monster {
 
   generateNewMonster(selectedPlayer) {
     return new Promise((resolve) => {
-      const playerBalance = (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.helmet.power + selectedPlayer.equipment.armor.power) * (selectedPlayer.level / 4);
+      const playerBalance = selectedPlayer.equipment.weapon.name === 'Fist'
+        ? selectedPlayer.level / 2
+        : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 2;
 
       const randomRarityChance = Math.round(helper.randomBetween(0, 100));
       const randomTypeChance = Math.round(helper.randomBetween(0, 100));
@@ -58,17 +60,17 @@ class Monster {
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
           str: (monsterRarityList[randomRarityIndex].stats.str
-            * monsterTypeList[randomTypeIndex].stats.str) + ((selectedPlayer.level + selectedPlayer.stats.str) / 4),
+            * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.stats.str / 2),
           dex: (monsterRarityList[randomRarityIndex].stats.dex
-            * monsterTypeList[randomTypeIndex].stats.dex) + ((selectedPlayer.level + selectedPlayer.stats.dex) / 4),
+            * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.stats.dex / 2),
           end: (monsterRarityList[randomRarityIndex].stats.end
-            * monsterTypeList[randomTypeIndex].stats.end) + ((selectedPlayer.level + selectedPlayer.stats.end) / 4),
+            * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.stats.end / 2),
           int: (monsterRarityList[randomRarityIndex].stats.int
-            * monsterTypeList[randomTypeIndex].stats.int) + ((selectedPlayer.level + selectedPlayer.stats.int) / 4),
+            * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 2),
           luk: (monsterRarityList[randomRarityIndex].stats.luk
-            * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 4)
+            * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 2)
         },
-        power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + (playerBalance / 4),
+        power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + playerBalance,
         equipment: monsterTypeList[randomTypeIndex].equipment,
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,

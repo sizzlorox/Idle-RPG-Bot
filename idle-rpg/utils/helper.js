@@ -193,7 +193,7 @@ class helper {
     if (selectedPlayer.health <= 0) {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
-      selectedPlayer.experience = 0;
+      selectedPlayer.experience = Math.round(selectedPlayer.experience / 2);
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
       const dropChance = this.randomBetween(0, 100);
       if (dropChance < 15) {
@@ -343,10 +343,10 @@ class helper {
   generateInventoryString(player) {
     return `\`\`\`Here is your inventory!
     Equipment:
-      ${player.inventory.equipment.map(equip => equip.name).join('\n')}
+      ${player.inventory.equipment.map(equip => equip.name).join('\n      ')}
     
     Items:
-      ${player.inventory.items.map(item => item.name).join('\n')}
+      ${player.inventory.items.map(item => item.name).join('\n      ')}
       \`\`\``;
   }
 
