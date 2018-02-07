@@ -103,6 +103,11 @@ const heartBeat = () => {
           ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
     }
 
+    onlinePlayerList.push({
+      name: 'Pyddur, God Of Beer',
+      discordId: 'pyddur'
+    })
+
     onlinePlayerList.forEach((player) => {
       if (!player.timer) {
         const playerTimer = randomBetween(minTimer, maxTimer);
