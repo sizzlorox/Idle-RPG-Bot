@@ -71,6 +71,10 @@ class helper {
   }
 
   sendMessage(discordHook, twitchBot, isMovement, msg) {
+    if (msg.toLowerCase().includes('pyddur')) {
+      msg.replace(/<@!pyddur>/g, 'Pyddur, God Of Beer');
+    }
+
     if (isMovement) {
       discordHook.movementHook.send(msg)
         .then(debugMsg => moveLog.move(this.formatLog(debugMsg)))
