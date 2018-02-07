@@ -231,21 +231,21 @@ class Event {
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.helmet) > item.power) {
+                if (selectedPlayer.equipment.helmet.power > item.power) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
                 }
                 break;
               case enumHelper.equipment.types.armor.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.armor) > item.power) {
+                if (selectedPlayer.equipment.armor.power > item.power) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
                 }
                 break;
               case enumHelper.equipment.types.weapon.position:
-                if (helper.calculateItemRating(selectedPlayer.equipment.weapon) > item.power) {
+                if (selectedPlayer.equipment.weapon.power > item.power) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);

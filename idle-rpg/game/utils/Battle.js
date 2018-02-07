@@ -64,6 +64,10 @@ class Battle {
           if (defender.health < 0) {
             defender.health = 0;
           }
+          if (attackerDamage === 0 && defenderDamage === 0) {
+            console.log(results);
+            console.log(battleResults);
+          }
 
           return resolve({ attacker, defender, attackerDamage, defenderDamage });
         });
@@ -101,7 +105,7 @@ class Battle {
       if (initiative.name === attacker.name) {
         helper.printBattleDebug('\nBattle Initiative is Attacker');
         if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-          attackerDamage = Math.round(battleStats.attacker.attackPower - ((battleStats.attacker.attackPower * battleStats.defender.defensePower.physicalDefensePower) / 100));
+          attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.physicalDefensePower / 100));
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -109,7 +113,7 @@ class Battle {
           defender.health -= attackerDamage;
           helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
-          attackerDamage = Math.round(battleStats.attacker.attackPower - ((battleStats.attacker.attackPower * battleStats.defender.defensePower.magicDefensePower) / 100));
+          attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.magicDefensePower / 100));
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -124,15 +128,15 @@ class Battle {
         }
 
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-          defenderDamage = Math.round(battleStats.defender.attackPower - ((battleStats.defender.attackPower * battleStats.attacker.defensePower.physicalDefensePower) / 100));
+          defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.physicalDefensePower / 100));
           if (defenderDamage < 0) {
-            defenderDamage = 0;
+             defenderDamage = 0;
           }
 
           attacker.health -= defenderDamage;
           helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
-          defenderDamage = Math.round(battleStats.defender.attackPower - ((battleStats.defender.attackPower * battleStats.attacker.defensePower.magicDefensePower) / 100));
+          defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.magicDefensePower / 100));
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -145,7 +149,7 @@ class Battle {
       } else if (initiative.name === defender.name) {
         helper.printBattleDebug('\nBattle Initiative is Defender');
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-          defenderDamage = Math.round(battleStats.defender.attackPower - ((battleStats.defender.attackPower * battleStats.attacker.defensePower.physicalDefensePower) / 100));
+          defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.physicalDefensePower / 100));
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -153,7 +157,7 @@ class Battle {
           attacker.health -= defenderDamage;
           helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
         } else {
-          defenderDamage = Math.round(battleStats.defender.attackPower - ((battleStats.defender.attackPower * battleStats.attacker.defensePower.magicDefensePower) / 100));
+          defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.magicDefensePower / 100));
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
@@ -168,7 +172,7 @@ class Battle {
         }
 
         if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-          attackerDamage = Math.round(battleStats.attacker.attackPower - ((battleStats.attacker.attackPower * battleStats.defender.defensePower.physicalDefensePower) / 100));
+          attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.physicalDefensePower / 100));
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -176,7 +180,7 @@ class Battle {
           defender.health -= attackerDamage;
           helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
-          attackerDamage = Math.round(battleStats.attacker.attackPower - ((battleStats.attacker.attackPower * battleStats.defender.defensePower.magicDefensePower) / 100));
+          attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.magicDefensePower / 100));
           if (attackerDamage < 0) {
             attackerDamage = 0;
           }
@@ -412,7 +416,7 @@ class Battle {
     switch (player.equipment.weapon.attackType) {
       case 'melee':
         attackPower = this.isMonster(player)
-          ? (player.stats.str + player.equipment.weapon.power + (player.power / 2)) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.str) / 2)))
+          ? (player.stats.str + player.equipment.weapon.power + player.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.str) / 2)))
           : (helper.sumPlayerTotalStrength(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
@@ -420,7 +424,7 @@ class Battle {
         break;
       case 'range':
         attackPower = this.isMonster(player)
-          ? (player.stats.dex + player.equipment.weapon.power + (player.power / 2)) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.dex) / 2)))
+          ? (player.stats.dex + player.equipment.weapon.power + player.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.dex) / 2)))
           : (helper.sumPlayerTotalDexterity(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
@@ -428,7 +432,7 @@ class Battle {
         break;
       case 'magic':
         attackPower = this.isMonster(player)
-          ? (player.stats.int + player.equipment.weapon.power + (player.power / 2)) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.int) / 2)))
+          ? (player.stats.int + player.equipment.weapon.power + player.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.int) / 2)))
           : (helper.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power)
           * (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
@@ -441,12 +445,12 @@ class Battle {
 
   calculateDefense(player) {
     const physicalDefensePower = this.isMonster(player)
-      ? (player.stats.end + (player.equipment.armor.power / 2) + (player.power / 4)) * ((player.stats.dex / 2) + (player.stats.luk / 2))
+      ? (player.stats.end + player.equipment.armor.power + player.power) * ((player.stats.dex / 2) + (player.stats.luk / 2))
       : (helper.sumPlayerTotalEndurance(player)
         + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
     const magicDefensePower = this.isMonster(player)
-      ? (player.stats.int + (player.equipment.armor.power / 2) + (player.power / 4)) * ((player.stats.dex / 2) + (player.stats.luk / 2))
+      ? (player.stats.int + player.equipment.armor.power + player.power) * ((player.stats.dex / 2) + (player.stats.luk / 2))
       : (helper.sumPlayerTotalIntelligence(player)
         + (player.equipment.armor.power / 2))
       * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
