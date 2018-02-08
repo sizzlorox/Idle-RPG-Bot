@@ -42,10 +42,6 @@ class Game {
         }
 
         selectedPlayer.name = player.name;
-        // TODO REMOVE LATER
-        if (!selectedPlayer.mana) {
-          selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-        }
         selectedPlayer.events++;
 
         if (selectedPlayer.events % 100 === 0) {

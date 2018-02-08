@@ -129,6 +129,7 @@ const enumHelper = {
   statsSelectFields: {
     name: 1,
     health: 1,
+    mana: 1,
     level: 1,
     experience: 1,
     gender: 1,
