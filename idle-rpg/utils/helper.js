@@ -368,10 +368,10 @@ class helper {
     return `\`\`\`Here is your inventory!
     Helmet: ${player.equipment.helmet.name}
       Defense: ${player.equipment.helmet.power}
-        ${this.generatePreviousOwnerString(player.equipment.helmet)}
+      ${this.generatePreviousOwnerString(player.equipment.helmet)}
     Armor: ${player.equipment.armor.name}
       Defense: ${player.equipment.armor.power}
-        ${this.generatePreviousOwnerString(player.equipment.armor)}
+      ${this.generatePreviousOwnerString(player.equipment.armor)}
     Weapon: ${player.equipment.weapon.name}
       AttackPower: ${player.equipment.weapon.power}
       AttackType: ${player.equipment.weapon.attackType}
