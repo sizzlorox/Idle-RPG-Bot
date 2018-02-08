@@ -412,9 +412,10 @@ class Event {
     return new Promise((resolve) => {
       const luckStealChance = helper.randomBetween(0, 100);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
+      const canSteal = !Number.isFinite(chance) ? 0 : chance;
 
-      console.log(`>>>>>>>>>>>>>>>>>>>> CHANCE : ${chance} - LUCKSTEALCHANCE : ${luckStealChance}`);
-      if (luckStealChance > 90 - !Number.isFinite(chance) ? 0 : chance) {
+      console.log(`>>>>>>>>>>>>>>>>>>>> CHANCE : ${chance} - LUCKSTEALCHANCE : ${luckStealChance} - BOUNTYLUCK : ${90 - canSteal}`);
+      if (luckStealChance > (90 - canSteal)) {
         const luckItem = helper.randomBetween(0, 2);
         switch (luckItem) {
           case 0:
@@ -425,7 +426,7 @@ class Event {
               stolenHelmet = victimPlayer.equipment.helmet;
               stolenHelmet.name = removePreviousOwnerName;
 
-              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.equipment.helmet.name}!`);
+              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenHelmet.name}!`);
               const eventLog = `Stole ${victimPlayer.equipment.helmet.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.helmet.name} from you`;
 
@@ -434,9 +435,9 @@ class Event {
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
               stolenHelmet = victimPlayer.equipment.helmet;
-              stolenHelmet.name = `${victimPlayer.name}s ${victimPlayer.equipment.helmet.name}`;
-              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${victimPlayer.equipment.helmet.name}!`);
-              const eventLog = `Stole ${victimPlayer.name}s ${victimPlayer.equipment.helmet.name}`;
+              stolenHelmet.name = `${victimPlayer.name}'s ${victimPlayer.equipment.helmet.name}`;
+              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenHelmet.name}!`);
+              const eventLog = `Stole ${stolenHelmet.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.helmet.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -453,7 +454,7 @@ class Event {
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
-            if (helper.calculateItemRating(stealingPlayer.equipment.helmet) < helper.calculateItemRating(victimPlayer.equipment.helmet)) {
+            if (stealingPlayer.equipment.helmet.power < victimPlayer.equipment.helmet.power) {
               stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.helmet.position, stolenHelmet);
               if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.helmet.position)) {
                 const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.helmet.position)
@@ -476,7 +477,7 @@ class Event {
               stolenArmor = victimPlayer.equipment.armor;
               stolenArmor.name = removePreviousOwnerName;
 
-              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.equipment.armor.name}!`);
+              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenArmor.name}!`);
               const eventLog = `Stole ${victimPlayer.equipment.armor.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
@@ -485,9 +486,9 @@ class Event {
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
               stolenArmor = victimPlayer.equipment.armor;
-              stolenArmor.name = `${victimPlayer.name}s ${victimPlayer.equipment.armor.name}`;
-              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${victimPlayer.equipment.armor.name}!`);
-              const eventLog = `Stole ${victimPlayer.name}s ${victimPlayer.equipment.armor.name}`;
+              stolenArmor.name = `${victimPlayer.name}'s ${victimPlayer.equipment.armor.name}`;
+              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${stolenArmor.name}!`);
+              const eventLog = `Stole ${stolenArmor.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -504,7 +505,7 @@ class Event {
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
-            if (helper.calculateItemRating(stealingPlayer.equipment.armor) < helper.calculateItemRating(victimPlayer.equipment.armor)) {
+            if (stealingPlayer.equipment.armor.power < victimPlayer.equipment.armor.power) {
               stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.armor.position, stolenArmor);
               if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.armor.position)) {
                 const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.armor.position)
@@ -524,10 +525,10 @@ class Event {
             if (victimPlayer.equipment.weapon.previousOwners.length > 0) {
               const lastOwnerInList = victimPlayer.equipment.weapon.previousOwners[victimPlayer.equipment.weapon.previousOwners.length - 1];
               const removePreviousOwnerName = victimPlayer.equipment.weapon.name.replace(`${lastOwnerInList}s`, `${victimPlayer.name}s`);
-              stolenWeapon = victimPlayer.equipment.armor;
+              stolenWeapon = victimPlayer.equipment.weapon;
               stolenWeapon.name = removePreviousOwnerName;
 
-              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenWeapon}!`);
+              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenWeapon.name}!`);
               const eventLog = `Stole ${stolenWeapon}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.weapon.name} from you`;
 
@@ -535,10 +536,10 @@ class Event {
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
-              stolenWeapon = victimPlayer.equipment.armor;
-              stolenWeapon.name = `${victimPlayer.name}s ${victimPlayer.equipment.weapon.name}`;
-              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${victimPlayer.equipment.weapon.name}!`);
-              const eventLog = `Stole ${victimPlayer.name}s ${victimPlayer.equipment.weapon.name}`;
+              stolenWeapon = victimPlayer.equipment.weapon;
+              stolenWeapon.name = `${victimPlayer.name}'s ${victimPlayer.equipment.weapon.name}`;
+              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenWeapon.name}!`);
+              const eventLog = `Stole ${stolenWeapon.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.weapon.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', false, eventMsg);
@@ -555,7 +556,7 @@ class Event {
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
-            if (helper.calculateItemRating(stealingPlayer.equipment.weapon) < helper.calculateItemRating(victimPlayer.equipment.weapon)) {
+            if (stealingPlayer.equipment.weapon.power < victimPlayer.equipment.weapon.power) {
               stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.weapon.position, stolenWeapon);
               if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.weapon.position)) {
                 const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.weapon.position)
