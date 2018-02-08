@@ -162,6 +162,7 @@ class helper {
       selectedPlayer.level++;
       selectedPlayer.experience = 0;
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+      selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.stats.str++;
       selectedPlayer.stats.dex++;
       selectedPlayer.stats.end++;
@@ -196,6 +197,7 @@ class helper {
   checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
     if (selectedPlayer.health <= 0) {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+      selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = Math.round(selectedPlayer.experience / 2);
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);

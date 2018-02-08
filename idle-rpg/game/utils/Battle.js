@@ -130,7 +130,7 @@ class Battle {
         if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
           defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.physicalDefensePower / 100));
           if (defenderDamage < 0) {
-             defenderDamage = 0;
+            defenderDamage = 0;
           }
 
           attacker.health -= defenderDamage;
@@ -206,8 +206,9 @@ class Battle {
           const attackerSpellToCast = attacker.spells[attackerRandomSpell];
           switch (attackerSpellToCast.type) {
             case 'self':
-              if (attackerSpellToCast.name.toLowerCase().includes('heal')) {
+              if (attackerSpellToCast.name.toLowerCase().includes('heal') && attacker.mana >= attackerSpellToCast.power) {
                 attacker.health += attackerSpellToCast.power * 2;
+                attacker.mana -= attackerSpellToCast.power;
                 helper.printBattleDebug(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
                 HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
                 if (attacker.health >= 100 + (attacker.level * 5)) {
@@ -219,13 +220,14 @@ class Battle {
               }
               break;
             case 'target':
-              if (attackerSpellToCast.name.toLowerCase().includes('fireball')) {
+              if (attackerSpellToCast.name.toLowerCase().includes('fireball') && attacker.mana >= attackerSpellToCast.power) {
                 let spellDamage = Math.round((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
                 defenderDamage += spellDamage;
                 defender.health -= spellDamage;
+                attacker.mana -= attackerSpellToCast.power;
                 helper.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
               }
@@ -237,8 +239,9 @@ class Battle {
           const defenderSpellToCast = defender.spells[defenderRandomSpell];
           switch (defenderSpellToCast.type) {
             case 'self':
-              if (defenderSpellToCast.name.toLowerCase().includes('heal')) {
+              if (defenderSpellToCast.name.toLowerCase().includes('heal') && defender.mana >= defenderSpellToCast.power) {
                 defender.health += defenderSpellToCast.power * 2;
+                defender.mana -= defenderSpellToCast.power;
                 helper.printBattleDebug(`${defender.name} healed for ${defenderSpellToCast.power * 2}
                 HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
                 if (defender.health >= 100 + (defender.level * 5)) {
@@ -250,13 +253,14 @@ class Battle {
               }
               break;
             case 'target':
-              if (defenderSpellToCast.name.toLowerCase().includes('fireball')) {
+              if (defenderSpellToCast.name.toLowerCase().includes('fireball') && defender.mana >= defenderSpellToCast.power) {
                 let spellDamage = Math.round((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
                 attackerDamage += spellDamage;
                 attacker.health -= spellDamage;
+                defender.mana -= defenderSpellToCast.power;
                 helper.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
               }
@@ -270,8 +274,9 @@ class Battle {
           const defenderSpellToCast = defender.spells[defenderRandomSpell];
           switch (defenderSpellToCast.type) {
             case 'self':
-              if (defenderSpellToCast.name.toLowerCase().includes('heal')) {
+              if (defenderSpellToCast.name.toLowerCase().includes('heal') && defender.mana >= defenderSpellToCast.power) {
                 defender.health += defenderSpellToCast.power * 2;
+                defender.mana -= defenderSpellToCast.power;
                 helper.printBattleDebug(`${defender.name} healed for ${defenderSpellToCast.power * 2}
                 HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
                 if (defender.health >= 100 + (defender.level * 5)) {
@@ -283,13 +288,14 @@ class Battle {
               }
               break;
             case 'target':
-              if (defenderSpellToCast.name.toLowerCase().includes('fireball')) {
+              if (defenderSpellToCast.name.toLowerCase().includes('fireball') && defender.mana >= defenderSpellToCast.power) {
                 let spellDamage = Math.round((defenderSpellToCast.power * 2) - battleStats.attacker.defensePower.magicDefensePower);
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
-                defenderDamage += spellDamage;
+                attackerDamage += spellDamage;
                 attacker.health -= spellDamage;
+                defender.mana -= defenderSpellToCast.power;
                 helper.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${attacker.health + spellDamage} -> ${attacker.health}`);
               }
@@ -301,8 +307,9 @@ class Battle {
           const attackerSpellToCast = attacker.spells[attackerRandomSpell];
           switch (attackerSpellToCast.type) {
             case 'self':
-              if (attackerSpellToCast.name.toLowerCase().includes('heal')) {
+              if (attackerSpellToCast.name.toLowerCase().includes('heal') && attacker.mana >= attackerSpellToCast.power) {
                 attacker.health += attackerSpellToCast.power * 2;
+                attacker.mana -= attackerSpellToCast.power;
                 helper.printBattleDebug(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
                 HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
                 if (attacker.health >= 100 + (attacker.level * 5)) {
@@ -314,13 +321,14 @@ class Battle {
               }
               break;
             case 'target':
-              if (attackerSpellToCast.name.toLowerCase().includes('fireball')) {
+              if (attackerSpellToCast.name.toLowerCase().includes('fireball') && attacker.mana >= attackerSpellToCast.power) {
                 let spellDamage = Math.round((attackerSpellToCast.power * 2) - battleStats.defender.defensePower.magicDefensePower);
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
-                attackerDamage += spellDamage;
+                defenderDamage += spellDamage;
                 defender.health -= spellDamage;
+                attacker.mana -= attackerSpellToCast.power;
                 helper.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
               }

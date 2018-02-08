@@ -9,6 +9,7 @@ const newPlayerObj = (discordId, name) => {
     discordId,
     name,
     health: 105,
+    mana: 50,
     experience: 0,
     map: maps[starterTown],
     level: 1,
@@ -63,6 +64,10 @@ const playerSchema = mongoose.Schema({
   discordId: String,
   name: String,
   health: Number,
+  mana: {
+    type: Number,
+    default: 50
+  },
   experience: Number,
   map: mapSchema,
   level: Number,
