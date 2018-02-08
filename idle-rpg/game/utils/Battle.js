@@ -338,9 +338,10 @@ class Battle {
       const initiative = this.initialAttack(attacker, defender);
       if (initiative.name === attacker.name) {
         helper.printBattleDebug('\nInventory Initiative is Attacker');
-        if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
-          const potion = attacker.inventory.items.find({ name: 'Health Potion' });
-          const healAmount = potion.power * (attacker.level / 2);
+        const attackerPotions = attacker.inventory.items.filter(item => item.name.includes('Health Potion'));
+        if (attacker.inventory.items.length > 0 && attackerPotions.length > 0) {
+          const potion = attackerPotions[helper.randomBetween(0, attackerPotions.length - 1)];
+          const healAmount = Math.ceil(potion.power * (attacker.level / 2));
           attacker.health += healAmount;
           if (attacker.health > 100 + (attacker.level * 5)) {
             attacker.health = 100 + (attacker.level * 5);
@@ -352,14 +353,15 @@ class Battle {
 
           helper.printBattleDebug(`${attacker.name} drank a health potion and healed ${healAmount} health`);
         }
-        if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
-          const potion = defender.inventory.items.find({ name: 'Health Potion' });
-          const healAmount = potion.power * (defender.level / 2);
+        const defenderPotions = defender.inventory.items.filter(item => item.name.includes('Health Potion'));
+        if (defender.inventory.items.length > 0 && defenderPotions.length > 0) {
+          const potion = defenderPotions[helper.randomBetween(0, defenderPotions.length - 1)];
+          const healAmount = Math.ceil(potion.power * (defender.level / 2));
           defender.health += healAmount;
           if (defender.health > 100 + (defender.level * 5)) {
             defender.health = 100 + (defender.level * 5);
           }
-          defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
+          defender.inventory.items = defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
           if (attackerDamage > healAmount) {
             attackerDamage -= healAmount;
           }
@@ -368,23 +370,25 @@ class Battle {
         }
       } else if (initiative.name === defender.name) {
         helper.printBattleDebug('\nInventory Initiative is defender');
-        if (defender.inventory.items.length > 0 && defender.inventory.items.includes({ name: 'Health Potion' })) {
-          const potion = defender.inventory.items.find({ name: 'Health Potion' });
-          const healAmount = potion.power * (defender.level / 2);
+        const defenderPotions = defender.inventory.items.filter(item => item.name.includes('Health Potion'));
+        if (defender.inventory.items.length > 0 && defenderPotions.length > 0) {
+          const potion = defenderPotions[helper.randomBetween(0, defenderPotions.length - 1)];
+          const healAmount = Math.ceil(potion.power * (defender.level / 2));
           defender.health += healAmount;
           if (defender.health > 100 + (defender.level * 5)) {
             defender.health = 100 + (defender.level * 5);
           }
-          defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
+          defender.inventory.items = defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
           if (attackerDamage > healAmount) {
             attackerDamage -= healAmount;
           }
 
           helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
         }
-        if (attacker.inventory.items.length > 0 && attacker.inventory.items.includes({ name: 'Health Potion' })) {
-          const potion = attacker.inventory.items.find({ name: 'Health Potion' });
-          const healAmount = potion.power * (attacker.level / 2);
+        const attackerPotions = attacker.inventory.items.filter(item => item.name.includes('Health Potion'));
+        if (attacker.inventory.items.length > 0 && attackerPotions.length > 0) {
+          const potion = attackerPotions[helper.randomBetween(0, attackerPotions.length - 1)];
+          const healAmount = Math.ceil(potion.power * (attacker.level / 2));
           attacker.health += healAmount;
           if (attacker.health > 100 + (attacker.level * 5)) {
             attacker.health = 100 + (attacker.level * 5);
@@ -416,25 +420,25 @@ class Battle {
     switch (player.equipment.weapon.attackType) {
       case 'melee':
         attackPower = this.isMonster(player)
-          ? (player.stats.str + player.equipment.weapon.power + player.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.str) / 2)))
+          ? (player.stats.str + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.str) / 2)))
           : (helper.sumPlayerTotalStrength(player) + player.equipment.weapon.power)
-          * (helper.sumPlayerTotalDexterity(player)
+          + (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
               + helper.randomBetween(1, helper.sumPlayerTotalStrength(player))) / 2));
         break;
       case 'range':
         attackPower = this.isMonster(player)
-          ? (player.stats.dex + player.equipment.weapon.power + player.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.dex) / 2)))
+          ? (player.stats.dex + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.dex) / 2)))
           : (helper.sumPlayerTotalDexterity(player) + player.equipment.weapon.power)
-          * (helper.sumPlayerTotalDexterity(player)
+          + (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
               + helper.randomBetween(1, helper.sumPlayerTotalDexterity(player))) / 2));
         break;
       case 'magic':
         attackPower = this.isMonster(player)
-          ? (player.stats.int + player.equipment.weapon.power + player.power) * (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.int) / 2)))
+          ? (player.stats.int + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (helper.randomBetween(1, player.stats.int) / 2)))
           : (helper.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power)
-          * (helper.sumPlayerTotalDexterity(player)
+          + (helper.sumPlayerTotalDexterity(player)
             + ((helper.sumPlayerTotalLuck(player)
               + helper.randomBetween(1, helper.sumPlayerTotalIntelligence(player))) / 2));
         break;
@@ -445,15 +449,15 @@ class Battle {
 
   calculateDefense(player) {
     const physicalDefensePower = this.isMonster(player)
-      ? (player.stats.end + player.equipment.armor.power + player.power) * ((player.stats.dex / 2) + (player.stats.luk / 2))
+      ? (player.stats.end + player.equipment.armor.power + player.power) + ((player.stats.dex / 2) + (player.stats.luk / 2))
       : (helper.sumPlayerTotalEndurance(player)
         + (player.equipment.armor.power / 2))
-      * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
+      + (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
     const magicDefensePower = this.isMonster(player)
-      ? (player.stats.int + player.equipment.armor.power + player.power) * ((player.stats.dex / 2) + (player.stats.luk / 2))
+      ? (player.stats.int + player.equipment.armor.power + player.power) + ((player.stats.dex / 2) + (player.stats.luk / 2))
       : (helper.sumPlayerTotalIntelligence(player)
         + (player.equipment.armor.power / 2))
-      * (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
+      + (helper.sumPlayerTotalDexterity(player) + (helper.sumPlayerTotalLuck(player) / 2));
     helper.printBattleDebug(`${player.name} - ${physicalDefensePower} - ${magicDefensePower}`);
 
     return { physicalDefensePower, magicDefensePower };

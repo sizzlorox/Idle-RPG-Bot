@@ -1,6 +1,5 @@
 const helper = require('../../utils/helper');
 const monsters = require('../data/monsters');
-const { equipment } = require('../../utils/enumHelper');
 
 class Monster {
 
@@ -39,10 +38,6 @@ class Monster {
 
   generateNewMonster(selectedPlayer) {
     return new Promise((resolve) => {
-      const playerBalance = selectedPlayer.equipment.weapon.name === 'Fist'
-        ? selectedPlayer.level / 2
-        : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 2;
-
       const randomRarityChance = Math.round(helper.randomBetween(0, 100));
       const randomTypeChance = Math.round(helper.randomBetween(0, 100));
       const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
@@ -54,6 +49,7 @@ class Monster {
 
       const randomRarityIndex = helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = helper.randomBetween(0, monsterTypeList.length - 1);
+      const playerBalance = (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4;
 
       const monsterObj = {
         name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name} `,
@@ -68,7 +64,7 @@ class Monster {
           int: (monsterRarityList[randomRarityIndex].stats.int
             * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 2),
           luk: (monsterRarityList[randomRarityIndex].stats.luk
-            * monsterTypeList[randomTypeIndex].stats.luk) + (selectedPlayer.level / 2)
+            * monsterTypeList[randomTypeIndex].stats.luk)
         },
         power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + playerBalance,
         equipment: monsterTypeList[randomTypeIndex].equipment,
