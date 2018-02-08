@@ -102,13 +102,19 @@ class helper {
     return `\`\`\`css\n${message}\`\`\``;
   }
 
-  passiveHeal(player) {
-    if (player.health <= 100 + (player.level * 5)) {
-      player.health += 2;
+  passiveRegen(player) {
+    if (player.health <= enumHelper.maxHealth(player.level)) {
+      player.health += 5;
+      if (player.health > enumHelper.maxHealth(player.level)) {
+        player.health = enumHelper.maxHealth(player.level);
+      }
     }
 
-    if (player.health > 100 + (player.level * 5)) {
-      player.health = 100 + (player.level * 5);
+    if (player.mana <= enumHelper.maxMana(player.level)) {
+      player.mana += 2;
+      if (player.mana > enumHelper.maxMana(player.level)) {
+        player.mana = enumHelper.maxMana(player.level);
+      }
     }
     return player;
   }
@@ -162,6 +168,7 @@ class helper {
       selectedPlayer.level++;
       selectedPlayer.experience = 0;
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+      selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.stats.str++;
       selectedPlayer.stats.dex++;
       selectedPlayer.stats.end++;
@@ -196,6 +203,7 @@ class helper {
   checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
     if (selectedPlayer.health <= 0) {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+      selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = Math.round(selectedPlayer.experience / 2);
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
@@ -275,7 +283,8 @@ class helper {
 
   generateStatsString(player) {
     return `\`\`\`Here are your stats!
-    Health: ${player.health} / ${100 + (player.level * 5)}
+    Health: ${player.health} / ${enumHelper.maxHealth(player.level)}
+    Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
     Gender: ${player.gender}

@@ -12,6 +12,14 @@ const enumHelper = {
     position: 'inventory'
   },
 
+  maxHealth: (level) => {
+    return 100 + (level * 5);
+  },
+
+  maxMana: (level) => {
+    return 50 + (level * 5);
+  },
+
   equipment: {
     empty: {
       helmet: {
@@ -121,6 +129,7 @@ const enumHelper = {
   statsSelectFields: {
     name: 1,
     health: 1,
+    mana: 1,
     level: 1,
     experience: 1,
     gender: 1,
