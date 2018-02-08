@@ -278,6 +278,7 @@ class helper {
   generateStatsString(player) {
     return `\`\`\`Here are your stats!
     Health: ${player.health} / ${100 + (player.level * 5)}
+    Mana: ${player.mana} / ${50 + (player.level * 5)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
     Gender: ${player.gender}
