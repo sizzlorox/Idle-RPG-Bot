@@ -1,4 +1,5 @@
 const helper = require('../../utils/helper');
+const enumHelper = require('../../utils/enumHelper');
 
 class Battle {
   simulateBattleWithMob(selectedPlayer, mobObj) {
@@ -63,10 +64,6 @@ class Battle {
           }
           if (defender.health < 0) {
             defender.health = 0;
-          }
-          if (attackerDamage === 0 && defenderDamage === 0) {
-            console.log(results);
-            console.log(battleResults);
           }
 
           return resolve({ attacker, defender, attackerDamage, defenderDamage });
@@ -211,8 +208,8 @@ class Battle {
                 attacker.mana -= attackerSpellToCast.power;
                 helper.printBattleDebug(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
                 HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
-                if (attacker.health >= 100 + (attacker.level * 5)) {
-                  attacker.health = 100 + (attacker.level * 5);
+                if (attacker.health >= enumHelper.maxHealth(attacker.level)) {
+                  attacker.health = enumHelper.maxHealth(attacker.level);
                 }
                 if (defenderDamage > (attackerSpellToCast.power * 2)) {
                   defenderDamage -= (attackerSpellToCast.power * 2);
@@ -244,8 +241,8 @@ class Battle {
                 defender.mana -= defenderSpellToCast.power;
                 helper.printBattleDebug(`${defender.name} healed for ${defenderSpellToCast.power * 2}
                 HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
-                if (defender.health >= 100 + (defender.level * 5)) {
-                  defender.health = 100 + (defender.level * 5);
+                if (defender.health >= enumHelper.maxHealth(defender.level)) {
+                  defender.health = enumHelper.maxHealth(defender.level);
                 }
                 if (attackerDamage > (defenderSpellToCast.power * 2)) {
                   attackerDamage -= (defenderSpellToCast.power * 2);
@@ -279,8 +276,8 @@ class Battle {
                 defender.mana -= defenderSpellToCast.power;
                 helper.printBattleDebug(`${defender.name} healed for ${defenderSpellToCast.power * 2}
                 HEALTH ${defender.health - (defenderSpellToCast.power * 2)} -> ${defender.health}`);
-                if (defender.health >= 100 + (defender.level * 5)) {
-                  defender.health = 100 + (defender.level * 5);
+                if (defender.health >= enumHelper.maxHealth(defender.level)) {
+                  defender.health = enumHelper.maxHealth(defender.level);
                 }
                 if (attackerDamage > (defenderSpellToCast.power * 2)) {
                   attackerDamage -= (defenderSpellToCast.power * 2);
@@ -312,8 +309,8 @@ class Battle {
                 attacker.mana -= attackerSpellToCast.power;
                 helper.printBattleDebug(`${attacker.name} healed for ${attackerSpellToCast.power * 2}
                 HEALTH ${attacker.health - (attackerSpellToCast.power * 2)} -> ${attacker.health}`);
-                if (attacker.health >= 100 + (attacker.level * 5)) {
-                  attacker.health = 100 + (attacker.level * 5);
+                if (attacker.health >= enumHelper.maxHealth(attacker.level)) {
+                  attacker.health = enumHelper.maxHealth(attacker.level);
                 }
                 if (defenderDamage > (attackerSpellToCast.power * 2)) {
                   defenderDamage -= (attackerSpellToCast.power * 2);
@@ -351,8 +348,8 @@ class Battle {
           const potion = attackerPotions[helper.randomBetween(0, attackerPotions.length - 1)];
           const healAmount = Math.ceil(potion.power * (attacker.level / 2));
           attacker.health += healAmount;
-          if (attacker.health > 100 + (attacker.level * 5)) {
-            attacker.health = 100 + (attacker.level * 5);
+          if (attacker.health > enumHelper.maxHealth(attacker.level)) {
+            attacker.health = enumHelper.maxHealth(attacker.level);
           }
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
           if (defenderDamage > healAmount) {
@@ -366,8 +363,8 @@ class Battle {
           const potion = defenderPotions[helper.randomBetween(0, defenderPotions.length - 1)];
           const healAmount = Math.ceil(potion.power * (defender.level / 2));
           defender.health += healAmount;
-          if (defender.health > 100 + (defender.level * 5)) {
-            defender.health = 100 + (defender.level * 5);
+          if (defender.health > enumHelper.maxHealth(defender.level)) {
+            defender.health = enumHelper.maxHealth(defender.level);
           }
           defender.inventory.items = defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
           if (attackerDamage > healAmount) {
@@ -383,8 +380,8 @@ class Battle {
           const potion = defenderPotions[helper.randomBetween(0, defenderPotions.length - 1)];
           const healAmount = Math.ceil(potion.power * (defender.level / 2));
           defender.health += healAmount;
-          if (defender.health > 100 + (defender.level * 5)) {
-            defender.health = 100 + (defender.level * 5);
+          if (defender.health > enumHelper.maxHealth(defender.level)) {
+            defender.health = enumHelper.maxHealth(defender.level);
           }
           defender.inventory.items = defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
           if (attackerDamage > healAmount) {
@@ -398,8 +395,8 @@ class Battle {
           const potion = attackerPotions[helper.randomBetween(0, attackerPotions.length - 1)];
           const healAmount = Math.ceil(potion.power * (attacker.level / 2));
           attacker.health += healAmount;
-          if (attacker.health > 100 + (attacker.level * 5)) {
-            attacker.health = 100 + (attacker.level * 5);
+          if (attacker.health > enumHelper.maxHealth(attacker.level)) {
+            attacker.health = enumHelper.maxHealth(attacker.level);
           }
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
           if (defenderDamage > healAmount) {

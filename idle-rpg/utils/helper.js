@@ -102,13 +102,19 @@ class helper {
     return `\`\`\`css\n${message}\`\`\``;
   }
 
-  passiveHeal(player) {
-    if (player.health <= 100 + (player.level * 5)) {
-      player.health += 2;
+  passiveRegen(player) {
+    if (player.health <= enumHelper.maxHealth(player.level)) {
+      player.health += 5;
+      if (player.health > enumHelper.maxHealth(player.level)) {
+        player.health = enumHelper.maxHealth(player.level);
+      }
     }
 
-    if (player.health > 100 + (player.level * 5)) {
-      player.health = 100 + (player.level * 5);
+    if (player.mana <= enumHelper.maxMana(player.level)) {
+      player.mana += 2;
+      if (player.mana > enumHelper.maxMana(player.level)) {
+        player.mana = enumHelper.maxMana(player.level);
+      }
     }
     return player;
   }
@@ -277,8 +283,8 @@ class helper {
 
   generateStatsString(player) {
     return `\`\`\`Here are your stats!
-    Health: ${player.health} / ${100 + (player.level * 5)}
-    Mana: ${player.mana} / ${50 + (player.level * 5)}
+    Health: ${player.health} / ${enumHelper.maxHealth(player.level)}
+    Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
     Gender: ${player.gender}

@@ -37,20 +37,22 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
-        // selectedPlayer = Event.regenItem(selectedPlayer);
-
         if (process.env.NODE_ENV === 'production') {
           this.setPlayerTitles(discordBot, selectedPlayer);
         }
 
         selectedPlayer.name = player.name;
+        // TODO REMOVE LATER
+        if (!selectedPlayer.mana) {
+          selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
+        }
         selectedPlayer.events++;
 
         if (selectedPlayer.events % 100 === 0) {
           helper.sendMessage(this.discordHook, twitchBot, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
         }
 
-        helper.passiveHeal(selectedPlayer);
+        helper.passiveRegen(selectedPlayer);
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);

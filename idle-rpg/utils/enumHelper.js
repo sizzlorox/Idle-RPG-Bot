@@ -12,6 +12,14 @@ const enumHelper = {
     position: 'inventory'
   },
 
+  maxHealth: (level) => {
+    return 100 + (level * 5);
+  },
+
+  maxMana: (level) => {
+    return 50 + (level * 5);
+  },
+
   equipment: {
     empty: {
       helmet: {
