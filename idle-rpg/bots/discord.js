@@ -70,7 +70,7 @@ if (!process.env.NODE_ENV.includes('production')) {
 }
 
 onlinePlayerList.push({
-  name: 'Pyddur, God Of Beer',
+  name: 'Pyddur, God of Beer',
   discordId: 'pyddur'
 });
 
@@ -133,7 +133,7 @@ discordBot.on('ready', () => {
 
 discordBot.on('message', (message) => {
   if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
-    message.reply('┬─┬ノ(ಠ_ಠノ)');
+    return message.reply('┬─┬ノ(ಠ_ಠノ)');
   }
 
   if (message.attachments && message.attachments.size > 0) {
@@ -143,9 +143,6 @@ discordBot.on('message', (message) => {
     return VirusTotal.scanUrl(url)
       .then(VirusTotal.retrieveReport)
       .then((reportResults) => {
-        console.log(reportResults.verbose_msg);
-        message.reply(`VirusTotal scan completed: ${reportResults.positives}/${reportResults.total}
-${reportResults.permalink}`);
         if (reportResults.positives > 0) {
           message.delete();
           message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');
@@ -158,7 +155,7 @@ ${reportResults.permalink}`);
 
 if (streamChannelId) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
-    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game.streaming) {
+    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game) {
       newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n${newMember.presence.game.url}`);
     }
   });
