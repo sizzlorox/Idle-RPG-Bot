@@ -78,8 +78,8 @@ class helper {
     if (player && player.isPrivateMessage) {
       discordHook.discordBot.guilds.find('id', guildID)
         .members.find('id', player.discordId).send(player.isMentionInDiscord
-          ? helper.capitalizeFirstLetter(msg.replace(new RegExp(`<@!${player.name}>`, 'g'), 'you'))
-          : helper.capitalizeFirstLetter(msg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you')))
+          ? this.capitalizeFirstLetter(msg.replace(new RegExp(`<@!${player.name}>`, 'g'), 'you'))
+          : this.capitalizeFirstLetter(msg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you')))
         .catch(err => errorLog.error(err));
     }
 
