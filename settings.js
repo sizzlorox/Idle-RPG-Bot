@@ -3,6 +3,7 @@ const settings = {
   battleDebug: false,
   eventDebug: false,
   pvpLevelRestriction: 5,
+  guildID: process.env.GUILD_ID,
 
   actionWebHookId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_ACTION_WEBHOOK_ID

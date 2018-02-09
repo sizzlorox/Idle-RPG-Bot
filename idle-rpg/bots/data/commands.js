@@ -27,6 +27,7 @@ const commands = [
         !eventlog - Lists up to 15 past events
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
+        !pm <on|off> - Change if events relating to you will be private messaged to you
         !gender <male|female|neutral|neuter> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
         !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
@@ -396,6 +397,29 @@ const commands = [
   },
 
   /**
+   * Subscribe to PM messages
+   */
+  privateMessage = {
+    command: '!pm',
+    channelOnlyId: commandChannel,
+    function: (game, message, discordBot, discordHook) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(/ (.+)/);
+        switch (splitCommand[1].toLowerCase()) {
+          case 'on':
+          case 'off':
+            return game.modifyPM(message.author, discordHook, splitCommand[1] === 'on');
+        }
+      }
+
+      return message.reply(`\`\`\`Possible options:
+      on - You will be pmed in events that include you
+      off - You won't be pmed in events that include you
+      \`\`\``);
+    }
+  },
+
+  /**
    * Modify if player will be @Mentioned in events
    */
   modifyMention = {
@@ -406,7 +430,7 @@ const commands = [
         const splitCommand = message.content.split(/ (.+)/);
 
         // Use switch to validate the value
-        switch (splitCommand[1]) {
+        switch (splitCommand[1].toLowerCase()) {
           case 'on':
           case 'off':
             return game.modifyMention(message.author, discordHook, splitCommand[1] === 'on');

@@ -2,7 +2,7 @@ const fs = require('fs');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog } = require('../utils/logger');
-const { battleDebug, eventDebug } = require('../../settings');
+const { battleDebug, eventDebug, guildID } = require('../../settings');
 
 class helper {
   printBattleDebug(debugMsg) {
@@ -70,9 +70,17 @@ class helper {
     return selectedPlayer;
   }
 
-  sendMessage(discordHook, twitchBot, isMovement, msg) {
+  sendMessage(discordHook, twitchBot, player, isMovement, msg) {
     if (msg.toLowerCase().includes('pyddur')) {
       msg = msg.replace(new RegExp('<@!pyddur>', 'g'), 'Pyddur, God Of Beer');
+    }
+
+    if (player && player.isPrivateMessage) {
+      discordHook.discordBot.guilds.find('id', guildID)
+        .members.find('id', player.discordId).send(player.isMentionInDiscord
+          ? helper.capitalizeFirstLetter(msg.replace(new RegExp(`<@!${player.name}>`, 'g'), 'you'))
+          : helper.capitalizeFirstLetter(msg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you')))
+        .catch(err => errorLog.error(err));
     }
 
     if (isMovement) {
@@ -176,7 +184,7 @@ class helper {
       const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
       const eventLog = `Leveled up to level ${selectedPlayer.level}`;
 
-      this.sendMessage(discordHook, 'twitch', false, eventMsg);
+      this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
       selectedPlayer = this.logEvent(selectedPlayer, eventLog);
     }
   }
@@ -212,7 +220,7 @@ class helper {
         switch (this.randomBetween(0, 2)) {
           case 0:
             if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
-              this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
+              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
               this.setPlayerEquipment(
                 selectedPlayer,
                 enumHelper.equipment.types.helmet.position,
@@ -222,7 +230,7 @@ class helper {
             break;
           case 1:
             if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
-              this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
+              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
               this.setPlayerEquipment(
                 selectedPlayer,
                 enumHelper.equipment.types.armor.position,
@@ -232,7 +240,7 @@ class helper {
             break;
           case 2:
             if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-              this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
+              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
               this.setPlayerEquipment(
                 selectedPlayer,
                 enumHelper.equipment.types.weapon.position,
@@ -252,7 +260,7 @@ class helper {
       } else {
         if (selectedPlayer.currentBounty > 0) {
           attackerObj.gold += selectedPlayer.currentBounty;
-          this.sendMessage(hook, 'twitch', false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
+          this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
           const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
           attackerObj = this.logEvent(attackerObj, bountyEventLog);
           selectedPlayer.currentBounty = 0;
@@ -266,7 +274,7 @@ class helper {
       const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`);
       const eventLog = 'You died. Game over man... Game over.';
 
-      this.sendMessage(hook, 'twitch', false, eventMsg);
+      this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg);
       selectedPlayer = this.logEvent(selectedPlayer, eventLog);
     }
   }

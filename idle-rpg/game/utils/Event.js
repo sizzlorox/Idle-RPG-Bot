@@ -41,7 +41,7 @@ class Event {
       selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
-      helper.sendMessage(discordHook, 'twitch', true, eventMsg);
+      helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
       return resolve(selectedPlayer);
@@ -86,7 +86,7 @@ class Event {
                   const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
-                  helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+                  helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                   selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                   randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
                   selectedPlayer.battles.lost++;
@@ -114,7 +114,7 @@ class Event {
                   const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${attackerDamage} damage!`;
                   const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and received ${attackerDamage} damage!`;
 
-                  helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+                  helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                   selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                   randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
 
@@ -126,7 +126,7 @@ class Event {
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
-                helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+                helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
                 selectedPlayer.battles.won++;
@@ -176,7 +176,7 @@ class Event {
     ${helper.capitalizeFirstLetter(helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = `${mob.name}'s ${defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
-                helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+                helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
                 selectedPlayer.battles.lost++;
@@ -197,7 +197,7 @@ class Event {
                   : `You fled from ${mob.name} in ${selectedPlayer.map.name}!`;
 
                 selectedPlayer.experience += expGain;
-                helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+                helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 helper.checkExperience(selectedPlayer, discordHook);
 
@@ -211,7 +211,7 @@ class Event {
               selectedPlayer.experience += defender.experience * multiplier;
               selectedPlayer.gold += defender.gold * multiplier;
               selectedPlayer.kills.mob++;
-              helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+              helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
               selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
               helper.checkExperience(selectedPlayer, discordHook);
               selectedPlayer.battles.won++;
@@ -268,7 +268,7 @@ class Event {
             }
             const eventLog = `Received ${item.name} from ${mob.name}`;
 
-            helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+            helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
             return resolve(selectedPlayer);
@@ -322,7 +322,7 @@ class Event {
           const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
           const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+          helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
           return resolve(selectedPlayer);
@@ -345,7 +345,7 @@ class Event {
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} just sold what they found adventuring for ${profit} gold!`;
       const eventLog = `Made ${profit} gold selling what you found adventuring`;
 
-      helper.sendMessage(discordHook, 'twitch', false, `${eventMsg}`);
+      helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsg}`);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
     }
 
@@ -430,7 +430,7 @@ class Event {
               const eventLog = `Stole ${victimPlayer.equipment.helmet.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.helmet.name} from you`;
 
-              helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+              helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
@@ -440,7 +440,7 @@ class Event {
               const eventLog = `Stole ${stolenHelmet.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.helmet.name} from you`;
 
-              helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+              helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
@@ -481,7 +481,7 @@ class Event {
               const eventLog = `Stole ${victimPlayer.equipment.armor.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
-              helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+              helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
@@ -491,7 +491,7 @@ class Event {
               const eventLog = `Stole ${stolenArmor.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
-              helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+              helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
@@ -532,7 +532,7 @@ class Event {
               const eventLog = `Stole ${stolenWeapon}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.weapon.name} from you`;
 
-              helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+              helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
@@ -542,7 +542,7 @@ class Event {
               const eventLog = `Stole ${stolenWeapon.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.weapon.name} from you`;
 
-              helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+              helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
@@ -581,7 +581,7 @@ class Event {
           const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`);
           const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+          helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
           stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
         }
       }
@@ -605,7 +605,7 @@ class Event {
           const eventMsgHades = `Hades unleashed his wrath upon ${helper.generatePlayerName(selectedPlayer)} making ${helper.generateGenderString(selectedPlayer, 'him')} lose ${luckExpAmount} experience!`;
           const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgHades);
+          helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogHades);
 
           return resolve(selectedPlayer);
@@ -618,7 +618,7 @@ class Event {
           const eventMsgZeus = `${helper.generatePlayerName(selectedPlayer)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
           const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgZeus);
+          helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogZeus);
 
           return resolve(selectedPlayer);
@@ -634,7 +634,7 @@ class Event {
 
             selectedPlayer.health += healAmount;
 
-            helper.sendMessage(discordHook, 'twitch', false, eventMsgAseco);
+            helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLogAseco);
 
             return resolve(selectedPlayer);
@@ -643,7 +643,7 @@ class Event {
           const eventMsgAsecoFull = `Aseco gave ${helper.generatePlayerName(selectedPlayer)} an elixir of life but it caused no effect on ${helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
           const eventLogAsecoFull = 'Aseco wanted to heal you, but you had full health';
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgAsecoFull);
+          helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAsecoFull);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogAsecoFull);
 
           return resolve(selectedPlayer);
@@ -653,7 +653,7 @@ class Event {
             const eventMsgHermesFail = `Hermes demanded some gold from ${helper.generatePlayerName(selectedPlayer)} but as ${helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
             const eventLogHermesFail = 'Hermes demanded gold from you but you had nothing to give';
 
-            helper.sendMessage(discordHook, 'twitch', false, eventMsgHermesFail);
+            helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermesFail);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermesFail);
 
             return resolve(selectedPlayer);
@@ -669,7 +669,7 @@ class Event {
             selectedPlayer.gold = 0;
           }
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgHermes);
+          helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermes);
 
           return resolve(selectedPlayer);
@@ -682,7 +682,7 @@ class Event {
           const eventMsgAthene = `Athene shared her wisdom with ${helper.generatePlayerName(selectedPlayer)} making ${helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAthena} experience!`;
           const eventLogAthene = `Athene shared her wisdom with you making you gain ${luckExpAthena} experience`;
 
-          helper.sendMessage(discordHook, 'twitch', false, eventMsgAthene);
+          helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthene);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogAthene);
 
           return resolve(selectedPlayer);
@@ -708,7 +708,7 @@ class Event {
                 });
 
                 if (shouldAddToList) {
-                  helper.sendMessage(discordHook, 'twitch', false, `${eventMsgEris}`);
+                  helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsgEris}`);
                   selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
                   if (tempArray) {
                     selectedPlayer.spells = tempArray;
@@ -716,7 +716,7 @@ class Event {
                   selectedPlayer.spells.push(spell);
                 }
               } else {
-                helper.sendMessage(discordHook, 'twitch', false, `${eventMsgEris}`);
+                helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsgEris}`);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
                 selectedPlayer.spells.push(spell);
               }
@@ -738,7 +738,7 @@ class Event {
         const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold!`;
         const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
 
-        helper.sendMessage(discordHook, 'twitch', false, eventMsg);
+        helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
         selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
         return resolve(selectedPlayer);
@@ -772,7 +772,7 @@ class Event {
               });
 
               if (shouldAddToList) {
-                helper.sendMessage(discordHook, 'twitch', false, `${spellEventResult.eventMsg}`);
+                helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${spellEventResult.eventMsg}`);
                 selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
                 if (tempArray) {
                   selectedPlayer.spells = tempArray;
@@ -780,7 +780,7 @@ class Event {
                 selectedPlayer.spells.push(spell);
               }
             } else {
-              helper.sendMessage(discordHook, 'twitch', false, `${spellEventResult.eventMsg}`);
+              helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${spellEventResult.eventMsg}`);
               selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
               selectedPlayer.spells.push(spell);
             }
@@ -821,7 +821,7 @@ class Event {
             }
 
             const itemEventResult = this.generateItemEventMessage(selectedPlayer, item);
-            helper.sendMessage(discordHook, 'twitch', false, itemEventResult.eventMsg);
+            helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, itemEventResult.eventMsg);
             selectedPlayer = helper.logEvent(selectedPlayer, itemEventResult.eventLog);
 
             return resolve(selectedPlayer);
@@ -850,7 +850,7 @@ class Event {
         Unfortunately, ${helper.generateGenderString(selectedPlayer, 'he')} lost ${luckGambleGold} gold!`;
         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} gold by gambling in a tavern.`;
 
-        helper.sendMessage(discordHook, 'twitch', false, eventMsgLoseGamble);
+        helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgLoseGamble);
         selectedPlayer = helper.logEvent(selectedPlayer, eventLogLoseGamble);
 
         return resolve(selectedPlayer);
@@ -862,7 +862,7 @@ class Event {
       Fortunately, ${helper.generateGenderString(selectedPlayer, 'he')} won ${luckGambleGold} gold!`;
       const eventLogWinGamble = `Congrats! You won ${luckGambleGold} gold by gambling in a tavern.`;
 
-      helper.sendMessage(discordHook, 'twitch', false, eventMsgWinGamble);
+      helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgWinGamble);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLogWinGamble);
 
       return resolve(selectedPlayer);
@@ -880,7 +880,7 @@ class Event {
         }
 
         this.isBlizzardActive = true;
-        helper.sendMessage(discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
+        helper.sendMessage(discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
         return this.isBlizzardActive;
       case 'off':
         if (!this.isBlizzardActive) {
@@ -888,7 +888,7 @@ class Event {
         }
 
         this.isBlizzardActive = false;
-        helper.sendMessage(discordHook, 'twitch', false, '@everyone\`\`\`python\n\'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!\'\`\`\`');
+        helper.sendMessage(discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!\'\`\`\`');
         return this.isBlizzardActive;
     }
   }
