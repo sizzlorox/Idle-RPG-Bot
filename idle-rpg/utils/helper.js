@@ -76,10 +76,14 @@ class helper {
     }
 
     if (player && player.isPrivateMessage) {
+      const pmMsg = player.isMentionInDiscord
+        ? msg.replace(new RegExp(`<@!${player.name}>'s`, 'g'), 'your')
+        : msg.replace(new RegExp(`\`${player.name}\`'s`, 'g'), 'your');
+
       discordHook.discordBot.guilds.find('id', guildID)
         .members.find('id', player.discordId).send(player.isMentionInDiscord
-          ? this.capitalizeFirstLetter(msg.replace(new RegExp(`<@!${player.name}>`, 'g'), 'you'))
-          : this.capitalizeFirstLetter(msg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you')))
+          ? pmMsg.replace(new RegExp(`<@!${player.name}>`, 'g'), 'you')
+          : pmMsg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you'))
         .catch(err => errorLog.error(err));
     }
 
