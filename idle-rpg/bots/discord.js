@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
 const { randomBetween } = require('../utils/helper');
-const { welcomeLog } = require('../utils/logger');
+const { welcomeLog, errorLog } = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
 const VirusTotal = require('../bots/modules/VirusTotal');
@@ -49,7 +49,8 @@ const movementHook = new Discord.WebhookClient(
 
 const hook = {
   actionHook,
-  movementHook
+  movementHook,
+  discordBot
 };
 
 const game = new Game(hook);
@@ -131,6 +132,11 @@ discordBot.on('ready', () => {
   setInterval(heartBeat, 60000 * interval);
 });
 
+discordBot.on('error', (err) => {
+  console.log(err);
+  errorLog.error(err);
+});
+
 discordBot.on('message', (message) => {
   if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
     return message.reply('┬─┬ノ(ಠ_ಠノ)');
@@ -155,8 +161,8 @@ discordBot.on('message', (message) => {
 
 if (streamChannelId) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
-    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game) {
-      newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n${newMember.presence.game.url}`);
+    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game.streaming) {
+      newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
     }
   });
 }

@@ -2,7 +2,6 @@ const helper = require('../utils/helper');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
-const spells = require('./data/spells');
 const { errorLog } = require('../utils/logger');
 const { multiplier } = require('../../settings');
 
@@ -29,7 +28,7 @@ class Game {
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          helper.sendMessage(this.discordHook, twitchBot, false, `${helper.generatePlayerName(player)} was born! Welcome to the world of Idle-RPG!`);
+          helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${helper.generatePlayerName(player)} was born! Welcome to the world of Idle-RPG!`);
 
           return Database.createNewPlayer(player.discordId, player.name);
         }
@@ -45,7 +44,7 @@ class Game {
         selectedPlayer.events++;
 
         if (selectedPlayer.events % 100 === 0) {
-          helper.sendMessage(this.discordHook, twitchBot, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
+          helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
         }
 
         helper.passiveRegen(selectedPlayer);
@@ -131,15 +130,15 @@ class Game {
 
   // Event
   powerHourBegin() {
-    helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+    helper.sendMessage(this.discordHook, 'twitch', undefined, false, helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
 
     setTimeout(() => {
-      helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+      helper.sendMessage(this.discordHook, 'twitch', undefined, false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
       this.multiplier += 1;
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
-      helper.sendMessage(this.discordHook, 'twitch', false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+      helper.sendMessage(this.discordHook, 'twitch', undefined, false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
       this.multiplier -= 1;
       this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
     }, 5400000); // 1hr 30 minutes
@@ -202,6 +201,28 @@ ${rankString}
         }
 
         return commandAuthor.send('Your @mention preference is already set to this value.');
+      });
+  }
+
+  /**
+   * Modify player preference for being private messaged in events
+   * @param {Number} commandAuthor
+   * @param {DiscordHook} hook
+   * @param {Boolean} isMentionInDiscord
+   */
+  modifyPM(commandAuthor, hook, isPrivateMessage) {
+    return Database.loadPlayer(commandAuthor.id)
+      .then((castingPlayer) => {
+        if (castingPlayer.isPrivateMessage !== isPrivateMessage) {
+          castingPlayer.isPrivateMessage = isPrivateMessage;
+
+          return Database.savePlayer(castingPlayer)
+            .then(() => {
+              return commandAuthor.send('Preference for being PMed has been updated.');
+            });
+        }
+
+        return commandAuthor.send('Your PM preference is already set to this value.');
       });
   }
 
@@ -477,11 +498,11 @@ ${rankString}
    * Sends Christmas Pre Event Message and another pre event message after 21 hours
    */
   sendChristmasFirstPreEventMessage() {
-    return helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
+    return helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
   }
 
   sendChristmasSecondPreEventMessage() {
-    return helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
+    return helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
   }
 
   // TODO change to utilize setTimeout
@@ -491,7 +512,7 @@ ${rankString}
    */
   updateChristmasEvent(isStarting) {
     if (isStarting) {
-      // helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
       Event.MonsterClass.monsters.forEach((mob) => {
         if (mob.isXmasEvent) {
           mob.isSpawnable = true;
@@ -507,7 +528,7 @@ ${rankString}
       return '';
     }
 
-    helper.sendMessage(this.discordHook, 'twitch', false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
+    helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
     Event.MonsterClass.monsters.forEach((mob) => {
       if (mob.isXmasEvent) {
         mob.isSpawnable = false;
