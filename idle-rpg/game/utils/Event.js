@@ -501,7 +501,7 @@ class Event {
             } else {
               stolenArmor = victimPlayer.equipment.armor;
               stolenArmor.name = `${victimPlayer.name}'s ${victimPlayer.equipment.armor.name}`;
-              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${stolenArmor.name}!`);
+              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenArmor.name}!`);
               const eventLog = `Stole ${stolenArmor.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
