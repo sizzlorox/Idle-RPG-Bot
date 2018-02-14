@@ -231,7 +231,7 @@ const items = {
       bucket = {
         name: 'Bucket',
         position: 'helmet',
-        power: 11,
+        power: 1,
         gold: 3
       },
     ],

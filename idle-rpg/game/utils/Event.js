@@ -352,6 +352,20 @@ class Event {
     return selectedPlayer;
   }
 
+  campEvent(discordHook, selectedPlayer) {
+    return new Promise((resolve) => {
+      selectedPlayer = helper.passiveRegen(selectedPlayer, 5 + (selectedPlayer.stats.end / 2), 5 + (selectedPlayer.stats.int / 2));
+      // TODO: Make more camp event messages to be selected randomly
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} has set up camp and began resting.`;
+      const eventLog = 'Set up camp to rest.';
+
+      helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsg}`);
+      selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
+
+      return resolve(selectedPlayer);
+    });
+  }
+
   generateItemEventMessage(selectedPlayer, item) {
     const randomEventMessage = helper.randomBetween(0, 9);
     switch (randomEventMessage) {
@@ -444,18 +458,17 @@ class Event {
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
-
-            if (!victimPlayer.equipment.helmet.previousOwners) {
-              stealingPlayer.equipment.helmet.previousOwners = [`${victimPlayer.name}`];
-            } else {
-              stealingPlayer.equipment.helmet.previousOwners = victimPlayer.equipment.helmet.previousOwners;
-              stealingPlayer.equipment.helmet.previousOwners.push(victimPlayer.name);
-            }
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
             if (stealingPlayer.equipment.helmet.power < victimPlayer.equipment.helmet.power) {
               stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.helmet.position, stolenHelmet);
+              if (!victimPlayer.equipment.helmet.previousOwners) {
+                stealingPlayer.equipment.helmet.previousOwners = [`${victimPlayer.name}`];
+              } else {
+                stealingPlayer.equipment.helmet.previousOwners = victimPlayer.equipment.helmet.previousOwners;
+                stealingPlayer.equipment.helmet.previousOwners.push(victimPlayer.name);
+              }
               if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.helmet.position)) {
                 const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.helmet.position)
                   .sort((item1, item2) => {
@@ -487,7 +500,7 @@ class Event {
             } else {
               stolenArmor = victimPlayer.equipment.armor;
               stolenArmor.name = `${victimPlayer.name}'s ${victimPlayer.equipment.armor.name}`;
-              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${victimPlayer.name}s ${stolenArmor.name}!`);
+              const eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenArmor.name}!`);
               const eventLog = `Stole ${stolenArmor.name}`;
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
@@ -495,18 +508,17 @@ class Event {
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
-
-            if (!victimPlayer.equipment.armor.previousOwners) {
-              stealingPlayer.equipment.armor.previousOwners = [`${victimPlayer.name}`];
-            } else {
-              stealingPlayer.equipment.armor.previousOwners = victimPlayer.equipment.armor.previousOwners;
-              stealingPlayer.equipment.armor.previousOwners.push(victimPlayer.name);
-            }
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
             if (stealingPlayer.equipment.armor.power < victimPlayer.equipment.armor.power) {
               stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.armor.position, stolenArmor);
+              if (!victimPlayer.equipment.armor.previousOwners) {
+                stealingPlayer.equipment.armor.previousOwners = [`${victimPlayer.name}`];
+              } else {
+                stealingPlayer.equipment.armor.previousOwners = victimPlayer.equipment.armor.previousOwners;
+                stealingPlayer.equipment.armor.previousOwners.push(victimPlayer.name);
+              }
               if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.armor.position)) {
                 const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.armor.position)
                   .sort((item1, item2) => {
@@ -546,18 +558,17 @@ class Event {
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
-
-            if (!victimPlayer.equipment.weapon.previousOwners) {
-              stealingPlayer.equipment.weapon.previousOwners = [`${victimPlayer.name}`];
-            } else {
-              stealingPlayer.equipment.weapon.previousOwners = victimPlayer.equipment.weapon.previousOwners;
-              stealingPlayer.equipment.weapon.previousOwners.push(victimPlayer.name);
-            }
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
             if (stealingPlayer.equipment.weapon.power < victimPlayer.equipment.weapon.power) {
               stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.weapon.position, stolenWeapon);
+              if (!victimPlayer.equipment.weapon.previousOwners) {
+                stealingPlayer.equipment.weapon.previousOwners = [`${victimPlayer.name}`];
+              } else {
+                stealingPlayer.equipment.weapon.previousOwners = victimPlayer.equipment.weapon.previousOwners;
+                stealingPlayer.equipment.weapon.previousOwners.push(victimPlayer.name);
+              }
               if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.weapon.position)) {
                 const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.weapon.position)
                   .sort((item1, item2) => {
@@ -629,7 +640,7 @@ class Event {
           if (healthDeficit) {
             const healAmount = Math.round(healthDeficit / 3);
 
-            const eventMsgAseco = `Fortune smiles upon ${helper.generatePlayerName(selectedPlayer)} as Aseco cured his sickness and restored ${helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
+            const eventMsgAseco = `Fortune smiles upon ${helper.generatePlayerName(selectedPlayer)} as Aseco cured ${helper.generateGenderString(selectedPlayer, 'him')} sickness and restored ${helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
             const eventLogAseco = `Aseco healed you for ${healAmount}`;
 
             selectedPlayer.health += healAmount;

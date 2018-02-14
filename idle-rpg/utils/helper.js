@@ -72,19 +72,7 @@ class helper {
 
   sendMessage(discordHook, twitchBot, player, isMovement, msg) {
     if (msg.toLowerCase().includes('pyddur')) {
-      msg = msg.replace(new RegExp('<@!pyddur>', 'g'), 'Pyddur, God Of Beer');
-    }
-
-    if (player && player.isPrivateMessage) {
-      const pmMsg = player.isMentionInDiscord
-        ? msg.replace(new RegExp(`<@!${player.name}>'s`, 'g'), 'your')
-        : msg.replace(new RegExp(`\`${player.name}\`'s`, 'g'), 'your');
-
-      discordHook.discordBot.guilds.find('id', guildID)
-        .members.find('id', player.discordId).send(player.isMentionInDiscord
-          ? pmMsg.replace(new RegExp(`<@!${player.name}>`, 'g'), 'you')
-          : pmMsg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you'))
-        .catch(err => errorLog.error(err));
+      msg = msg.replace(new RegExp('<@!pyddur>', 'g'), '\`Pyddur, God Of Beer\`');
     }
 
     if (isMovement) {
@@ -92,6 +80,18 @@ class helper {
         .then(debugMsg => moveLog.move(this.formatLog(debugMsg)))
         .catch(err => errorLog.error(err));
     } else {
+      if (player && player.isPrivateMessage) {
+        const pmMsg = player.isMentionInDiscord
+          ? msg.replace(new RegExp(`<@!${player.name}>'s`, 'g'), 'your')
+          : msg.replace(new RegExp(`\`${player.name}\`'s`, 'g'), 'your');
+
+        discordHook.discordBot.guilds.find('id', guildID)
+          .members.find('id', player.discordId).send(player.isMentionInDiscord
+            ? pmMsg.replace(new RegExp(`<@!${player.name}>`, 'g'), 'you')
+            : pmMsg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you'))
+          .catch(err => errorLog.error(err));
+      }
+
       discordHook.actionHook.send(msg)
         .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
         .catch(err => errorLog.error(err));
@@ -114,16 +114,16 @@ class helper {
     return `\`\`\`css\n${message}\`\`\``;
   }
 
-  passiveRegen(player) {
+  passiveRegen(player, hpRegenAmount, mpRegenAmount) {
     if (player.health <= enumHelper.maxHealth(player.level)) {
-      player.health += 5;
+      player.health += hpRegenAmount;
       if (player.health > enumHelper.maxHealth(player.level)) {
         player.health = enumHelper.maxHealth(player.level);
       }
     }
 
     if (player.mana <= enumHelper.maxMana(player.level)) {
-      player.mana += 2;
+      player.mana += mpRegenAmount;
       if (player.mana > enumHelper.maxMana(player.level)) {
         player.mana = enumHelper.maxMana(player.level);
       }
