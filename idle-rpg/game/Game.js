@@ -47,7 +47,7 @@ class Game {
           helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
         }
 
-        helper.passiveRegen(selectedPlayer);
+        helper.passiveRegen(selectedPlayer, 5 + (selectedPlayer.stats.end / 2), 5 + (selectedPlayer.stats.int / 2));
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
@@ -88,7 +88,11 @@ class Game {
     }
 
     if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-      return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
+      if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
+        return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
+      }
+
+      return Event.campEvent(this.discordHook, selectedPlayer);
     }
 
     if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
@@ -96,7 +100,7 @@ class Game {
         return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
       }
 
-      return Event.moveEvent(selectedPlayer, this.discordHook);
+      return Event.campEvent(this.discordHook, selectedPlayer);
     }
 
     return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);

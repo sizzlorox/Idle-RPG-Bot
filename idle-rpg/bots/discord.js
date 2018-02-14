@@ -161,7 +161,8 @@ discordBot.on('message', (message) => {
 
 if (streamChannelId) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
-    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game.streaming) {
+    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game && oldMember.presence.status !== 'offline'
+      || newMember.presence.game && newMember.presence.game.streaming && oldMember.presence.game && !oldMember.presence.game.streaming && oldMember.presence.status !== 'offline') {
       newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
     }
   });
