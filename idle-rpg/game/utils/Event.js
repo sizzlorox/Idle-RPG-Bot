@@ -353,15 +353,17 @@ class Event {
   }
 
   campEvent(discordHook, selectedPlayer) {
-    selectedPlayer = helper.passiveRegen(selectedPlayer, 5 + (selectedPlayer.stats.end / 2), 5 + (selectedPlayer.stats.int / 2));
-    // TODO: Make more camp event messages to be selected randomly
-    const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} has set up camp and began resting.`;
-    const eventLog = 'Set up camp to rest.';
+    return new Promise((resolve) => {
+      selectedPlayer = helper.passiveRegen(selectedPlayer, 5 + (selectedPlayer.stats.end / 2), 5 + (selectedPlayer.stats.int / 2));
+      // TODO: Make more camp event messages to be selected randomly
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${helper.generatePlayerName(selectedPlayer)} has set up camp and began resting.`;
+      const eventLog = 'Set up camp to rest.';
 
-    helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsg}`);
-    selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
+      helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsg}`);
+      selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
-    return selectedPlayer;
+      return resolve(selectedPlayer);
+    });
   }
 
   generateItemEventMessage(selectedPlayer, item) {
