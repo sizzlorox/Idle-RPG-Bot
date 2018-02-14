@@ -641,7 +641,7 @@ class Event {
           if (healthDeficit) {
             const healAmount = Math.round(healthDeficit / 3);
 
-            const eventMsgAseco = `Fortune smiles upon ${helper.generatePlayerName(selectedPlayer)} as Aseco cured his sickness and restored ${helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
+            const eventMsgAseco = `Fortune smiles upon ${helper.generatePlayerName(selectedPlayer)} as Aseco cured ${helper.generateGenderString(selectedPlayer, 'him')} sickness and restored ${helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
             const eventLogAseco = `Aseco healed you for ${healAmount}`;
 
             selectedPlayer.health += healAmount;
