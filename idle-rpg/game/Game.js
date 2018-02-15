@@ -214,11 +214,12 @@ ${rankString}
    * @param {DiscordHook} hook
    * @param {Boolean} isMentionInDiscord
    */
-  modifyPM(commandAuthor, hook, isPrivateMessage) {
+  modifyPM(commandAuthor, hook, isPrivateMessage, filtered) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (castingPlayer.isPrivateMessage !== isPrivateMessage) {
           castingPlayer.isPrivateMessage = isPrivateMessage;
+          castingPlayer.isPrivateMessageImportant = filtered;
 
           return Database.savePlayer(castingPlayer)
             .then(() => {

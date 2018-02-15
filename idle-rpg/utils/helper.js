@@ -80,7 +80,15 @@ class helper {
         .then(debugMsg => moveLog.move(this.formatLog(debugMsg)))
         .catch(err => errorLog.error(err));
     } else {
+      discordHook.actionHook.send(msg)
+        .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
+        .catch(err => errorLog.error(err));
+
       if (player && player.isPrivateMessage) {
+        if (player.isPrivateMessageImportant && msg.includes('\'s') && msg.includes('just killed')) {
+          return;
+        }
+
         const pmMsg = player.isMentionInDiscord
           ? msg.replace(new RegExp(`<@!${player.name}>'s`, 'g'), 'your')
           : msg.replace(new RegExp(`\`${player.name}\`'s`, 'g'), 'your');
@@ -91,10 +99,6 @@ class helper {
             : pmMsg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you'))
           .catch(err => errorLog.error(err));
       }
-
-      discordHook.actionHook.send(msg)
-        .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
-        .catch(err => errorLog.error(err));
     }
 
     // Add if to check if channel is streaming
@@ -181,23 +185,19 @@ class helper {
       selectedPlayer.experience = 0;
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      if (process.env.includes('development')) {
+      if (process.env.NODE_ENV.includes('development')) {
         for (let i = 0; i < 4; i++) {
           switch (this.randomBetween(0, 3)) {
             case 0:
-              console.log(`${selectedPlayer.name} increased Str!`);
               selectedPlayer.stats.str++;
               break;
             case 1:
-              console.log(`${selectedPlayer.name} increased Dex!`);
               selectedPlayer.stats.dex++;
               break;
             case 2:
-              console.log(`${selectedPlayer.name} increased End!`);
               selectedPlayer.stats.end++;
               break;
             case 3:
-              console.log(`${selectedPlayer.name} increased Int!`);
               selectedPlayer.stats.int++;
               break;
           }

@@ -27,7 +27,7 @@ const commands = [
         !eventlog - Lists up to 15 past events
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
-        !pm <on|off> - Change if events relating to you will be private messaged to you
+        !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
         !gender <male|female|neutral|neuter> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
         !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
@@ -408,7 +408,9 @@ const commands = [
         switch (splitCommand[1].toLowerCase()) {
           case 'on':
           case 'off':
-            return game.modifyPM(message.author, discordHook, splitCommand[1] === 'on');
+            return game.modifyPM(message.author, discordHook, splitCommand[1] === 'on', false);
+          case 'filtered':
+            return game.modifyPM(message.author, discordHook, splitCommand[1] === 'on', true);
         }
       }
 
