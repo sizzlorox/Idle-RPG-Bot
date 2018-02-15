@@ -211,23 +211,19 @@ class helper {
             };
           }
         }).filter(obj => obj !== undefined)
-          .sort((stat1, stat2) => stat2 - stat1);
+          .sort((stat1, stat2) => stat2.value - stat1.value);
 
         switch (playerStats[0].key) {
           case 'str':
             selectedPlayer.class = 'Knight';
             break;
           case 'dex':
-            this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
             selectedPlayer.class = 'Thief';
             break;
           case 'int':
-            this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
             selectedPlayer.class = 'Mage';
             break;
         }
-
-        this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} is now a ${selectedPlayer.class}!`));
       } else {
         selectedPlayer.stats.str++;
         selectedPlayer.stats.dex++;
@@ -354,6 +350,7 @@ class helper {
     Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
+    Class: ${player.class}
     Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}
