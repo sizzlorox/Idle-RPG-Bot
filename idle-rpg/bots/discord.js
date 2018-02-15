@@ -77,12 +77,12 @@ onlinePlayerList.push({
 
 const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
 const heartBeat = () => {
-  const discordUsers = discordBot.guilds.size > 0
-    ? discordBot.guilds.find('name', 'Idle-RPG').members
-    : undefined;
+  if (process.env.NODE_ENV.includes('production')) {
+    const discordUsers = discordBot.guilds.size > 0
+      ? discordBot.guilds.find('name', 'Idle-RPG').members
+      : undefined;
 
-  if (discordUsers) {
-    if (process.env.NODE_ENV.includes('production')) {
+    if (discordUsers) {
       const discordOfflinePlayers = discordUsers
         .filter(player => player.presence.status === 'offline' && !player.user.bot)
         .map((player) => {
@@ -109,17 +109,17 @@ const heartBeat = () => {
             p.discordId === player.discordId
           ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
     }
-
-    onlinePlayerList.forEach((player) => {
-      if (!player.timer) {
-        const playerTimer = randomBetween(minTimer, maxTimer);
-        player.timer = setTimeout(() => {
-          game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
-          delete player.timer;
-        }, playerTimer);
-      }
-    });
   }
+
+  onlinePlayerList.forEach((player) => {
+    if (!player.timer) {
+      const playerTimer = randomBetween(minTimer, maxTimer);
+      player.timer = setTimeout(() => {
+        game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
+        delete player.timer;
+      }, playerTimer);
+    }
+  });
 };
 
 discordBot.on('ready', () => {

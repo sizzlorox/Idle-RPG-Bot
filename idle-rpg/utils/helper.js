@@ -116,14 +116,14 @@ class helper {
 
   passiveRegen(player, hpRegenAmount, mpRegenAmount) {
     if (player.health <= enumHelper.maxHealth(player.level)) {
-      player.health += hpRegenAmount;
+      player.health += Math.ceil(hpRegenAmount);
       if (player.health > enumHelper.maxHealth(player.level)) {
         player.health = enumHelper.maxHealth(player.level);
       }
     }
 
     if (player.mana <= enumHelper.maxMana(player.level)) {
-      player.mana += mpRegenAmount;
+      player.mana += Math.ceil(mpRegenAmount);
       if (player.mana > enumHelper.maxMana(player.level)) {
         player.mana = enumHelper.maxMana(player.level);
       }
