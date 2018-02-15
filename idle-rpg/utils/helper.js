@@ -80,7 +80,15 @@ class helper {
         .then(debugMsg => moveLog.move(this.formatLog(debugMsg)))
         .catch(err => errorLog.error(err));
     } else {
-      if (player && player.isPrivateMessage) {
+      discordHook.actionHook.send(msg)
+        .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
+        .catch(err => errorLog.error(err));
+
+      if (player && player.isPrivateMessage && !isMovement) {
+        if (player.isPrivateMessageImportant && msg.includes('\'s') && msg.includes('just killed')) {
+          return;
+        }
+
         const pmMsg = player.isMentionInDiscord
           ? msg.replace(new RegExp(`<@!${player.name}>'s`, 'g'), 'your')
           : msg.replace(new RegExp(`\`${player.name}\`'s`, 'g'), 'your');
@@ -91,10 +99,6 @@ class helper {
             : pmMsg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you'))
           .catch(err => errorLog.error(err));
       }
-
-      discordHook.actionHook.send(msg)
-        .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
-        .catch(err => errorLog.error(err));
     }
 
     // Add if to check if channel is streaming
@@ -116,14 +120,14 @@ class helper {
 
   passiveRegen(player, hpRegenAmount, mpRegenAmount) {
     if (player.health <= enumHelper.maxHealth(player.level)) {
-      player.health += hpRegenAmount;
+      player.health += Math.ceil(hpRegenAmount);
       if (player.health > enumHelper.maxHealth(player.level)) {
         player.health = enumHelper.maxHealth(player.level);
       }
     }
 
     if (player.mana <= enumHelper.maxMana(player.level)) {
-      player.mana += mpRegenAmount;
+      player.mana += Math.ceil(mpRegenAmount);
       if (player.mana > enumHelper.maxMana(player.level)) {
         player.mana = enumHelper.maxMana(player.level);
       }
@@ -181,10 +185,52 @@ class helper {
       selectedPlayer.experience = 0;
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      selectedPlayer.stats.str++;
-      selectedPlayer.stats.dex++;
-      selectedPlayer.stats.end++;
-      selectedPlayer.stats.int++;
+      if (process.env.NODE_ENV.includes('development')) {
+        for (let i = 0; i < 4; i++) {
+          switch (this.randomBetween(0, 3)) {
+            case 0:
+              selectedPlayer.stats.str++;
+              break;
+            case 1:
+              selectedPlayer.stats.dex++;
+              break;
+            case 2:
+              selectedPlayer.stats.end++;
+              break;
+            case 3:
+              selectedPlayer.stats.int++;
+              break;
+          }
+        }
+
+        const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
+          if (['str', 'dex', 'int'].includes(key)) {
+            return {
+              key,
+              value: selectedPlayer.stats[key]
+            };
+          }
+        }).filter(obj => obj !== undefined)
+          .sort((stat1, stat2) => stat2.value - stat1.value);
+
+        switch (playerStats[0].key) {
+          case 'str':
+            selectedPlayer.class = 'Knight';
+            break;
+          case 'dex':
+            selectedPlayer.class = 'Thief';
+            break;
+          case 'int':
+            selectedPlayer.class = 'Mage';
+            break;
+        }
+      } else {
+        selectedPlayer.stats.str++;
+        selectedPlayer.stats.dex++;
+        selectedPlayer.stats.end++;
+        selectedPlayer.stats.int++;
+      }
+
       const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
       const eventLog = `Leveled up to level ${selectedPlayer.level}`;
 
@@ -217,8 +263,13 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
-      selectedPlayer.experience = Math.round(selectedPlayer.experience / 2);
+      selectedPlayer.experience -= Math.round(selectedPlayer.experience / 4);
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
+      selectedPlayer.inventory = {
+        equipment: [],
+        items: []
+      };
+
       const dropChance = this.randomBetween(0, 100);
       if (dropChance < 15) {
         switch (this.randomBetween(0, 2)) {
@@ -299,6 +350,7 @@ class helper {
     Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
     Experience: ${player.experience} / ${player.level * 15}
+    Class: ${player.class}
     Gender: ${player.gender}
     Gold: ${player.gold}
     Map: ${player.map.name}

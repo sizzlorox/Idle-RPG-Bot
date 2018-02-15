@@ -8,6 +8,7 @@ const newPlayerObj = (discordId, name) => {
   return {
     discordId,
     name,
+    class: 'Wanderer',
     health: 105,
     mana: 50,
     experience: 0,
@@ -16,6 +17,7 @@ const newPlayerObj = (discordId, name) => {
     gold: 0,
     isMentionInDiscord: true,
     isPrivateMessage: false,
+    isPrivateMessageImportant: false,
     gender: 'neutral',
     equipment: {
       helmet: equipment.empty.helmet,
@@ -64,6 +66,10 @@ const newPlayerObj = (discordId, name) => {
 const playerSchema = mongoose.Schema({
   discordId: String,
   name: String,
+  class: {
+    type: String,
+    default: 'Wanderer'
+  },
   health: Number,
   mana: {
     type: Number,
@@ -78,6 +84,10 @@ const playerSchema = mongoose.Schema({
     default: true
   },
   isPrivateMessage: {
+    type: Boolean,
+    default: false
+  },
+  isPrivateMessageImportant: {
     type: Boolean,
     default: false
   },
