@@ -181,10 +181,34 @@ class helper {
       selectedPlayer.experience = 0;
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      selectedPlayer.stats.str++;
-      selectedPlayer.stats.dex++;
-      selectedPlayer.stats.end++;
-      selectedPlayer.stats.int++;
+      if (process.env.includes('development')) {
+        for (let i = 0; i < 4; i++) {
+          switch (this.randomBetween(0, 3)) {
+            case 0:
+              console.log(`${selectedPlayer.name} increased Str!`);
+              selectedPlayer.stats.str++;
+              break;
+            case 1:
+              console.log(`${selectedPlayer.name} increased Dex!`);
+              selectedPlayer.stats.dex++;
+              break;
+            case 2:
+              console.log(`${selectedPlayer.name} increased End!`);
+              selectedPlayer.stats.end++;
+              break;
+            case 3:
+              console.log(`${selectedPlayer.name} increased Int!`);
+              selectedPlayer.stats.int++;
+              break;
+          }
+        }
+      } else {
+        selectedPlayer.stats.str++;
+        selectedPlayer.stats.dex++;
+        selectedPlayer.stats.end++;
+        selectedPlayer.stats.int++;
+      }
+
       const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
       const eventLog = `Leveled up to level ${selectedPlayer.level}`;
 
@@ -223,6 +247,7 @@ class helper {
         equipment: [],
         items: []
       };
+
       const dropChance = this.randomBetween(0, 100);
       if (dropChance < 15) {
         switch (this.randomBetween(0, 2)) {
