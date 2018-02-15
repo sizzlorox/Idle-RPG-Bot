@@ -219,6 +219,10 @@ class helper {
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience = Math.round(selectedPlayer.experience / 2);
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
+      selectedPlayer.inventory = {
+        equipment: [],
+        items: []
+      };
       const dropChance = this.randomBetween(0, 100);
       if (dropChance < 15) {
         switch (this.randomBetween(0, 2)) {
