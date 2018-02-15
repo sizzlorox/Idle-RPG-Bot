@@ -217,7 +217,7 @@ ${rankString}
   modifyPM(commandAuthor, hook, isPrivateMessage, filtered) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
-        if (castingPlayer.isPrivateMessage !== isPrivateMessage) {
+        if (castingPlayer.isPrivateMessage !== isPrivateMessage || castingPlayer.isPrivateMessageImportant !== filtered) {
           castingPlayer.isPrivateMessage = isPrivateMessage;
           castingPlayer.isPrivateMessageImportant = filtered;
 

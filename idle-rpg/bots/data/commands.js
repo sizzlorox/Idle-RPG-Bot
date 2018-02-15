@@ -410,7 +410,7 @@ const commands = [
           case 'off':
             return game.modifyPM(message.author, discordHook, splitCommand[1] === 'on', false);
           case 'filtered':
-            return game.modifyPM(message.author, discordHook, splitCommand[1] === 'on', true);
+            return game.modifyPM(message.author, discordHook, true, true);
         }
       }
 

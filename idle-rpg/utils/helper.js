@@ -84,7 +84,7 @@ class helper {
         .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
         .catch(err => errorLog.error(err));
 
-      if (player && player.isPrivateMessage) {
+      if (player && player.isPrivateMessage && !isMovement) {
         if (player.isPrivateMessageImportant && msg.includes('\'s') && msg.includes('just killed')) {
           return;
         }
