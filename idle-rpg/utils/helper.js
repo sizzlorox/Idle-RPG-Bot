@@ -202,6 +202,32 @@ class helper {
               break;
           }
         }
+
+        const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
+          if (['str', 'dex', 'int'].includes(key)) {
+            return {
+              key,
+              value: selectedPlayer.stats[key]
+            };
+          }
+        }).filter(obj => obj !== undefined)
+          .sort((stat1, stat2) => stat2 - stat1);
+
+        switch (playerStats[0].key) {
+          case 'str':
+            selectedPlayer.class = 'Knight';
+            break;
+          case 'dex':
+            this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
+            selectedPlayer.class = 'Thief';
+            break;
+          case 'int':
+            this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
+            selectedPlayer.class = 'Mage';
+            break;
+        }
+
+        this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} is now a ${selectedPlayer.class}!`));
       } else {
         selectedPlayer.stats.str++;
         selectedPlayer.stats.dex++;
