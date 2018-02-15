@@ -217,7 +217,7 @@ class helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
-      selectedPlayer.experience = Math.round(selectedPlayer.experience / 2);
+      selectedPlayer.experience -= Math.round(selectedPlayer.experience / 4);
       selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
       selectedPlayer.inventory = {
         equipment: [],
