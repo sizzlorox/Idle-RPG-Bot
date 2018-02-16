@@ -231,6 +231,7 @@ class helper {
       const eventLog = `Leveled up to level ${selectedPlayer.level}`;
 
       this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
+      this.sendPrivateMessage(selectedPlayer, eventLog, true);
       selectedPlayer = this.logEvent(selectedPlayer, eventLog);
     }
   }
@@ -272,6 +273,7 @@ class helper {
           case 0:
             if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
               this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
+              this.sendPrivateMessage(selectedPlayer, `Your ${selectedPlayer.equipment.helmet.name} just broke!`, true);
               this.setPlayerEquipment(
                 selectedPlayer,
                 enumHelper.equipment.types.helmet.position,
@@ -282,6 +284,7 @@ class helper {
           case 1:
             if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
               this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
+              this.sendPrivateMessage(selectedPlayer, `Your ${selectedPlayer.equipment.armor.name} just broke!`, true);
               this.setPlayerEquipment(
                 selectedPlayer,
                 enumHelper.equipment.types.armor.position,
@@ -292,6 +295,7 @@ class helper {
           case 2:
             if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
               this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
+              this.sendPrivateMessage(selectedPlayer, `Your ${selectedPlayer.equipment.weapon.name} just broke!`, true);
               this.setPlayerEquipment(
                 selectedPlayer,
                 enumHelper.equipment.types.weapon.position,
@@ -312,8 +316,10 @@ class helper {
         if (selectedPlayer.currentBounty > 0) {
           attackerObj.gold += selectedPlayer.currentBounty;
           this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
+          this.sendPrivateMessage(selectedPlayer, `${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing you!`, true);
           const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
           attackerObj = this.logEvent(attackerObj, bountyEventLog);
+          this.sendPrivateMessage(selectedPlayer, bountyEventLog, true);
           selectedPlayer.currentBounty = 0;
         }
 
@@ -326,6 +332,7 @@ class helper {
       const eventLog = 'You died. Game over man... Game over.';
 
       this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg);
+      this.sendPrivateMessage(selectedPlayer, eventLog, true);
       selectedPlayer = this.logEvent(selectedPlayer, eventLog);
     }
   }
