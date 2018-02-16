@@ -476,26 +476,27 @@ class Event {
             }
             victimPlayer.stolen++;
             stealingPlayer.stole++;
-
-            if (stealingPlayer.equipment.helmet.power < victimPlayer.equipment.helmet.power) {
-              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.helmet.position, stolenHelmet);
-              if (!victimPlayer.equipment.helmet.previousOwners) {
-                stealingPlayer.equipment.helmet.previousOwners = [`${victimPlayer.name}`];
+            if (victimPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
+              if (stealingPlayer.equipment.helmet.power < victimPlayer.equipment.helmet.power) {
+                stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.helmet.position, stolenHelmet);
+                if (!victimPlayer.equipment.helmet.previousOwners) {
+                  stealingPlayer.equipment.helmet.previousOwners = [`${victimPlayer.name}`];
+                } else {
+                  stealingPlayer.equipment.helmet.previousOwners = victimPlayer.equipment.helmet.previousOwners;
+                  stealingPlayer.equipment.helmet.previousOwners.push(victimPlayer.name);
+                }
+                if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.helmet.position)) {
+                  const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.helmet.position)
+                    .sort((item1, item2) => {
+                      return item1.power - item2.power;
+                    })[0];
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, equipFromInventory);
+                } else {
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
+                }
               } else {
-                stealingPlayer.equipment.helmet.previousOwners = victimPlayer.equipment.helmet.previousOwners;
-                stealingPlayer.equipment.helmet.previousOwners.push(victimPlayer.name);
+                stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenHelmet);
               }
-              if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.helmet.position)) {
-                const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.helmet.position)
-                  .sort((item1, item2) => {
-                    return item1.power - item2.power;
-                  })[0];
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, equipFromInventory);
-              } else {
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
-              }
-            } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenHelmet);
             }
             break;
           case 1:
@@ -531,25 +532,27 @@ class Event {
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
-            if (stealingPlayer.equipment.armor.power < victimPlayer.equipment.armor.power) {
-              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.armor.position, stolenArmor);
-              if (!victimPlayer.equipment.armor.previousOwners) {
-                stealingPlayer.equipment.armor.previousOwners = [`${victimPlayer.name}`];
+            if (victimPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
+              if (stealingPlayer.equipment.armor.power < victimPlayer.equipment.armor.power) {
+                stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.armor.position, stolenArmor);
+                if (!victimPlayer.equipment.armor.previousOwners) {
+                  stealingPlayer.equipment.armor.previousOwners = [`${victimPlayer.name}`];
+                } else {
+                  stealingPlayer.equipment.armor.previousOwners = victimPlayer.equipment.armor.previousOwners;
+                  stealingPlayer.equipment.armor.previousOwners.push(victimPlayer.name);
+                }
+                if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.armor.position)) {
+                  const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.armor.position)
+                    .sort((item1, item2) => {
+                      return item1.power - item2.power;
+                    })[0];
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, equipFromInventory);
+                } else {
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
+                }
               } else {
-                stealingPlayer.equipment.armor.previousOwners = victimPlayer.equipment.armor.previousOwners;
-                stealingPlayer.equipment.armor.previousOwners.push(victimPlayer.name);
+                stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenArmor);
               }
-              if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.armor.position)) {
-                const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.armor.position)
-                  .sort((item1, item2) => {
-                    return item1.power - item2.power;
-                  })[0];
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, equipFromInventory);
-              } else {
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
-              }
-            } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenArmor);
             }
             break;
           case 2:
@@ -585,25 +588,27 @@ class Event {
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
-            if (stealingPlayer.equipment.weapon.power < victimPlayer.equipment.weapon.power) {
-              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.weapon.position, stolenWeapon);
-              if (!victimPlayer.equipment.weapon.previousOwners) {
-                stealingPlayer.equipment.weapon.previousOwners = [`${victimPlayer.name}`];
+            if (victimPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+              if (stealingPlayer.equipment.weapon.power < victimPlayer.equipment.weapon.power) {
+                stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.weapon.position, stolenWeapon);
+                if (!victimPlayer.equipment.weapon.previousOwners) {
+                  stealingPlayer.equipment.weapon.previousOwners = [`${victimPlayer.name}`];
+                } else {
+                  stealingPlayer.equipment.weapon.previousOwners = victimPlayer.equipment.weapon.previousOwners;
+                  stealingPlayer.equipment.weapon.previousOwners.push(victimPlayer.name);
+                }
+                if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.weapon.position)) {
+                  const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.weapon.position)
+                    .sort((item1, item2) => {
+                      return item1.power - item2.power;
+                    })[0];
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, equipFromInventory);
+                } else {
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
+                }
               } else {
-                stealingPlayer.equipment.weapon.previousOwners = victimPlayer.equipment.weapon.previousOwners;
-                stealingPlayer.equipment.weapon.previousOwners.push(victimPlayer.name);
+                stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenWeapon);
               }
-              if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.weapon.position)) {
-                const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.weapon.position)
-                  .sort((item1, item2) => {
-                    return item1.power - item2.power;
-                  })[0];
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, equipFromInventory);
-              } else {
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
-              }
-            } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenWeapon);
             }
             break;
         }
