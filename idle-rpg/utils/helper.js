@@ -70,6 +70,18 @@ class helper {
     return selectedPlayer;
   }
 
+  sendPrivateMessage(player, msg, isImportantMessage) {
+    if (player && player.isPrivateMessage) {
+      if (player.isPrivateMessageImportant && !isImportantMessage) {
+        return;
+      }
+
+      discordHook.discordBot.guilds.find('id', guildID)
+        .members.find('id', player.discordId).send(msg)
+        .catch(err => errorLog.error(err));
+    }
+  }
+
   sendMessage(discordHook, twitchBot, player, isMovement, msg) {
     if (msg.toLowerCase().includes('pyddur')) {
       msg = msg.replace(new RegExp('<@!pyddur>', 'g'), '\`Pyddur, God Of Beer\`');
@@ -83,269 +95,254 @@ class helper {
       discordHook.actionHook.send(msg)
         .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
         .catch(err => errorLog.error(err));
-
-      if (player && player.isPrivateMessage && !isMovement) {
-        if (player.isPrivateMessageImportant && msg.includes('\'s') && msg.includes('just killed')) {
-          return;
-        }
-
-        const pmMsg = player.isMentionInDiscord
-          ? msg.replace(new RegExp(`<@!${player.name}>'s`, 'g'), 'your')
-          : msg.replace(new RegExp(`\`${player.name}\`'s`, 'g'), 'your');
-
-        discordHook.discordBot.guilds.find('id', guildID)
-          .members.find('id', player.discordId).send(player.isMentionInDiscord
-            ? pmMsg.replace(new RegExp(`<@!${player.name}>`, 'g'), 'you')
-            : pmMsg.replace(new RegExp(`\`${player.name}\``, 'g'), 'you'))
-          .catch(err => errorLog.error(err));
-      }
     }
-
-    // Add if to check if channel is streaming
-    // twitchBot.say(msg.replace('/\*/g', ''));
   }
 
-  formatLog(json) {
-    const formattedLog = {
-      timeStamp: json.timestamp,
-      content: json.content,
-      mentions: json.mentions,
-    };
-    return formattedLog;
-  }
+  // Add if to check if channel is streaming
+  // twitchBot.say(msg.replace('/\*/g', ''));
+}
 
-  setImportantMessage(message) {
-    return `\`\`\`css\n${message}\`\`\``;
-  }
+formatLog(json) {
+  const formattedLog = {
+    timeStamp: json.timestamp,
+    content: json.content,
+    mentions: json.mentions,
+  };
+  return formattedLog;
+}
 
-  passiveRegen(player, hpRegenAmount, mpRegenAmount) {
-    if (player.health <= enumHelper.maxHealth(player.level)) {
-      player.health += Math.ceil(hpRegenAmount);
-      if (player.health > enumHelper.maxHealth(player.level)) {
-        player.health = enumHelper.maxHealth(player.level);
-      }
+setImportantMessage(message) {
+  return `\`\`\`css\n${message}\`\`\``;
+}
+
+passiveRegen(player, hpRegenAmount, mpRegenAmount) {
+  if (player.health <= enumHelper.maxHealth(player.level)) {
+    player.health += Math.ceil(hpRegenAmount);
+    if (player.health > enumHelper.maxHealth(player.level)) {
+      player.health = enumHelper.maxHealth(player.level);
     }
-
-    if (player.mana <= enumHelper.maxMana(player.level)) {
-      player.mana += Math.ceil(mpRegenAmount);
-      if (player.mana > enumHelper.maxMana(player.level)) {
-        player.mana = enumHelper.maxMana(player.level);
-      }
-    }
-    return player;
   }
 
-  countDirectoryFiles(directory) {
-    return new Promise((resolve, reject) => {
-      return fs.readdir(directory, (err, files) => {
-        if (err) {
-          return reject(err);
-        }
-        return resolve(files.length);
-      });
+  if (player.mana <= enumHelper.maxMana(player.level)) {
+    player.mana += Math.ceil(mpRegenAmount);
+    if (player.mana > enumHelper.maxMana(player.level)) {
+      player.mana = enumHelper.maxMana(player.level);
+    }
+  }
+  return player;
+}
+
+countDirectoryFiles(directory) {
+  return new Promise((resolve, reject) => {
+    return fs.readdir(directory, (err, files) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(files.length);
     });
+  });
+}
+
+calculateItemRating(item) {
+  if (item.position !== enumHelper.equipment.types.relic.position) {
+    return item.power;
   }
 
-  calculateItemRating(item) {
-    if (item.position !== enumHelper.equipment.types.relic.position) {
-      return item.power;
-    }
+  return Math.round(item.str + item.dex + item.end + item.int + item.luk);
+}
 
-    return Math.round(item.str + item.dex + item.end + item.int + item.luk);
-  }
+sumPlayerTotalStrength(player) {
+  return player.stats.str
+    + player.equipment.relic.str;
+}
 
-  sumPlayerTotalStrength(player) {
-    return player.stats.str
-      + player.equipment.relic.str;
-  }
+sumPlayerTotalDexterity(player) {
+  return player.stats.dex
+    + player.equipment.relic.dex;
+}
 
-  sumPlayerTotalDexterity(player) {
-    return player.stats.dex
-      + player.equipment.relic.dex;
-  }
+sumPlayerTotalEndurance(player) {
+  return player.stats.end
+    + player.equipment.relic.end;
+}
 
-  sumPlayerTotalEndurance(player) {
-    return player.stats.end
-      + player.equipment.relic.end;
-  }
+sumPlayerTotalIntelligence(player) {
+  return player.stats.int
+    + player.equipment.relic.int;
+}
 
-  sumPlayerTotalIntelligence(player) {
-    return player.stats.int
-      + player.equipment.relic.int;
-  }
+sumPlayerTotalLuck(player) {
+  return player.stats.luk
+    + player.equipment.relic.luk;
+}
 
-  sumPlayerTotalLuck(player) {
-    return player.stats.luk
-      + player.equipment.relic.luk;
-  }
-
-  checkExperience(selectedPlayer, discordHook, twitchBot) {
-    if (selectedPlayer.experience >= selectedPlayer.level * 15) {
-      selectedPlayer.level++;
-      selectedPlayer.experience = 0;
-      selectedPlayer.health = 100 + (selectedPlayer.level * 5);
-      selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      if (process.env.NODE_ENV.includes('development')) {
-        for (let i = 0; i < 4; i++) {
-          switch (this.randomBetween(0, 3)) {
-            case 0:
-              selectedPlayer.stats.str++;
-              break;
-            case 1:
-              selectedPlayer.stats.dex++;
-              break;
-            case 2:
-              selectedPlayer.stats.end++;
-              break;
-            case 3:
-              selectedPlayer.stats.int++;
-              break;
-          }
-        }
-
-        const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
-          if (['str', 'dex', 'int'].includes(key)) {
-            return {
-              key,
-              value: selectedPlayer.stats[key]
-            };
-          }
-        }).filter(obj => obj !== undefined)
-          .sort((stat1, stat2) => stat2.value - stat1.value);
-
-        switch (playerStats[0].key) {
-          case 'str':
-            selectedPlayer.class = 'Knight';
-            break;
-          case 'dex':
-            selectedPlayer.class = 'Thief';
-            break;
-          case 'int':
-            selectedPlayer.class = 'Mage';
-            break;
-        }
-      } else {
-        selectedPlayer.stats.str++;
-        selectedPlayer.stats.dex++;
-        selectedPlayer.stats.end++;
-        selectedPlayer.stats.int++;
-      }
-
-      const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
-      const eventLog = `Leveled up to level ${selectedPlayer.level}`;
-
-      this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-      selectedPlayer = this.logEvent(selectedPlayer, eventLog);
-    }
-  }
-
-  setPlayerEquipment(selectedPlayer, equipment, item) {
-    selectedPlayer.equipment[equipment].name = item.name;
-    if (equipment !== enumHelper.equipment.types.relic.position) {
-      selectedPlayer.equipment[equipment].power = item.power;
-      if (equipment === enumHelper.equipment.types.weapon.position) {
-        selectedPlayer.equipment[equipment].attackType = item.attackType;
-      }
-    } else if (equipment === enumHelper.equipment.types.relic.position) {
-      selectedPlayer.equipment[equipment].str = item.stats.str;
-      selectedPlayer.equipment[equipment].dex = item.stats.dex;
-      selectedPlayer.equipment[equipment].end = item.stats.end;
-      selectedPlayer.equipment[equipment].int = item.stats.int;
-      selectedPlayer.equipment[equipment].luk = item.stats.luk;
-    }
-    selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
-
-    return selectedPlayer;
-  }
-
-  checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
-    if (selectedPlayer.health <= 0) {
-      selectedPlayer.health = 100 + (selectedPlayer.level * 5);
-      selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      selectedPlayer.map = MapClass.getMapByIndex(4);
-      selectedPlayer.experience -= Math.round(selectedPlayer.experience / 4);
-      selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
-      selectedPlayer.inventory = {
-        equipment: [],
-        items: []
-      };
-
-      const dropChance = this.randomBetween(0, 100);
-      if (dropChance < 15) {
-        switch (this.randomBetween(0, 2)) {
+checkExperience(selectedPlayer, discordHook, twitchBot) {
+  if (selectedPlayer.experience >= selectedPlayer.level * 15) {
+    selectedPlayer.level++;
+    selectedPlayer.experience = 0;
+    selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+    selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
+    if (process.env.NODE_ENV.includes('development')) {
+      for (let i = 0; i < 4; i++) {
+        switch (this.randomBetween(0, 3)) {
           case 0:
-            if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
-              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
-              this.setPlayerEquipment(
-                selectedPlayer,
-                enumHelper.equipment.types.helmet.position,
-                enumHelper.equipment.empty.helmet
-              );
-            }
+            selectedPlayer.stats.str++;
             break;
           case 1:
-            if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
-              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
-              this.setPlayerEquipment(
-                selectedPlayer,
-                enumHelper.equipment.types.armor.position,
-                enumHelper.equipment.empty.armor
-              );
-            }
+            selectedPlayer.stats.dex++;
             break;
           case 2:
-            if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
-              this.setPlayerEquipment(
-                selectedPlayer,
-                enumHelper.equipment.types.weapon.position,
-                enumHelper.equipment.empty.weapon
-              );
-            }
+            selectedPlayer.stats.end++;
+            break;
+          case 3:
+            selectedPlayer.stats.int++;
             break;
         }
       }
 
-      if (selectedPlayer.deaths.firstDeath === 'never') {
-        selectedPlayer.deaths.firstDeath = new Date().getTime();
-      }
-
-      if (!attackerObj.discordId) {
-        selectedPlayer.deaths.mob++;
-      } else {
-        if (selectedPlayer.currentBounty > 0) {
-          attackerObj.gold += selectedPlayer.currentBounty;
-          this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
-          const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
-          attackerObj = this.logEvent(attackerObj, bountyEventLog);
-          selectedPlayer.currentBounty = 0;
+      const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
+        if (['str', 'dex', 'int'].includes(key)) {
+          return {
+            key,
+            value: selectedPlayer.stats[key]
+          };
         }
+      }).filter(obj => obj !== undefined)
+        .sort((stat1, stat2) => stat2.value - stat1.value);
 
-        selectedPlayer.deaths.player++;
-        attackerObj.kills.player++;
-        Database.savePlayer(selectedPlayer);
+      switch (playerStats[0].key) {
+        case 'str':
+          selectedPlayer.class = 'Knight';
+          break;
+        case 'dex':
+          selectedPlayer.class = 'Thief';
+          break;
+        case 'int':
+          selectedPlayer.class = 'Mage';
+          break;
+      }
+    } else {
+      selectedPlayer.stats.str++;
+      selectedPlayer.stats.dex++;
+      selectedPlayer.stats.end++;
+      selectedPlayer.stats.int++;
+    }
+
+    const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
+    const eventLog = `Leveled up to level ${selectedPlayer.level}`;
+
+    this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
+    selectedPlayer = this.logEvent(selectedPlayer, eventLog);
+  }
+}
+
+setPlayerEquipment(selectedPlayer, equipment, item) {
+  selectedPlayer.equipment[equipment].name = item.name;
+  if (equipment !== enumHelper.equipment.types.relic.position) {
+    selectedPlayer.equipment[equipment].power = item.power;
+    if (equipment === enumHelper.equipment.types.weapon.position) {
+      selectedPlayer.equipment[equipment].attackType = item.attackType;
+    }
+  } else if (equipment === enumHelper.equipment.types.relic.position) {
+    selectedPlayer.equipment[equipment].str = item.stats.str;
+    selectedPlayer.equipment[equipment].dex = item.stats.dex;
+    selectedPlayer.equipment[equipment].end = item.stats.end;
+    selectedPlayer.equipment[equipment].int = item.stats.int;
+    selectedPlayer.equipment[equipment].luk = item.stats.luk;
+  }
+  selectedPlayer.equipment[equipment].previousOwners = item.previousOwners;
+
+  return selectedPlayer;
+}
+
+checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
+  if (selectedPlayer.health <= 0) {
+    selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+    selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
+    selectedPlayer.map = MapClass.getMapByIndex(4);
+    selectedPlayer.experience -= Math.round(selectedPlayer.experience / 4);
+    selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
+    selectedPlayer.inventory = {
+      equipment: [],
+      items: []
+    };
+
+    const dropChance = this.randomBetween(0, 100);
+    if (dropChance < 15) {
+      switch (this.randomBetween(0, 2)) {
+        case 0:
+          if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
+            this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`));
+            this.setPlayerEquipment(
+              selectedPlayer,
+              enumHelper.equipment.types.helmet.position,
+              enumHelper.equipment.empty.helmet
+            );
+          }
+          break;
+        case 1:
+          if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
+            this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`));
+            this.setPlayerEquipment(
+              selectedPlayer,
+              enumHelper.equipment.types.armor.position,
+              enumHelper.equipment.empty.armor
+            );
+          }
+          break;
+        case 2:
+          if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+            this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`));
+            this.setPlayerEquipment(
+              selectedPlayer,
+              enumHelper.equipment.types.weapon.position,
+              enumHelper.equipment.empty.weapon
+            );
+          }
+          break;
+      }
+    }
+
+    if (selectedPlayer.deaths.firstDeath === 'never') {
+      selectedPlayer.deaths.firstDeath = new Date().getTime();
+    }
+
+    if (!attackerObj.discordId) {
+      selectedPlayer.deaths.mob++;
+    } else {
+      if (selectedPlayer.currentBounty > 0) {
+        attackerObj.gold += selectedPlayer.currentBounty;
+        this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
+        const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
+        attackerObj = this.logEvent(attackerObj, bountyEventLog);
+        selectedPlayer.currentBounty = 0;
       }
 
-      const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`);
-      const eventLog = 'You died. Game over man... Game over.';
-
-      this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg);
-      selectedPlayer = this.logEvent(selectedPlayer, eventLog);
+      selectedPlayer.deaths.player++;
+      attackerObj.kills.player++;
+      Database.savePlayer(selectedPlayer);
     }
+
+    const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`);
+    const eventLog = 'You died. Game over man... Game over.';
+
+    this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg);
+    selectedPlayer = this.logEvent(selectedPlayer, eventLog);
   }
+}
 
-  generateSpellBookString(player) {
-    let spellBookString = '\`\`\`Here\'s your spellbook!\n';
-    player.spells.forEach((spell) => {
-      spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
-    });
-    spellBookString = spellBookString.concat('\`\`\`');
+generateSpellBookString(player) {
+  let spellBookString = '\`\`\`Here\'s your spellbook!\n';
+  player.spells.forEach((spell) => {
+    spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
+  });
+  spellBookString = spellBookString.concat('\`\`\`');
 
-    return spellBookString;
-  }
+  return spellBookString;
+}
 
-  generateStatsString(player) {
-    return `\`\`\`Here are your stats!
+generateStatsString(player) {
+  return `\`\`\`Here are your stats!
     Health: ${player.health} / ${enumHelper.maxHealth(player.level)}
     Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
@@ -382,54 +379,54 @@ class helper {
     Past Events:
       ${this.generateLog(player, 5).replace('Heres what you have done so far:\n      ', '')}
       \`\`\``;
+}
+
+generatePreviousOwnerString(equipment) {
+  if (equipment.previousOwners && equipment.previousOwners.length > 0) {
+    let result = 'Previous Owners:\n        ';
+    result = result.concat(equipment.previousOwners.join('\n        '));
+    result = result.concat('\n');
+    return result;
   }
 
-  generatePreviousOwnerString(equipment) {
-    if (equipment.previousOwners && equipment.previousOwners.length > 0) {
-      let result = 'Previous Owners:\n        ';
-      result = result.concat(equipment.previousOwners.join('\n        '));
-      result = result.concat('\n');
-      return result;
-    }
+  return '';
+}
 
-    return '';
+/**
+ * Based on player setting, either return <@!discordId> or playerName
+ * @param player
+ * @returns String
+ */
+generatePlayerName(player) {
+  if (player.isMentionInDiscord === false) {
+    return `\`${player.name}\``;
   }
 
-  /**
-   * Based on player setting, either return <@!discordId> or playerName
-   * @param player
-   * @returns String
-   */
-  generatePlayerName(player) {
-    if (player.isMentionInDiscord === false) {
-      return `\`${player.name}\``;
-    }
+  return `<@!${player.discordId}>`;
+}
 
-    return `<@!${player.discordId}>`;
-  }
+/**
+ * Based on player setting, transform into the correct gender
+ * @param player
+ * @param word
+ * @returns String
+ */
+generateGenderString(player, word) {
+  return enumHelper.genders[player.gender] ? enumHelper.genders[player.gender][word] : word;
+}
 
-  /**
-   * Based on player setting, transform into the correct gender
-   * @param player
-   * @param word
-   * @returns String
-   */
-  generateGenderString(player, word) {
-    return enumHelper.genders[player.gender] ? enumHelper.genders[player.gender][word] : word;
-  }
-
-  generateInventoryString(player) {
-    return `\`\`\`Here is your inventory!
+generateInventoryString(player) {
+  return `\`\`\`Here is your inventory!
     Equipment:
       ${player.inventory.equipment.map(equip => equip.name).join('\n      ')}
     
     Items:
       ${player.inventory.items.map(item => item.name).join('\n      ')}
       \`\`\``;
-  }
+}
 
-  generateEquipmentsString(player) {
-    return `\`\`\`Here is your inventory!
+generateEquipmentsString(player) {
+  return `\`\`\`Here is your inventory!
     Helmet: ${player.equipment.helmet.name}
       Defense: ${player.equipment.helmet.power}
       ${this.generatePreviousOwnerString(player.equipment.helmet)}
@@ -449,25 +446,25 @@ class helper {
         Luck: ${player.equipment.relic.luk}
       ${this.generatePreviousOwnerString(player.equipment.relic)}
         \`\`\``;
+}
+
+generateLog(player, count) {
+  if (player.pastEvents.length === 0) {
+    return '';
   }
 
-  generateLog(player, count) {
-    if (player.pastEvents.length === 0) {
-      return '';
+  let logResult = 'Heres what you have done so far:\n      ';
+  let logCount = 0;
+  for (let i = player.pastEvents.length - 1; i >= 0; i--) {
+    if (logCount === count) {
+      break;
     }
 
-    let logResult = 'Heres what you have done so far:\n      ';
-    let logCount = 0;
-    for (let i = player.pastEvents.length - 1; i >= 0; i--) {
-      if (logCount === count) {
-        break;
-      }
-
-      logResult = logResult.concat(`${player.pastEvents[i].event} [${this.getTimePassed(player.pastEvents[i].timeStamp)} ago]\n      `);
-      logCount++;
-    }
-
-    return logResult;
+    logResult = logResult.concat(`${player.pastEvents[i].event} [${this.getTimePassed(player.pastEvents[i].timeStamp)} ago]\n      `);
+    logCount++;
   }
+
+  return logResult;
+}
 }
 module.exports = new helper();
