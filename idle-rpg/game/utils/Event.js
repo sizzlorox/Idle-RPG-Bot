@@ -42,7 +42,7 @@ class Event {
       const eventMsg = `${helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg);
-      helper.sendPrivateMessage(selectedPlayer, eventLog, false);
+      helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
       return resolve(selectedPlayer);
@@ -88,8 +88,8 @@ class Event {
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
                   helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                  helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-                  helper.sendPrivateMessage(randomPlayer, otherPlayerLog, true);
+                  helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+                  helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true);
                   selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                   randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
                   selectedPlayer.battles.lost++;
@@ -130,8 +130,8 @@ class Event {
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
                 helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-                helper.sendPrivateMessage(randomPlayer, otherPlayerLog, true);
+                helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+                helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 randomPlayer = helper.logEvent(randomPlayer, otherPlayerLog);
                 selectedPlayer.battles.won++;
@@ -182,7 +182,7 @@ class Event {
 
                 const eventLog = `${mob.name}'s ${defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
                 helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                helper.sendPrivateMessage(selectedPlayer, eventLog, true);
+                helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
                 selectedPlayer.battles.lost++;
@@ -204,7 +204,7 @@ class Event {
 
                 selectedPlayer.experience += expGain;
                 helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                helper.sendPrivateMessage(selectedPlayer, eventLog, true);
+                helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
                 helper.checkExperience(selectedPlayer, discordHook);
 
@@ -219,7 +219,7 @@ class Event {
               selectedPlayer.gold += defender.gold * multiplier;
               selectedPlayer.kills.mob++;
               helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-              helper.sendPrivateMessage(selectedPlayer, eventLog, true);
+              helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
               selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
               helper.checkExperience(selectedPlayer, discordHook);
               selectedPlayer.battles.won++;
@@ -277,7 +277,7 @@ class Event {
             const eventLog = `Received ${item.name} from ${mob.name}`;
 
             helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-            helper.sendPrivateMessage(selectedPlayer, eventLog, true);
+            helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
             return resolve(selectedPlayer);
@@ -332,7 +332,7 @@ class Event {
           const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
           helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-          helper.sendPrivateMessage(selectedPlayer, eventLog, false);
+          helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
           return resolve(selectedPlayer);
@@ -356,7 +356,7 @@ class Event {
       const eventLog = `Made ${profit} gold selling what you found adventuring`;
 
       helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsg}`);
-      helper.sendPrivateMessage(selectedPlayer, eventLog, false);
+      helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
     }
 
@@ -371,7 +371,7 @@ class Event {
       const eventLog = 'Set up camp to rest.';
 
       helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsg}`);
-      helper.sendPrivateMessage(selectedPlayer, eventLog, false);
+      helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
       return resolve(selectedPlayer);
@@ -457,8 +457,8 @@ class Event {
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.helmet.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-              helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-              helper.sendPrivateMessage(victimPlayer, otherPlayerLog, true);
+              helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+              helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
@@ -469,33 +469,34 @@ class Event {
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.helmet.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-              helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-              helper.sendPrivateMessage(victimPlayer, otherPlayerLog, true);
+              helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+              helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
             victimPlayer.stolen++;
             stealingPlayer.stole++;
-
-            if (stealingPlayer.equipment.helmet.power < victimPlayer.equipment.helmet.power) {
-              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.helmet.position, stolenHelmet);
-              if (!victimPlayer.equipment.helmet.previousOwners) {
-                stealingPlayer.equipment.helmet.previousOwners = [`${victimPlayer.name}`];
+            if (victimPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
+              if (stealingPlayer.equipment.helmet.power < victimPlayer.equipment.helmet.power) {
+                stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.helmet.position, stolenHelmet);
+                if (!victimPlayer.equipment.helmet.previousOwners) {
+                  stealingPlayer.equipment.helmet.previousOwners = [`${victimPlayer.name}`];
+                } else {
+                  stealingPlayer.equipment.helmet.previousOwners = victimPlayer.equipment.helmet.previousOwners;
+                  stealingPlayer.equipment.helmet.previousOwners.push(victimPlayer.name);
+                }
+                if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.helmet.position)) {
+                  const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.helmet.position)
+                    .sort((item1, item2) => {
+                      return item1.power - item2.power;
+                    })[0];
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, equipFromInventory);
+                } else {
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
+                }
               } else {
-                stealingPlayer.equipment.helmet.previousOwners = victimPlayer.equipment.helmet.previousOwners;
-                stealingPlayer.equipment.helmet.previousOwners.push(victimPlayer.name);
+                stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenHelmet);
               }
-              if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.helmet.position)) {
-                const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.helmet.position)
-                  .sort((item1, item2) => {
-                    return item1.power - item2.power;
-                  })[0];
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, equipFromInventory);
-              } else {
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.helmet.position, enumHelper.equipment.empty.helmet);
-              }
-            } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenHelmet);
             }
             break;
           case 1:
@@ -511,8 +512,8 @@ class Event {
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-              helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-              helper.sendPrivateMessage(victimPlayer, otherPlayerLog, true);
+              helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+              helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
@@ -523,33 +524,35 @@ class Event {
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.armor.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-              helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-              helper.sendPrivateMessage(victimPlayer, otherPlayerLog, true);
+              helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+              helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
-            if (stealingPlayer.equipment.armor.power < victimPlayer.equipment.armor.power) {
-              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.armor.position, stolenArmor);
-              if (!victimPlayer.equipment.armor.previousOwners) {
-                stealingPlayer.equipment.armor.previousOwners = [`${victimPlayer.name}`];
+            if (victimPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
+              if (stealingPlayer.equipment.armor.power < victimPlayer.equipment.armor.power) {
+                stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.armor.position, stolenArmor);
+                if (!victimPlayer.equipment.armor.previousOwners) {
+                  stealingPlayer.equipment.armor.previousOwners = [`${victimPlayer.name}`];
+                } else {
+                  stealingPlayer.equipment.armor.previousOwners = victimPlayer.equipment.armor.previousOwners;
+                  stealingPlayer.equipment.armor.previousOwners.push(victimPlayer.name);
+                }
+                if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.armor.position)) {
+                  const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.armor.position)
+                    .sort((item1, item2) => {
+                      return item1.power - item2.power;
+                    })[0];
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, equipFromInventory);
+                } else {
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
+                }
               } else {
-                stealingPlayer.equipment.armor.previousOwners = victimPlayer.equipment.armor.previousOwners;
-                stealingPlayer.equipment.armor.previousOwners.push(victimPlayer.name);
+                stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenArmor);
               }
-              if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.armor.position)) {
-                const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.armor.position)
-                  .sort((item1, item2) => {
-                    return item1.power - item2.power;
-                  })[0];
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, equipFromInventory);
-              } else {
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.armor.position, enumHelper.equipment.empty.armor);
-              }
-            } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenArmor);
             }
             break;
           case 2:
@@ -565,8 +568,8 @@ class Event {
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.weapon.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-              helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-              helper.sendPrivateMessage(victimPlayer, otherPlayerLog, true);
+              helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+              helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             } else {
@@ -577,33 +580,35 @@ class Event {
               const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment.weapon.name} from you`;
 
               helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-              helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-              helper.sendPrivateMessage(victimPlayer, otherPlayerLog, true);
+              helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+              helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
               stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
               victimPlayer = helper.logEvent(victimPlayer, otherPlayerLog);
             }
             victimPlayer.stolen++;
             stealingPlayer.stole++;
 
-            if (stealingPlayer.equipment.weapon.power < victimPlayer.equipment.weapon.power) {
-              stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.weapon.position, stolenWeapon);
-              if (!victimPlayer.equipment.weapon.previousOwners) {
-                stealingPlayer.equipment.weapon.previousOwners = [`${victimPlayer.name}`];
+            if (victimPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+              if (stealingPlayer.equipment.weapon.power < victimPlayer.equipment.weapon.power) {
+                stealingPlayer = helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types.weapon.position, stolenWeapon);
+                if (!victimPlayer.equipment.weapon.previousOwners) {
+                  stealingPlayer.equipment.weapon.previousOwners = [`${victimPlayer.name}`];
+                } else {
+                  stealingPlayer.equipment.weapon.previousOwners = victimPlayer.equipment.weapon.previousOwners;
+                  stealingPlayer.equipment.weapon.previousOwners.push(victimPlayer.name);
+                }
+                if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.weapon.position)) {
+                  const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.weapon.position)
+                    .sort((item1, item2) => {
+                      return item1.power - item2.power;
+                    })[0];
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, equipFromInventory);
+                } else {
+                  victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
+                }
               } else {
-                stealingPlayer.equipment.weapon.previousOwners = victimPlayer.equipment.weapon.previousOwners;
-                stealingPlayer.equipment.weapon.previousOwners.push(victimPlayer.name);
+                stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenWeapon);
               }
-              if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types.weapon.position)) {
-                const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types.weapon.position)
-                  .sort((item1, item2) => {
-                    return item1.power - item2.power;
-                  })[0];
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, equipFromInventory);
-              } else {
-                victimPlayer = helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types.weapon.position, enumHelper.equipment.empty.weapon);
-              }
-            } else {
-              stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenWeapon);
             }
             break;
         }
@@ -617,8 +622,8 @@ class Event {
           const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
 
           helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-          helper.sendPrivateMessage(selectedPlayer, eventLog, true);
-          helper.sendPrivateMessage(victimPlayer, otherPlayerLog, true);
+          helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+          helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
           stealingPlayer = helper.logEvent(stealingPlayer, eventLog);
         }
       }
@@ -643,7 +648,7 @@ class Event {
           const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
 
           helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades);
-          helper.sendPrivateMessage(selectedPlayer, eventLogHades, false);
+          helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, false);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogHades);
 
           return resolve(selectedPlayer);
@@ -657,7 +662,7 @@ class Event {
           const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
 
           helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus);
-          helper.sendPrivateMessage(selectedPlayer, eventLogZeus, false);
+          helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, false);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogZeus);
 
           return resolve(selectedPlayer);
@@ -674,7 +679,7 @@ class Event {
             selectedPlayer.health += healAmount;
 
             helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco);
-            helper.sendPrivateMessage(selectedPlayer, eventLogAseco, false);
+            helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, false);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLogAseco);
 
             return resolve(selectedPlayer);
@@ -684,7 +689,7 @@ class Event {
           const eventLogAsecoFull = 'Aseco wanted to heal you, but you had full health';
 
           helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAsecoFull);
-          helper.sendPrivateMessage(selectedPlayer, eventLogAsecoFull, false);
+          helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAsecoFull, false);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogAsecoFull);
 
           return resolve(selectedPlayer);
@@ -695,7 +700,7 @@ class Event {
             const eventLogHermesFail = 'Hermes demanded gold from you but you had nothing to give';
 
             helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermesFail);
-            helper.sendPrivateMessage(selectedPlayer, eventLogHermesFail, false);
+            helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermesFail, false);
             selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermesFail);
 
             return resolve(selectedPlayer);
@@ -712,7 +717,7 @@ class Event {
           }
 
           helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes);
-          helper.sendPrivateMessage(selectedPlayer, eventLogHermes, false);
+          helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, false);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogHermes);
 
           return resolve(selectedPlayer);
@@ -726,7 +731,7 @@ class Event {
           const eventLogAthene = `Athene shared her wisdom with you making you gain ${luckExpAthena} experience`;
 
           helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthene);
-          helper.sendPrivateMessage(selectedPlayer, eventLogAthene, false);
+          helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthene, false);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogAthene);
 
           return resolve(selectedPlayer);
@@ -753,7 +758,7 @@ class Event {
 
                 if (shouldAddToList) {
                   helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsgEris}`);
-                  helper.sendPrivateMessage(selectedPlayer, eventLogEris, false);
+                  helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false);
                   selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
                   if (tempArray) {
                     selectedPlayer.spells = tempArray;
@@ -762,7 +767,7 @@ class Event {
                 }
               } else {
                 helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsgEris}`);
-                helper.sendPrivateMessage(selectedPlayer, eventLogEris, false);
+                helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false);
                 selectedPlayer = helper.logEvent(selectedPlayer, eventLogEris);
                 selectedPlayer.spells.push(spell);
               }
@@ -785,7 +790,7 @@ class Event {
         const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
 
         helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-        helper.sendPrivateMessage(selectedPlayer, eventLog, false);
+        helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
         selectedPlayer = helper.logEvent(selectedPlayer, eventLog);
 
         return resolve(selectedPlayer);
@@ -820,7 +825,7 @@ class Event {
 
               if (shouldAddToList) {
                 helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${spellEventResult.eventMsg}`);
-                helper.sendPrivateMessage(selectedPlayer, spellEventResult.eventLog, false);
+                helper.sendPrivateMessage(discordHook, selectedPlayer, spellEventResult.eventLog, false);
                 selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
                 if (tempArray) {
                   selectedPlayer.spells = tempArray;
@@ -829,7 +834,7 @@ class Event {
               }
             } else {
               helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${spellEventResult.eventMsg}`);
-              helper.sendPrivateMessage(selectedPlayer, spellEventResult.eventLog, false);
+              helper.sendPrivateMessage(discordHook, selectedPlayer, spellEventResult.eventLog, false);
               selectedPlayer = helper.logEvent(selectedPlayer, spellEventResult.eventLog);
               selectedPlayer.spells.push(spell);
             }
@@ -871,7 +876,7 @@ class Event {
 
             const itemEventResult = this.generateItemEventMessage(selectedPlayer, item);
             helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, itemEventResult.eventMsg);
-            helper.sendPrivateMessage(selectedPlayer, itemEventResult.eventLog, true);
+            helper.sendPrivateMessage(discordHook, selectedPlayer, itemEventResult.eventLog, true);
             selectedPlayer = helper.logEvent(selectedPlayer, itemEventResult.eventLog);
 
             return resolve(selectedPlayer);
@@ -901,7 +906,7 @@ class Event {
         const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} gold by gambling in a tavern.`;
 
         helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgLoseGamble);
-        helper.sendPrivateMessage(selectedPlayer, eventMsgLoseGamble, true);
+        helper.sendPrivateMessage(discordHook, selectedPlayer, eventMsgLoseGamble, true);
         selectedPlayer = helper.logEvent(selectedPlayer, eventLogLoseGamble);
 
         return resolve(selectedPlayer);
@@ -914,7 +919,7 @@ class Event {
       const eventLogWinGamble = `Congrats! You won ${luckGambleGold} gold by gambling in a tavern.`;
 
       helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgWinGamble);
-      helper.sendPrivateMessage(selectedPlayer, eventMsgWinGamble, true);
+      helper.sendPrivateMessage(discordHook, selectedPlayer, eventMsgWinGamble, true);
       selectedPlayer = helper.logEvent(selectedPlayer, eventLogWinGamble);
 
       return resolve(selectedPlayer);
@@ -956,7 +961,7 @@ class Event {
           const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
 
           helper.sendMessage(discordHook, 'twitch', false, eventMsgSnowflake);
-          helper.sendPrivateMessage(selectedPlayer, eventLogSnowflake, true);
+          helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true);
           selectedPlayer = helper.logEvent(selectedPlayer, eventLogSnowflake);
         }
       }
