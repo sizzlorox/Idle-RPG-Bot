@@ -4,7 +4,7 @@ const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog } = require('../utils/logger');
 const { battleDebug, eventDebug, guildID } = require('../../settings');
 
-class helper {
+class Helper {
   printBattleDebug(debugMsg) {
     if (battleDebug) {
       console.log(debugMsg);
@@ -143,12 +143,34 @@ class helper {
     });
   }
 
-  calculateItemRating(item) {
-    if (item.position !== enumHelper.equipment.types.relic.position) {
-      return item.power;
+  calculateItemRating(player, item) {
+    if (player && item.position !== enumHelper.equipment.types.relic.position) {
+      if (item.position !== enumHelper.equipment.types.weapon.position) {
+        return item.power;
+      }
+
+      switch (item.attackType) {
+        case 'melee':
+          return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)
+              + ((this.sumPlayerTotalLuck(player)
+                + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2)));
+
+        case 'range':
+          return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)
+              + ((this.sumPlayerTotalLuck(player)
+                + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2)));
+
+        case 'magic':
+          return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)
+              + ((this.sumPlayerTotalLuck(player)
+                + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2)));
+      }
     }
 
-    return Math.round(item.str + item.dex + item.end + item.int + item.luk);
+    return Math.ceil(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -474,4 +496,4 @@ class helper {
     return logResult;
   }
 }
-module.exports = new helper();
+module.exports = new Helper();

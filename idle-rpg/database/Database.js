@@ -206,12 +206,13 @@ class Database {
       return Player.update({},
         {
           $set: {
+            class: 'Wanderer',
             health: 105,
+            mana: 50,
             experience: 0,
             map: maps[starterTown],
             level: 1,
             gold: 0,
-            isMentionInDiscord: true,
             gender: 'neutral',
             'equipment.helmet': {
               name: 'Nothing',

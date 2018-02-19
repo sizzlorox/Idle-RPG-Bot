@@ -1,4 +1,4 @@
-const helper = require('../utils/helper');
+const Helper = require('../utils/Helper');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
@@ -23,12 +23,12 @@ class Game {
    * @param {*} twitchBot
    */
   selectEvent(discordBot, player, onlinePlayers, twitchBot) {
-    const randomEvent = helper.randomBetween(0, 2);
+    const randomEvent = Helper.randomBetween(0, 2);
 
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${helper.generatePlayerName(player)} was born! Welcome to the world of Idle-RPG!`);
+          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(player)} was born! Welcome to the world of Idle-RPG!`);
 
           return Database.createNewPlayer(player.discordId, player.name);
         }
@@ -44,11 +44,11 @@ class Game {
         selectedPlayer.events++;
 
         if (selectedPlayer.events % 100 === 0) {
-          helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
-          helper.sendPrivateMessage(this.discordHook, selectedPlayer, `You have encountered ${selectedPlayer.events} events!`, true);
+          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, Helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
+          Helper.sendPrivateMessage(this.discordHook, selectedPlayer, `You have encountered ${selectedPlayer.events} events!`, true);
         }
 
-        helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
+        Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
@@ -81,7 +81,7 @@ class Game {
    * @param {*} twitchBot
    */
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    const luckDice = helper.randomBetween(0, 100);
+    const luckDice = Helper.randomBetween(0, 100);
     if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
       selectedPlayer = Event.sellInTown(this.discordHook, twitchBot, selectedPlayer);
 
@@ -113,7 +113,7 @@ class Game {
    * @param {*} twitchBot
    */
   luckEvent(selectedPlayer, twitchBot) {
-    const luckDice = helper.randomBetween(0, 100);
+    const luckDice = Helper.randomBetween(0, 100);
     if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
     }
@@ -135,15 +135,15 @@ class Game {
 
   // Event
   powerHourBegin() {
-    helper.sendMessage(this.discordHook, 'twitch', undefined, false, helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+    Helper.sendMessage(this.discordHook, 'twitch', undefined, false, Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
 
     setTimeout(() => {
-      helper.sendMessage(this.discordHook, 'twitch', undefined, false, helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+      Helper.sendMessage(this.discordHook, 'twitch', undefined, false, Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
       this.multiplier += 1;
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
-      helper.sendMessage(this.discordHook, 'twitch', undefined, false, helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+      Helper.sendMessage(this.discordHook, 'twitch', undefined, false, Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
       this.multiplier -= 1;
       this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
     }, 5400000); // 1hr 30 minutes
@@ -279,7 +279,7 @@ ${rankString}
                 return bless.spellName === 'Bless';
               }).length;
 
-              hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
+              hook.actionHook.send(Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               setTimeout(() => {
                 this.multiplier -= 1;
                 this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
@@ -288,7 +288,7 @@ ${rankString}
                   return bless.spellName === 'Bless';
                 }).length;
 
-                hook.actionHook.send(helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
+                hook.actionHook.send(Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               }, 1800000); // 30 minutes
 
               Database.savePlayer(castingPlayer)
@@ -356,28 +356,28 @@ ${rankString}
     const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
     if (selectedPlayer.gold >= 10000 && !hasGoldTitle) {
       playerDiscordObj.addRole(goldTitleRole);
-      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
+      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
     } else if (selectedPlayer.gold < 10000 && hasGoldTitle) {
       playerDiscordObj.removeRole(goldTitleRole);
-      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
+      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
     }
 
     const hasThiefTitle = playerDiscordObj.roles.array().includes(thiefTitleRole);
     if (selectedPlayer.stole >= 50 && !hasThiefTitle) {
       playerDiscordObj.addRole(thiefTitleRole);
-      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Thief title!`));
+      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Thief title!`));
     } else if (selectedPlayer.stole < 50 && hasThiefTitle) {
       playerDiscordObj.removeRole(thiefTitleRole);
-      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Thief title!`));
+      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} lost the Thief title!`));
     }
 
     const hasVeteranTitle = playerDiscordObj.roles.array().includes(veteranTitleRole);
     if (selectedPlayer.events >= 10000 && !hasVeteranTitle) {
       playerDiscordObj.addRole(veteranTitleRole);
-      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} has just earned the Veteran Idler title!`));
+      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Veteran Idler title!`));
     } else if (selectedPlayer.events < 10000 && hasVeteranTitle) {
       playerDiscordObj.removeRole(veteranTitleRole);
-      this.discordHook.actionHook.send(helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
+      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
     }
   }
 
@@ -403,7 +403,7 @@ ${rankString}
                   }
                   bountyRecipient.currentBounty += amount;
                   discordHook.actionHook.send(
-                    helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
+                    Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
                   );
 
                   return Database.savePlayer(bountyRecipient)
@@ -426,7 +426,7 @@ ${rankString}
   playerEventLog(playerId, count) {
     return Database.loadPlayer(playerId)
       .then((player) => {
-        return helper.generateLog(player, count);
+        return Helper.generateLog(player, count);
       });
   }
 
@@ -504,11 +504,11 @@ ${rankString}
    * Sends Christmas Pre Event Message and another pre event message after 21 hours
    */
   sendChristmasFirstPreEventMessage() {
-    return helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
+    return Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
   }
 
   sendChristmasSecondPreEventMessage() {
-    return helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
+    return Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
   }
 
   // TODO change to utilize setTimeout
@@ -518,7 +518,7 @@ ${rankString}
    */
   updateChristmasEvent(isStarting) {
     if (isStarting) {
-      helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
       Event.MonsterClass.monsters.forEach((mob) => {
         if (mob.isXmasEvent) {
           mob.isSpawnable = true;
@@ -534,7 +534,7 @@ ${rankString}
       return '';
     }
 
-    helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
+    Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
     Event.MonsterClass.monsters.forEach((mob) => {
       if (mob.isXmasEvent) {
         mob.isSpawnable = false;

@@ -3,7 +3,7 @@ const Space = require('../modules/Space');
 const Crypto = require('../modules/Crypto');
 const Urban = require('../modules/Urban');
 const maps = require('../../game/data/maps');
-const helper = require('../../utils/helper');
+const Helper = require('../../utils/Helper');
 const { commandChannel } = require('../../../settings');
 
 const commands = [
@@ -58,8 +58,8 @@ const commands = [
               return message.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const stats = helper.generateStatsString(playerStats);
-            const equip = helper.generateEquipmentsString(playerStats);
+            const stats = Helper.generateStatsString(playerStats);
+            const equip = Helper.generateEquipmentsString(playerStats);
             message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`)
               .concat('\n')
               .concat(equip).replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`));
@@ -72,8 +72,8 @@ const commands = [
             return message.author.send('Your character were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          const stats = helper.generateStatsString(playerStats);
-          const equip = helper.generateEquipmentsString(playerStats);
+          const stats = Helper.generateStatsString(playerStats);
+          const equip = Helper.generateEquipmentsString(playerStats);
           message.author.send(stats.concat('\n').concat(equip));
         });
     }
@@ -99,7 +99,7 @@ const commands = [
               return message.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const inv = helper.generateInventoryString(playerInventory);
+            const inv = Helper.generateInventoryString(playerInventory);
             message.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`));
           });
       }
@@ -110,7 +110,7 @@ const commands = [
             return message.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          const inv = helper.generateInventoryString(playerInventory);
+          const inv = Helper.generateInventoryString(playerInventory);
           message.author.send(inv);
         });
     }
@@ -136,7 +136,7 @@ const commands = [
               return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const stats = helper.generateStatsString(playerStats);
+            const stats = Helper.generateStatsString(playerStats);
             message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`));
           });
       }
@@ -147,7 +147,7 @@ const commands = [
             return message.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          const stats = helper.generateStatsString(playerStats);
+          const stats = Helper.generateStatsString(playerStats);
           message.author.send(stats);
         });
     }
@@ -173,7 +173,7 @@ const commands = [
               return message.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const equip = helper.generateEquipmentsString(playerEquipment);
+            const equip = Helper.generateEquipmentsString(playerEquipment);
             message.author.send(equip.replace('Heres your equipment!', `Here is ${playerEquipment.name}s equipment!`));
           });
       }
@@ -184,7 +184,7 @@ const commands = [
             return message.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          const equip = helper.generateEquipmentsString(playerEquipment);
+          const equip = Helper.generateEquipmentsString(playerEquipment);
           message.author.send(equip);
         });
     }
@@ -210,7 +210,7 @@ const commands = [
               return message.author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const spellBook = helper.generateSpellBookString(playerSpells);
+            const spellBook = Helper.generateSpellBookString(playerSpells);
             message.author.send(spellBook.replace('Here\'s your spellbook!', `Here is ${playerSpells.name}'s spellbook!`));
           });
       }
@@ -221,7 +221,7 @@ const commands = [
             return message.author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          const spellBook = helper.generateSpellBookString(playerSpells);
+          const spellBook = Helper.generateSpellBookString(playerSpells);
           message.author.send(spellBook);
         });
     }
@@ -272,7 +272,7 @@ const commands = [
           return message.author.send(`${splitMessage} was not found. Did you type the map correctly?`);
         }
 
-        return message.author.send(`\`\`\`${helper.capitalizeFirstLetter(splitMessage)}: ${requestedMap[0]}\`\`\``);
+        return message.author.send(`\`\`\`${Helper.capitalizeFirstLetter(splitMessage)}: ${requestedMap[0]}\`\`\``);
       }
 
       return message.author.send('You must enter a map to retrieve its lore. Check `!help` for more info.');
@@ -417,6 +417,7 @@ const commands = [
       return message.reply(`\`\`\`Possible options:
       on - You will be pmed in events that include you
       off - You won't be pmed in events that include you
+      filtered - You will be pmed certain important events that include you
       \`\`\``);
     }
   },
@@ -693,7 +694,7 @@ const commands = [
             const wordDefinition = result.list.sort((item1, item2) => {
               return item1.thumbs_up - item2.thumbs_up;
             })[0];
-            definition = definition.replace('****', `\`${helper.capitalizeFirstLetter(wordDefinition.word).replace('+', ' ')}\``);
+            definition = definition.replace('****', `\`${Helper.capitalizeFirstLetter(wordDefinition.word).replace('+', ' ')}\``);
 
             return message.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`));
           });
