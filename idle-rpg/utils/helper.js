@@ -137,6 +137,7 @@ class helper {
         if (err) {
           return reject(err);
         }
+
         return resolve(files.length);
       });
     });

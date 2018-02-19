@@ -8,6 +8,7 @@ const Spell = require('../utils/Spell');
 const Map = require('../utils/Map');
 const Database = require('../../database/Database');
 const { pvpLevelRestriction } = require('../../../settings');
+const { errorLog } = require('../../utils/logger');
 
 class Event {
 
@@ -103,7 +104,7 @@ class Event {
                           return stealResult.victimPlayer;
                         });
                     })
-                    .catch(err => helper.printEventDebug(err));
+                    .catch(err => errorLog.error(err));
                 }
 
                 if (defender.health > 0 && selectedPlayer.health > 0) {
@@ -145,14 +146,14 @@ class Event {
                         return stealResult.stealingPlayer;
                       });
                   })
-                  .catch(err => helper.printEventDebug(err));
+                  .catch(err => errorLog.error(err));
               });
             }
           }
         }
 
         return this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
-          .catch(err => helper.printEventDebug(err));
+          .catch(err => errorLog.error(err));
       });
   }
 
