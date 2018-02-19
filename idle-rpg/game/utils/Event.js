@@ -585,7 +585,7 @@ class Event {
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
-                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.helmet) > Helper.calculateItemRating(selectedPlayer, item.power)) {
+                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.helmet) > Helper.calculateItemRating(selectedPlayer, item)) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
@@ -593,7 +593,7 @@ class Event {
                 break;
 
               case enumHelper.equipment.types.armor.position:
-                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.armor) > Helper.calculateItemRating(selectedPlayer, item.power)) {
+                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.armor) > Helper.calculateItemRating(selectedPlayer, item)) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
@@ -601,7 +601,7 @@ class Event {
                 break;
 
               case enumHelper.equipment.types.weapon.position:
-                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.weapon) > Helper.calculateItemRating(selectedPlayer, item.power)) {
+                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.weapon) > Helper.calculateItemRating(selectedPlayer, item)) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
                   selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
@@ -694,7 +694,7 @@ class Event {
       const snowFlakeDice = Helper.randomBetween(0, 100);
       if (snowFlakeDice <= 15) {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
-        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic) < Helper.calculateItemRating(selectedPlayer, snowFlake.power)) {
+        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic) < Helper.calculateItemRating(selectedPlayer, snowFlake)) {
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
           const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
           const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
