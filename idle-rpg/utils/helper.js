@@ -260,7 +260,7 @@ class Helper {
 
       this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
       this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-      selectedPlayer = this.logEvent(selectedPlayer, eventLog);
+      selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
     }
   }
 

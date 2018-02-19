@@ -70,7 +70,7 @@ const events = {
         if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
           selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
         } else {
-          selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position], item);
+          selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
         }
       } else {
         selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
@@ -84,7 +84,7 @@ const events = {
         }
 
         selectedPlayer.gold -= itemCost;
-        selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
+        selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position.position, item);
       } else {
         selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
       }
