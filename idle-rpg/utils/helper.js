@@ -149,24 +149,29 @@ class Helper {
         return item.power;
       }
 
-      switch (item.attackType) {
-        case 'melee':
-          return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)
-              + ((this.sumPlayerTotalLuck(player)
-                + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2)));
+      // TODO: Remove when releasing feature
+      if (process.env.NODE_ENV.includes('development')) {
+        switch (item.attackType) {
+          case 'melee':
+            return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player)
+                + ((this.sumPlayerTotalLuck(player)
+                  + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2)));
 
-        case 'range':
-          return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)
-              + ((this.sumPlayerTotalLuck(player)
-                + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2)));
+          case 'range':
+            return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player)
+                + ((this.sumPlayerTotalLuck(player)
+                  + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2)));
 
-        case 'magic':
-          return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)
-              + ((this.sumPlayerTotalLuck(player)
-                + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2)));
+          case 'magic':
+            return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player)
+                + ((this.sumPlayerTotalLuck(player)
+                  + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2)));
+        }
+      } else {
+        return item.power;
       }
     }
 
