@@ -222,6 +222,10 @@ ${rankString}
   modifyPM(commandAuthor, hook, isPrivateMessage, filtered) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
+        if (!castingPlayer) {
+          return commandAuthor.send('Please set this after you have been born');
+        }
+
         if (castingPlayer.isPrivateMessage !== isPrivateMessage || castingPlayer.isPrivateMessageImportant !== filtered) {
           castingPlayer.isPrivateMessage = isPrivateMessage;
           castingPlayer.isPrivateMessageImportant = filtered;
@@ -245,6 +249,10 @@ ${rankString}
   modifyGender(commandAuthor, hook, gender) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
+        if (!castingPlayer) {
+          return commandAuthor.send('Please set this after you have been born');
+        }
+
         if (castingPlayer.gender !== gender) {
           castingPlayer.gender = gender;
           return Database.savePlayer(castingPlayer)
@@ -430,6 +438,10 @@ ${rankString}
   playerEventLog(playerId, count) {
     return Database.loadPlayer(playerId, enumHelper.playerEventLogSelectFields)
       .then((player) => {
+        if (!player) {
+          return;
+        }
+
         return Helper.generateLog(player, count);
       });
   }
@@ -442,6 +454,10 @@ ${rankString}
   playerPvpLog(playerId, count) {
     return Database.loadPlayer(playerId, enumHelper.pvpLogSelectFields)
       .then((player) => {
+        if (!player) {
+          return;
+        }
+
         return Helper.generatePvpLog(player, count);
       });
   }

@@ -386,7 +386,7 @@ const commands = [
         const splitCommand = message.content.split(/ (.+)/);
         return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
           .then((result) => {
-            if (result.length === 0) {
+            if (!result || result.length === 0) {
               return message.author.send('This player has not activated any Events yet.');
             }
 
@@ -396,7 +396,7 @@ const commands = [
 
       return game.playerEventLog(message.author.id, 15)
         .then((result) => {
-          if (result.length === 0) {
+          if (!result || result.length === 0) {
             return message.author.send('You have not activated any Events yet.');
           }
 
@@ -413,7 +413,7 @@ const commands = [
         const splitCommand = message.content.split(/ (.+)/);
         return game.playerPvpLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
           .then((result) => {
-            if (result.length === 0) {
+            if (!result || result.length === 0) {
               return message.author.send('This player has not had any PvP Events yet.');
             }
 
@@ -423,7 +423,7 @@ const commands = [
 
       return game.playerPvpLog(message.author.id, 15)
         .then((result) => {
-          if (result.length === 0) {
+          if (!result || result.length === 0) {
             return message.author.send('You have not had any PvP Events yet.');
           }
 
