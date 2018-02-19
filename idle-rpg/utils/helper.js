@@ -260,7 +260,7 @@ class Helper {
 
       this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
       this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-      selectedPlayer = this.logEvent(selectedPlayer, eventLog);
+      selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
     }
   }
 
@@ -346,7 +346,8 @@ class Helper {
           this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`));
           this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing you!`, true);
           const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
-          attackerObj = this.logEvent(attackerObj, bountyEventLog);
+          attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastEvents');
+          attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastPvpEvents');
           this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true);
           selectedPlayer.currentBounty = 0;
         }
@@ -361,7 +362,7 @@ class Helper {
 
       this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg);
       this.sendPrivateMessage(hook, selectedPlayer, eventLog, true);
-      selectedPlayer = this.logEvent(selectedPlayer, eventLog);
+      selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
     }
   }
 

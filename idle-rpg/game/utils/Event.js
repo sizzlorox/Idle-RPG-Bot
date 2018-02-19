@@ -245,7 +245,7 @@ class Event {
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
         return this.ItemManager.generateItem(selectedPlayer, mob)
           .then((item) => {
-            events.utils.dropItem(selectedPlayer, item);
+            events.utils.dropItem(this.InventoryManager, selectedPlayer, item);
 
             let eventMsg;
             if (!item.isXmasEvent) {
@@ -278,7 +278,7 @@ class Event {
             return resolve(selectedPlayer);
           }
 
-          events.utils.townItem(selectedPlayer, item, itemCost, resolve);
+          events.utils.townItem(this.InventoryManager, selectedPlayer, item, itemCost, resolve);
 
           const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
           const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
@@ -346,7 +346,7 @@ class Event {
         const luckItem = Helper.randomBetween(0, 2);
         const itemKeys = [enumHelper.equipment.helmet.position, enumHelper.equipment.armor.position, enumHelper.equipment.weapon.position];
 
-        events.utils.stealEquip(discordHook, stealingPlayer, victimPlayer, itemKeys[luckItem]);
+        events.utils.stealEquip(this.InventoryManager, discordHook, stealingPlayer, victimPlayer, itemKeys[luckItem]);
       } else if (victimPlayer.gold > 0) {
         const goldStolen = Math.round(victimPlayer.gold / 6);
         if (goldStolen !== 0) {

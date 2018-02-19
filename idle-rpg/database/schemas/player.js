@@ -59,7 +59,8 @@ const newPlayerObj = (discordId, name) => {
       player: 0,
       firstDeath: 'never'
     },
-    pastEvents: []
+    pastEvents: [],
+    pastPvpEvents: []
   };
 };
 
