@@ -1,21 +1,21 @@
 const spells = require('../data/spells');
-const helper = require('../../utils/helper');
+const Helper = require('../../utils/Helper');
 
 class Spell {
 
   generateSpell(selectedPlayer) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.round(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomSpellChance = Math.round(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomRarityChance = Math.round(Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomSpellChance = Math.round(Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
       const spellRarityList = spells.strength.filter(spellRarity => spellRarity.rarity >= randomRarityChance);
       const spellSpellList = spells.spell.filter(spell => spell.rarity >= randomSpellChance);
-      const randomRarityIndex = helper.randomBetween(0, spellRarityList.length - 1);
+      const randomRarityIndex = Helper.randomBetween(0, spellRarityList.length - 1);
 
       let spellType;
       let randomSpellIndex;
       do {
         console.log('generating spell');
-        randomSpellIndex = helper.randomBetween(0, spellSpellList.length - 1);
+        randomSpellIndex = Helper.randomBetween(0, spellSpellList.length - 1);
         spellType = spellSpellList[randomSpellIndex];
       } while (spellType === undefined);
 

@@ -4,7 +4,7 @@ const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog } = require('../utils/logger');
 const { battleDebug, eventDebug, guildID } = require('../../settings');
 
-class helper {
+class Helper {
   printBattleDebug(debugMsg) {
     if (battleDebug) {
       console.log(debugMsg);
@@ -58,11 +58,11 @@ class helper {
     return `${dayString}${hourString}${minuteString}${secondString}`;
   }
 
-  logEvent(selectedPlayer, msg) {
-    if (selectedPlayer.pastEvents.length === 99) {
-      selectedPlayer.pastEvents.shift();
+  logEvent(selectedPlayer, msg, eventToLog) {
+    if (selectedPlayer[eventToLog].length === 99) {
+      selectedPlayer[eventToLog].shift();
     }
-    selectedPlayer.pastEvents.push({
+    selectedPlayer[eventToLog].push({
       event: msg,
       timeStamp: new Date().getTime()
     });
@@ -137,17 +137,45 @@ class helper {
         if (err) {
           return reject(err);
         }
+
         return resolve(files.length);
       });
     });
   }
 
-  calculateItemRating(item) {
-    if (item.position !== enumHelper.equipment.types.relic.position) {
-      return item.power;
+  calculateItemRating(player, item) {
+    if (player && item.position !== enumHelper.equipment.types.relic.position) {
+      if (item.position !== enumHelper.equipment.types.weapon.position) {
+        return item.power;
+      }
+
+      // TODO: Remove when releasing feature
+      if (process.env.NODE_ENV.includes('development')) {
+        switch (item.attackType) {
+          case 'melee':
+            return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player)
+                + ((this.sumPlayerTotalLuck(player)
+                  + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2)));
+
+          case 'range':
+            return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player)
+                + ((this.sumPlayerTotalLuck(player)
+                  + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2)));
+
+          case 'magic':
+            return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player)
+                + ((this.sumPlayerTotalLuck(player)
+                  + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2)));
+        }
+      } else {
+        return item.power;
+      }
     }
 
-    return Math.round(item.str + item.dex + item.end + item.int + item.luk);
+    return Math.ceil(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -319,7 +347,7 @@ class helper {
           this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing you!`, true);
           const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
           attackerObj = this.logEvent(attackerObj, bountyEventLog);
-          this.sendPrivateMessage(hook, selectedPlayer, bountyEventLog, true);
+          this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true);
           selectedPlayer.currentBounty = 0;
         }
 
@@ -472,5 +500,24 @@ class helper {
 
     return logResult;
   }
+
+  generatePvpLog(player, count) {
+    if (player.pastPvpEvents.length === 0) {
+      return '';
+    }
+
+    let logResult = 'Heres what you have done so far:\n      ';
+    let logCount = 0;
+    for (let i = player.pastPvpEvents.length - 1; i >= 0; i--) {
+      if (logCount === count) {
+        break;
+      }
+
+      logResult = logResult.concat(`${player.pastPvpEvents[i].event} [${this.getTimePassed(player.pastPvpEvents[i].timeStamp)} ago]\n      `);
+      logCount++;
+    }
+
+    return logResult;
+  }
 }
-module.exports = new helper();
+module.exports = new Helper();

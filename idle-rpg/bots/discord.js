@@ -1,7 +1,7 @@
 const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
-const { randomBetween } = require('../utils/helper');
+const { randomBetween } = require('../utils/Helper');
 const { welcomeLog, errorLog } = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
