@@ -65,19 +65,19 @@ const events = {
       }
     },
 
-    dropItem: (selectedPlayer, item) => {
+    dropItem: (InventoryManager, selectedPlayer, item) => {
       if (item.position !== enumHelper.inventory.position) {
         if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
-          selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
+          selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
         } else {
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
         }
       } else {
-        selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
+        selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
       }
     },
 
-    townItem: (selectedPlayer, item, itemCost, resolve) => {
+    townItem: (InventoryManager, selectedPlayer, item, itemCost, resolve) => {
       if (item.position !== enumHelper.inventory.position) {
         if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
           return resolve(selectedPlayer);
@@ -86,11 +86,11 @@ const events = {
         selectedPlayer.gold -= itemCost;
         selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position.position, item);
       } else {
-        selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
+        selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
       }
     },
 
-    stealEquip: (discordHook, stealingPlayer, victimPlayer, itemKey) => {
+    stealEquip: (InventoryManager, discordHook, stealingPlayer, victimPlayer, itemKey) => {
       let stolenEquip;
       if (victimPlayer.equipment[itemKey].previousOwners.length > 0) {
         const lastOwnerInList = victimPlayer.equipment[itemKey].previousOwners[victimPlayer.equipment[itemKey].previousOwners.length - 1];
@@ -145,7 +145,7 @@ const events = {
             victimPlayer = Helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKey].position, enumHelper.equipment.empty[itemKey]);
           }
         } else {
-          stealingPlayer = this.InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenEquip);
+          stealingPlayer = InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenEquip);
         }
       }
     }
