@@ -126,6 +126,11 @@ const enumHelper = {
     inventory: 1
   },
 
+  playerEventLogSelectFields: {
+    name: 1,
+    pastEvents: 1
+  },
+
   pvpLogSelectFields: {
     name: 1,
     stole: 1,

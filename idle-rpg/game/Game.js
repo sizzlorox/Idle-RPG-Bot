@@ -424,7 +424,7 @@ ${rankString}
    * @param {Number} count
    */
   playerEventLog(playerId, count) {
-    return Database.loadPlayer(playerId)
+    return Database.loadPlayer(playerId, enumHelper.playerEventLogSelectFields)
       .then((player) => {
         return Helper.generateLog(player, count);
       });
@@ -436,7 +436,7 @@ ${rankString}
    * @param {Number} count
    */
   playerPvpLog(playerId, count) {
-    return Database.loadPlayer(playerId)
+    return Database.loadPlayer(playerId, enumHelper.pvpLogSelectFields)
       .then((player) => {
         return Helper.generatePvpLog(player, count);
       });
