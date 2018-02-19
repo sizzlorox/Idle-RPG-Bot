@@ -102,12 +102,12 @@ const events = {
         const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment[itemKey].name} from you`;
 
         Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+        Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true);
         Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
-        victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastEvents');
-        victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastPvpEvents');
+        stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
+        stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
+        victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents');
+        victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastPvpEvents');
       } else {
         stolenEquip = victimPlayer.equipment[itemKey];
         stolenEquip.name = `${victimPlayer.name}'s ${victimPlayer.equipment[itemKey].name}`;
@@ -116,12 +116,12 @@ const events = {
         const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment[itemKey].name} from you`;
 
         Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+        Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true);
         Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
-        victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastEvents');
-        victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastPvpEvents');
+        stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
+        stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
+        victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents');
+        victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastPvpEvents');
       }
       victimPlayer.stolen++;
       stealingPlayer.stole++;

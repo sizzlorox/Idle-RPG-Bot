@@ -358,12 +358,12 @@ class Event {
           const otherPlayerLog = `${stealingPlayer.name} stole ${goldStolen} from you`;
 
           Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+          Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true);
           Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
-          victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastEvents');
-          victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastPvpEvents');
+          stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
+          stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
+          victimPlayer = Helper.logEvent(stealingPlayer, otherPlayerLog, 'pastEvents');
+          victimPlayer = Helper.logEvent(stealingPlayer, otherPlayerLog, 'pastPvpEvents');
         }
       }
 
