@@ -1,4 +1,5 @@
 const Helper = require('../../utils/Helper');
+const enumHelper = require('../../utils/enumHelper');
 
 const events = {
   utils: {
