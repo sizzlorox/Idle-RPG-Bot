@@ -362,8 +362,8 @@ class Event {
           Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
           stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
           stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
-          victimPlayer = Helper.logEvent(stealingPlayer, otherPlayerLog, 'pastEvents');
-          victimPlayer = Helper.logEvent(stealingPlayer, otherPlayerLog, 'pastPvpEvents');
+          victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents');
+          victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastPvpEvents');
         }
       }
 
