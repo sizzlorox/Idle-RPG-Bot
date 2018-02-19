@@ -319,7 +319,7 @@ class helper {
           this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing you!`, true);
           const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
           attackerObj = this.logEvent(attackerObj, bountyEventLog);
-          this.sendPrivateMessage(hook, selectedPlayer, bountyEventLog, true);
+          this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true);
           selectedPlayer.currentBounty = 0;
         }
 

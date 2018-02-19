@@ -52,7 +52,7 @@ class Monster {
       const playerBalance = selectedPlayer.level <= 3 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4;
 
       const monsterObj = {
-        name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name} `,
+        name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
           str: (monsterRarityList[randomRarityIndex].stats.str
