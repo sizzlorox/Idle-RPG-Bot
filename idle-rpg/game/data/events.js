@@ -78,12 +78,11 @@ const events = {
     },
 
     townItem: (InventoryManager, selectedPlayer, item, itemCost, resolve) => {
+      selectedPlayer.gold -= itemCost;
       if (item.position !== enumHelper.inventory.position) {
         if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
           return resolve(selectedPlayer);
         }
-
-        selectedPlayer.gold -= itemCost;
         selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
       } else {
         selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
