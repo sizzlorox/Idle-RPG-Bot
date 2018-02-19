@@ -196,6 +196,10 @@ ${rankString}
   modifyMention(commandAuthor, hook, isMentionInDiscord) {
     return Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
+        if (!castingPlayer) {
+          return commandAuthor.send('Please set this after you have been born');
+        }
+
         if (castingPlayer.isMentionInDiscord !== isMentionInDiscord) {
           castingPlayer.isMentionInDiscord = isMentionInDiscord;
 
