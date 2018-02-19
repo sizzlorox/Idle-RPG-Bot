@@ -84,7 +84,7 @@ const events = {
         }
 
         selectedPlayer.gold -= itemCost;
-        selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position.position, item);
+        selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
       } else {
         selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
       }
