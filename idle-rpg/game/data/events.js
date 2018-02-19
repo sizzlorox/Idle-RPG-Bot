@@ -66,7 +66,7 @@ const events = {
 
     dropItem: (selectedPlayer, item) => {
       if (item.position !== enumHelper.inventory.position) {
-        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item.power)) {
+        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
           selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
         } else {
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position], item);
@@ -78,7 +78,7 @@ const events = {
 
     townItem: (selectedPlayer, item, itemCost, resolve) => {
       if (item.position !== enumHelper.inventory.position) {
-        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item.power)) {
+        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
           return resolve(selectedPlayer);
         }
 
