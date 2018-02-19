@@ -126,6 +126,15 @@ const enumHelper = {
     inventory: 1
   },
 
+  pvpLogSelectFields: {
+    name: 1,
+    stole: 1,
+    stolen: 1,
+    kills: 1,
+    battles: 1,
+    pastPvpEvents: 1
+  },
+
   statsSelectFields: {
     name: 1,
     health: 1,

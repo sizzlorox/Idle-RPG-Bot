@@ -45,7 +45,7 @@ class Event {
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg);
       Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
       return resolve(selectedPlayer);
     });
@@ -92,8 +92,10 @@ class Event {
                   Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                   Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
                   Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true);
-                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
-                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog);
+                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
+                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
+                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
                   selectedPlayer.battles.lost++;
                   randomPlayer.battles.won++;
 
@@ -120,8 +122,10 @@ class Event {
                   const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and received ${attackerDamage} damage!`;
 
                   Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
-                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog);
+                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
+                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
+                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
 
                   return selectedPlayer;
                 }
@@ -134,8 +138,10 @@ class Event {
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                 Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
                 Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true);
-                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
-                randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog);
+                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
+                randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
+                randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
                 selectedPlayer.battles.won++;
                 randomPlayer.battles.lost++;
 
@@ -185,7 +191,7 @@ class Event {
                 const eventLog = `${mob.name}'s ${defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                 Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
                 Helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
                 selectedPlayer.battles.lost++;
 
@@ -207,7 +213,7 @@ class Event {
                 selectedPlayer.experience += expGain;
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
                 Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
                 Helper.checkExperience(selectedPlayer, discordHook);
 
                 return resolve(selectedPlayer);
@@ -222,7 +228,7 @@ class Event {
               selectedPlayer.kills.mob++;
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-              selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+              selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
               Helper.checkExperience(selectedPlayer, discordHook);
               selectedPlayer.battles.won++;
 
@@ -251,7 +257,7 @@ class Event {
 
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-            selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+            selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
             return resolve(selectedPlayer);
           });
@@ -279,7 +285,7 @@ class Event {
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
           return resolve(selectedPlayer);
         });
@@ -303,7 +309,7 @@ class Event {
 
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsg}`);
       Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
     }
 
     return selectedPlayer;
@@ -318,7 +324,7 @@ class Event {
 
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsg}`);
       Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
       return resolve(selectedPlayer);
     });
@@ -326,7 +332,7 @@ class Event {
 
   generateItemEventMessage(selectedPlayer, item) {
     const randomEventInt = Helper.randomBetween(0, 9);
-    return events.utils.randomEventMessage(randomEventInt);
+    return events.utils.randomItemEventMessage(randomEventInt, selectedPlayer, item);
   }
 
   stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {
@@ -338,7 +344,7 @@ class Event {
       console.log(`>>>>>>>>>>>>>>>>>>>> CHANCE : ${chance} - LUCKSTEALCHANCE : ${luckStealChance} - BOUNTYLUCK : ${90 - canSteal}`);
       if (luckStealChance > (90 - canSteal)) {
         const luckItem = Helper.randomBetween(0, 2);
-        const itemKeys = ['helmet', 'armor', 'weapon'];
+        const itemKeys = [enumHelper.equipment.helmet.position, enumHelper.equipment.armor.position, enumHelper.equipment.weapon.position];
 
         events.utils.stealEquip(discordHook, stealingPlayer, victimPlayer, itemKeys[luckItem]);
       } else if (victimPlayer.gold > 0) {
@@ -349,11 +355,15 @@ class Event {
 
           const eventMsg = Helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`);
           const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
+          const otherPlayerLog = `${stealingPlayer.name} stole ${goldStolen} from you`;
 
           Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
           Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
-          stealingPlayer = Helper.logEvent(stealingPlayer, eventLog);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
+          victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastEvents');
+          victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastPvpEvents');
         }
       }
 
@@ -378,7 +388,7 @@ class Event {
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades);
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, false);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHades);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHades, 'pastEvents');
 
           return resolve(selectedPlayer);
 
@@ -392,7 +402,7 @@ class Event {
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus);
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, false);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogZeus);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogZeus, 'pastEvents');
 
           return resolve(selectedPlayer);
 
@@ -409,7 +419,7 @@ class Event {
 
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco);
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, false);
-            selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAseco);
+            selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAseco, 'pastEvents');
 
             return resolve(selectedPlayer);
           }
@@ -419,7 +429,7 @@ class Event {
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAsecoFull);
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAsecoFull, false);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAsecoFull);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAsecoFull, 'pastEvents');
 
           return resolve(selectedPlayer);
 
@@ -430,7 +440,7 @@ class Event {
 
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermesFail);
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermesFail, false);
-            selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermesFail);
+            selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermesFail, 'pastEvents');
 
             return resolve(selectedPlayer);
           }
@@ -447,7 +457,7 @@ class Event {
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes);
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, false);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermes);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermes, 'pastEvents');
 
           return resolve(selectedPlayer);
 
@@ -461,7 +471,7 @@ class Event {
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthene);
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthene, false);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAthene);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAthene, 'pastEvents');
 
           return resolve(selectedPlayer);
 
@@ -488,7 +498,7 @@ class Event {
                 if (shouldAddToList) {
                   Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsgEris}`);
                   Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false);
-                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLogEris);
+                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents');
                   if (tempArray) {
                     selectedPlayer.spells = tempArray;
                   }
@@ -497,7 +507,7 @@ class Event {
               } else {
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsgEris}`);
                 Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false);
-                selectedPlayer = Helper.logEvent(selectedPlayer, eventLogEris);
+                selectedPlayer = Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents');
                 selectedPlayer.spells.push(spell);
               }
 
@@ -520,7 +530,7 @@ class Event {
 
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog);
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
         return resolve(selectedPlayer);
       }
@@ -555,7 +565,7 @@ class Event {
               if (shouldAddToList) {
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${spellEventResult.eventMsg}`);
                 Helper.sendPrivateMessage(discordHook, selectedPlayer, spellEventResult.eventLog, false);
-                selectedPlayer = Helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+                selectedPlayer = Helper.logEvent(selectedPlayer, spellEventResult.eventLog, 'pastEvents');
                 if (tempArray) {
                   selectedPlayer.spells = tempArray;
                 }
@@ -564,7 +574,7 @@ class Event {
             } else {
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${spellEventResult.eventMsg}`);
               Helper.sendPrivateMessage(discordHook, selectedPlayer, spellEventResult.eventLog, false);
-              selectedPlayer = Helper.logEvent(selectedPlayer, spellEventResult.eventLog);
+              selectedPlayer = Helper.logEvent(selectedPlayer, spellEventResult.eventLog, 'pastEvents');
               selectedPlayer.spells.push(spell);
             }
 
@@ -606,7 +616,7 @@ class Event {
             const itemEventResult = this.generateItemEventMessage(selectedPlayer, item);
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, itemEventResult.eventMsg);
             Helper.sendPrivateMessage(discordHook, selectedPlayer, itemEventResult.eventLog, true);
-            selectedPlayer = Helper.logEvent(selectedPlayer, itemEventResult.eventLog);
+            selectedPlayer = Helper.logEvent(selectedPlayer, itemEventResult.eventLog, 'pastEvents');
 
             return resolve(selectedPlayer);
           });
@@ -636,7 +646,7 @@ class Event {
 
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgLoseGamble);
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventMsgLoseGamble, true);
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLogLoseGamble);
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLogLoseGamble, 'pastEvents');
 
         return resolve(selectedPlayer);
       }
@@ -649,7 +659,7 @@ class Event {
 
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgWinGamble);
       Helper.sendPrivateMessage(discordHook, selectedPlayer, eventMsgWinGamble, true);
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogWinGamble);
+      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogWinGamble, 'pastEvents');
 
       return resolve(selectedPlayer);
     });
@@ -691,7 +701,7 @@ class Event {
 
           Helper.sendMessage(discordHook, 'twitch', false, eventMsgSnowflake);
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogSnowflake);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogSnowflake, 'pastEvents');
         }
       }
 

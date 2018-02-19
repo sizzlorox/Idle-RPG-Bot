@@ -58,11 +58,11 @@ class Helper {
     return `${dayString}${hourString}${minuteString}${secondString}`;
   }
 
-  logEvent(selectedPlayer, msg) {
-    if (selectedPlayer.pastEvents.length === 99) {
-      selectedPlayer.pastEvents.shift();
+  logEvent(selectedPlayer, msg, eventToLog) {
+    if (selectedPlayer[eventToLog].length === 99) {
+      selectedPlayer[eventToLog].shift();
     }
-    selectedPlayer.pastEvents.push({
+    selectedPlayer[eventToLog].push({
       event: msg,
       timeStamp: new Date().getTime()
     });
@@ -495,6 +495,25 @@ class Helper {
       }
 
       logResult = logResult.concat(`${player.pastEvents[i].event} [${this.getTimePassed(player.pastEvents[i].timeStamp)} ago]\n      `);
+      logCount++;
+    }
+
+    return logResult;
+  }
+
+  generatePvpLog(player, count) {
+    if (player.pastPvpEvents.length === 0) {
+      return '';
+    }
+
+    let logResult = 'Heres what you have done so far:\n      ';
+    let logCount = 0;
+    for (let i = player.pastPvpEvents.length - 1; i >= 0; i--) {
+      if (logCount === count) {
+        break;
+      }
+
+      logResult = logResult.concat(`${player.pastPvpEvents[i].event} [${this.getTimePassed(player.pastPvpEvents[i].timeStamp)} ago]\n      `);
       logCount++;
     }
 

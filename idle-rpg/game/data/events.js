@@ -2,7 +2,7 @@ const Helper = require('../../utils/Helper');
 
 const events = {
   utils: {
-    randomItemEventMessage: (randomEventInt) => {
+    randomItemEventMessage: (randomEventInt, selectedPlayer, item) => {
       switch (randomEventInt) {
         case 0:
           return {
@@ -77,12 +77,16 @@ const events = {
     },
 
     townItem: (selectedPlayer, item, itemCost, resolve) => {
-      if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item.power)) {
-        return resolve(selectedPlayer);
-      }
+      if (item.position !== enumHelper.inventory.position) {
+        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item.power)) {
+          return resolve(selectedPlayer);
+        }
 
-      selectedPlayer.gold -= itemCost;
-      selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
+        selectedPlayer.gold -= itemCost;
+        selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
+      } else {
+        selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
+      }
     },
 
     stealEquip: (discordHook, stealingPlayer, victimPlayer, itemKey) => {
@@ -100,8 +104,10 @@ const events = {
         Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
         Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
-        stealingPlayer = Helper.logEvent(stealingPlayer, eventLog);
-        victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog);
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
+        victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastEvents');
+        victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastPvpEvents');
       } else {
         stolenEquip = victimPlayer.equipment[itemKey];
         stolenEquip.name = `${victimPlayer.name}'s ${victimPlayer.equipment[itemKey].name}`;
@@ -112,8 +118,10 @@ const events = {
         Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
         Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
-        stealingPlayer = Helper.logEvent(stealingPlayer, eventLog);
-        victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog);
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
+        victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastEvents');
+        victimPlayer = Helper.logEvent(selectedPlayer, otherPlayerLog, 'pastPvpEvents');
       }
       victimPlayer.stolen++;
       stealingPlayer.stole++;

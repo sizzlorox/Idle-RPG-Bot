@@ -420,13 +420,25 @@ ${rankString}
 
   /**
    * Returns player eventlog by <count> amount
-   * @param {Mumber} playerId
+   * @param {String} playerId
    * @param {Number} count
    */
   playerEventLog(playerId, count) {
     return Database.loadPlayer(playerId)
       .then((player) => {
         return Helper.generateLog(player, count);
+      });
+  }
+
+  /**
+   * Returns player pvp event log by <count> amount
+   * @param {String} playerId
+   * @param {Number} count
+   */
+  playerPvpLog(playerId, count) {
+    return Database.loadPlayer(playerId)
+      .then((player) => {
+        return Helper.generatePvpLog(player, count);
       });
   }
 

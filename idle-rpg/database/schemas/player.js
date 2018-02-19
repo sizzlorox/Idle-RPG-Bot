@@ -200,6 +200,10 @@ const playerSchema = mongoose.Schema({
   pastEvents: {
     type: Array,
     default: []
+  },
+  pastPvpEvents: {
+    type: Array,
+    default: []
   }
 });
 

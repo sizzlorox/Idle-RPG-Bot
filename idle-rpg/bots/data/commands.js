@@ -26,6 +26,8 @@ const commands = [
         !castspell <spell> - Casts a global spell onto Idle-RPG
         !eventlog - Lists up to 15 past events
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
+        !pvplog - Lists up to 15 past PvP events
+        !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
         !mention <on|off> - Change if events relating to you will @Mention you
         !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
         !gender <male|female|neutral|neuter> - Change your character's gender
@@ -389,6 +391,26 @@ const commands = [
       }
 
       return game.playerEventLog(message.author.id, 15)
+        .then((result) => {
+          console.log(`\`\`\`${result}\`\`\``.length);
+          return message.author.send(`\`\`\`${result}\`\`\``);
+        });
+    }
+  },
+
+  pvpLog = {
+    command: '!pvplog',
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        const splitCommand = message.content.split(/ (.+)/);
+        return game.playerPvpLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
+          .then((result) => {
+            return message.author.send(`\`\`\`${result}\`\`\``);
+          });
+      }
+
+      return game.playerPvpLog(message.author.id, 15)
         .then((result) => {
           console.log(`\`\`\`${result}\`\`\``.length);
           return message.author.send(`\`\`\`${result}\`\`\``);
