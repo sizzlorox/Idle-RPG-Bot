@@ -3,13 +3,13 @@ const { playerSchema, newPlayerObj } = require('./schemas/player');
 const { mongoDBUri } = require('../../settings');
 const maps = require('../game/data/maps');
 const { starterTown } = require('../../settings');
-const moment = require('moment');
 
 const Player = mongoose.model('Player', playerSchema);
 const { equipment } = require('../../idle-rpg/utils/enumHelper');
 
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 
+/*
 mongoose.connection.on('open', () => {
   // console.log('\nDATABASE: Connected!');
 });
@@ -17,9 +17,15 @@ mongoose.connection.on('open', () => {
 mongoose.connection.on('close', () => {
   // console.log('DATABASE: Disconnected!\n');
 });
+*/
 
 process.on('close', () => {
-  // console.log('Database disconnecting on app termination');
+  console.log('Database disconnecting on app termination');
+  if (mongoose.connection.readyState === 1) {
+    mongoose.connection.close(() => {
+      process.exit(0);
+    });
+  }
 });
 
 process.on('SIGINT', () => {
