@@ -239,36 +239,7 @@ class Event {
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
         return this.ItemManager.generateItem(selectedPlayer, mob)
           .then((item) => {
-            switch (item.position) {
-              case enumHelper.equipment.types.helmet.position:
-                if (selectedPlayer.equipment.helmet.power > item.power) {
-                  selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-                } else {
-                  selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
-                }
-                break;
-              case enumHelper.equipment.types.armor.position:
-                if (selectedPlayer.equipment.armor.power > item.power) {
-                  selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-                } else {
-                  selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
-                }
-                break;
-              case enumHelper.equipment.types.weapon.position:
-                if (selectedPlayer.equipment.weapon.power > item.power) {
-                  selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-                } else {
-                  selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
-                }
-                break;
-              case enumHelper.equipment.types.relic.position:
-                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic) > Helper.calculateItemRating(selectedPlayer, item.power)) {
-                  selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-                } else {
-                  selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, item);
-                }
-                break;
-            }
+            events.utils.dropItem(selectedPlayer, item);
 
             let eventMsg;
             if (!item.isXmasEvent) {
@@ -301,34 +272,7 @@ class Event {
             return resolve(selectedPlayer);
           }
 
-          switch (item.position) {
-            case enumHelper.equipment.types.helmet.position:
-              if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.helmet) > Helper.calculateItemRating(selectedPlayer, item.power)) {
-                return resolve(selectedPlayer);
-              }
-
-              selectedPlayer.gold -= itemCost;
-              selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
-              break;
-
-            case enumHelper.equipment.types.armor.position:
-              if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.armor) > Helper.calculateItemRating(selectedPlayer, item.power)) {
-                return resolve(selectedPlayer);
-              }
-
-              selectedPlayer.gold -= itemCost;
-              selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
-              break;
-
-            case enumHelper.equipment.types.weapon.position:
-              if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.weapon) > Helper.calculateItemRating(selectedPlayer, item.power)) {
-                return resolve(selectedPlayer);
-              }
-
-              selectedPlayer.gold -= itemCost;
-              selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
-              break;
-          }
+          events.utils.townItem(selectedPlayer, item, itemCost, resolve);
 
           const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
           const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
@@ -381,59 +325,8 @@ class Event {
   }
 
   generateItemEventMessage(selectedPlayer, item) {
-    const randomEventMessage = Helper.randomBetween(0, 9);
-    switch (randomEventMessage) {
-      case 0:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} found a chest containing \`${item.name}\`!`,
-          eventLog: `Found a chest containing ${item.name} in ${selectedPlayer.map.name}`
-        };
-      case 1:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} found \`${item.name}\` on the ground!`,
-          eventLog: `Found ${item.name} on the ground in ${selectedPlayer.map.name}`
-        };
-      case 2:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} explored an abandoned hut which had \`${item.name}\` inside!`,
-          eventLog: `Explored an abandoned hut in ${selectedPlayer.map.name} which had ${item.name} inside`
-        };
-      case 3:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} a bird just dropped \`${item.name}\` infront of ${Helper.generateGenderString(selectedPlayer, 'him')}!`,
-          eventLog: `A bird just dropped ${item.name} infront of you in ${selectedPlayer.map.name}`
-        };
-      case 4:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} stumbles upon a grizzly scene. One of the corpses has \`${item.name}\` next to it! Seems like it is in good enough condition to use.`,
-          eventLog: `You found ${item.name} on a corpse in ${selectedPlayer.map.name}`
-        };
-      case 5:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} found an alter. \`${item.name}\` is sitting on the center, ready to be used!`,
-          eventLog: `On an alter in ${selectedPlayer.map.name} you found ${item.name}`
-        };
-      case 6:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} catches a glint out of the corner of ${Helper.generateGenderString(selectedPlayer, 'his')} eye. Brushing aside some leaves ${Helper.generatePlayerName(selectedPlayer)} finds \`${item.name}\` left here by the last person to camp at this spot.`,
-          eventLog: `Near your camp in ${selectedPlayer.map.name} there was ${item.name}`
-        };
-      case 7:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} notices something reflecting inside a nearby cave. Exploring it further ${Helper.generateGenderString(selectedPlayer, 'he')} find \`${item.name}\` resting against a wall.`,
-          eventLog: `While exploring a cave in ${selectedPlayer.map.name} you found ${item.name}`
-        };
-      case 8:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} finds a grave with \`${item.name}\` sitting on it. The dead do not need equipment so it's yours for the taking`,
-          eventLog: `You stole ${item.name} from a grave in ${selectedPlayer.map.name}`
-        };
-      case 9:
-        return {
-          eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} looks around a derlict building and finds \`${item.name}\` in one of the corners.`,
-          eventLog: `Found ${item.name} while looking around a derlict building in ${selectedPlayer.map.name}`
-        };
-    }
+    const randomEventInt = Helper.randomBetween(0, 9);
+    return events.utils.randomEventMessage(randomEventInt);
   }
 
   stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {
