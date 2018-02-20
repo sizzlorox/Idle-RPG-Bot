@@ -71,32 +71,44 @@ class Helper {
   }
 
   sendPrivateMessage(discordHook, player, msg, isImportantMessage) {
-    if (player && player.isPrivateMessage) {
-      if (player.isPrivateMessageImportant && !isImportantMessage) {
-        return;
-      }
+    return new Promise((resolve) => {
+      if (player && player.isPrivateMessage) {
+        if (player.isPrivateMessageImportant && !isImportantMessage) {
+          return resolve();
+        }
 
-      discordHook.discordBot.guilds.find('id', guildID)
-        .members.find('id', player.discordId).send(msg)
-        .catch(err => errorLog.error(err));
-    }
+        return discordHook.discordBot.guilds.find('id', guildID)
+          .members.find('id', player.discordId).send(msg)
+          .then(() => {
+            return resolve();
+          })
+          .catch(err => errorLog.error(err));
+      }
+    });
   }
 
   sendMessage(discordHook, twitchBot, player, isMovement, msg) {
-    if (msg.toLowerCase().includes('pyddur')) {
-      msg = msg.replace(new RegExp('<@!pyddur>', 'g'), '\`Pyddur, God Of Beer\`');
-    }
+    return new Promise((resolve) => {
+      if (msg.toLowerCase().includes('pyddur')) {
+        msg = msg.replace(new RegExp('<@!pyddur>', 'g'), '\`Pyddur, God Of Beer\`');
+      }
 
-    if (isMovement) {
-      discordHook.movementHook.send(msg)
-        .then(debugMsg => moveLog.move(this.formatLog(debugMsg)))
-        .catch(err => errorLog.error(err));
-    } else {
-      discordHook.actionHook.send(msg)
+      if (isMovement) {
+        return discordHook.movementHook.send(msg)
+          .then(debugMsg => moveLog.move(this.formatLog(debugMsg)))
+          .then(() => {
+            return resolve();
+          })
+          .catch(err => errorLog.error(err));
+      }
+
+      return discordHook.actionHook.send(msg)
         .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
+        .then(() => {
+          return resolve();
+        })
         .catch(err => errorLog.error(err));
-    }
-
+    });
     // Add if to check if channel is streaming
     // twitchBot.say(msg.replace('/\*/g', ''));
   }

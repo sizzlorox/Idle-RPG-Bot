@@ -21,6 +21,15 @@ const enumHelper = {
   },
 
   equipment: {
+    starter: {
+      weapon: {
+        name: 'Training Sword',
+        power: 0.75,
+        position: 'weapon',
+        attackType: 'melee',
+        previousOwners: []
+      }
+    },
     empty: {
       helmet: {
         name: 'Nothing',
