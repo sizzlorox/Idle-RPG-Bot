@@ -100,6 +100,7 @@ const playerSchema = mongoose.Schema({
     helmet: {
       name: String,
       power: Number,
+      position: String,
       previousOwners: {
         type: Array,
         default: []
@@ -108,6 +109,7 @@ const playerSchema = mongoose.Schema({
     armor: {
       name: String,
       power: Number,
+      position: String,
       previousOwners: {
         type: Array,
         default: []
@@ -116,6 +118,7 @@ const playerSchema = mongoose.Schema({
     weapon: {
       name: String,
       power: Number,
+      position: String,
       attackType: String,
       previousOwners: {
         type: Array,
@@ -129,6 +132,7 @@ const playerSchema = mongoose.Schema({
       end: Number,
       int: Number,
       luk: Number,
+      position: String,
       previousOwners: {
         type: Array,
         default: []
