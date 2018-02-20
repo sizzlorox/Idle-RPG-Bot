@@ -36,8 +36,8 @@ const events = {
           };
         case 5:
           return {
-            eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} found an alter. \`${item.name}\` is sitting on the center, ready to be used!`,
-            eventLog: `On an alter in ${selectedPlayer.map.name} you found ${item.name}`
+            eventMsg: `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} found an altar. \`${item.name}\` is sitting on the center, ready to be used!`,
+            eventLog: `On an altar in ${selectedPlayer.map.name} you found ${item.name}`
           };
 
         case 6:
