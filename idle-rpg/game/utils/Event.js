@@ -289,14 +289,7 @@ class Event {
             }
           }
 
-          events.utils.townItem(this.InventoryManager, selectedPlayer, item, itemCost);
-
-          const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
-          const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
-
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-            .then(Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+          events.utils.townItem(this.InventoryManager, discordHook, selectedPlayer, item, itemCost);
 
           return resolve(selectedPlayer);
         });

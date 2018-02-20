@@ -78,12 +78,23 @@ const events = {
       }
     },
 
-    townItem: (InventoryManager, selectedPlayer, item, itemCost) => {
-      selectedPlayer.gold -= itemCost;
+    townItem: (InventoryManager, discordHook, selectedPlayer, item, itemCost) => {
+      const purchasedItem = false;
       if (item.position !== enumHelper.inventory.position) {
+        selectedPlayer.gold -= itemCost;
         selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
-      } else {
+      } else if (selectedPlayer.inventory.items.length < enumHelper.inventory.maxItemAmount) {
+        selectedPlayer.gold -= itemCost;
         selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
+      }
+
+      if (purchasedItem) {
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
+        const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
+
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+          .then(Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
       }
     },
 
