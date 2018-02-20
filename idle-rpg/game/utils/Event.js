@@ -278,6 +278,7 @@ class Event {
             return resolve(selectedPlayer);
           }
 
+          selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
           if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
             return resolve(selectedPlayer);
           }
@@ -589,6 +590,7 @@ class Event {
           .then((item) => {
             switch (item.position) {
               case enumHelper.equipment.types.helmet.position:
+                selectedPlayer.equipment.helmet.position = enumHelper.equipment.types.helmet.position;
                 if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.helmet) > Helper.calculateItemRating(selectedPlayer, item)) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
@@ -597,6 +599,7 @@ class Event {
                 break;
 
               case enumHelper.equipment.types.armor.position:
+                selectedPlayer.equipment.armor.position = enumHelper.equipment.types.armor.position;
                 if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.armor) > Helper.calculateItemRating(selectedPlayer, item)) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {
@@ -605,6 +608,7 @@ class Event {
                 break;
 
               case enumHelper.equipment.types.weapon.position:
+                selectedPlayer.equipment.weapon.position = enumHelper.equipment.types.weapon.position;
                 if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.weapon) > Helper.calculateItemRating(selectedPlayer, item)) {
                   selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
                 } else {

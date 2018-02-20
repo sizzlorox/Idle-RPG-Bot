@@ -25,16 +25,19 @@ const enumHelper = {
       helmet: {
         name: 'Nothing',
         power: 0.15,
+        position: 'helmet',
         previousOwners: []
       },
       armor: {
         name: 'Nothing',
         power: 0.15,
+        position: 'armor',
         previousOwners: []
       },
       weapon: {
         name: 'Fist',
         power: 0.15,
+        position: 'weapon',
         attackType: 'melee',
         previousOwners: []
       },
@@ -45,6 +48,7 @@ const enumHelper = {
         end: 0,
         int: 0,
         luk: 0,
+        position: 'relic',
         previousOwners: []
       }
     },

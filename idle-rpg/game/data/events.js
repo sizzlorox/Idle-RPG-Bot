@@ -67,6 +67,7 @@ const events = {
 
     dropItem: (InventoryManager, selectedPlayer, item) => {
       if (item.position !== enumHelper.inventory.position) {
+        selectedPlayer.equipment[item.position].position = item.position;
         if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
           selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
         } else {
@@ -123,7 +124,8 @@ const events = {
       victimPlayer.stolen++;
       stealingPlayer.stole++;
       if (victimPlayer.equipment[itemKey].name !== enumHelper.equipment.empty[itemKey].name) {
-        if (Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKey].power) < Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKey])) {
+        selectedPlayer.equipment[itemKey].position = itemKey;
+        if (Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKey]) < Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKey])) {
           stealingPlayer = Helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKey].position, stolenEquip);
           if (!victimPlayer.equipment[itemKey].previousOwners) {
             stealingPlayer.equipment[itemKey].previousOwners = [`${victimPlayer.name}`];
