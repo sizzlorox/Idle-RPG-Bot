@@ -4,6 +4,7 @@ const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
 const { errorLog } = require('../utils/logger');
 const { multiplier } = require('../../settings');
+const globalSpells = require('./data/globalSpells');
 
 /**
  * GANE CLASS
