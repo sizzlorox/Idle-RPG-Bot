@@ -278,7 +278,11 @@ class Event {
             return resolve(selectedPlayer);
           }
 
-          events.utils.townItem(this.InventoryManager, selectedPlayer, item, itemCost, resolve);
+          if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
+            return resolve(selectedPlayer);
+          }
+
+          selectedPlayer = events.utils.townItem(this.InventoryManager, selectedPlayer, item, itemCost);
 
           const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
           const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
