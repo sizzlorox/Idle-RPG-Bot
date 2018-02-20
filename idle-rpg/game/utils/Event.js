@@ -232,7 +232,7 @@ class Event {
               Helper.checkExperience(selectedPlayer, discordHook);
               selectedPlayer.battles.won++;
 
-              return this.generateDropItemEvent(discordHook, 'twitch', selectedPlayer, mob);
+              return resolve(this.generateDropItemEvent(discordHook, 'twitch', selectedPlayer, mob));
             });
         });
     });
