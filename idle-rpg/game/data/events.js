@@ -99,9 +99,9 @@ const events = {
         const eventLog = `Stole ${victimPlayer.equipment[itemKey].name}`;
         const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment[itemKey].name} from you`;
 
-        Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-        Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true);
-        Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
+        Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg)
+          .then(Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true))
+          .then(Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true));
         stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
         stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
         victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents');
@@ -113,9 +113,9 @@ const events = {
         const eventLog = `Stole ${stolenEquip.name}`;
         const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment[itemKey].name} from you`;
 
-        Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg);
-        Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true);
-        Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true);
+        Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg)
+          .then(Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true))
+          .then(Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true));
         stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
         stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
         victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents');
