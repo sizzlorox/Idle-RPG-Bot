@@ -22,7 +22,7 @@ const newPlayerObj = (discordId, name) => {
     equipment: {
       helmet: equipment.empty.helmet,
       armor: equipment.empty.armor,
-      weapon: equipment.empty.weapon,
+      weapon: equipment.starter.weapon,
       relic: equipment.empty.relic
     },
     inventory: {
