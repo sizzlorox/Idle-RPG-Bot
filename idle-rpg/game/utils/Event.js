@@ -232,7 +232,11 @@ class Event {
               Helper.checkExperience(selectedPlayer, discordHook);
               selectedPlayer.battles.won++;
 
-              return resolve(this.generateDropItemEvent(discordHook, 'twitch', selectedPlayer, mob));
+              return this.generateDropItemEvent(discordHook, 'twitch', selectedPlayer, mob)
+                .then((updatedPlayer) => {
+                  selectedPlayer = updatedPlayer;
+                  return resolve(selectedPlayer);
+                });
             });
         });
     });
@@ -283,7 +287,7 @@ class Event {
             return resolve(selectedPlayer);
           }
 
-          selectedPlayer = events.utils.townItem(this.InventoryManager, selectedPlayer, item, itemCost);
+          events.utils.townItem(this.InventoryManager, selectedPlayer, item, itemCost);
 
           const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
           const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
