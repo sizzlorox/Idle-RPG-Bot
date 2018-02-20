@@ -55,14 +55,26 @@ class Monster {
         name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
-          str: (monsterRarityList[randomRarityIndex].stats.str
-            * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.stats.str / 2),
-          dex: (monsterRarityList[randomRarityIndex].stats.dex
-            * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.stats.dex / 2),
-          end: (monsterRarityList[randomRarityIndex].stats.end
-            * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.stats.end / 2),
-          int: (monsterRarityList[randomRarityIndex].stats.int
-            * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 2),
+          str: selectedPlayer.level <= 5
+            ? ((monsterRarityList[randomRarityIndex].stats.str
+              * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.stats.str / 2)) / 2
+            : (monsterRarityList[randomRarityIndex].stats.str
+              * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.stats.str / 2),
+          dex: selectedPlayer.level <= 5
+            ? ((monsterRarityList[randomRarityIndex].stats.dex
+              * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.stats.dex / 2)) / 2
+            : (monsterRarityList[randomRarityIndex].stats.dex
+              * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.stats.dex / 2),
+          end: selectedPlayer.level <= 5
+            ? ((monsterRarityList[randomRarityIndex].stats.end
+              * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.stats.end / 2)) / 2
+            : (monsterRarityList[randomRarityIndex].stats.end
+              * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.stats.end / 2),
+          int: selectedPlayer.level <= 5
+            ? ((monsterRarityList[randomRarityIndex].stats.int
+              * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 2)) / 2
+            : (monsterRarityList[randomRarityIndex].stats.int
+              * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 2),
           luk: (monsterRarityList[randomRarityIndex].stats.luk
             * monsterTypeList[randomTypeIndex].stats.luk)
         },
