@@ -43,8 +43,8 @@ class Event {
       selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg);
-      () => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
+      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg)
+        .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false));
       selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
       return resolve(selectedPlayer);
@@ -89,9 +89,9 @@ class Event {
                   const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
-                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                  () => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-                  () => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true);
+                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+                    .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
+                    .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
                   selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
                   selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
@@ -135,9 +135,9 @@ class Event {
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
-                Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                () => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-                () => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true);
+                Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+                  .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
+                  .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
                 randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
@@ -220,7 +220,7 @@ class Event {
               }
 
               const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
-      ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
+    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
               const eventLog = `Killed ${mob.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
 
               selectedPlayer.experience += defender.experience * multiplier;
@@ -321,7 +321,7 @@ class Event {
 
   campEvent(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
-      selectedPlayer = Helper.passiveRegen(selectedPlayer, 5 + (selectedPlayer.stats.end / 2), 5 + (selectedPlayer.stats.int / 2));
+      selectedPlayer = Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
       // TODO: Make more camp event messages to be selected randomly
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} has set up camp and began resting.`;
       const eventLog = 'Set up camp to rest.';
