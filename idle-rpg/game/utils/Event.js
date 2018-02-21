@@ -321,7 +321,7 @@ class Event {
 
   campEvent(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
-      selectedPlayer = Helper.passiveRegen(selectedPlayer, 5 + (selectedPlayer.stats.end / 2), 5 + (selectedPlayer.stats.int / 2));
+      selectedPlayer = Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
       // TODO: Make more camp event messages to be selected randomly
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} has set up camp and began resting.`;
       const eventLog = 'Set up camp to rest.';

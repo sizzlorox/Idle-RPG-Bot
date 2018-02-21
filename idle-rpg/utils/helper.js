@@ -260,6 +260,7 @@ class Helper {
             selectedPlayer.class = 'Mage';
             break;
         }
+        this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`));
       } else {
         selectedPlayer.stats.str++;
         selectedPlayer.stats.dex++;
@@ -270,8 +271,8 @@ class Helper {
       const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
       const eventLog = `Leveled up to level ${selectedPlayer.level}`;
 
-      this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-      this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+      this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+        .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
       selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
     }
   }
@@ -300,8 +301,8 @@ class Helper {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
-      selectedPlayer.experience -= Math.round(selectedPlayer.experience / 4);
-      selectedPlayer.gold = Math.round(selectedPlayer.gold / 2);
+      selectedPlayer.experience -= Math.ceil(selectedPlayer.experience / 6);
+      selectedPlayer.gold = Math.ceil(selectedPlayer.gold / 4);
       selectedPlayer.inventory = {
         equipment: [],
         items: []
@@ -372,8 +373,8 @@ class Helper {
       const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`);
       const eventLog = 'You died. Game over man... Game over.';
 
-      this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg);
-      this.sendPrivateMessage(hook, selectedPlayer, eventLog, true);
+      this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg)
+        .then(() => this.sendPrivateMessage(hook, selectedPlayer, eventLog, true));
       selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
     }
   }
