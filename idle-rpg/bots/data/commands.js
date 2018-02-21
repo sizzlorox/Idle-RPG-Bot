@@ -19,8 +19,8 @@ const commands = [
         !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
         !equip - Sends a PM with your equipment
         !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-senstive)
-        !character - Sends PM with your stats and equipment
-        !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-senstive)
+        !c, !char, !character - Sends PM with your stats and equipment
+        !c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-senstive)
         !map - Displays the worlds locations
         !castspell - Lists spells available to cast
         !castspell <spell> - Casts a global spell onto Idle-RPG
@@ -34,7 +34,7 @@ const commands = [
         !lore <Map Name> - Retrieves the lore of map selected
         !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         !spellbook - Returns list of spells your character has learned
-        !inventory - Displays what your character has in his/her inventory
+        !i, !inv, !inventory - Displays what your character has in his/her inventory
         \`\`\``;
       message.author.send(helpMsg);
     }
@@ -82,7 +82,7 @@ const commands = [
   },
 
   inventory = {
-    command: '!inventory',
+    command: ['!inventory', '!inv', '!i'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot) => {
