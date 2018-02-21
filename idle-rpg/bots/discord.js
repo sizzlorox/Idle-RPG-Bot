@@ -111,13 +111,14 @@ const heartBeat = () => {
     }
   }
 
+  if (onlinePlayerList.length >= 50) {
+    console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
+    minTimer = ((Number(minimalTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
+    maxTimer = ((Number(maximumTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
+  }
+
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {
-      if (onlinePlayerList.length >= 75) {
-        minTimer = ((minimalTimer + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
-        maxTimer = ((maximumTimer + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
-      }
-      console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
 
       const playerTimer = randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
@@ -185,6 +186,7 @@ discordBot.on('guildMemberAdd', (member) => {
 });
 
 discordBot.login(botLoginToken);
+console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
 
 new CronJob({
   cronTime: powerHourWarnTime,
