@@ -3,7 +3,7 @@ const { botOperator } = require('../../../settings');
 const { commandLog } = require('../../utils/logger');
 const moment = require('moment');
 
-const commandList = commands.map(c => c.command).join('|');
+const commandList = commands.map(c => c.command).join('|').replace(/(,)/g, '|');
 const commandRegex = new RegExp(commandList);
 
 class CommandParser {
@@ -15,7 +15,7 @@ class CommandParser {
     const channelId = messageObj.channel.id;
 
     if (commandRegex.test(command)) {
-      const commandObj = commands.filter(c => c.command === command)[0];
+      const commandObj = commands.filter(c => c.command instanceof Array ? c.command.includes(command) : c.command === command)[0];
       if (!commandObj) {
         return;
       }

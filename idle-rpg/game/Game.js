@@ -45,8 +45,8 @@ class Game {
         selectedPlayer.events++;
 
         if (selectedPlayer.events % 100 === 0) {
-          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, Helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`));
-          Helper.sendPrivateMessage(this.discordHook, selectedPlayer, `You have encountered ${selectedPlayer.events} events!`, true);
+          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, Helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`))
+            .then(() => Helper.sendPrivateMessage(this.discordHook, selectedPlayer, `You have encountered ${selectedPlayer.events} events!`, true));
         }
 
         Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
