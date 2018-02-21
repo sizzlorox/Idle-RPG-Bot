@@ -41,7 +41,7 @@ const commands = [
   },
 
   character = {
-    command: '!character',
+    command: ['!character', '!c', '!char'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot) => {
