@@ -43,8 +43,8 @@ class Event {
       selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg);
-      () => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
+      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg)
+        .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false));
       selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
       return resolve(selectedPlayer);
@@ -89,9 +89,9 @@ class Event {
                   const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
-                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                  () => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-                  () => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true);
+                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+                    .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
+                    .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
                   selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
                   selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
@@ -135,9 +135,9 @@ class Event {
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
-                Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
-                () => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-                () => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true);
+                Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+                  .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
+                  .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
                 randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');

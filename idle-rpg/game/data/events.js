@@ -148,7 +148,7 @@ const events = {
         } else {
           stealingPlayer = InventoryManager.addEquipmentIntoInventory(stealingPlayer, stolenEquip);
         }
-        if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types[itemKey].position) !== undefined) {
+        if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find(equip => equip.position === enumHelper.equipment.types[itemKey].position) !== undefined) {
           const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types[itemKey].position)
             .sort((item1, item2) => {
               return item1.power - item2.power;
