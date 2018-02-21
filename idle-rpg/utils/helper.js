@@ -238,6 +238,7 @@ class Helper {
               break;
           }
         }
+        const oldClass = selectedPlayer.class;
 
         const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
           if (['str', 'dex', 'int'].includes(key)) {
@@ -260,7 +261,11 @@ class Helper {
             selectedPlayer.class = 'Mage';
             break;
         }
-        this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`));
+
+        if (selectedPlayer.class !== oldClass) {
+          this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
+            .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true));
+        }
       } else {
         selectedPlayer.stats.str++;
         selectedPlayer.stats.dex++;

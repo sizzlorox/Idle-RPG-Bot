@@ -59,8 +59,8 @@ const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
 
 const timeZone = 'America/Los_Angeles';
 
-const minTimer = (minimalTimer * 1000) * 60;
-const maxTimer = (maximumTimer * 1000) * 60;
+let minTimer = (minimalTimer * 1000) * 60;
+let maxTimer = (maximumTimer * 1000) * 60;
 
 const tickInMinutes = 2;
 let onlinePlayerList = [];
@@ -113,6 +113,12 @@ const heartBeat = () => {
 
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {
+      if (onlinePlayerList.length >= 75) {
+        minTimer = ((minimalTimer + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
+        maxTimer = ((maximumTimer + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
+      }
+      console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
+
       const playerTimer = randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
         game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
@@ -179,7 +185,6 @@ discordBot.on('guildMemberAdd', (member) => {
 });
 
 discordBot.login(botLoginToken);
-console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
 
 new CronJob({
   cronTime: powerHourWarnTime,
