@@ -15,7 +15,7 @@ class CommandParser {
     const channelId = messageObj.channel.id;
 
     if (commandRegex.test(command)) {
-      const commandObj = commands.filter(c => c.command.includes(command))[0];
+      const commandObj = commands.filter(c => c.command instanceof Array ? c.command.includes(command) : c.command === command)[0];
       if (!commandObj) {
         return;
       }
