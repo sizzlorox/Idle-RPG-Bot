@@ -407,7 +407,7 @@ class Helper {
       Intelligence: ${player.stats.int} (${this.sumPlayerTotalIntelligence(player)})
       Luck: ${player.stats.luk} (${this.sumPlayerTotalLuck(player)})
 
-    Born: ${this.toTimeFormat(Number(player.createdAt))}
+    Born: ${this.getTimePassed(player.createdAt)}
     Events: ${player.events}
     Gambles: ${player.gambles}
     Items Stolen: ${player.stole}
