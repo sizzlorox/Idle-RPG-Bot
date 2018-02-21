@@ -93,7 +93,7 @@ const events = {
         const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-          .then(Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
       }
     },
@@ -111,8 +111,8 @@ const events = {
         const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment[itemKey].name} from you`;
 
         Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg)
-          .then(Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true))
-          .then(Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true));
+          .then(() => Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true))
+          .then(() => Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true));
         stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
         stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
         victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents');
@@ -125,8 +125,8 @@ const events = {
         const otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment[itemKey].name} from you`;
 
         Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg)
-          .then(Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true))
-          .then(Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true));
+          .then(() => Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true))
+          .then(() => Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true));
         stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
         stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
         victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents');
@@ -144,7 +144,7 @@ const events = {
             stealingPlayer.equipment[itemKey].previousOwners = victimPlayer.equipment[itemKey].previousOwners;
             stealingPlayer.equipment[itemKey].previousOwners.push(victimPlayer.name);
           }
-          if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types[itemKey].position)) {
+          if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find('position', enumHelper.equipment.types[itemKey].position) !== undefined) {
             const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types[itemKey].position)
               .sort((item1, item2) => {
                 return item1.power - item2.power;
