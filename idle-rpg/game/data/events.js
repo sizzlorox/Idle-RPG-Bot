@@ -135,7 +135,7 @@ const events = {
       victimPlayer.stolen++;
       stealingPlayer.stole++;
       if (victimPlayer.equipment[itemKey].name !== enumHelper.equipment.empty[itemKey].name) {
-        selectedPlayer.equipment[itemKey].position = itemKey;
+        stealingPlayer.equipment[itemKey].position = itemKey;
         if (Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKey]) < Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKey])) {
           stealingPlayer = Helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKey].position, stolenEquip);
           if (!victimPlayer.equipment[itemKey].previousOwners) {

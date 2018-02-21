@@ -71,7 +71,7 @@ const commands = [
       return game.playerStats(message.author)
         .then((playerStats) => {
           if (!playerStats) {
-            return message.author.send('Your character were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+            return message.author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
           const stats = Helper.generateStatsString(playerStats);

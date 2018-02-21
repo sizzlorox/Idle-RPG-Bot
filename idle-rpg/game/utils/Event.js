@@ -348,7 +348,7 @@ class Event {
       console.log(`>>>>>>>>>>>>>>>>>>>> CHANCE : ${chance} - LUCKSTEALCHANCE : ${luckStealChance} - BOUNTYLUCK : ${90 - canSteal}`);
       if (luckStealChance > (90 - canSteal)) {
         const luckItem = Helper.randomBetween(0, 2);
-        const itemKeys = [enumHelper.equipment.helmet.position, enumHelper.equipment.armor.position, enumHelper.equipment.weapon.position];
+        const itemKeys = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
 
         events.utils.stealEquip(this.InventoryManager, discordHook, stealingPlayer, victimPlayer, itemKeys[luckItem]);
       } else if (victimPlayer.gold > 0) {
