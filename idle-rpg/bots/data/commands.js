@@ -283,6 +283,7 @@ const commands = [
 
   top10 = {
     command: '!top10',
+    operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message) => {
       switch ((message.content.split(/ (.+)/)[1] === undefined) ? 'level' : message.content.split(/ (.+)/)[1].toLowerCase()) {
@@ -314,29 +315,9 @@ const commands = [
     }
   },
 
-  giveEquipmentToPlayer = {
-    command: '!giveplayer',
-    operatorOnly: true,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitArray = message.content.split(' ');
-        const playerId = splitArray[1];
-        const position = splitArray[2];
-        const equipment = JSON.parse(splitArray.slice(3, splitArray.length).join(' '));
-        game.loadPlayer(playerId)
-          .then((player) => {
-            player.equipment[position] = equipment;
-            game.savePlayer(player)
-              .then(() => {
-                message.author.send('Done.');
-              });
-          });
-      }
-    }
-  },
-
   castSpell = {
     command: '!castspell',
+    operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
@@ -355,6 +336,7 @@ const commands = [
    */
   placeBounty = {
     command: '!bounty',
+    operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       const splitArray = message.content.split(' ');
@@ -380,6 +362,7 @@ const commands = [
 
   eventLog = {
     command: '!eventlog',
+    operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message) => {
       if (message.content.includes(' ')) {
@@ -407,6 +390,7 @@ const commands = [
 
   pvpLog = {
     command: '!pvplog',
+    operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message) => {
       if (message.content.includes(' ')) {
@@ -437,6 +421,7 @@ const commands = [
    */
   privateMessage = {
     command: '!pm',
+    operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
@@ -463,6 +448,7 @@ const commands = [
    */
   modifyMention = {
     command: '!mention',
+    operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
@@ -488,6 +474,7 @@ const commands = [
    */
   modifyGender = {
     command: '!gender',
+    operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
       if (message.content.includes(' ')) {
@@ -639,6 +626,27 @@ const commands = [
   },
 
   // MODULE COMMANDS
+  giveEquipmentToPlayer = {
+    command: '!giveplayer',
+    operatorOnly: true,
+    function: (game, message) => {
+      if (message.content.includes(' ')) {
+        const splitArray = message.content.split(' ');
+        const playerId = splitArray[1];
+        const position = splitArray[2];
+        const equipment = JSON.parse(splitArray.slice(3, splitArray.length).join(' '));
+        game.loadPlayer(playerId)
+          .then((player) => {
+            player.equipment[position] = equipment;
+            game.savePlayer(player)
+              .then(() => {
+                message.author.send('Done.');
+              });
+          });
+      }
+    }
+  },
+
   nextLaunch = {
     command: '!nextlaunch',
     operatorOnly: false,
