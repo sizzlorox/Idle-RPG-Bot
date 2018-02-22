@@ -220,13 +220,15 @@ class Database {
               previousOwners: []
             },
             'equipment.armor': {
-              name: 'Nothing',
-              power: 0.15,
+              name: 'Linen Shirt',
+              power: 0.30,
+              position: 'armor',
               previousOwners: []
             },
             'equipment.weapon': {
-              name: 'Fist',
-              power: 0.15,
+              name: 'Training Sword',
+              power: 0.75,
+              position: 'weapon',
               attackType: 'melee',
               previousOwners: []
             },

@@ -28,6 +28,12 @@ const enumHelper = {
         position: 'weapon',
         attackType: 'melee',
         previousOwners: []
+      },
+      armor: {
+        name: 'Linen Shirt',
+        power: 0.30,
+        position: 'armor',
+        previousOwners: []
       }
     },
     empty: {

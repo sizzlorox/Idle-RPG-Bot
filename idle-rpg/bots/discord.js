@@ -166,7 +166,7 @@ discordBot.on('message', (message) => {
   CommandParser.parseUserCommand(game, discordBot, hook, message);
 });
 
-if (streamChannelId) {
+if (streamChannelId && process.env.NODE_ENV.includes('production')) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
     if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game && oldMember.presence.status !== 'offline'
       || newMember.presence.game && newMember.presence.game.streaming && oldMember.presence.game && !oldMember.presence.game.streaming && oldMember.presence.status !== 'offline') {
