@@ -350,7 +350,9 @@ class Event {
         const luckItem = Helper.randomBetween(0, 2);
         const itemKeys = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
 
-        events.utils.stealEquip(this.InventoryManager, discordHook, stealingPlayer, victimPlayer, itemKeys[luckItem]);
+        if (!['Nothing', 'Fist'].includes(victimPlayer.equipment[itemKeys[luckItem]].name)) {
+          events.utils.stealEquip(this.InventoryManager, discordHook, stealingPlayer, victimPlayer, itemKeys[luckItem]);
+        }
       } else if (victimPlayer.gold > 0) {
         const goldStolen = Math.round(victimPlayer.gold / 6);
         if (goldStolen !== 0) {
