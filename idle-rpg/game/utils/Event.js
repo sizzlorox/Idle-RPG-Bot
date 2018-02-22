@@ -626,7 +626,7 @@ class Event {
     });
   }
 
-  generateGamblingEvent(discordHook, selectedPlayer, multiplier) {
+  generateGamblingEvent(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
       if (selectedPlayer.gold < 10) {
         return resolve(selectedPlayer)
@@ -642,26 +642,20 @@ class Event {
           selectedPlayer.gold = 0;
         }
 
-        const eventMsgLoseGamble = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} decided to try ${Helper.generateGenderString(selectedPlayer, 'his')} luck in a tavern.
-    Unfortunately, ${Helper.generateGenderString(selectedPlayer, 'he')} lost ${luckGambleGold} gold!`;
-        const eventLogLoseGamble = `Oh dear! You lost ${luckGambleGold} gold by gambling in a tavern.`;
-
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgLoseGamble)
-          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventMsgLoseGamble, true));
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLogLoseGamble, 'pastEvents');
+        const { eventMsg, eventLog } = events.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
         return resolve(selectedPlayer);
       }
 
       selectedPlayer.gold += luckGambleGold;
 
-      const eventMsgWinGamble = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} decided to try ${Helper.generateGenderString(selectedPlayer, 'his')} luck in a tavern.
-    Fortunately, ${Helper.generateGenderString(selectedPlayer, 'he')} won ${luckGambleGold} gold!`;
-      const eventLogWinGamble = `Congrats! You won ${luckGambleGold} gold by gambling in a tavern.`;
-
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgWinGamble)
-        .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventMsgWinGamble, true));
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogWinGamble, 'pastEvents');
+      const { eventMsg, eventLog } = events.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
+      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+        .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
       return resolve(selectedPlayer);
     });

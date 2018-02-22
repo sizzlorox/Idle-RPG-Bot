@@ -7,6 +7,11 @@ const messages = {
    * && -> seletecdPlayer gender he
    * %% -> item name
    * !! -> victimPlayer name
+   * 
+   * Specific events:
+   *    gamble:
+   *      $& = luckGambleGold
+   * TODO: Need moar messages!
    */
   event: {
     camp: [{
@@ -22,9 +27,24 @@ const messages = {
       eventLog: 'Hunt for food around $$'
     },
     {
-      eventMsg: '[\`$$\`] ## went foraging to make medicine for ^^ wounds.',
+      eventMsg: '[\`$$\`] ## went foraging for ingredients to make medicine for ^^ wounds.',
       eventLog: 'Foraged for ingredients to make medicine for your wounds'
-    }],
+    },
+    ],
+
+    gamble: {
+      win: [{
+        eventMsg: `[\`$$\`] ## decided to try ^^ luck in a tavern.
+    Fortunately, && won $& gold!`,
+        eventLog: 'Congrats! You won $& gold by gambling in a tavern.'
+      }],
+
+      lose: [{
+        eventMsg: `[\`$$\`] ## decided to try ^^ luck in a tavern.
+    Unfortunately, && lost $& gold!`,
+        eventLog: 'Oh dear! You lost $& gold by gambling in a tavern.'
+      }]
+    },
 
     item: [{
       eventMsg: '[\`$$\`] ## found a chest containing \`%%\`!',

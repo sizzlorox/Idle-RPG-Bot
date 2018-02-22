@@ -120,7 +120,7 @@ class Game {
     }
 
     if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
-      return Event.generateGamblingEvent(this.discordHook, selectedPlayer, this.multiplier);
+      return Event.generateGamblingEvent(this.discordHook, selectedPlayer);
     }
 
     if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 2)) {

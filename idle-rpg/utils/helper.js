@@ -82,7 +82,7 @@ class Helper {
           .then(() => {
             return resolve();
           })
-          .catch(err => errorLog.error(err));
+          .catch(err => err instanceof JSON ? errorLog.error(err) : console.log(err));
       }
     });
   }
@@ -99,7 +99,7 @@ class Helper {
           .then(() => {
             return resolve();
           })
-          .catch(err => errorLog.error(err));
+          .catch(err => err instanceof JSON ? errorLog.error(err) : console.log(err));
       }
 
       return discordHook.actionHook.send(msg)
@@ -107,7 +107,7 @@ class Helper {
         .then(() => {
           return resolve();
         })
-        .catch(err => errorLog.error(err));
+        .catch(err => err instanceof JSON ? errorLog.error(err) : console.log(err));
     });
     // Add if to check if channel is streaming
     // twitchBot.say(msg.replace('/\*/g', ''));
@@ -539,7 +539,8 @@ class Helper {
     return logResult;
   }
 
-  generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, victimPlayer, otherPlayerLog) {
+  generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, luckGambleGold, victimPlayer, otherPlayerLog) {
+    // TODO: Maybe change these ^^^^^ into an array???
     eventMsg = eventMsg.replace('$$', selectedPlayer.map.name)
       .replace('##', this.generatePlayerName(selectedPlayer))
       .replace('@@', this.generateGenderString(selectedPlayer, 'him'))
@@ -555,6 +556,10 @@ class Helper {
     if (item) {
       eventMsg = eventMsg.replace('%%', item.name);
       eventLog = eventLog.replace('%%', item.name);
+    }
+    if (luckGambleGold) {
+      eventMsg = eventMsg.replace('$&', luckGambleGold);
+      eventLog = eventLog.replace('$&', luckGambleGold);
     }
     if (victimPlayer) {
       eventMsg = eventMsg.replace('!!', this.generatePlayerName(victimPlayer));
