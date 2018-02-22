@@ -21,7 +21,7 @@ const newPlayerObj = (discordId, name) => {
     gender: 'neutral',
     equipment: {
       helmet: equipment.empty.helmet,
-      armor: equipment.empty.armor,
+      armor: equipment.starter.armor,
       weapon: equipment.starter.weapon,
       relic: equipment.empty.relic
     },
