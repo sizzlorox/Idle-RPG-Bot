@@ -538,5 +538,30 @@ class Helper {
 
     return logResult;
   }
+
+  generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, victimPlayer, otherPlayerLog) {
+    eventMsg = eventMsg.replace('$$', selectedPlayer.map.name)
+      .replace('##', this.generatePlayerName(selectedPlayer))
+      .replace('@@', this.generateGenderString(selectedPlayer, 'him'))
+      .replace('^^', this.generateGenderString(selectedPlayer, 'his'))
+      .replace('&&', this.generateGenderString(selectedPlayer, 'he'));
+
+    eventLog = eventLog.replace('$$', selectedPlayer.map.name)
+      .replace('##', selectedPlayer.name)
+      .replace('@@', this.generateGenderString(selectedPlayer, 'him'))
+      .replace('^^', this.generateGenderString(selectedPlayer, 'his'))
+      .replace('&&', this.generateGenderString(selectedPlayer, 'he'));
+
+    if (item) {
+      eventMsg = eventMsg.replace('%%', item.name);
+      eventLog = eventLog.replace('%%', item.name);
+    }
+    if (victimPlayer) {
+      eventMsg = eventMsg.replace('!!', this.generatePlayerName(victimPlayer));
+      eventLog = eventLog.replace('!!', victimPlayer.name);
+    }
+
+    return { eventMsg, eventLog, selectedPlayer, item, victimPlayer, otherPlayerLog };
+  }
 }
 module.exports = new Helper();
