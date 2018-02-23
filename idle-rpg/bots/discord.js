@@ -68,12 +68,12 @@ console.log(`Current ENV: ${process.env.NODE_ENV}`);
 if (!process.env.NODE_ENV.includes('production')) {
   console.log('Mock Players loaded');
   onlinePlayerList = mockPlayers;
+} else {
+  onlinePlayerList.push({
+    name: 'Pyddur, God of Beer',
+    discordId: 'pyddur'
+  });
 }
-
-onlinePlayerList.push({
-  name: 'Pyddur, God of Beer',
-  discordId: 'pyddur'
-});
 
 const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
 const heartBeat = () => {

@@ -30,6 +30,14 @@ const messages = {
       eventMsg: '[\`$$\`] ## went foraging for ingredients to make medicine for ^^ wounds.',
       eventLog: 'Foraged for ingredients to make medicine for your wounds'
     },
+    {
+      eventMsg: '[\`$$\`] ## has decided to rest his head on this rock for a while.',
+      eventLog: 'Rested your head on a rock'
+    },
+    {
+      eventMsg: '[\`$$\`] ## just noticed its time for second breakfast and a break.',
+      eventLog: 'Noticed it was time for second breakfast and a break'
+    }
     ],
 
     gamble: {
