@@ -529,29 +529,29 @@ class Helper {
 
   generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, luckGambleGold, victimPlayer, otherPlayerLog) {
     // TODO: Maybe change these ^^^^^ into an array???
-    eventMsg = eventMsg.replace('$$', selectedPlayer.map.name)
-      .replace('##', this.generatePlayerName(selectedPlayer))
-      .replace('@@', this.generateGenderString(selectedPlayer, 'him'))
-      .replace('^^', this.generateGenderString(selectedPlayer, 'his'))
-      .replace('&&', this.generateGenderString(selectedPlayer, 'he'));
+    eventMsg = eventMsg.replace(/(\$\$)/g, selectedPlayer.map.name)
+      .replace(/(##)/g, this.generatePlayerName(selectedPlayer))
+      .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
+      .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
+      .replace(/(&&)/g, this.generateGenderString(selectedPlayer, 'he'));
 
     eventLog = eventLog.replace('$$', selectedPlayer.map.name)
-      .replace('##', selectedPlayer.name)
-      .replace('@@', this.generateGenderString(selectedPlayer, 'him'))
-      .replace('^^', this.generateGenderString(selectedPlayer, 'his'))
-      .replace('&&', this.generateGenderString(selectedPlayer, 'he'));
+      .replace(/(##)/g, selectedPlayer.name)
+      .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
+      .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
+      .replace(/(&&)/g, this.generateGenderString(selectedPlayer, 'he'));
 
     if (item) {
-      eventMsg = eventMsg.replace('%%', item.name);
-      eventLog = eventLog.replace('%%', item.name);
+      eventMsg = eventMsg.replace(/(%%)/g, item.name);
+      eventLog = eventLog.replace(/(%%)/g, item.name);
     }
     if (luckGambleGold) {
-      eventMsg = eventMsg.replace('$&', luckGambleGold);
-      eventLog = eventLog.replace('$&', luckGambleGold);
+      eventMsg = eventMsg.replace(/(\$&)/g, luckGambleGold);
+      eventLog = eventLog.replace(/(\$&)/g, luckGambleGold);
     }
     if (victimPlayer) {
-      eventMsg = eventMsg.replace('!!', this.generatePlayerName(victimPlayer));
-      eventLog = eventLog.replace('!!', victimPlayer.name);
+      eventMsg = eventMsg.replace(/(!!)/g, this.generatePlayerName(victimPlayer));
+      eventLog = eventLog.replace(/(!!)/g, victimPlayer.name);
     }
 
     return { eventMsg, eventLog, selectedPlayer, item, victimPlayer, otherPlayerLog };
