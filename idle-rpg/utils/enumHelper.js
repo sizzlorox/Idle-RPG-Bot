@@ -31,7 +31,7 @@ const enumHelper = {
       },
       armor: {
         name: 'Linen Shirt',
-        power: 0.30,
+        power: 0.75,
         position: 'armor',
         previousOwners: []
       }
@@ -96,20 +96,20 @@ const enumHelper = {
   },
 
   mockPlayers: [{
-    name: 'Statssss01',
-    discordId: 'Statssss01'
+    name: 'plisbebalanced01',
+    discordId: 'plisbebalanced01'
   },
   {
-    name: 'Statssss02',
-    discordId: 'Statssss02'
+    name: 'plisbebalanced02',
+    discordId: 'plisbebalanced02'
   },
   {
-    name: 'Statssss03',
-    discordId: 'Statssss03'
+    name: 'plisbebalanced03',
+    discordId: 'plisbebalanced03'
   },
   {
-    name: 'Statssss04',
-    discordId: 'Statssss04'
+    name: 'plisbebalanced04',
+    discordId: 'plisbebalanced04'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns

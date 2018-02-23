@@ -221,7 +221,7 @@ class Database {
             },
             'equipment.armor': {
               name: 'Linen Shirt',
-              power: 0.30,
+              power: 0.75,
               position: 'armor',
               previousOwners: []
             },
