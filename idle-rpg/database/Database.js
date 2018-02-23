@@ -213,7 +213,6 @@ class Database {
             map: maps[starterTown],
             level: 1,
             gold: 0,
-            gender: 'neutral',
             'equipment.helmet': {
               name: 'Nothing',
               power: 0.15,
@@ -266,7 +265,8 @@ class Database {
               player: 0,
               firstDeath: 'never'
             },
-            pastEvents: []
+            pastEvents: [],
+            pastPvpEvents: []
           }
         },
         {

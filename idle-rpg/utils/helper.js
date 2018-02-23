@@ -161,29 +161,24 @@ class Helper {
         return item.power;
       }
 
-      // TODO: Remove when releasing feature
-      if (process.env.NODE_ENV.includes('development')) {
-        switch (item.attackType) {
-          case 'melee':
-            return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
-              + (this.sumPlayerTotalDexterity(player)
-                + ((this.sumPlayerTotalLuck(player)
-                  + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2)));
+      switch (item.attackType) {
+        case 'melee':
+          return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)
+              + ((this.sumPlayerTotalLuck(player)
+                + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2)));
 
-          case 'range':
-            return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
-              + (this.sumPlayerTotalDexterity(player)
-                + ((this.sumPlayerTotalLuck(player)
-                  + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2)));
+        case 'range':
+          return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)
+              + ((this.sumPlayerTotalLuck(player)
+                + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2)));
 
-          case 'magic':
-            return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
-              + (this.sumPlayerTotalDexterity(player)
-                + ((this.sumPlayerTotalLuck(player)
-                  + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2)));
-        }
-      } else {
-        return item.power;
+        case 'magic':
+          return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)
+              + ((this.sumPlayerTotalLuck(player)
+                + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2)));
       }
     }
 
@@ -221,56 +216,49 @@ class Helper {
       selectedPlayer.experience = 0;
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      if (process.env.NODE_ENV.includes('development')) {
-        for (let i = 0; i < 4; i++) {
-          switch (this.randomBetween(0, 3)) {
-            case 0:
-              selectedPlayer.stats.str++;
-              break;
-            case 1:
-              selectedPlayer.stats.dex++;
-              break;
-            case 2:
-              selectedPlayer.stats.end++;
-              break;
-            case 3:
-              selectedPlayer.stats.int++;
-              break;
-          }
-        }
-        const oldClass = selectedPlayer.class;
-
-        const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
-          if (['str', 'dex', 'int'].includes(key)) {
-            return {
-              key,
-              value: selectedPlayer.stats[key]
-            };
-          }
-        }).filter(obj => obj !== undefined)
-          .sort((stat1, stat2) => stat2.value - stat1.value);
-
-        switch (playerStats[0].key) {
-          case 'str':
-            selectedPlayer.class = 'Knight';
+      for (let i = 0; i < 4; i++) {
+        switch (this.randomBetween(0, 3)) {
+          case 0:
+            selectedPlayer.stats.str++;
             break;
-          case 'dex':
-            selectedPlayer.class = 'Thief';
+          case 1:
+            selectedPlayer.stats.dex++;
             break;
-          case 'int':
-            selectedPlayer.class = 'Mage';
+          case 2:
+            selectedPlayer.stats.end++;
+            break;
+          case 3:
+            selectedPlayer.stats.int++;
             break;
         }
+      }
+      const oldClass = selectedPlayer.class;
 
-        if (selectedPlayer.class !== oldClass) {
-          this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
-            .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true));
+      const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
+        if (['str', 'dex', 'int'].includes(key)) {
+          return {
+            key,
+            value: selectedPlayer.stats[key]
+          };
         }
-      } else {
-        selectedPlayer.stats.str++;
-        selectedPlayer.stats.dex++;
-        selectedPlayer.stats.end++;
-        selectedPlayer.stats.int++;
+      }).filter(obj => obj !== undefined)
+        .sort((stat1, stat2) => stat2.value - stat1.value);
+
+      switch (playerStats[0].key) {
+        case 'str':
+          selectedPlayer.class = 'Knight';
+          break;
+        case 'dex':
+          selectedPlayer.class = 'Thief';
+          break;
+        case 'int':
+          selectedPlayer.class = 'Mage';
+          break;
+      }
+
+      if (selectedPlayer.class !== oldClass) {
+        this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
+          .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true));
       }
 
       const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
