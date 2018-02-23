@@ -99,7 +99,7 @@ class Helper {
           .then(() => {
             return resolve();
           })
-          .catch(err => err instanceof JSON ? errorLog.error(err) : console.log(err));
+          .catch(err => err instanceof Object ? errorLog.error(err) : console.log(err));
       }
 
       return discordHook.actionHook.send(msg)
@@ -107,7 +107,7 @@ class Helper {
         .then(() => {
           return resolve();
         })
-        .catch(err => err instanceof JSON ? errorLog.error(err) : console.log(err));
+        .catch(err => err instanceof Object ? errorLog.error(err) : console.log(err));
     });
     // Add if to check if channel is streaming
     // twitchBot.say(msg.replace('/\*/g', ''));
