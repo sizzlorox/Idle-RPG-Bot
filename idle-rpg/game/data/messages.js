@@ -31,7 +31,7 @@ const messages = {
       eventLog: 'Foraged for ingredients to make medicine for your wounds'
     },
     {
-      eventMsg: '[\`$$\`] ## has decided to rest his head on this rock for a while.',
+      eventMsg: '[\`$$\`] ## has decided to rest his head on a rock for a while.',
       eventLog: 'Rested your head on a rock'
     },
     {

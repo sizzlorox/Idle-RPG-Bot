@@ -121,7 +121,9 @@ class Event {
                   const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${attackerDamage} damage!`;
                   const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and received ${attackerDamage} damage!`;
 
-                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg);
+                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+                    .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
+                    .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
                   selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
                   selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
