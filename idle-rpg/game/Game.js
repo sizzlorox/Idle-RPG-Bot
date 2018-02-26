@@ -89,7 +89,7 @@ class Game {
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
-    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
+    if (luckDice >= 95 - (selectedPlayer.stats.luk / 2) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
       && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
       return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
     }
