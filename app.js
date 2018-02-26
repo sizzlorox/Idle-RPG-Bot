@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
-const router = require('./routes/index');
+const router = require('./web/routes/index');
 
 const app = express();
 const { errorLog } = require('./idle-rpg/utils/logger');

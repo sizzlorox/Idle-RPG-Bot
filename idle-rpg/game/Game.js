@@ -83,18 +83,15 @@ class Game {
    */
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const luckDice = Helper.randomBetween(0, 100);
-    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 2)) {
+    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
       selectedPlayer = Event.sellInTown(this.discordHook, twitchBot, selectedPlayer);
 
       return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
-    if (luckDice >= 90 - (selectedPlayer.stats.luk / 2) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-      if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
-      }
-
-      return Event.campEvent(this.discordHook, selectedPlayer);
+    if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
+      && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
+      return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
     }
 
     if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
@@ -115,19 +112,19 @@ class Game {
    */
   luckEvent(selectedPlayer, twitchBot) {
     const luckDice = Helper.randomBetween(0, 100);
-    if (luckDice <= 5 + (selectedPlayer.stats.luk / 2)) {
+    if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
       return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 
-    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 2)) {
+    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
       return Event.generateGamblingEvent(this.discordHook, selectedPlayer);
     }
 
-    if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 2)) {
+    if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
       return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer);
     }
 
-    if (luckDice >= 65 - (selectedPlayer.stats.luk / 2)) {
+    if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
       return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
     }
 

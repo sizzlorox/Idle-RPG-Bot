@@ -95,6 +95,13 @@ const enumHelper = {
     luk: 'Luck'
   },
 
+  roamingNpcs: [
+    pyddur = {
+      name: 'Pyddur, God of Beer',
+      discordId: 'pyddur'
+    }
+  ],
+
   mockPlayers: [{
     name: 'plisbebalanced01',
     discordId: 'plisbebalanced01'

@@ -22,11 +22,13 @@ class CommandParser {
       commandLog.command({ author: messageObj.author.username, command: messageContent, time: moment().utc().toISOString() });
 
       if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId && messageObj.channel.type !== 'dm') {
-        return messageObj.author.send(`Please send this to <#${commandObj.channelOnlyId}> or PM me.`);
+        return messageObj.delete(1500)
+          .then(messageObj.author.send(`Please send this to <#${commandObj.channelOnlyId}> or PM me.`));
       }
 
       if (commandObj.operatorOnly && authorId !== botOperator) {
-        return messageObj.author.send('This is a bot operator only command.');
+        return messageObj.delete(1500)
+          .then(messageObj.author.send('This is a bot operator only command.'));
       }
 
       return commandObj.function(game, messageObj, discordBot, hook);
