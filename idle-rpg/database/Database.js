@@ -5,7 +5,7 @@ const maps = require('../game/data/maps');
 const { starterTown } = require('../../settings');
 
 const Player = mongoose.model('Player', playerSchema);
-const { equipment } = require('../../idle-rpg/utils/enumHelper');
+const enumHelper = require('../utils/enumHelper');
 
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 
@@ -110,6 +110,8 @@ class Database {
     const select = {
       name: 1
     };
+    const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.name);
+
     select[Object.keys(type)[0]] = 1;
 
     if (Object.keys(type)[0] === 'level') {
@@ -118,7 +120,9 @@ class Database {
     }
 
     return new Promise((resolve, reject) => {
-      return Player.find({}, (err, result) => {
+      return Player.find({
+        name: { $nin: removeNpcs }
+      }, (err, result) => {
         if (err) {
           disconnect();
           return reject(err);
