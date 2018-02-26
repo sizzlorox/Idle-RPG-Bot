@@ -324,7 +324,7 @@ const commands = [
         return game.castSpell(message.author, discordHook, message.content.split(/ (.+)/)[1].toLowerCase());
       }
 
-      return message.reply(`\`\`\`List of spells:
+      return message.author.send(`\`\`\`List of spells:
         bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
         home - 500 gold - Teleports you back to Kindale.
         \`\`\``);
@@ -435,7 +435,7 @@ const commands = [
         }
       }
 
-      return message.reply(`\`\`\`Possible options:
+      return message.author.send(`\`\`\`Possible options:
       on - You will be pmed in events that include you
       off - You won't be pmed in events that include you
       filtered - You will be pmed certain important events that include you
@@ -462,7 +462,7 @@ const commands = [
         }
       }
 
-      return message.reply(`\`\`\`Possible options:
+      return message.author.send(`\`\`\`Possible options:
         on - You will be tagged in events that include you
         off - You won't be tagged in events that include you
         \`\`\``);
@@ -490,7 +490,7 @@ const commands = [
         }
       }
 
-      return message.reply(`\`\`\`Possible options:
+      return message.author.send(`\`\`\`Possible options:
         male
         female
         neutral
