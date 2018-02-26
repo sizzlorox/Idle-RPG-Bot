@@ -221,9 +221,13 @@ class Event {
                 return resolve(selectedPlayer);
               }
 
-              const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
+              let eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
     ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
               const eventLog = `Killed ${mob.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
+
+              if (defender.gold * multiplier === 0) {
+                eventMsg = eventMsg.replace(` and ${defender.gold * multiplier} gold`);
+              }
 
               selectedPlayer.experience += defender.experience * multiplier;
               selectedPlayer.gold += defender.gold * multiplier;
@@ -248,7 +252,7 @@ class Event {
     return new Promise((resolve) => {
       const dropitemChance = Helper.randomBetween(0, 100);
 
-      if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 2)) {
+      if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
         return this.ItemManager.generateItem(selectedPlayer, mob)
           .then((item) => {
             events.utils.dropItem(this.InventoryManager, selectedPlayer, item);
@@ -544,7 +548,7 @@ class Event {
     return new Promise((resolve) => {
       const luckItemDice = Helper.randomBetween(0, 100);
 
-      if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 2)) {
+      if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
         return this.SpellManager.generateSpell(selectedPlayer)
           .then((spell) => {
             const { eventMsg, eventLog } = events.messages.randomItemEventMessage(selectedPlayer, spell);
@@ -581,7 +585,7 @@ class Event {
 
             return resolve(selectedPlayer);
           });
-      } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 2)) {
+      } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
         return this.ItemManager.generateItem(selectedPlayer)
           .then((item) => {
             switch (item.position) {
@@ -638,7 +642,7 @@ class Event {
       const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3));
       selectedPlayer.gambles++;
 
-      if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 2)) {
+      if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
         selectedPlayer.gold -= luckGambleGold;
         if (selectedPlayer.gold <= 0) {
           selectedPlayer.gold = 0;
