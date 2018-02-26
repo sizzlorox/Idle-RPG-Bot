@@ -5,6 +5,7 @@ const Urban = require('../modules/Urban');
 const maps = require('../../game/data/maps');
 const Helper = require('../../utils/Helper');
 const { commandChannel } = require('../../../settings');
+const enumHelper = require('../../utils/enumHelper');
 
 const commands = [
   // RPG COMMANDS
@@ -241,6 +242,7 @@ const commands = [
         .map((player) => {
           return player.id;
         });
+      enumHelper.roamingNpcs.forEach(npc => discordOnlinePlayers.push(npc.discordId));
 
       game.getOnlinePlayerMaps(discordOnlinePlayers)
         .then((players) => {
@@ -249,7 +251,7 @@ const commands = [
             mapInfo = mapInfo.concat(`\n${map.name} (${map.type.name}):\n`);
             players.forEach((player) => {
               if (player.map.name === map.name) {
-                mapInfo = mapInfo.concat(`${player.name}, `);
+                mapInfo = mapInfo.concat(`${player.name.replace(/(\,)/g, '')}, `);
               }
             });
             mapInfo = mapInfo.replace(/,\s*$/, '\n');
