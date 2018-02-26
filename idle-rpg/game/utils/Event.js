@@ -356,7 +356,7 @@ class Event {
 
           const eventMsg = Helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`);
           const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
-          const otherPlayerLog = `${stealingPlayer.name} stole ${goldStolen} from you`;
+          const otherPlayerLog = `${stealingPlayer.name} stole ${goldStolen} gold from you`;
 
           Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg)
             .then(() => Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true))
