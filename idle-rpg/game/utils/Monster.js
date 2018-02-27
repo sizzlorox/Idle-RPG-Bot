@@ -88,7 +88,6 @@ class Monster {
         gold: Math.round((monsterRarityList[randomRarityIndex].gold
           * monsterTypeList[randomTypeIndex].gold))
       };
-      monsterObj.experience += Math.round((monsterObj.stats.str + monsterObj.stats.dex + monsterObj.stats.end + monsterObj.stats.int) / 2);
       console.log(`MOB POW: ${monsterObj.power} - PLAYER POW: ${playerBalance}`);
 
       return resolve(monsterObj);
