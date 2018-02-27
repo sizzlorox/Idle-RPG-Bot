@@ -295,7 +295,7 @@ class Helper {
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getMapByIndex(4);
       selectedPlayer.experience -= Math.ceil(selectedPlayer.experience / 8);
-      selectedPlayer.gold = Math.ceil(selectedPlayer.gold / 4);
+      selectedPlayer.gold -= Math.ceil(selectedPlayer.gold / 4);
       selectedPlayer.inventory = {
         equipment: [],
         items: []
