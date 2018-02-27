@@ -98,6 +98,7 @@ class Event {
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
                   selectedPlayer.battles.lost++;
                   randomPlayer.battles.won++;
+                  randomPlayer.experience += Math.floor(attackerDamage / 8);
 
                   return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
                     .then((stealResult) => {
@@ -128,6 +129,8 @@ class Event {
                   selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
+                  selectedPlayer.experience += Math.floor(defenderDamage / 8);
+                  randomPlayer.experience += Math.floor(attackerDamage / 8);
 
                   return selectedPlayer;
                 }
@@ -146,6 +149,7 @@ class Event {
                 randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
                 selectedPlayer.battles.won++;
                 randomPlayer.battles.lost++;
+                selectedPlayer.experience += Math.floor(defenderDamage / 8);
 
                 return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
                   .then((stealResult) => {
