@@ -156,33 +156,29 @@ class Helper {
   }
 
   calculateItemRating(player, item) {
-    if (player && item.position !== enumHelper.equipment.types.relic.position) {
-      if (item.position !== enumHelper.equipment.types.weapon.position) {
-        return item.power;
+    return new Promise((resolve) => {
+      if (player && item.position !== enumHelper.equipment.types.relic.position) {
+        if (item.position !== enumHelper.equipment.types.weapon.position) {
+          return item.power;
+        }
+
+        switch (item.attackType) {
+          case 'melee':
+            return resolve(Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player))));
+
+          case 'range':
+            return resolve(Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player))));
+
+          case 'magic':
+            return resolve(Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
+              + (this.sumPlayerTotalDexterity(player))));
+        }
       }
 
-      switch (item.attackType) {
-        case 'melee':
-          return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)
-              + ((this.sumPlayerTotalLuck(player)
-                + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2)));
-
-        case 'range':
-          return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)
-              + ((this.sumPlayerTotalLuck(player)
-                + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2)));
-
-        case 'magic':
-          return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
-            + (this.sumPlayerTotalDexterity(player)
-              + ((this.sumPlayerTotalLuck(player)
-                + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2)));
-      }
-    }
-
-    return Math.ceil(item.str + item.dex + item.end + item.int + item.luk);
+      return resolve(Math.ceil(item.str + item.dex + item.end + item.int + item.luk));
+    });
   }
 
   sumPlayerTotalStrength(player) {
@@ -424,8 +420,8 @@ class Helper {
 
   generatePreviousOwnerString(equipment) {
     if (equipment.previousOwners && equipment.previousOwners.length > 0) {
-      let result = 'Previous Owners:\n        ';
-      result = result.concat(equipment.previousOwners.join('\n        '));
+      let result = 'Previous Owners:\n            ';
+      result = result.concat(equipment.previousOwners.join('\n            '));
       result = result.concat('\n');
       return result;
     }
@@ -467,27 +463,30 @@ class Helper {
   }
 
   generateEquipmentsString(player) {
-    return `\`\`\`Here is your inventory!
-    Helmet: ${player.equipment.helmet.name}
-      Defense: ${player.equipment.helmet.power}
-      ${this.generatePreviousOwnerString(player.equipment.helmet)}
-    Armor: ${player.equipment.armor.name}
-      Defense: ${player.equipment.armor.power}
-      ${this.generatePreviousOwnerString(player.equipment.armor)}
-    Weapon: ${player.equipment.weapon.name}
-      BaseAttackPower: ${player.equipment.weapon.power}
-      AttackPower: ${this.calculateItemRating(player, player.equipment.weapon)}
-      AttackType: ${player.equipment.weapon.attackType}
-        ${this.generatePreviousOwnerString(player.equipment.weapon)}
-    Relic: ${player.equipment.relic.name}
-      Stats:
-        Strength: ${player.equipment.relic.str}
-        Dexterity: ${player.equipment.relic.dex}
-        Endurance: ${player.equipment.relic.end}
-        Intelligence: ${player.equipment.relic.int}
-        Luck: ${player.equipment.relic.luk}
-      ${this.generatePreviousOwnerString(player.equipment.relic)}
-        \`\`\``;
+    return this.calculateItemRating(player, player.equipment.weapon)
+      .then((attackPower) => {
+        return `\`\`\`Here is your inventory!
+        Helmet: ${player.equipment.helmet.name}
+          Defense: ${player.equipment.helmet.power}
+          ${this.generatePreviousOwnerString(player.equipment.helmet)}
+        Armor: ${player.equipment.armor.name}
+          Defense: ${player.equipment.armor.power}
+          ${this.generatePreviousOwnerString(player.equipment.armor)}
+        Weapon: ${player.equipment.weapon.name}
+          BaseAttackPower: ${player.equipment.weapon.power}
+          AttackPower: ${attackPower}
+          AttackType: ${player.equipment.weapon.attackType}
+            ${this.generatePreviousOwnerString(player.equipment.weapon)}
+        Relic: ${player.equipment.relic.name}
+          Stats:
+            Strength: ${player.equipment.relic.str}
+            Dexterity: ${player.equipment.relic.dex}
+            Endurance: ${player.equipment.relic.end}
+            Intelligence: ${player.equipment.relic.int}
+            Luck: ${player.equipment.relic.luk}
+          ${this.generatePreviousOwnerString(player.equipment.relic)}
+            \`\`\``;
+      });
   }
 
   generateLog(player, count) {
