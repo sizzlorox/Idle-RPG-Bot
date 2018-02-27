@@ -194,6 +194,7 @@ const enumHelper = {
 
   equipSelectFields: {
     name: 1,
+    stats: 1,
     equipment: 1
   }
 };
