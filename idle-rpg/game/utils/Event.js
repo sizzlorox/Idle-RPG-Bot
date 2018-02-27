@@ -230,7 +230,7 @@ class Event {
               const eventLog = `Killed ${mob.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
 
               if (defender.gold * multiplier === 0) {
-                eventMsg = eventMsg.replace(` and ${defender.gold * multiplier} gold`, '');
+                eventMsg = eventMsg.replace(` and \`${defender.gold * multiplier}\` gold`, '');
               }
 
               selectedPlayer.experience += defender.experience * multiplier;
