@@ -474,7 +474,7 @@ class Helper {
           ${this.generatePreviousOwnerString(player.equipment.armor)}
         Weapon: ${player.equipment.weapon.name}
           BaseAttackPower: ${player.equipment.weapon.power}
-          AttackPower: ${attackPower}
+          AttackPower: ${Number(attackPower)}
           AttackType: ${player.equipment.weapon.attackType}
             ${this.generatePreviousOwnerString(player.equipment.weapon)}
         Relic: ${player.equipment.relic.name}
