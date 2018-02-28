@@ -146,7 +146,7 @@ class Event {
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
-                if (randomPlayer.horse = 0){
+                if (randomPlayer.horse = 'Yes'){
                   const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}. ${randomPlayer.name}'s horse died in the fight.`;
                 }
 
