@@ -176,6 +176,7 @@ const enumHelper = {
     gender: 1,
     events: 1,
     gold: 1,
+    horse:1,
     equipment: 1,
     map: 1,
     currentBounty: 1,

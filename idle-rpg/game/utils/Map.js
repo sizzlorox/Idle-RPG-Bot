@@ -5,10 +5,27 @@ class Map {
 
   moveToRandomMap(selectedPlayer) {
     const movement = Helper.randomBetween(0, 100);
-    if (movement > 50 && selectedPlayer.map.id !== 0 && selectedPlayer.map.id !== maps.length - 1 || selectedPlayer.map.id === 0) {
-      return maps[selectedPlayer.map.id + 1];
+    let movementSpeed = 1;
+    if ( selectedPlayer.horse === "Yes" ){
+      let movementSpeed = randomBetween (1,3);
+      
     }
-    return maps[selectedPlayer.map.id - 1];
+    
+    if (movement > 50 && selectedPlayer.map.id !== 0 && selectedPlayer.map.id !== maps.length - 1 || selectedPlayer.map.id === 0) {
+      let distanceMoved = selectedPlayer.map.id + movementSpeed;
+      if(distanceMoved > maps.length){
+        selectedPlayer.map.id = map.length;
+        distanceMoved = selectedPlayer.map.id;
+      } 
+      return maps[distanceMoved];
+    }
+    let distanceMoved = selectedPlayer.map.id - movementSpeed;
+
+    if(distanceMoved < 0){
+      selectedPlayer.map.id = 0;
+      distanceMoved = selectedPlayer.map.id;
+    } 
+    return maps[distanceMoved];
   }
 
   getMapByIndex(index) {

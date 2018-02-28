@@ -389,6 +389,7 @@ class Helper {
     Gold: ${player.gold}
     Map: ${player.map.name}
     Bounty: ${player.currentBounty}
+    Horse: ${player.horse}
 
     Stats (Sum of stats with equipment):
       Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})
