@@ -498,9 +498,9 @@ class Event {
                     if (spell.name.includes(spellName)) {
                       tempArray = selectedPlayer.spells.splice(index, 1, spell);
                       shouldAddToList = true;
-                    } else {
-                      shouldAddToList = true;
                     }
+                  } else {
+                    shouldAddToList = true;
                   }
                 });
 
@@ -565,9 +565,9 @@ class Event {
                   if (spell.name.includes(spellName)) {
                     tempArray = selectedPlayer.spells.splice(index, 1, spell);
                     shouldAddToList = true;
-                  } else {
-                    shouldAddToList = true;
                   }
+                } else {
+                  shouldAddToList = true;
                 }
               });
 
