@@ -19,6 +19,7 @@ const newPlayerObj = (discordId, name) => {
     isPrivateMessage: false,
     isPrivateMessageImportant: false,
     gender: 'neutral',
+    horse: 'No',
     equipment: {
       helmet: equipment.empty.helmet,
       armor: equipment.starter.armor,
@@ -95,6 +96,10 @@ const playerSchema = mongoose.Schema({
   gender: {
     type: String,
     default: 'neutral'
+  },
+  horse: {
+    type: String,
+    default: 'No'
   },
   equipment: {
     helmet: {

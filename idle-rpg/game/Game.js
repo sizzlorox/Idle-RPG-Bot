@@ -70,7 +70,7 @@ class Game {
       })
       .catch(err => console.log(err));
   }
-
+  //this ends up in Map.js for controlling movement speed/direction and Event.js for the message generation
   moveEvent(selectedPlayer) {
     return Event.moveEvent(selectedPlayer, this.discordHook);
   }
