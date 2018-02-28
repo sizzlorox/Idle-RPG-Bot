@@ -40,6 +40,7 @@ class Event {
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
+      //The control for where the player is moving to is in Map.JS
       selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
@@ -89,6 +90,10 @@ class Event {
                   const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
+                  if (selectedPlayer.horse === 'Yes'){
+                    otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}. ${selectedPlayer.name}'s horse also died in the fight.`
+                  }
+                  
                   Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                     .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
                     .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
@@ -97,6 +102,7 @@ class Event {
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
                   selectedPlayer.battles.lost++;
+                  selectedPlayer.horse = 'No';
                   randomPlayer.battles.won++;
                   randomPlayer.experience += Math.floor(attackerDamage / 8);
 
@@ -140,6 +146,10 @@ class Event {
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
+                if (randomPlayer.horse = 'Yes'){
+                  const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}. ${randomPlayer.name}'s horse died in the fight.`;
+                }
+
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                   .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
                   .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
@@ -149,6 +159,7 @@ class Event {
                 randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
                 selectedPlayer.battles.won++;
                 randomPlayer.battles.lost++;
+                randomPlayer.horse = 'No';
                 selectedPlayer.experience += Math.floor(defenderDamage / 8);
 
                 return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
@@ -252,10 +263,11 @@ class Event {
     });
   }
 
+  //this is used for mobs and not random item finds
   generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob) {
     return new Promise((resolve) => {
       const dropitemChance = Helper.randomBetween(0, 100);
-
+      
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
         return this.ItemManager.generateItem(selectedPlayer, mob)
           .then((item) => {
@@ -284,6 +296,20 @@ class Event {
   // Item Events
   generateTownItemEvent(discordHook, twitchBot, selectedPlayer) {
     return new Promise((resolve) => {
+      const horseChance = Helper.randomBetween(1, 5);
+      if(horseChance === 5){
+        const horseCost = 200;
+        if (selectedPlayer.gold >= horseCost){
+          selectedPlayer.horse = 'Yes';
+        }
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just purchased a horse for ${horseCost} gold!`;
+        const eventLog = `Purchased horse from Town for ${horseCost} Gold`;
+
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+        return resolve(selectedPlayer);
+      }
       return this.ItemManager.generateItem(selectedPlayer)
         .then((item) => {
           const itemCost = Math.round(item.gold);

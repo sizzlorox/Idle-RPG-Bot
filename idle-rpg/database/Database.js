@@ -217,6 +217,7 @@ class Database {
             map: maps[starterTown],
             level: 1,
             gold: 0,
+            horse: 'No',
             'equipment.helmet': {
               name: 'Nothing',
               power: 0.15,
