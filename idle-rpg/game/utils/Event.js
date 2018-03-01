@@ -41,7 +41,7 @@ class Event {
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
       selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
-      const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} just arrived in \`${selectedPlayer.map.name}\`.`;
+      const eventMsg = `${Helper.generatePlayerName(selectedPlayer, false)} just arrived in \`${selectedPlayer.map.name}\`.`;
       const eventLog = `Arrived in ${selectedPlayer.map.name}`;
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg)
         .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false));
@@ -75,16 +75,16 @@ class Event {
                 selectedPlayer = attacker;
                 randomPlayer = defender;
                 const battleResult = `Battle Results:
-                  ${Helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                  ${Helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} HP left.
-                  ${Helper.generatePlayerName(randomPlayer)} 's \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
-                  ${Helper.generatePlayerName(randomPlayer)} has ${randomPlayer.health} HP left.`;
+                  ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+                  ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} HP left.
+                  ${Helper.generatePlayerName(randomPlayer, true)} 's \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
+                  ${Helper.generatePlayerName(randomPlayer, true)} has ${randomPlayer.health} HP left.`;
 
                 Helper.printEventDebug(battleResult);
 
                 if (selectedPlayer.health <= 0) {
-                  const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(randomPlayer)} just killed ${Helper.generatePlayerName(selectedPlayer)} with ${Helper.generateGenderString(randomPlayer, 'his')} \`${randomPlayer.equipment.weapon.name}\`!
-    ${Helper.generatePlayerName(selectedPlayer)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${Helper.generatePlayerName(randomPlayer)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
+                  const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(randomPlayer, true)} just killed ${Helper.generatePlayerName(selectedPlayer, true)} with ${Helper.generateGenderString(randomPlayer, 'his')} \`${randomPlayer.equipment.weapon.name}\`!
+    ${Helper.generatePlayerName(selectedPlayer, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
 
                   const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
@@ -113,10 +113,10 @@ class Event {
 
                 if (defender.health > 0 && selectedPlayer.health > 0) {
                   const eventMsg = attackerDamage > defenderDamage
-                    ? `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} attacked ${Helper.generatePlayerName(randomPlayer)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${Helper.generateGenderString(randomPlayer, 'he')} managed to get away!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer)} HP:${defender.health}/${randomPlayerMaxHealth}]`
-                    : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} attacked ${Helper.generatePlayerName(randomPlayer)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${Helper.generatePlayerName(randomPlayer)} was too strong!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
+                    ? `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} attacked ${Helper.generatePlayerName(randomPlayer, true)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${Helper.generateGenderString(randomPlayer, 'he')} managed to get away!
+    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`
+                    : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} attacked ${Helper.generatePlayerName(randomPlayer, true)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${Helper.generatePlayerName(randomPlayer, true)} was too strong!
+    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
                   // TODO: Find a way of making this visible some other method
                   // eventMsg = eventMsg.concat(battleResult);
                   const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${attackerDamage} damage!`;
@@ -135,8 +135,8 @@ class Event {
                   return selectedPlayer;
                 }
 
-                const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just killed \`${randomPlayer.name}\` with ${Helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\`!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
+                const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just killed \`${randomPlayer.name}\` with ${Helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\`!
+    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
@@ -183,15 +183,15 @@ class Event {
             }) => {
               selectedPlayer = attacker;
               const battleResult = `Battle Results:
-                ${Helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                ${Helper.generatePlayerName(selectedPlayer)} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
+                ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+                ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
                 ${defender.name}'s \`${defender.equipment.weapon.name}\` did ${defenderDamage} damage.
                 ${defender.name} has ${defender.health} / ${mobMaxHealth} HP left.`;
 
               Helper.printEventDebug(battleResult);
 
               if (selectedPlayer.health <= 0) {
-                const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${mob.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${Helper.generatePlayerName(selectedPlayer)}!
+                const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${mob.name}\`'s \`${defender.equipment.weapon.name}\` just killed ${Helper.generatePlayerName(selectedPlayer, true)}!
     ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = `${mob.name}'s ${defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
@@ -207,9 +207,9 @@ class Event {
               if (defender.health > 0 && selectedPlayer.health > 0) {
                 const expGain = Math.floor((defender.experience * multiplier) / 2);
                 const eventMsg = attackerDamage > defenderDamage
-                  ? `[\`${selectedPlayer.map.name}\`] \`${mob.name}\` just fled from ${Helper.generatePlayerName(selectedPlayer)}!
+                  ? `[\`${selectedPlayer.map.name}\`] \`${mob.name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
     ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`
-                  : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just fled from \`${mob.name}\`!
+                  : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from \`${mob.name}\`!
     ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = attackerDamage > defenderDamage
@@ -225,7 +225,7 @@ class Event {
                 return resolve(selectedPlayer);
               }
 
-              let eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
+              let eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
     ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
               const eventLog = `Killed ${mob.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
 
@@ -263,9 +263,9 @@ class Event {
 
             let eventMsg;
             if (!item.isXmasEvent) {
-              eventMsg = `${Helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\``;
+              eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.name}!\``;
             } else {
-              eventMsg = `**${Helper.generatePlayerName(selectedPlayer)} received \`${item.name}\` from \`${mob.name}!\`**`;
+              eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.name}!\`**`;
             }
             const eventLog = `Received ${item.name} from ${mob.name}`;
 
@@ -318,7 +318,7 @@ class Event {
       profit = Math.floor(profit);
       selectedPlayer.gold += profit;
 
-      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just sold what they found adventuring for ${profit} gold!`;
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just sold what they found adventuring for ${profit} gold!`;
       const eventLog = `Made ${profit} gold selling what you found adventuring`;
 
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
@@ -392,7 +392,7 @@ class Event {
             selectedPlayer.experience = 0;
           }
 
-          const eventMsgHades = `Hades unleashed his wrath upon ${Helper.generatePlayerName(selectedPlayer)} making ${Helper.generateGenderString(selectedPlayer, 'him')} lose ${luckExpAmount} experience!`;
+          const eventMsgHades = `Hades unleashed his wrath upon ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} lose ${luckExpAmount} experience!`;
           const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades)
@@ -406,7 +406,7 @@ class Event {
           selectedPlayer.health -= luckHealthAmount;
           Helper.checkHealth(this.MapClass, selectedPlayer, discordHook);
 
-          const eventMsgZeus = `${Helper.generatePlayerName(selectedPlayer)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
+          const eventMsgZeus = `${Helper.generatePlayerName(selectedPlayer, true)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
           const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus)
@@ -421,7 +421,7 @@ class Event {
           if (healthDeficit) {
             const healAmount = Math.round(healthDeficit / 3);
 
-            const eventMsgAseco = `Fortune smiles upon ${Helper.generatePlayerName(selectedPlayer)} as Aseco cured ${Helper.generateGenderString(selectedPlayer, 'his')} sickness and restored ${Helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
+            const eventMsgAseco = `Fortune smiles upon ${Helper.generatePlayerName(selectedPlayer, true)} as Aseco cured ${Helper.generateGenderString(selectedPlayer, 'his')} sickness and restored ${Helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
             const eventLogAseco = `Aseco healed you for ${healAmount}`;
 
             selectedPlayer.health += healAmount;
@@ -433,7 +433,7 @@ class Event {
             return resolve(selectedPlayer);
           }
 
-          const eventMsgAsecoFull = `Aseco gave ${Helper.generatePlayerName(selectedPlayer)} an elixir of life but it caused no effect on ${Helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
+          const eventMsgAsecoFull = `Aseco gave ${Helper.generatePlayerName(selectedPlayer, true)} an elixir of life but it caused no effect on ${Helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
           const eventLogAsecoFull = 'Aseco wanted to heal you, but you had full health';
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAsecoFull)
@@ -444,7 +444,7 @@ class Event {
 
         case 4:
           if (selectedPlayer.gold < 20) {
-            const eventMsgHermesFail = `Hermes demanded some gold from ${Helper.generatePlayerName(selectedPlayer)} but as ${Helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
+            const eventMsgHermesFail = `Hermes demanded some gold from ${Helper.generatePlayerName(selectedPlayer, true)} but as ${Helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
             const eventLogHermesFail = 'Hermes demanded gold from you but you had nothing to give';
 
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermesFail)
@@ -456,7 +456,7 @@ class Event {
 
           const goldTaken = Math.round(selectedPlayer.gold / 20);
 
-          const eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer)} by force. Probably he is just out of humor.`
+          const eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`
           const eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
 
           selectedPlayer.gold -= goldTaken;
@@ -475,7 +475,7 @@ class Event {
           selectedPlayer.experience += luckExpAthena;
           Helper.checkExperience(selectedPlayer, discordHook)
 
-          const eventMsgAthene = `Athene shared her wisdom with ${Helper.generatePlayerName(selectedPlayer)} making ${Helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAthena} experience!`;
+          const eventMsgAthene = `Athene shared her wisdom with ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAthena} experience!`;
           const eventLogAthene = `Athene shared her wisdom with you making you gain ${luckExpAthena} experience`;
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthene)
@@ -487,7 +487,7 @@ class Event {
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
             .then((spell) => {
-              const eventMsgEris = `Eris has given ${Helper.generatePlayerName(selectedPlayer)} a scroll containing \`${spell.name}\` to add to ${Helper.generateGenderString(selectedPlayer, 'his')} spellbook!`;
+              const eventMsgEris = `Eris has given ${Helper.generatePlayerName(selectedPlayer, true)} a scroll containing \`${spell.name}\` to add to ${Helper.generateGenderString(selectedPlayer, 'his')} spellbook!`;
               const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
               if (selectedPlayer.spells.length > 0) {
                 let shouldAddToList = false;
@@ -534,7 +534,7 @@ class Event {
         const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
         selectedPlayer.gold += goldAmount;
 
-        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} found ${goldAmount} gold!`;
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} found ${goldAmount} gold!`;
         const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
 
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)

@@ -29,7 +29,7 @@ const commands = [
         !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !pvplog - Lists up to 15 past PvP events
         !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
-        !mention <on|off> - Change if events relating to you will @Mention you
+        !mention <on|off|action|move> - Change if events relating to you will @Mention you
         !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
         !gender <male|female|neutral|neuter> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
@@ -460,13 +460,17 @@ const commands = [
         switch (splitCommand[1].toLowerCase()) {
           case 'on':
           case 'off':
-            return game.modifyMention(message.author, discordHook, splitCommand[1] === 'on');
+          case 'action':
+          case 'move':
+            return game.modifyMention(message.author, discordHook, splitCommand[1].toLowerCase());
         }
       }
 
       return message.author.send(`\`\`\`Possible options:
         on - You will be tagged in events that include you
         off - You won't be tagged in events that include you
+        action - You will be tagged in action events that include you
+        move - You will be tagged in move events that include you
         \`\`\``);
     }
   },

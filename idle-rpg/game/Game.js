@@ -29,7 +29,7 @@ class Game {
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(player)} was born! Welcome to the world of Idle-RPG!`);
+          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(player, true)} was born! Welcome to the world of Idle-RPG!`);
 
           return Database.createNewPlayer(player.discordId, player.name);
         }
@@ -43,6 +43,13 @@ class Game {
 
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
+
+        // TODO: REMOVE LATER
+        if (selectedPlayer.isMentionInDiscord === 'true') {
+          selectedPlayer.isMentionInDiscord = 'on';
+        } else if (selectedPlayer.isMentionInDiscord === 'false') {
+          selectedPlayer.isMentionInDiscord = 'off';
+        }
 
         // TODO: REMOVE LATER
         // Removing duplicate spells from bug that was fixed earlier
