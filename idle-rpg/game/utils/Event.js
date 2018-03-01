@@ -496,11 +496,11 @@ class Event {
                   const spellName = ownedSpell.name.split(/ (.+)/)[1];
                   if (spell.power > ownedSpell.power) {
                     if (spell.name.includes(spellName)) {
-                      tempArray = selectedPlayer.spells.splice(index, 1, spell);
+                      tempArray = selectedPlayer.spells.splice(index, 1, ownedSpell);
+                      shouldAddToList = true;
+                    } else {
                       shouldAddToList = true;
                     }
-                  } else {
-                    shouldAddToList = true;
                   }
                 });
 
@@ -563,11 +563,11 @@ class Event {
                 const spellName = ownedSpell.name.split(/ (.+)/)[1];
                 if (spell.power > ownedSpell.power) {
                   if (spell.name.includes(spellName)) {
-                    tempArray = selectedPlayer.spells.splice(index, 1, spell);
+                    tempArray = selectedPlayer.spells.splice(index, 1, ownedSpell);
+                    shouldAddToList = true;
+                  } else {
                     shouldAddToList = true;
                   }
-                } else {
-                  shouldAddToList = true;
                 }
               });
 
