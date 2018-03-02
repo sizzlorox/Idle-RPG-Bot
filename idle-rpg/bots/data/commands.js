@@ -10,31 +10,31 @@ const enumHelper = require('../../utils/enumHelper');
 const commands = [
   // RPG COMMANDS
   help = {
-    command: '!help',
+    command: ['!help', '!h'],
     operatorOnly: false,
     function: (game, message) => {
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
         !top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
-        !stats - Sends a PM with your stats
-        !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
-        !equip - Sends a PM with your equipment
-        !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-senstive)
+        !s, !stats - Sends a PM with your stats
+        !s, !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
+        !e, !equip - Sends a PM with your equipment
+        !e, !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-senstive)
         !c, !char, !character - Sends PM with your stats and equipment
         !c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-senstive)
-        !map - Displays the worlds locations
-        !castspell - Lists spells available to cast
-        !castspell <spell> - Casts a global spell onto Idle-RPG
-        !eventlog - Lists up to 15 past events
-        !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
-        !pvplog - Lists up to 15 past PvP events
-        !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
+        !m, !map - Displays the worlds locations
+        !cs, !castspell - Lists spells available to cast
+        !cs, !castspell <spell> - Casts a global spell onto Idle-RPG
+        !el, !eventlog - Lists up to 15 past events
+        !el, !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
+        !pl, !pvplog - Lists up to 15 past PvP events
+        !pl, !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
         !mention <on|off|action|move> - Change if events relating to you will @Mention you
         !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
         !gender <male|female|neutral|neuter> - Change your character's gender
         !lore <Map Name> - Retrieves the lore of map selected
-        !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
-        !spellbook - Returns list of spells your character has learned
+        !b, !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
+        !sb, !spellbook - Returns list of spells your character has learned
         !i, !inv, !inventory - Displays what your character has in his/her inventory
         \`\`\``;
       message.author.send(helpMsg);
@@ -120,7 +120,7 @@ const commands = [
   },
 
   stats = {
-    command: '!stats',
+    command: ['!stats', '!s'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot) => {
@@ -157,7 +157,7 @@ const commands = [
   },
 
   equip = {
-    command: '!equip',
+    command: ['!equip', '!e'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot) => {
@@ -194,7 +194,7 @@ const commands = [
   },
 
   spellbook = {
-    command: '!spellbook',
+    command: ['!spellbook', '!sb'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot) => {
@@ -231,7 +231,7 @@ const commands = [
   },
 
   map = {
-    command: '!map',
+    command: ['!map', '!m'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot) => {
@@ -318,7 +318,7 @@ const commands = [
   },
 
   castSpell = {
-    command: '!castspell',
+    command: ['!castspell', '!cs'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
@@ -337,7 +337,7 @@ const commands = [
    * places a bounty on a specific player for a specific amount should work with @playername and then a gold amount
    */
   placeBounty = {
-    command: '!bounty',
+    command: ['!bounty', '!b'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message, discordBot, discordHook) => {
@@ -363,7 +363,7 @@ const commands = [
   },
 
   eventLog = {
-    command: '!eventlog',
+    command: ['!eventlog', '!el'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message) => {
@@ -391,7 +391,7 @@ const commands = [
   },
 
   pvpLog = {
-    command: '!pvplog',
+    command: ['!pvplog', '!pl'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (game, message) => {
