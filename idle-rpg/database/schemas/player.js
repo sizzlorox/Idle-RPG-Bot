@@ -101,6 +101,7 @@ const playerSchema = mongoose.Schema({
       name: String,
       power: Number,
       position: String,
+      gold: Number,
       previousOwners: {
         type: Array,
         default: []
@@ -110,6 +111,7 @@ const playerSchema = mongoose.Schema({
       name: String,
       power: Number,
       position: String,
+      gold: Number,
       previousOwners: {
         type: Array,
         default: []
@@ -120,6 +122,7 @@ const playerSchema = mongoose.Schema({
       power: Number,
       position: String,
       attackType: String,
+      gold: Number,
       previousOwners: {
         type: Array,
         default: []
