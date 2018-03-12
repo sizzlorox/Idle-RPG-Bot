@@ -37,7 +37,7 @@ const settings = {
   rpgChannel: process.env.DISCORD_RPG_CHANNEL_ID,
   commandChannel: process.env.DISCORD_RPG_COMMAND_CHANNEL_ID,
   mongoDBUri: process.env.MONGODB_URI,
-  starterTown: 4,
+  starterTown: [0, 0],
   multiplier: 1
 };
 module.exports = settings;

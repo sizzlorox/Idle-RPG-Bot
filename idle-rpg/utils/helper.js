@@ -82,7 +82,7 @@ class Helper {
           .then(() => {
             return resolve();
           })
-          .catch(err => err instanceof JSON ? errorLog.error(err) : console.log(err));
+          .catch(err => console.log(err));
       }
     });
   }

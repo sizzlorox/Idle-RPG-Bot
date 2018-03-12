@@ -9,7 +9,7 @@ const Map = require('../utils/Map');
 const Database = require('../../database/Database');
 const events = require('../data/events');
 const { pvpLevelRestriction } = require('../../../settings');
-const { errorLog } = require('../../utils/logger');
+const { errorLog, infoLog } = require('../../utils/logger');
 
 class Event {
 
@@ -40,9 +40,11 @@ class Event {
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
-      selectedPlayer.map = this.MapManager.moveToRandomMap(selectedPlayer);
-      const eventMsg = `${Helper.generatePlayerName(selectedPlayer, false)} just arrived in \`${selectedPlayer.map.name}\`.`;
-      const eventLog = `Arrived in ${selectedPlayer.map.name}`;
+      const { map, direction } = this.MapManager.moveToRandomMap(selectedPlayer);
+      selectedPlayer.map = map;
+      const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${direction}\` and arrived in \`${map.name}\` DEBUG:[ ${map.coords.toString()} ].`;
+      const eventLog = `Moved ${direction} and arrived in ${map.name}`;
+
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg)
         .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false));
       selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
@@ -310,7 +312,10 @@ class Event {
     if (selectedPlayer.inventory.equipment.length > 0) {
       let profit = 0;
       Helper.printEventDebug(selectedPlayer.inventory.equipment);
+      infoLog.log(selectedPlayer.inventory.equipment);
+      console.log(selectedPlayer.inventory.equipment);
       selectedPlayer.inventory.equipment.forEach((equipment) => {
+        infoLog.log(equipment);
         Helper.printEventDebug(`Equipment selling: ${equipment.name}`);
         profit += Number(equipment.gold);
       });

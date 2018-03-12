@@ -44,20 +44,6 @@ class Game {
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
 
-        // TODO: REMOVE LATER
-        if (selectedPlayer.isMentionInDiscord === 'true') {
-          selectedPlayer.isMentionInDiscord = 'on';
-        } else if (selectedPlayer.isMentionInDiscord === 'false') {
-          selectedPlayer.isMentionInDiscord = 'off';
-        }
-
-        // TODO: REMOVE LATER
-        // Removing duplicate spells from bug that was fixed earlier
-        selectedPlayer.spells = selectedPlayer.spells.filter((thing, index, self) =>
-          index === self.findIndex(t => (
-            t.name === thing.name
-          )));
-
         if (selectedPlayer.events % 100 === 0) {
           Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, Helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`))
             .then(() => Helper.sendPrivateMessage(this.discordHook, selectedPlayer, `You have encountered ${selectedPlayer.events} events!`, true));

@@ -12,7 +12,7 @@ const newPlayerObj = (discordId, name) => {
     health: 105,
     mana: 50,
     experience: 0,
-    map: maps[starterTown],
+    map: maps.find(map => map.coords[0] === starterTown[0] && map.coords[1] === starterTown[1]),
     level: 1,
     gold: 0,
     isMentionInDiscord: 'on',
