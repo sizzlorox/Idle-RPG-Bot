@@ -74,6 +74,7 @@ const maps = [
   {
     id: 0,
     coords: [0, 0],
+    image: '',
     name: 'The Isle Of Puckarmpit',
     type: type.land,
     levelReq: 1,
@@ -82,6 +83,7 @@ const maps = [
   {
     id: 1,
     coords: [0, 1],
+    image: '',
     name: 'Neataman Lake',
     type: type.land,
     levelReq: 1,
@@ -90,6 +92,7 @@ const maps = [
   {
     id: 2,
     coords: [0, 2],
+    image: '',
     name: 'Hellserscrutch Hill',
     type: type.land,
     levelReq: 1,
@@ -98,6 +101,7 @@ const maps = [
   {
     id: 3,
     coords: [0, 3],
+    image: '',
     name: 'Woldingfords Barrow',
     type: type.land,
     levelReq: 1,
@@ -106,6 +110,7 @@ const maps = [
   {
     id: 4,
     coords: [0, 4],
+    image: '',
     name: 'Kindale',
     type: type.town,
     levelReq: 1,
@@ -114,6 +119,7 @@ const maps = [
   {
     id: 5,
     coords: [0, 5],
+    image: '',
     name: 'Uglyoch Temple',
     type: type.land,
     levelReq: 1,
@@ -122,6 +128,7 @@ const maps = [
   {
     id: 12,
     coords: [1, 0],
+    image: '',
     name: 'Port Grimonas',
     type: type.town,
     levelReq: 1,
@@ -130,6 +137,7 @@ const maps = [
   {
     id: 15,
     coords: [1, 1],
+    image: '',
     name: 'Appleview',
     type: type.land,
     levelReq: 1,
@@ -138,6 +146,7 @@ const maps = [
   {
     id: 17,
     coords: [1, 2],
+    image: '',
     name: 'Rosepond',
     type: type.land,
     levelReq: 1,
@@ -146,6 +155,7 @@ const maps = [
   {
     id: 19,
     coords: [1, 3],
+    image: '',
     name: 'Kingdom Of Olohaseth',
     type: type.town,
     levelReq: 1,
@@ -154,6 +164,7 @@ const maps = [
   {
     id: 20,
     coords: [1, 4],
+    image: '',
     name: 'Damascus Fields clone',
     type: type.land,
     levelReq: 1,
@@ -162,6 +173,7 @@ const maps = [
   {
     id: 6,
     coords: [1, 5],
+    image: '',
     name: 'Sludgefold',
     type: type.land,
     levelReq: 1,
@@ -170,6 +182,7 @@ const maps = [
   {
     id: 7,
     coords: [2, 0],
+    image: '',
     name: 'North Rendmount',
     type: type.tundra,
     levelReq: 1,
@@ -178,6 +191,7 @@ const maps = [
   {
     id: 8,
     coords: [2, 1],
+    image: '',
     name: 'Skullsampton',
     type: type.land,
     levelReq: 1,
@@ -186,6 +200,7 @@ const maps = [
   {
     id: 9,
     coords: [2, 2],
+    image: '',
     name: 'Axeter',
     type: type.land,
     levelReq: 1,
@@ -194,6 +209,7 @@ const maps = [
   {
     id: 10,
     coords: [2, 3],
+    image: '',
     name: 'Wintermere',
     type: type.tundra,
     levelReq: 1,
@@ -202,6 +218,7 @@ const maps = [
   {
     id: 11,
     coords: [2, 4],
+    image: '',
     name: 'Nastihenge Moors',
     type: type.land,
     levelReq: 1,
@@ -210,6 +227,7 @@ const maps = [
   {
     id: 13,
     coords: [2, 5],
+    image: '',
     name: 'Deerhaven',
     type: type.land,
     levelReq: 1,
@@ -218,6 +236,7 @@ const maps = [
   {
     id: 14,
     coords: [3, 0],
+    image: '',
     name: 'Norpond',
     type: type.tundra,
     levelReq: 1,
@@ -226,6 +245,7 @@ const maps = [
   {
     id: 16,
     coords: [3, 1],
+    image: '',
     name: 'Aldbarrow',
     type: type.land,
     levelReq: 1,
@@ -234,6 +254,7 @@ const maps = [
   {
     id: 18,
     coords: [3, 2],
+    image: '',
     name: 'Witchlyn',
     type: type.land,
     levelReq: 1,
@@ -242,10 +263,11 @@ const maps = [
   {
     id: 20,
     coords: [3, 3],
+    image: '',
     name: 'Damascus Fields',
     type: type.land,
     levelReq: 1,
     lore: 'So much blood has been shed on the Damascus Fields that the plants growing in it have become red. The battlegrounds of the Kingdom of Olohaseth it is where the soldiers fight and protect the kingdoms inhabitants. Scoured by treasure hunters in search of unfound weapons, armor, and other artifacts which could command a high price inside the city. It has been said that a profitable iron mine could be made with the discarded chunks of debris alone. These fields surround the Kingdom of Olohaseth as far as the eye can see only to run into the ocean that surround the island.'
-  },
+  }
 ];
 module.exports = maps;
