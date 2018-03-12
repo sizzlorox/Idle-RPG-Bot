@@ -74,7 +74,7 @@ const events = {
       }
 
       if (purchasedItem) {
-        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer)} just purchased \`${item.name}\` for ${itemCost} gold!`;
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`;
         const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)

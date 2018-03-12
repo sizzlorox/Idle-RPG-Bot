@@ -434,8 +434,12 @@ class Helper {
    * @param player
    * @returns String
    */
-  generatePlayerName(player) {
-    if (player.isMentionInDiscord === false) {
+  generatePlayerName(player, isAction) {
+    if (
+      player.isMentionInDiscord === 'off'
+      || player.isMentionInDiscord === 'action' && !isAction
+      || player.isMentionInDiscord === 'move' && isAction
+    ) {
       return `\`${player.name}\``;
     }
 
@@ -530,7 +534,7 @@ class Helper {
   generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, luckGambleGold, victimPlayer, otherPlayerLog) {
     // TODO: Maybe change these ^^^^^ into an array???
     eventMsg = eventMsg.replace(/(\$\$)/g, selectedPlayer.map.name)
-      .replace(/(##)/g, this.generatePlayerName(selectedPlayer))
+      .replace(/(##)/g, this.generatePlayerName(selectedPlayer, true))
       .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
       .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
       .replace(/(&&)/g, this.generateGenderString(selectedPlayer, 'he'));
@@ -550,7 +554,7 @@ class Helper {
       eventLog = eventLog.replace(/(\$&)/g, luckGambleGold);
     }
     if (victimPlayer) {
-      eventMsg = eventMsg.replace(/(!!)/g, this.generatePlayerName(victimPlayer));
+      eventMsg = eventMsg.replace(/(!!)/g, this.generatePlayerName(victimPlayer, true));
       eventLog = eventLog.replace(/(!!)/g, victimPlayer.name);
     }
 

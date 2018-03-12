@@ -15,7 +15,7 @@ const newPlayerObj = (discordId, name) => {
     map: maps[starterTown],
     level: 1,
     gold: 0,
-    isMentionInDiscord: true,
+    isMentionInDiscord: 'on',
     isPrivateMessage: false,
     isPrivateMessageImportant: false,
     gender: 'neutral',
@@ -81,8 +81,8 @@ const playerSchema = mongoose.Schema({
   level: Number,
   gold: Number,
   isMentionInDiscord: {
-    type: Boolean,
-    default: true
+    type: String,
+    default: 'on'
   },
   isPrivateMessage: {
     type: Boolean,
@@ -101,6 +101,7 @@ const playerSchema = mongoose.Schema({
       name: String,
       power: Number,
       position: String,
+      gold: Number,
       previousOwners: {
         type: Array,
         default: []
@@ -110,6 +111,7 @@ const playerSchema = mongoose.Schema({
       name: String,
       power: Number,
       position: String,
+      gold: Number,
       previousOwners: {
         type: Array,
         default: []
@@ -120,6 +122,7 @@ const playerSchema = mongoose.Schema({
       power: Number,
       position: String,
       attackType: String,
+      gold: Number,
       previousOwners: {
         type: Array,
         default: []
