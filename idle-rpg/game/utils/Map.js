@@ -1,5 +1,5 @@
 const maps = require('../data/maps');
-const Helper = require('../../utils/Helper');
+const Helper = require('../../utils/helper');
 
 class Map {
 
