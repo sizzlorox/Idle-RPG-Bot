@@ -61,11 +61,10 @@ const commands = [
               return message.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const stats = Helper.generateStatsString(playerStats);
-            Helper.generateEquipmentsString(playerStats)
-              .then(equip => message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`)
-                .concat('\n')
-                .concat(equip).replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`)));
+            const stats = Helper.generateStatsString(playerStats).concat(Helper.generateEquipmentsString(playerStats));
+            message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`)
+              .concat('\n')
+              .concat(equip).replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`));
           });
       }
 
@@ -76,8 +75,8 @@ const commands = [
           }
 
           const stats = Helper.generateStatsString(playerStats);
-          Helper.generateEquipmentsString(playerStats)
-            .then(equip => message.author.send(stats.concat('\n').concat(equip)));
+          const equip = Helper.generateEquipmentsString(playerStats);
+          message.author.send(stats.concat('\n').concat(equip));
         });
     }
   },
@@ -176,8 +175,8 @@ const commands = [
               return message.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            Helper.generateEquipmentsString(playerEquipment)
-              .then(equip => message.author.send(equip.replace('Heres your equipment!', `Here is ${playerEquipment.name}s equipment!`)));
+            const equip = Helper.generateEquipmentsString(playerEquipment)
+            message.author.send(equip.replace('Heres your equipment!', `Here is ${playerEquipment.name}s equipment!`));
           });
       }
 
@@ -187,8 +186,8 @@ const commands = [
             return message.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          Helper.generateEquipmentsString(playerEquipment)
-            .then(equip => message.author.send(equip));
+          const equip = Helper.generateEquipmentsString(playerEquipment);
+          message.author.send(equip);
         });
     }
   },

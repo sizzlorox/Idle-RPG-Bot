@@ -1,6 +1,7 @@
 const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 const messages = require('../data/messages');
+const { infoLog } = require('../../utils/logger');
 
 const events = {
   messages: {
@@ -65,7 +66,7 @@ const events = {
 
     townItem: (InventoryManager, discordHook, selectedPlayer, item, itemCost) => {
       const purchasedItem = false;
-      if (item.position !== enumHelper.inventory.position || Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
+      if (item.position !== enumHelper.inventory.position || Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) < Helper.calculateItemRating(selectedPlayer, item)) {
         if (item.position !== enumHelper.inventory.position) {
           selectedPlayer.gold -= itemCost;
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
