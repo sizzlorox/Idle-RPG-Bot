@@ -119,7 +119,6 @@ const heartBeat = () => {
 
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {
-
       const playerTimer = randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
         game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
