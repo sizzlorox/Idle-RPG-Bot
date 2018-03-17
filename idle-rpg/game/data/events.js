@@ -53,8 +53,10 @@ const events = {
   utils: {
     dropItem: (InventoryManager, selectedPlayer, item) => {
       if (item.position !== enumHelper.inventory.position) {
-        selectedPlayer.equipment[item.position].position = item.position;
-        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
+        const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+        const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+        // selectedPlayer.equipment[item.position].position = item.position;
+        if (oldItemRating > newItemRating) {
           selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
         } else {
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);

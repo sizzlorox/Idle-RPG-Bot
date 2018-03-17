@@ -9,7 +9,7 @@ const Map = require('../utils/Map');
 const Database = require('../../database/Database');
 const events = require('../data/events');
 const { pvpLevelRestriction } = require('../../../settings');
-const { errorLog } = require('../../utils/logger');
+const { errorLog, infoLog } = require('../../utils/logger');
 
 class Event {
 
