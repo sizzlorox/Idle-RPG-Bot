@@ -299,6 +299,7 @@ class Event {
             }
           }
 
+          infoLog.info({ event: 'TOOOOOOWN', item });
           events.utils.townItem(this.InventoryManager, discordHook, selectedPlayer, item, itemCost);
 
           return resolve(selectedPlayer);
@@ -592,37 +593,16 @@ class Event {
       } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
         return this.ItemManager.generateItem(selectedPlayer)
           .then((item) => {
-            switch (item.position) {
-              case enumHelper.equipment.types.helmet.position:
-                selectedPlayer.equipment.helmet.position = enumHelper.equipment.types.helmet.position;
-                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.helmet) > Helper.calculateItemRating(selectedPlayer, item)) {
-                  selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-                } else {
-                  selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.helmet.position, item);
-                }
-                break;
-
-              case enumHelper.equipment.types.armor.position:
-                selectedPlayer.equipment.armor.position = enumHelper.equipment.types.armor.position;
-                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.armor) > Helper.calculateItemRating(selectedPlayer, item)) {
-                  selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-                } else {
-                  selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.armor.position, item);
-                }
-                break;
-
-              case enumHelper.equipment.types.weapon.position:
-                selectedPlayer.equipment.weapon.position = enumHelper.equipment.types.weapon.position;
-                if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.weapon) > Helper.calculateItemRating(selectedPlayer, item)) {
-                  selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-                } else {
-                  selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.weapon.position, item);
-                }
-                break;
-
-              case enumHelper.inventory.position:
-                selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
-                break;
+            if (item.position !== enumHelper.inventory.position) {
+              const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+              const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+              if (oldItemRating > newItemRating) {
+                selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
+              } else {
+                selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, item.position, item);
+              }
+            } else {
+              selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
             }
 
             const { eventMsg, eventLog } = events.messages.randomItemEventMessage(selectedPlayer, item);
