@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
-const { moveLog, actionLog, errorLog } = require('../utils/logger');
+const { moveLog, actionLog, errorLog, infoLog } = require('../utils/logger');
 const { battleDebug, eventDebug, guildID } = require('../../settings');
 
 class Helper {
@@ -156,29 +156,27 @@ class Helper {
   }
 
   calculateItemRating(player, item) {
-    return new Promise((resolve) => {
-      if (player && item.position !== enumHelper.equipment.types.relic.position) {
-        if (item.position !== enumHelper.equipment.types.weapon.position) {
-          return item.power;
-        }
-
-        switch (item.attackType) {
-          case 'melee':
-            return resolve(Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
-              + (this.sumPlayerTotalDexterity(player))));
-
-          case 'range':
-            return resolve(Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
-              + (this.sumPlayerTotalDexterity(player))));
-
-          case 'magic':
-            return resolve(Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
-              + (this.sumPlayerTotalDexterity(player))));
-        }
+    if (player && item.position !== enumHelper.equipment.types.relic.position) {
+      if (item.position !== enumHelper.equipment.types.weapon.position) {
+        return item.power;
       }
 
-      return resolve(Math.ceil(item.str + item.dex + item.end + item.int + item.luk));
-    });
+      switch (item.attackType) {
+        case 'melee':
+          return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)));
+
+        case 'range':
+          return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)));
+
+        case 'magic':
+          return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)));
+      }
+    }
+
+    return Math.ceil(item.str + item.dex + item.end + item.int + item.luk);
   }
 
   sumPlayerTotalStrength(player) {
@@ -267,6 +265,17 @@ class Helper {
   }
 
   setPlayerEquipment(selectedPlayer, equipment, item) {
+    const oldRating = this.calculateItemRating(selectedPlayer, selectedPlayer.equipment[equipment]);
+    const newRating = this.calculateItemRating(selectedPlayer, item);
+    if (oldRating > newRating && item.name !== enumHelper.equipment.empty.weapon.name && item.name !== enumHelper.equipment.empty.armor.name) {
+      infoLog.info({
+        player: selectedPlayer.name,
+        oldEqup: selectedPlayer.equipment[equipment],
+        oldRating,
+        newItem: item,
+        newRating
+      });
+    }
     selectedPlayer.equipment[equipment].name = item.name;
     if (equipment !== enumHelper.equipment.types.relic.position) {
       selectedPlayer.equipment[equipment].power = item.power;
@@ -467,9 +476,8 @@ class Helper {
   }
 
   generateEquipmentsString(player) {
-    return this.calculateItemRating(player, player.equipment.weapon)
-      .then((attackPower) => {
-        return `\`\`\`Here is your inventory!
+    const weaponRating = this.calculateItemRating(player, player.equipment.weapon);
+    return `\`\`\`Here is your inventory!
         Helmet: ${player.equipment.helmet.name}
           Defense: ${player.equipment.helmet.power}
           ${this.generatePreviousOwnerString(player.equipment.helmet)}
@@ -478,7 +486,7 @@ class Helper {
           ${this.generatePreviousOwnerString(player.equipment.armor)}
         Weapon: ${player.equipment.weapon.name}
           BaseAttackPower: ${player.equipment.weapon.power}
-          AttackPower: ${Number(attackPower)}
+          AttackPower: ${Number(weaponRating)}
           AttackType: ${player.equipment.weapon.attackType}
             ${this.generatePreviousOwnerString(player.equipment.weapon)}
         Relic: ${player.equipment.relic.name}
@@ -490,7 +498,6 @@ class Helper {
             Luck: ${player.equipment.relic.luk}
           ${this.generatePreviousOwnerString(player.equipment.relic)}
             \`\`\``;
-      });
   }
 
   generateLog(player, count) {
