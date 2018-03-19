@@ -9,6 +9,10 @@ const mapSchema = mongoose.Schema({
     id: Number,
     name: String,
   },
+  biome: {
+    id: Number,
+    name: String
+  },
   levelReq: Number,
   lore: String
 });

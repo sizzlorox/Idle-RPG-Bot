@@ -205,9 +205,9 @@ class Helper {
   }
 
   checkExperience(selectedPlayer, discordHook, twitchBot) {
-    if (selectedPlayer.experience >= selectedPlayer.level * 15) {
+    if (selectedPlayer.experience.current >= selectedPlayer.level * 15) {
       selectedPlayer.level++;
-      selectedPlayer.experience = 0;
+      selectedPlayer.experience.current = 0;
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       for (let i = 0; i < 4; i++) {
@@ -296,11 +296,13 @@ class Helper {
 
   checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
     if (selectedPlayer.health <= 0) {
+      const expLoss = Math.ceil(selectedPlayer.experience.current / 8);
+      const goldLoss = Math.ceil(selectedPlayer.gold.current / 4);
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
       selectedPlayer.map = MapClass.getRandomTown();
-      selectedPlayer.experience -= Math.ceil(selectedPlayer.experience / 8);
-      selectedPlayer.gold.current -= Math.ceil(selectedPlayer.gold.current / 4);
+      selectedPlayer.experience.current -= expLoss;
+      selectedPlayer.gold.current -= goldLoss;
       selectedPlayer.inventory = {
         equipment: [],
         items: []
@@ -370,8 +372,8 @@ class Helper {
         Database.savePlayer(selectedPlayer);
       }
 
-      const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died! Game over man... Game over.`);
-      const eventLog = 'You died. Game over man... Game over.';
+      const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died and lost ${expLoss} exp and ${goldLoss} gold! Game over man... Game over.`);
+      const eventLog = `You died and lost ${expLoss} exp and ${goldLoss} gold. Game over man... Game over.`;
 
       this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg)
         .then(() => this.sendPrivateMessage(hook, selectedPlayer, eventLog, true));
@@ -394,7 +396,10 @@ class Helper {
     Health: ${player.health} / ${enumHelper.maxHealth(player.level)}
     Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
-    Experience: ${player.experience} / ${player.level * 15}
+    Experience: 
+      Current: ${player.experience.current}
+      Total: ${player.experience.total}
+      TNL: ${player.level * 15}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:

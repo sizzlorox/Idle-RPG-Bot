@@ -12,7 +12,10 @@ const newPlayerObj = (discordId, name) => {
     class: 'Wanderer',
     health: 105,
     mana: 50,
-    experience: 0,
+    experience: {
+      current: 0,
+      total: 0
+    },
     map: MapClass.getRandomTown(),
     level: 1,
     gold: {
@@ -82,7 +85,10 @@ const playerSchema = mongoose.Schema({
     type: Number,
     default: 50
   },
-  experience: Number,
+  experience: {
+    current: Number,
+    total: Number
+  },
   map: mapSchema,
   level: Number,
   gold: {

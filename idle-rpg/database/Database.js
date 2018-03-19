@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const { playerSchema, newPlayerObj } = require('./schemas/player');
 const { mongoDBUri } = require('../../settings');
-const Map = require('../../game/utils/Map');
-const { starterTown } = require('../../settings');
+const Map = require('../game/utils/Map');
 
 const Player = mongoose.model('Player', playerSchema);
 const enumHelper = require('../utils/enumHelper');
@@ -215,7 +214,10 @@ class Database {
             class: 'Wanderer',
             health: 105,
             mana: 50,
-            experience: 0,
+            experience: {
+              current: 0,
+              total: 0
+            },
             map: MapClass.getRandomTown(),
             level: 1,
             gold: {

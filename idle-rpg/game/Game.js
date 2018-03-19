@@ -35,6 +35,8 @@ class Game {
 
               return newPlayer;
             });
+        } else if (selectedPlayer.events === 0) {
+          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
         }
 
         return selectedPlayer;
@@ -74,9 +76,9 @@ class Game {
       .catch(err => console.log(err));
   }
 
-  moveEvent(selectedPlayer) {
+  moveEvent(selectedPlayer, onlinePlayers, twitchBot) {
     const pastMoveCount = selectedPlayer.pastEvents.filter(event => event.event.includes('and arrived in')).length;
-    if (pastMoveCount >= 5) {
+    if (pastMoveCount >= 8) {
       this.attackEvent(selectedPlayer, onlinePlayers, twitchBot);
     }
 
@@ -180,7 +182,7 @@ class Game {
         const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
           .sort((player1, player2) => {
             if (Object.keys(type)[0] === 'level') {
-              return player2.experience - player1.experience && player2.level - player2.level;
+              return player2.experience.current - player1.experience.current && player2.level - player2.level;
             }
 
             return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];

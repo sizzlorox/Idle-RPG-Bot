@@ -88,7 +88,7 @@ class Map {
 
   getRandomTown() {
     const towns = maps.filter(area => area.type.name === 'Town');
-    return towns[Helper.randomBetween(0, towns.length)];
+    return towns[Helper.randomBetween(0, towns.length - 1)];
   }
 
   getMapByName(name) {

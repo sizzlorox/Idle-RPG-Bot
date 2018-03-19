@@ -11,6 +11,12 @@ const type = {
 };
 
 const biome = {
+  // TODO: REMOVE WHEN BIOMES COMPLETE
+  land: {
+    id: 0,
+    name: 'Land'
+  },
+
   tundra: {
     id: 1,
     name: 'Tundra'
@@ -61,16 +67,11 @@ const biome = {
     name: 'Barren'
   },
 
-  graveyard: {
-    id: 12,
-    name: 'Graveyard'
-  },
-
-  sacred: {
+  plateau: {
     id: 13,
-    name: 'Sacred'
+    name: 'Plateau'
   }
-}
+};
 
 const maps = [
   {
@@ -79,7 +80,7 @@ const maps = [
     image: '',
     name: 'The Isle Of Puckarmpit',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A few islands near Neataman Lake.'
   },
@@ -90,7 +91,7 @@ const maps = [
     image: '',
     name: 'Beach of Flames',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
@@ -101,7 +102,7 @@ const maps = [
     image: '',
     name: 'Silent Rain City',
     type: type.town,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A large sized city, holding 75,000 villagers, holding a first line of defence with thousands of mages and knights. The rain comes everyday in a dark luster which overruns the streets with vibrant specks of water.'
   },
@@ -112,7 +113,7 @@ const maps = [
     image: '',
     name: 'Uglyoch Temple',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'Once inhabitted by the monks of the local religion it has fallen into disrepair. Plants grow through the stonework, and sections have collapsed of what was once a sprawling complex. Now monsters roam the dark forgotten halls.'
   },
@@ -123,7 +124,7 @@ const maps = [
     image: '',
     name: 'Axeter',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'The tough lumberjacks make this timblerland their home. It seems no matter how many logs they send down the fast moving river there is still many more to cut. The lumber here is said to be some of the best in the land.'
   },
@@ -134,7 +135,7 @@ const maps = [
     image: '',
     name: 'Aldbarrow',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'Quiet and sleepy. Never at threat of invasion as there is nothing worth invading. What few people who do live here are subsistence farmers or else wizarding types. It is said the school of wizardry for the continent is somewhere in the hills but any attempt to give directions to it seems to result in a radically different path each time.'
   },
@@ -145,7 +146,7 @@ const maps = [
     image: 'https://cdn.discordapp.com/attachments/418132578030190594/418132614931808256/unknown.png',
     name: 'Opemdek Peak',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A white, snowy mountain covered with evergreens. Paths running through the hills are known to be very vulnerable to bandit attacks...'
   },
@@ -156,7 +157,7 @@ const maps = [
     image: '',
     name: 'Appleview',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'The people residing in Appleview having been farming since before written record. It is said that their fruit and vegetables can cure illness and exorcise demons. Very secret of their techniques but rather friendly in other contexts.'
   },
@@ -167,7 +168,7 @@ const maps = [
     image: '',
     name: 'Sludgefold',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'Mud. Muck. Sticky dirt that requires wading through. No one wants to be there, not even the monsters that go there to feed.'
   },
@@ -178,43 +179,40 @@ const maps = [
     image: '',
     name: 'Witchlyn',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'No matter what warnings are given there are always those who find themselves attracted to this closely packed dark forest. Trees do not look healthy but grow dense enough to obscure much of the light. The forest round is home to a number creatures that hate the light. Many stories use this as a location of evil.'
   },
 
-  // TODO
   {
     id: 10,
     coords: [4, 1],
     image: '',
-    name: 'TO NAME',
+    name: 'Polcester',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
 
-  // TODO
   {
     id: 11,
     coords: [5, 1],
     image: '',
-    name: 'TO NAME PLAINS',
+    name: 'Pantbryde Plains',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
 
-  // TODO
   {
     id: 12,
     coords: [0, 2],
     image: '',
-    name: 'TO NAME',
+    name: 'Macingdon',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
@@ -225,7 +223,7 @@ const maps = [
     image: '',
     name: 'Rosepond',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A beautiful blue lake surrounded by high weeds. The depth is said to be unknowable, only becoming darker closer to the center. Nothing lost in Rosepond is ever recovered. The name comes from the crop of choice in the area a unique blue rose rumored to bring health when prepared right.'
   },
@@ -236,7 +234,7 @@ const maps = [
     image: '',
     name: 'Wintermere',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A tall set of snow tipped peaks, many paths have been chiseled out of the rock by unknown ancient people.'
   },
@@ -247,31 +245,29 @@ const maps = [
     image: '',
     name: 'North Rendmount',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'High peeks covered in snow the majority of the year. The altitude deters most people, and the remoteness most others. Rumored to be filled with yetis and other fierce creatures.'
   },
 
-  // TODO
   {
     id: 16,
     coords: [4, 2],
     image: '',
-    name: 'TO NAME CAVES',
+    name: 'Modesarder Caves',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
 
-  // TODO
   {
     id: 17,
     coords: [5, 2],
     image: '',
-    name: 'TO NAME TOWN',
+    name: 'Holmsham',
     type: type.town,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
@@ -282,7 +278,7 @@ const maps = [
     image: '',
     name: 'Port Grimonas',
     type: type.town,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A larger city, though not the largest of the continent. Stone buildings, and an extensive dock system characterize this city. Never are you far from a place to drink away troubles and gamble away money.'
   },
@@ -293,7 +289,7 @@ const maps = [
     image: '',
     name: 'Damascus Fields',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'So much blood has been shed on the Damascus Fields that the plants growing in it have become red. The battlegrounds of the Kingdom of Olohaseth it is where the soldiers fight and protect the kingdoms inhabitants. Scoured by treasure hunters in search of unfound weapons, armor, and other artifacts which could command a high price inside the city. It has been said that a profitable iron mine could be made with the discarded chunks of debris alone.'
   },
@@ -304,7 +300,7 @@ const maps = [
     image: '',
     name: 'Norpond',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A nearly peramently frozen lake located high up on a plateau. Once a year it defrosts allowing the creatures that reside bellow the ice to begin their mating season. These fish are a local delicacy and sell for quite a pretty penny.'
   },
@@ -315,7 +311,7 @@ const maps = [
     image: '',
     name: 'Espion Peak',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'Renowned to be one of the highest peaks in the world. Many young warriors train here by climbing up its steps in perserverance.'
   },
@@ -326,31 +322,29 @@ const maps = [
     image: '',
     name: 'Deerhaven',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'Not a dreadful place to be lost in. The basis for many local tales of fairies, and other little folk. Catching a meal is easy with the abundant wildlife.'
   },
 
-  // TODO
   {
     id: 23,
     coords: [5, 3],
     image: '',
-    name: 'TO NAME PATH',
+    name: 'Topscros Path',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
 
-  // TODO
   {
     id: 24,
     coords: [0, 4],
     image: '',
-    name: 'TO NAME COVE',
+    name: 'Llynenham Cove',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
@@ -361,7 +355,7 @@ const maps = [
     image: '',
     name: 'Kingdom Of Olohaseth',
     type: type.town,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'There have been good kings and evil kings. They are just men temporary. The Kingdom of Olohaseth seems to be eternal. No successful invasion has ever taken place and the high walls around the land keep the residents safe. Roads stretch from it, and if you can find it somewhere in the continent it is likely bought and sold inside the kingdom walls.'
   },
@@ -372,7 +366,7 @@ const maps = [
     image: '',
     name: 'Neataman Lake',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'It\'s rumored that a mighty kraken resides in the lake. Adventurers travel from all over to visit the lake.'
   },
@@ -383,7 +377,7 @@ const maps = [
     image: '',
     name: 'Skullsampton',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'Named for the large amount of bones to be found in the dense forest. The powerful creatures hidden in the mists are the cause of the death. No full maps exist of the forest and some say such a task is impossible due to a constantly shifting nature.'
   },
@@ -394,19 +388,18 @@ const maps = [
     image: '',
     name: 'Nastihenge Moors',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'Dry and deserted. It is hard to survive in is just a few inches of rain a year above a desert. Occasionally the bones of great beasts that seem like odd forms of dragons will be unearthed in these loose soils.'
   },
 
-  // TODO
   {
     id: 29,
     coords: [5, 4],
     image: '',
-    name: 'TO NAME DESERT',
+    name: 'Wanaton Desert',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
@@ -417,19 +410,18 @@ const maps = [
     image: '',
     name: 'Cliff of Birds',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
 
-  // TODO
   {
     id: 31,
     coords: [1, 5],
     image: '',
-    name: 'TO NAME PLATEAU',
+    name: 'Auchterkeld',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
   },
@@ -440,7 +432,7 @@ const maps = [
     image: '',
     name: 'Hellserscrutch Hill',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A medium sized hill topped with trees. The howls that emanate from this place at night keep all but the brave away.'
   },
@@ -451,7 +443,7 @@ const maps = [
     image: '',
     name: 'Kindale',
     type: type.town,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'A quiet farming town that was once more populous before the troubles begin nearby. The people are generally friendly unless provoked but wary of strangers.'
   },
@@ -462,21 +454,20 @@ const maps = [
     image: '',
     name: 'Woldingfords Barrow',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: 'Named after an old farm that used to stand on the field. Flat and featureless except for tall grass on both sides of the one road that runs through. The rustling of it could just be the wind or could be the elves sneaking up for a kill.'
   },
 
-  // TODO
   {
     id: 35,
     coords: [5, 5],
     image: '',
-    name: 'TO NAME DESERT',
+    name: 'Kinwardine Desert',
     type: type.land,
-    biome: biome.beach,
+    biome: biome.land,
     levelReq: 1,
     lore: ''
-  },
+  }
 ];
 module.exports = maps;

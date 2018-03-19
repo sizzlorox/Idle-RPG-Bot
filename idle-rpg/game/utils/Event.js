@@ -42,12 +42,13 @@ class Event {
     return new Promise((resolve) => {
       // TODO: Remove later after release
       if (!selectedPlayer.map) {
-        selectedPlayer.map = Map.getMapByCoords([3, 5]);
+        selectedPlayer.map = this.MapManager.getRandomTown();
       }
 
       const { map, direction } = this.MapManager.moveToRandomMap(selectedPlayer);
+      const previousMap = selectedPlayer.map;
       selectedPlayer.map = map;
-      const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${direction}\` and arrived in \`${map.name}\` DEBUG:[ ${map.coords.toString()} ].`;
+      const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${direction}\` from \`${previousMap.name}\` and arrived in \`${map.name}\`.`;
       const eventLog = `Moved ${direction} and arrived in ${map.name}`;
 
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg)
@@ -95,6 +96,7 @@ class Event {
 
                   const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
                   const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
+                  const expGain = Math.floor(attackerDamage / 8);
 
                   Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                     .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
@@ -105,7 +107,8 @@ class Event {
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
                   selectedPlayer.battles.lost++;
                   randomPlayer.battles.won++;
-                  randomPlayer.experience += Math.floor(attackerDamage / 8);
+                  randomPlayer.experience.current += expGain;
+                  randomPlayer.experience.total += expGain;
 
                   return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
                     .then((stealResult) => {
@@ -128,6 +131,8 @@ class Event {
                   // eventMsg = eventMsg.concat(battleResult);
                   const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${attackerDamage} damage!`;
                   const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and received ${attackerDamage} damage!`;
+                  const expGainAttacker = Math.floor(defenderDamage / 8);
+                  const expGainDefender = Math.floor(attackerDamage / 8);
 
                   Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                     .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
@@ -136,8 +141,10 @@ class Event {
                   selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
                   randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
-                  selectedPlayer.experience += Math.floor(defenderDamage / 8);
-                  randomPlayer.experience += Math.floor(attackerDamage / 8);
+                  selectedPlayer.experience.current += expGainAttacker;
+                  selectedPlayer.experience.total += expGainAttacker;
+                  randomPlayer.experience.current += expGainDefender;
+                  randomPlayer.experience.total += expGainDefender;
 
                   return selectedPlayer;
                 }
@@ -146,6 +153,7 @@ class Event {
     ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
                 const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
                 const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
+                const expGain = Math.floor(defenderDamage / 8);
 
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                   .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
@@ -156,7 +164,8 @@ class Event {
                 randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
                 selectedPlayer.battles.won++;
                 randomPlayer.battles.lost++;
-                selectedPlayer.experience += Math.floor(defenderDamage / 8);
+                selectedPlayer.experience.current += expGain;
+                selectedPlayer.experience.total += expGain;
 
                 return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
                   .then((stealResult) => {
@@ -213,17 +222,22 @@ class Event {
 
               if (defender.health > 0 && selectedPlayer.health > 0) {
                 const expGain = Math.floor((defender.experience * multiplier) / 2);
-                const eventMsg = attackerDamage > defenderDamage
+                let eventMsg = attackerDamage > defenderDamage
                   ? `[\`${selectedPlayer.map.name}\`] \`${mob.name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`
+    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${expGain}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`
                   : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from \`${mob.name}\`!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained ${expGain} exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
+    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${expGain}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
 
                 const eventLog = attackerDamage > defenderDamage
                   ? `${mob.name} fled from you in ${selectedPlayer.map.name}!`
                   : `You fled from ${mob.name} in ${selectedPlayer.map.name}!`;
 
-                selectedPlayer.experience += expGain;
+                if (expGain === 0) {
+                  eventMsg = eventMsg.replace(` and \`${expGain}\` exp`, '');
+                }
+
+                selectedPlayer.experience.current += expGain;
+                selectedPlayer.experience.total += expGain;
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                   .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
@@ -231,17 +245,19 @@ class Event {
 
                 return resolve(selectedPlayer);
               }
-              const goldGain = defender.gold.current * multiplier;
+              const goldGain = Number(defender.gold * multiplier);
+              const expGain = Number(defender.experience * multiplier);
 
               let eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${goldGain}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
+    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${expGain}\` exp and \`${goldGain}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
               const eventLog = `Killed ${mob.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
 
               if (goldGain === 0) {
                 eventMsg = eventMsg.replace(` and \`${goldGain}\` gold`, '');
               }
 
-              selectedPlayer.experience += defender.experience * multiplier;
+              selectedPlayer.experience.current += expGain;
+              selectedPlayer.experience.total += expGain;
               selectedPlayer.gold.current += goldGain;
               selectedPlayer.gold.total += goldGain;
               selectedPlayer.kills.mob++;
@@ -404,9 +420,9 @@ class Event {
       switch (luckEvent) {
         case 1:
           const luckExpAmount = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
-          selectedPlayer.experience -= luckExpAmount;
-          if (selectedPlayer.experience < 0) {
-            selectedPlayer.experience = 0;
+          selectedPlayer.experience.current -= luckExpAmount;
+          if (selectedPlayer.experience.current < 0) {
+            selectedPlayer.experience.current = 0;
           }
 
           const eventMsgHades = `Hades unleashed his wrath upon ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} lose ${luckExpAmount} experience!`;
@@ -489,7 +505,8 @@ class Event {
 
         case 5:
           const luckExpAthena = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
-          selectedPlayer.experience += luckExpAthena;
+          selectedPlayer.experience.current += luckExpAthena;
+          selectedPlayer.experience.total += luckExpAthena;
           Helper.checkExperience(selectedPlayer, discordHook)
 
           const eventMsgAthene = `Athene shared her wisdom with ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAthena} experience!`;

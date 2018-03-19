@@ -40,7 +40,7 @@ class Battle {
 
   newSimulateBattle(attacker, defender) {
     return new Promise((resolve) => {
-      const maxRounds = 10;
+      const maxRounds = 5;
       const battleResults = [];
       for (let round = 1; round <= maxRounds; round++) {
         battleResults.push(
