@@ -43,7 +43,7 @@ class Map {
       case 2:
         // Right - Move left if at edge
         if (selectedPlayer.map.coords[0] === mapSize[0]) {
-          selectedPlayer.map.coords[1]--;
+          selectedPlayer.map.coords[0]--;
           return {
             map: this.getMapByCoords(selectedPlayer.map.coords),
             direction: 'West'
@@ -59,7 +59,7 @@ class Map {
       case 3:
         // Left - Move right if at edge
         if (selectedPlayer.map.coords[0] === 0) {
-          selectedPlayer.map.coords[1]++;
+          selectedPlayer.map.coords[0]++;
           return {
             map: this.getMapByCoords(selectedPlayer.map.coords),
             direction: 'East'

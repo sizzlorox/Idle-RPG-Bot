@@ -142,7 +142,7 @@ const maps = [
 
   {
     id: 6,
-    coords: [1, 1],
+    coords: [0, 1],
     image: 'https://cdn.discordapp.com/attachments/418132578030190594/418132614931808256/unknown.png',
     name: 'Opemdek Peak',
     type: type.land,

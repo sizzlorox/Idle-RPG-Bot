@@ -55,7 +55,6 @@ const events = {
       if (item.position !== enumHelper.inventory.position) {
         const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
         const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
-        // selectedPlayer.equipment[item.position].position = item.position;
         if (oldItemRating > newItemRating) {
           selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
         } else {
@@ -67,24 +66,28 @@ const events = {
     },
 
     townItem: (InventoryManager, discordHook, selectedPlayer, item, itemCost) => {
-      const purchasedItem = false;
-      if (item.position !== enumHelper.inventory.position || Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) < Helper.calculateItemRating(selectedPlayer, item)) {
-        if (item.position !== enumHelper.inventory.position) {
+      let purchasedItem = false;
+      if (item.position !== enumHelper.inventory.position) {
+        const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+        const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+        if (oldItemRating < newItemRating) {
+          purchasedItem = true;
           selectedPlayer.gold.current -= itemCost;
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
-        } else if (selectedPlayer.inventory.items.length < enumHelper.inventory.maxItemAmount) {
-          selectedPlayer.gold.current -= itemCost;
-          selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
         }
+      } else if (selectedPlayer.inventory.items.length < enumHelper.inventory.maxItemAmount) {
+        purchasedItem = true;
+        selectedPlayer.gold.current -= itemCost;
+        selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
+      }
 
-        if (purchasedItem) {
-          const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`;
-          const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
+      if (purchasedItem) {
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`;
+        const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-        }
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
       }
     },
 

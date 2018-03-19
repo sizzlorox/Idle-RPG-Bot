@@ -82,7 +82,7 @@ class Helper {
           .then(() => {
             return resolve();
           })
-          .catch(err => console.log(err));
+          .catch(err => errorLog.error(err));
       }
     });
   }

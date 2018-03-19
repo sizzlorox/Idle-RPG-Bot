@@ -221,7 +221,7 @@ class Event {
               }
 
               if (defender.health > 0 && selectedPlayer.health > 0) {
-                const expGain = Math.floor((defender.experience * multiplier) / 2);
+                const expGain = Math.floor(((defender.experience * multiplier) + (defenderDamage / 4)) / 6);
                 let eventMsg = attackerDamage > defenderDamage
                   ? `[\`${selectedPlayer.map.name}\`] \`${mob.name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
     ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${expGain}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`
@@ -233,7 +233,7 @@ class Event {
                   : `You fled from ${mob.name} in ${selectedPlayer.map.name}!`;
 
                 if (expGain === 0) {
-                  eventMsg = eventMsg.replace(` and \`${expGain}\` exp`, '');
+                  eventMsg = eventMsg.replace(` and gained \`${expGain}\` exp`, '');
                 }
 
                 selectedPlayer.experience.current += expGain;
@@ -246,7 +246,7 @@ class Event {
                 return resolve(selectedPlayer);
               }
               const goldGain = Number(defender.gold * multiplier);
-              const expGain = Number(defender.experience * multiplier);
+              const expGain = Math.floor((defender.experience * multiplier) + (defenderDamage / 4));
 
               let eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
     ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${expGain}\` exp and \`${goldGain}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
@@ -324,7 +324,6 @@ class Event {
             }
           }
 
-          infoLog.info({ event: 'TOOOOOOWN', item });
           events.utils.townItem(this.InventoryManager, discordHook, selectedPlayer, item, itemCost);
 
           return resolve(selectedPlayer);
