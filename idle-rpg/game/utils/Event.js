@@ -299,7 +299,6 @@ class Event {
             }
           }
 
-          infoLog.info({ event: 'TOOOOOOWN', item });
           events.utils.townItem(this.InventoryManager, discordHook, selectedPlayer, item, itemCost);
 
           return resolve(selectedPlayer);
