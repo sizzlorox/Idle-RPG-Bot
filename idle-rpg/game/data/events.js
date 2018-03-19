@@ -70,10 +70,10 @@ const events = {
       const purchasedItem = false;
       if (item.position !== enumHelper.inventory.position || Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) < Helper.calculateItemRating(selectedPlayer, item)) {
         if (item.position !== enumHelper.inventory.position) {
-          selectedPlayer.gold -= itemCost;
+          selectedPlayer.gold.current -= itemCost;
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
         } else if (selectedPlayer.inventory.items.length < enumHelper.inventory.maxItemAmount) {
-          selectedPlayer.gold -= itemCost;
+          selectedPlayer.gold.current -= itemCost;
           selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
         }
 

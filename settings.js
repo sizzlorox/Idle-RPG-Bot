@@ -35,9 +35,9 @@ const settings = {
 
   botOperator: process.env.DISCORD_BOT_OPERATOR_ID,
   rpgChannel: process.env.DISCORD_RPG_CHANNEL_ID,
-  commandChannel: process.env.DISCORD_RPG_COMMAND_CHANNEL_ID,
+  commandChannel: process.env.NODE_ENV.includes('production') ? process.env.DISCORD_RPG_COMMAND_CHANNEL_ID : process.env.TEST_DISCORD_RPG_COMMAND_CHANNEL_ID,
   mongoDBUri: process.env.MONGODB_URI,
-  starterTown: [0, 0],
+  starterTown: [3, 5],
   multiplier: 1
 };
 module.exports = settings;

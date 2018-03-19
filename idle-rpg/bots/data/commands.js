@@ -298,7 +298,7 @@ const commands = [
           game.top10(message.author, { stole: -1 });
           break;
         case 'gold':
-          game.top10(message.author, { gold: -1 });
+          game.top10(message.author, { gold: { current: -1 } });
           break;
         case 'spells':
           game.top10(message.author, { spellCasted: -1 });

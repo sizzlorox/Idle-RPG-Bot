@@ -40,6 +40,11 @@ class Event {
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
+      // TODO: Remove later after release
+      if (!selectedPlayer.map) {
+        selectedPlayer.map = Map.getMapByCoords([3, 5]);
+      }
+
       const { map, direction } = this.MapManager.moveToRandomMap(selectedPlayer);
       selectedPlayer.map = map;
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${direction}\` and arrived in \`${map.name}\` DEBUG:[ ${map.coords.toString()} ].`;
@@ -226,17 +231,19 @@ class Event {
 
                 return resolve(selectedPlayer);
               }
+              const goldGain = defender.gold.current * multiplier;
 
               let eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${mob.name}\`!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${defender.gold * multiplier}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
+    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg and gained \`${defender.experience * multiplier}\` exp and \`${goldGain}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${mob.name}\` HP:${defender.health}/${mobMaxHealth}]`;
               const eventLog = `Killed ${mob.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
 
-              if (defender.gold * multiplier === 0) {
-                eventMsg = eventMsg.replace(` and \`${defender.gold * multiplier}\` gold`, '');
+              if (goldGain === 0) {
+                eventMsg = eventMsg.replace(` and \`${goldGain}\` gold`, '');
               }
 
               selectedPlayer.experience += defender.experience * multiplier;
-              selectedPlayer.gold += defender.gold * multiplier;
+              selectedPlayer.gold.current += goldGain;
+              selectedPlayer.gold.total += goldGain;
               selectedPlayer.kills.mob++;
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                 .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
@@ -290,7 +297,7 @@ class Event {
         .then((item) => {
           const itemCost = Math.round(item.gold);
 
-          if (selectedPlayer.gold <= itemCost || item.name.startsWith('Cracked')) {
+          if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
             return resolve(selectedPlayer);
           }
 
@@ -313,8 +320,7 @@ class Event {
     if (selectedPlayer.inventory.equipment.length > 0) {
       let profit = 0;
       Helper.printEventDebug(selectedPlayer.inventory.equipment);
-      infoLog.log(selectedPlayer.inventory.equipment);
-      console.log(selectedPlayer.inventory.equipment);
+      infoLog.log({ sell: 'SELLL', equip: selectedPlayer.inventory.equipment });
       selectedPlayer.inventory.equipment.forEach((equipment) => {
         infoLog.log(equipment);
         Helper.printEventDebug(`Equipment selling: ${equipment.name}`);
@@ -322,7 +328,8 @@ class Event {
       });
       selectedPlayer.inventory.equipment.length = 0;
       profit = Math.floor(profit);
-      selectedPlayer.gold += profit;
+      selectedPlayer.gold.current += profit;
+      selectedPlayer.gold.total += profit;
 
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just sold what they found adventuring for ${profit} gold!`;
       const eventLog = `Made ${profit} gold selling what you found adventuring`;
@@ -362,11 +369,15 @@ class Event {
         if (!['Nothing', 'Fist'].includes(victimPlayer.equipment[itemKeys[luckItem]].name)) {
           events.utils.stealEquip(this.InventoryManager, discordHook, stealingPlayer, victimPlayer, itemKeys[luckItem]);
         }
-      } else if (victimPlayer.gold > 0) {
-        const goldStolen = Math.round(victimPlayer.gold / 6);
+      } else if (victimPlayer.gold.current > victimPlayer.gold.current / 6) {
+        const goldStolen = Math.round(victimPlayer.gold.current / 6);
         if (goldStolen !== 0) {
-          stealingPlayer.gold += goldStolen;
-          victimPlayer.gold -= goldStolen;
+          stealingPlayer.gold.current += goldStolen;
+          stealingPlayer.gold.total += goldStolen;
+          stealingPlayer.gold.stole += goldStolen;
+
+          victimPlayer.gold.current -= goldStolen;
+          victimPlayer.gold.stolen += goldStolen;
 
           const eventMsg = Helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`);
           const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
@@ -449,7 +460,7 @@ class Event {
           return resolve(selectedPlayer);
 
         case 4:
-          if (selectedPlayer.gold < 20) {
+          if (selectedPlayer.gold.current < (selectedPlayer.gold.current / 6)) {
             const eventMsgHermesFail = `Hermes demanded some gold from ${Helper.generatePlayerName(selectedPlayer, true)} but as ${Helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
             const eventLogHermesFail = 'Hermes demanded gold from you but you had nothing to give';
 
@@ -460,14 +471,14 @@ class Event {
             return resolve(selectedPlayer);
           }
 
-          const goldTaken = Math.round(selectedPlayer.gold / 20);
+          const goldTaken = Math.round(selectedPlayer.gold.current / 6);
 
           const eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`
           const eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
 
-          selectedPlayer.gold -= goldTaken;
-          if (selectedPlayer.gold < 0) {
-            selectedPlayer.gold = 0;
+          selectedPlayer.gold.current -= goldTaken;
+          if (selectedPlayer.gold.current < 0) {
+            selectedPlayer.gold.current = 0;
           }
 
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes)
@@ -538,7 +549,8 @@ class Event {
       if (luckGoldChance >= 75) {
         const luckGoldDice = Helper.randomBetween(5, 100);
         const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
-        selectedPlayer.gold += goldAmount;
+        selectedPlayer.gold.current += goldAmount;
+        selectedPlayer.gold.total += goldAmount;
 
         const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} found ${goldAmount} gold!`;
         const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
@@ -623,18 +635,18 @@ class Event {
 
   generateGamblingEvent(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
-      if (selectedPlayer.gold < 10) {
+      if (selectedPlayer.gold.current < 10) {
         return resolve(selectedPlayer)
       }
 
       const luckGambleChance = Helper.randomBetween(0, 100);
-      const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold / 10, selectedPlayer.gold / 3));
+      const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold.current / 10, selectedPlayer.gold.current / 3));
       selectedPlayer.gambles++;
 
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
-        selectedPlayer.gold -= luckGambleGold;
-        if (selectedPlayer.gold <= 0) {
-          selectedPlayer.gold = 0;
+        selectedPlayer.gold.current -= luckGambleGold;
+        if (selectedPlayer.gold.current <= 0) {
+          selectedPlayer.gold.current = 0;
         }
 
         const { eventMsg, eventLog } = events.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
@@ -645,7 +657,8 @@ class Event {
         return resolve(selectedPlayer);
       }
 
-      selectedPlayer.gold += luckGambleGold;
+      selectedPlayer.gold.current += luckGambleGold;
+      selectedPlayer.gold.total += luckGambleGold;
 
       const { eventMsg, eventLog } = events.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
       Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)

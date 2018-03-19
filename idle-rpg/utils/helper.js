@@ -298,9 +298,9 @@ class Helper {
     if (selectedPlayer.health <= 0) {
       selectedPlayer.health = 100 + (selectedPlayer.level * 5);
       selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      selectedPlayer.map = MapClass.getMapByIndex(4);
+      selectedPlayer.map = MapClass.getRandomTown();
       selectedPlayer.experience -= Math.ceil(selectedPlayer.experience / 8);
-      selectedPlayer.gold -= Math.ceil(selectedPlayer.gold / 4);
+      selectedPlayer.gold.current -= Math.ceil(selectedPlayer.gold.current / 4);
       selectedPlayer.inventory = {
         equipment: [],
         items: []
@@ -353,12 +353,14 @@ class Helper {
         selectedPlayer.deaths.mob++;
       } else {
         if (selectedPlayer.currentBounty > 0) {
-          const bountyEventLog = `Claimed ${selectedPlayer.currentBounty} gold for ${selectedPlayer.name}'s head`;
-          attackerObj.gold += selectedPlayer.currentBounty;
+          const bountyGain = selectedPlayer.currentBounty / 4;
+          const bountyEventLog = `Claimed ${bountyGain} gold for ${selectedPlayer.name}'s head`;
+          attackerObj.gold.current += Number(bountyGain);
+          attackerObj.gold.total += Number(bountyGain);
           attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastEvents');
           attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastPvpEvents');
-          this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing ${selectedPlayer.name}!`))
-            .then(() => this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${selectedPlayer.currentBounty} gold as a reward for killing you!`, true))
+          this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
+            .then(() => this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
             .then(() => this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true));
           selectedPlayer.currentBounty = 0;
         }
@@ -395,7 +397,11 @@ class Helper {
     Experience: ${player.experience} / ${player.level * 15}
     Class: ${player.class}
     Gender: ${player.gender}
-    Gold: ${player.gold}
+    Gold:
+      Current: ${player.gold.current}
+      Stolen: ${player.gold.stolen}
+      Stole: ${player.gold.stole}
+      Total: ${player.gold.total}
     Map: ${player.map.name}
     Bounty: ${player.currentBounty}
 

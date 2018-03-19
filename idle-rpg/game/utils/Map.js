@@ -86,6 +86,11 @@ class Map {
     return maps.filter(area => area.type.name === 'Town').map(area => area.name);
   }
 
+  getRandomTown() {
+    const towns = maps.filter(area => area.type.name === 'Town');
+    return towns[Helper.randomBetween(0, towns.length)];
+  }
+
   getMapByName(name) {
     return maps.find(map => map.name === name);
   }

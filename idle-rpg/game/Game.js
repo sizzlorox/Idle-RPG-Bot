@@ -29,9 +29,12 @@ class Game {
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(player, true)} was born! Welcome to the world of Idle-RPG!`);
+          return Database.createNewPlayer(player.discordId, player.name)
+            .then((newPlayer) => {
+              Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
 
-          return Database.createNewPlayer(player.discordId, player.name);
+              return newPlayer;
+            });
         }
 
         return selectedPlayer;
@@ -53,7 +56,7 @@ class Game {
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
-            this.moveEvent(selectedPlayer)
+            this.moveEvent(selectedPlayer, onlinePlayers, twitchBot)
               .then(updatedPlayer => Database.savePlayer(updatedPlayer));
             break;
           case 1:
@@ -72,6 +75,11 @@ class Game {
   }
 
   moveEvent(selectedPlayer) {
+    const pastMoveCount = selectedPlayer.pastEvents.filter(event => event.event.includes('and arrived in')).length;
+    if (pastMoveCount >= 5) {
+      this.attackEvent(selectedPlayer, onlinePlayers, twitchBot);
+    }
+
     return Event.moveEvent(selectedPlayer, this.discordHook);
   }
 
@@ -155,7 +163,8 @@ class Game {
   giveGold(playerId, amount) {
     return Database.loadPlayer(playerId)
       .then((updatingPlayer) => {
-        updatingPlayer.gold += Number(amount);
+        updatingPlayer.gold.current += Number(amount);
+        updatedPlayer.gold.total += Number(amount);
         Database.savePlayer(updatingPlayer);
       });
   }
@@ -274,9 +283,9 @@ ${rankString}
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
-            if (castingPlayer.gold >= globalSpells.bless.spellCost) {
+            if (castingPlayer.gold.current >= globalSpells.bless.spellCost) {
               castingPlayer.spellCasted++;
-              castingPlayer.gold -= globalSpells.bless.spellCost;
+              castingPlayer.gold.current -= globalSpells.bless.spellCost;
               this.multiplier += 1;
               const blessLogObj = {
                 spellName: 'Bless',
@@ -306,13 +315,13 @@ ${rankString}
                   commandAuthor.send('Spell has been casted!');
                 });
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold} gold.`);
+              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
             }
             break;
 
           case 'home':
-            if (castingPlayer.gold >= globalSpells.home.spellCost) {
-              castingPlayer.gold -= globalSpells.bless.spellCost;
+            if (castingPlayer.gold.current >= globalSpells.home.spellCost) {
+              castingPlayer.gold.current -= globalSpells.bless.spellCost;
               const Kindale = Event.MapClass.getMapByIndex(4);
               castingPlayer.map = Kindale;
               hook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
@@ -322,7 +331,7 @@ ${rankString}
                   commandAuthor.send('Spell has been casted!');
                 });
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold} gold.`);
+              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold.current} gold.`);
             }
             break;
         }
@@ -350,7 +359,8 @@ ${rankString}
   setPlayerGold(recipient, amount) {
     return Database.loadPlayer(recipient)
       .then((player) => {
-        player.gold = amount;
+        player.gold.current = Number(amount);
+        player.gold.total += Number(amount);
         return Database.savePlayer(player);
       });
   }
@@ -364,10 +374,10 @@ ${rankString}
     const veteranTitleRole = currentGuild.roles.filterArray(role => role.name === 'Veteran Idler')[0];
 
     const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
-    if (selectedPlayer.gold >= 10000 && !hasGoldTitle) {
+    if (selectedPlayer.gold.current >= 10000 && !hasGoldTitle) {
       playerDiscordObj.addRole(goldTitleRole);
       this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
-    } else if (selectedPlayer.gold < 10000 && hasGoldTitle) {
+    } else if (selectedPlayer.gold.current < 10000 && hasGoldTitle) {
       playerDiscordObj.removeRole(goldTitleRole);
       this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
     }
@@ -401,8 +411,8 @@ ${rankString}
   placeBounty(discordHook, bountyPlacer, recipient, amount) {
     return Database.loadPlayer(bountyPlacer.id)
       .then((placer) => {
-        if (placer.gold >= amount) {
-          placer.gold -= amount;
+        if (placer.gold.current >= amount) {
+          placer.gold.current -= amount;
 
           return Database.savePlayer(placer)
             .then(() => {

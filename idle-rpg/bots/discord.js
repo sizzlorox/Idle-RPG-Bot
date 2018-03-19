@@ -56,30 +56,31 @@ const hook = {
 const game = new Game(hook);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
-
 const timeZone = 'America/Los_Angeles';
-
 let minTimer = (minimalTimer * 1000) * 60;
 let maxTimer = (maximumTimer * 1000) * 60;
-
 const tickInMinutes = 2;
 let onlinePlayerList = [];
+let guildName
+
 console.log(`Current ENV: ${process.env.NODE_ENV}`);
 if (!process.env.NODE_ENV.includes('production')) {
   console.log('Mock Players loaded');
   onlinePlayerList = mockPlayers;
+  guildName = 'Idle-RPG-TEST';
 } else {
   onlinePlayerList.push({
     name: 'Pyddur, God of Beer',
     discordId: 'pyddur'
   });
+  guildName = 'Idle-RPG';
 }
 
 const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
 const heartBeat = () => {
   if (process.env.NODE_ENV.includes('production')) {
     const discordUsers = discordBot.guilds.size > 0
-      ? discordBot.guilds.find('name', 'Idle-RPG').members
+      ? discordBot.guilds.find('name', guildName).members
       : undefined;
 
     if (discordUsers) {

@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const { playerSchema, newPlayerObj } = require('./schemas/player');
 const { mongoDBUri } = require('../../settings');
-const maps = require('../game/data/maps');
+const Map = require('../../game/utils/Map');
 const { starterTown } = require('../../settings');
 
 const Player = mongoose.model('Player', playerSchema);
 const enumHelper = require('../utils/enumHelper');
+
+const MapClass = new Map();
 
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 
@@ -214,9 +216,14 @@ class Database {
             health: 105,
             mana: 50,
             experience: 0,
-            map: maps[starterTown],
+            map: MapClass.getRandomTown(),
             level: 1,
-            gold: 0,
+            gold: {
+              current: 0,
+              stolen: 0,
+              stole: 0,
+              total: 0
+            },
             'equipment.helmet': {
               name: 'Nothing',
               power: 0.15,
