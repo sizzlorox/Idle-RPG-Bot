@@ -112,6 +112,7 @@ class Database {
       name: 1
     };
     const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.name);
+    enumHelper.mockPlayers.map(npc => npc.name).forEach(npc => removeNpcs.push(npc));
 
     select[Object.keys(type)[0]] = 1;
 
@@ -119,11 +120,13 @@ class Database {
       select.experience = 1;
       type.experience = -1;
     }
+    const query = {
+      name: { $nin: removeNpcs, $exists: true },
+      $or: [{ [Object.keys(type)[0]]: { $type: 16 } }, { [Object.keys(type)[0]]: { $type: 18 } }]
+    };
 
     return new Promise((resolve, reject) => {
-      return Player.find({
-        name: { $nin: removeNpcs }
-      }, (err, result) => {
+      return Player.find(query, (err, result) => {
         if (err) {
           disconnect();
           return reject(err);
