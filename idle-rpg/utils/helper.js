@@ -476,14 +476,52 @@ class Helper {
     return enumHelper.genders[player.gender] ? enumHelper.genders[player.gender][word] : word;
   }
 
+  generateInventoryEquipmentString(player) {
+    return new Promise((resolve) => {
+      let equipString = '';
+      player.inventory.equipment.forEach((equip, index, array) => {
+        switch (equip.position) {
+          case enumHelper.equipment.types.helmet.position:
+            equipString = equipString.concat(`${equip.name}:
+            Defense: ${equip.power}
+          ${this.generatePreviousOwnerString(equip)}`);
+            break;
+
+          case enumHelper.equipment.types.armor.position:
+            equipString = equipString.concat(`${equip.name}:
+            Defense: ${equip.power}
+          ${this.generatePreviousOwnerString(equip)}`);
+            break;
+
+          case enumHelper.equipment.types.weapon.position:
+            const weaponRating = this.calculateItemRating(player, equip);
+            equipString = equipString.concat(`${equip.name}:
+            BaseAttackPower: ${equip.power}
+            AttackPower: ${Number(weaponRating)}
+            AttackType: ${equip.attackType}
+          ${this.generatePreviousOwnerString(equip)}`);
+            break;
+        }
+
+        if (index !== array.length - 1) {
+          equipString = equipString.concat('\n          ');
+        }
+      });
+
+      return resolve(equipString);
+    });
+  }
+
   generateInventoryString(player) {
-    return `\`\`\`Here is your inventory!
-    Equipment:
-      ${player.inventory.equipment.map(equip => equip.name).join('\n      ')}
-    
-    Items:
-      ${player.inventory.items.map(item => item.name).join('\n      ')}
-      \`\`\``;
+    return this.generateInventoryEquipmentString(player)
+      .then((equipment) => {
+        return `\`\`\`Here is your inventory!
+        Equipment:
+          ${equipment}
+        
+        Items:
+          ${player.inventory.items.map(item => item.name).join('\n      ')}\`\`\``;
+      });
   }
 
   generateEquipmentsString(player) {

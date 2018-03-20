@@ -149,6 +149,8 @@ const enumHelper = {
 
   inventorySelectFields: {
     name: 1,
+    stats: 1,
+    equipment: 1,
     inventory: 1
   },
 

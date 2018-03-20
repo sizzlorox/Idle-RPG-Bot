@@ -103,8 +103,8 @@ const commands = [
               return message.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const inv = Helper.generateInventoryString(playerInventory);
-            message.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`));
+            return Helper.generateInventoryString(playerInventory)
+              .then(inv => message.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`)));
           });
       }
 
@@ -114,8 +114,8 @@ const commands = [
             return message.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          const inv = Helper.generateInventoryString(playerInventory);
-          message.author.send(inv);
+          Helper.generateInventoryString(playerInventory)
+            .then(inv => message.author.send(inv));
         });
     }
   },
