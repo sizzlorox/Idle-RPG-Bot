@@ -61,10 +61,12 @@ const commands = [
               return message.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const stats = Helper.generateStatsString(playerStats).concat(Helper.generateEquipmentsString(playerStats));
+            const stats = Helper.generateStatsString(playerStats);
+            const equip = Helper.generateEquipmentsString(playerStats);
             message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`)
               .concat('\n')
-              .concat(equip).replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`));
+              .concat(equip)
+              .replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`));
           });
       }
 
