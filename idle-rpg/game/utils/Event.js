@@ -106,11 +106,7 @@ class Event {
                   randomPlayer.experience.total += expGain;
 
                   return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
-                    .then((stealResult) => {
-                      return Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
-                        .then(updatedPlayer => Database.savePlayer(updatedPlayer))
-                        .catch(err => errorLog.error(err))
-                    });
+                    .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook));
                 }
 
                 if (defender.health > 0 && selectedPlayer.health > 0) {
@@ -160,11 +156,7 @@ class Event {
                 selectedPlayer.experience.total += expGain;
 
                 return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
-                  .then((stealResult) => {
-                    return Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
-                      .then(updatedPlayer => Database.savePlayer(updatedPlayer))
-                      .catch(err => errorLog.error(err))
-                  });
+                  .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook));
               });
             }
           }
@@ -205,7 +197,8 @@ class Event {
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
                 selectedPlayer.battles.lost++;
 
-                return Helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
+                return Helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook)
+                  .then(updatedPlayer => resolve(updatedPlayer));
               }
 
               if (defender.health > 0 && selectedPlayer.health > 0) {
@@ -230,7 +223,8 @@ class Event {
                   .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
-                return Helper.checkExperience(selectedPlayer, discordHook);
+                return Helper.checkExperience(selectedPlayer, discordHook)
+                  .then(updatedPlayer => resolve(updatedPlayer));
               }
               const goldGain = Number(defender.gold * multiplier);
               const expGain = Math.floor((defender.experience * multiplier) + (defenderDamage / 4));
@@ -254,7 +248,10 @@ class Event {
               selectedPlayer.battles.won++;
 
               return this.generateDropItemEvent(discordHook, 'twitch', selectedPlayer, mob)
-                .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook));
+                .then((updatedPlayer) => {
+                  return Helper.checkExperience(updatedPlayer, discordHook);
+                })
+                .then(newUpdatedPlayer => resolve(newUpdatedPlayer));
             });
         });
     });
@@ -429,7 +426,8 @@ class Event {
             .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, false));
           selectedPlayer = Helper.logEvent(selectedPlayer, eventLogZeus, 'pastEvents');
 
-          return Helper.checkHealth(this.MapClass, selectedPlayer, discordHook);
+          return Helper.checkHealth(this.MapClass, selectedPlayer, discordHook)
+            .then(updatedPlayer => resolve(updatedPlayer));
 
         case 3:
           const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
@@ -498,7 +496,8 @@ class Event {
             .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthene, false));
           selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAthene, 'pastEvents');
 
-          return Helper.checkExperience(selectedPlayer, discordHook);
+          return Helper.checkExperience(selectedPlayer, discordHook)
+            .then(updatedPlayer => resolve(updatedPlayer));
 
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
@@ -507,7 +506,7 @@ class Event {
               const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
               if (selectedPlayer.spells.length > 0) {
                 let shouldAddToList = false;
-                let tempArray;  
+                let tempArray;
                 selectedPlayer.spells.forEach((ownedSpell, index) => {
                   const spellName = ownedSpell.name.split(/ (.+)/)[1];
                   if (spell.power > ownedSpell.power) {

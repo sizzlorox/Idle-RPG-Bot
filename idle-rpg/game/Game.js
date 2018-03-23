@@ -81,19 +81,19 @@ class Game {
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
-            this.moveEvent(selectedPlayer, onlinePlayers, twitchBot)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
-            break;
+            return this.moveEvent(selectedPlayer, onlinePlayers, twitchBot)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .catch(err => console.log(err));
           case 1:
             console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
-            this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
-            break;
+            return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .catch(err => console.log(err));
           case 2:
             console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
-            this.luckEvent(selectedPlayer, twitchBot)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
-            break;
+            return this.luckEvent(selectedPlayer, twitchBot)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .catch(err => console.log(err));
         }
       })
       .catch(err => console.log(err));
