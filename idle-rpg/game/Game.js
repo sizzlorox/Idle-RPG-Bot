@@ -29,9 +29,14 @@ class Game {
     Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(player, true)} was born! Welcome to the world of Idle-RPG!`);
+          return Database.createNewPlayer(player.discordId, player.name)
+            .then((newPlayer) => {
+              Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
 
-          return Database.createNewPlayer(player.discordId, player.name);
+              return newPlayer;
+            });
+        } else if (selectedPlayer.events === 0) {
+          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
         }
 
         return selectedPlayer;
@@ -39,6 +44,29 @@ class Game {
       .then((selectedPlayer) => {
         if (process.env.NODE_ENV === 'production') {
           this.setPlayerTitles(discordBot, selectedPlayer);
+        }
+
+        // TODO: Remove later after release
+        if (!selectedPlayer.map || !selectedPlayer.map.coords || selectedPlayer.map.coords.length === 0) {
+          selectedPlayer.map = Event.MapClass.getRandomTown();
+          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `The land has suddenly shifted with a large Earthquake and deafening sounds. Someone has tinkered with the fabric of reality! ${Helper.generatePlayerName(selectedPlayer)} was teleported by a mysterious wizard to \`${selectedPlayer.map.name}\``);
+          Database.savePlayer(selectedPlayer);
+        }
+        if (!selectedPlayer.gold.current) {
+          selectedPlayer.gold = {
+            current: 0,
+            stole: 0,
+            stolen: 0,
+            total: 0
+          };
+          Database.savePlayer(selectedPlayer);
+        }
+        if (!selectedPlayer.experience.current) {
+          selectedPlayer.experience = {
+            current: 0,
+            total: 0
+          };
+          Database.savePlayer(selectedPlayer);
         }
 
         selectedPlayer.name = player.name;
@@ -53,25 +81,30 @@ class Game {
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
-            this.moveEvent(selectedPlayer)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
-            break;
+            return this.moveEvent(selectedPlayer, onlinePlayers, twitchBot)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .catch(err => console.log(err));
           case 1:
             console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
-            this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
-            break;
+            return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .catch(err => console.log(err));
           case 2:
             console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
-            this.luckEvent(selectedPlayer, twitchBot)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer));
-            break;
+            return this.luckEvent(selectedPlayer, twitchBot)
+              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .catch(err => console.log(err));
         }
       })
       .catch(err => console.log(err));
   }
 
-  moveEvent(selectedPlayer) {
+  moveEvent(selectedPlayer, onlinePlayers, twitchBot) {
+    const pastMoveCount = selectedPlayer.pastEvents.filter(event => event.event.includes('and arrived in')).length;
+    if (pastMoveCount >= 8) {
+      this.attackEvent(selectedPlayer, onlinePlayers, twitchBot);
+    }
+
     return Event.moveEvent(selectedPlayer, this.discordHook);
   }
 
@@ -155,7 +188,8 @@ class Game {
   giveGold(playerId, amount) {
     return Database.loadPlayer(playerId)
       .then((updatingPlayer) => {
-        updatingPlayer.gold += Number(amount);
+        updatingPlayer.gold.current += Number(amount);
+        updatedPlayer.gold.total += Number(amount);
         Database.savePlayer(updatingPlayer);
       });
   }
@@ -168,18 +202,23 @@ class Game {
   top10(commandAuthor, type = { level: -1 }) {
     return Database.loadTop10(type)
       .then((top10) => {
-        const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
+        const rankString = `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
           .sort((player1, player2) => {
             if (Object.keys(type)[0] === 'level') {
-              return player2.experience - player1.experience && player2.level - player2.level;
+              return player2.experience.current - player1.experience.current && player2.level - player2.level;
+            }
+
+            if (Object.keys(type)[0].includes('.')) {
+              const keys = Object.keys(type)[0].split('.');
+              return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
             }
 
             return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
           })
-          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`)
+          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`;
 
-        commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0].replace('currentBounty', 'Bounty')}:
+        commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
 ${rankString}
         \`\`\``);
       });
@@ -274,9 +313,9 @@ ${rankString}
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
-            if (castingPlayer.gold >= globalSpells.bless.spellCost) {
+            if (castingPlayer.gold.current >= globalSpells.bless.spellCost) {
               castingPlayer.spellCasted++;
-              castingPlayer.gold -= globalSpells.bless.spellCost;
+              castingPlayer.gold.current -= globalSpells.bless.spellCost;
               this.multiplier += 1;
               const blessLogObj = {
                 spellName: 'Bless',
@@ -306,13 +345,13 @@ ${rankString}
                   commandAuthor.send('Spell has been casted!');
                 });
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold} gold.`);
+              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
             }
             break;
 
           case 'home':
-            if (castingPlayer.gold >= globalSpells.home.spellCost) {
-              castingPlayer.gold -= globalSpells.bless.spellCost;
+            if (castingPlayer.gold.current >= globalSpells.home.spellCost) {
+              castingPlayer.gold.current -= globalSpells.bless.spellCost;
               const Kindale = Event.MapClass.getMapByIndex(4);
               castingPlayer.map = Kindale;
               hook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
@@ -322,7 +361,7 @@ ${rankString}
                   commandAuthor.send('Spell has been casted!');
                 });
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold} gold.`);
+              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold.current} gold.`);
             }
             break;
         }
@@ -350,7 +389,8 @@ ${rankString}
   setPlayerGold(recipient, amount) {
     return Database.loadPlayer(recipient)
       .then((player) => {
-        player.gold = amount;
+        player.gold.current = Number(amount);
+        player.gold.total += Number(amount);
         return Database.savePlayer(player);
       });
   }
@@ -364,10 +404,10 @@ ${rankString}
     const veteranTitleRole = currentGuild.roles.filterArray(role => role.name === 'Veteran Idler')[0];
 
     const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
-    if (selectedPlayer.gold >= 10000 && !hasGoldTitle) {
+    if (selectedPlayer.gold.current >= 10000 && !hasGoldTitle) {
       playerDiscordObj.addRole(goldTitleRole);
       this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
-    } else if (selectedPlayer.gold < 10000 && hasGoldTitle) {
+    } else if (selectedPlayer.gold.current < 10000 && hasGoldTitle) {
       playerDiscordObj.removeRole(goldTitleRole);
       this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
     }
@@ -401,8 +441,8 @@ ${rankString}
   placeBounty(discordHook, bountyPlacer, recipient, amount) {
     return Database.loadPlayer(bountyPlacer.id)
       .then((placer) => {
-        if (placer.gold >= amount) {
-          placer.gold -= amount;
+        if (placer.gold.current >= amount) {
+          placer.gold.current -= amount;
 
           return Database.savePlayer(placer)
             .then(() => {

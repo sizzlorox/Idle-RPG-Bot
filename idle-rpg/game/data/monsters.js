@@ -171,7 +171,7 @@ const monsters = {
     rat = {
       name: 'Rat',
       isSpawnable: true,
-      spawnableMapType: ['Land'],
+      spawnableBiomes: ['Land'],
       power: 1,
       health: 15,
       stats: {
@@ -204,7 +204,7 @@ const monsters = {
     crab = {
       name: 'Crab',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Shores', 'Swamp'],
+      spawnableBiomes: ['Land', 'Shores', 'Swamp'],
       power: 1.25,
       health: 20,
       stats: {
@@ -237,7 +237,7 @@ const monsters = {
     bat = {
       name: 'Bat',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest', 'Swamp',],
+      spawnableBiomes: ['Land', 'Forest', 'Swamp',],
       power: 1.25,
       health: 45,
       stats: {
@@ -270,7 +270,7 @@ const monsters = {
     slime = {
       name: 'Slime',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Tundra', 'Swamp', 'Plains', 'Forest', 'Barrows'],
+      spawnableBiomes: ['Land', 'Tundra', 'Swamp', 'Plains', 'Forest', 'Barrows'],
       power: 1.5,
       health: 35,
       stats: {
@@ -303,7 +303,7 @@ const monsters = {
     pixie = {
       name: 'Pixie',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest', 'Sacred'],
+      spawnableBiomes: ['Land', 'Forest', 'Sacred'],
       power: 1.5,
       health: 35,
       stats: {
@@ -336,7 +336,7 @@ const monsters = {
     goblin = {
       name: 'Goblin',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Barrows', 'Forest', 'Swamp', 'Plains'],
+      spawnableBiomes: ['Land', 'Barrows', 'Forest', 'Swamp', 'Plains'],
       power: 1.75,
       health: 50,
       stats: {
@@ -369,7 +369,7 @@ const monsters = {
     bandit = {
       name: 'Bandit',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Barrows', 'Forest', 'Plains'],
+      spawnableBiomes: ['Land', 'Barrows', 'Forest', 'Plains'],
       power: 1.75,
       health: 75,
       stats: {
@@ -402,7 +402,7 @@ const monsters = {
     zombie = {
       name: 'Zombie',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest', 'Barren', 'Graveyard'],
+      spawnableBiomes: ['Land', 'Forest', 'Barren', 'Graveyard'],
       power: 1.5,
       health: 65,
       stats: {
@@ -435,7 +435,7 @@ const monsters = {
     knight = {
       name: 'Knight',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest', 'Plains', 'Beach', 'Barrows', 'Mountains', 'Sacred'],
+      spawnableBiomes: ['Land', 'Forest', 'Plains', 'Beach', 'Barrows', 'Mountains', 'Sacred'],
       power: 1.75,
       health: 100,
       stats: {
@@ -468,7 +468,7 @@ const monsters = {
     necromancer = {
       name: 'Necromancer',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest', 'Barrows', 'Mountains', 'Graveyard'],
+      spawnableBiomes: ['Land', 'Forest', 'Barrows', 'Mountains', 'Graveyard'],
       power: 2,
       health: 85,
       stats: {
@@ -501,7 +501,7 @@ const monsters = {
     gargoyle = {
       name: 'Gargoyle',
       isSpawnable: true,
-      spawnableMapType: ['Graveyard'],
+      spawnableBiomes: ['Graveyard'],
       power: 2,
       health: 160,
       stats: {
@@ -534,7 +534,7 @@ const monsters = {
     bugbear = {
       name: 'Bugbear',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains', 'Forest', 'Barrows', 'Mountains', 'Barren', 'Caves'],
+      spawnableBiomes: ['Land', 'Plains', 'Forest', 'Barrows', 'Mountains', 'Barren', 'Caves'],
       power: 2.25,
       health: 175,
       stats: {
@@ -567,7 +567,7 @@ const monsters = {
     griffin = {
       name: 'Griffin',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains'],
+      spawnableBiomes: ['Land', 'Plains'],
       power: 2,
       health: 120,
       stats: {
@@ -600,7 +600,7 @@ const monsters = {
     orc = {
       name: 'Orc',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains', 'Forest'],
+      spawnableBiomes: ['Land', 'Plains', 'Forest'],
       power: 2.5,
       health: 125,
       stats: {
@@ -633,7 +633,7 @@ const monsters = {
     elf = {
       name: 'Elf',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
+      spawnableBiomes: ['Land', 'Forest'],
       power: 2,
       health: 90,
       stats: {
@@ -666,7 +666,7 @@ const monsters = {
     wereWolf = {
       name: 'Werewolf',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
+      spawnableBiomes: ['Land', 'Forest'],
       power: 2,
       health: 115,
       stats: {
@@ -699,7 +699,7 @@ const monsters = {
     basilisk = {
       name: 'Basilisk',
       isSpawnable: true,
-      spawnableMapType: ['Mountains'],
+      spawnableBiomes: ['Mountains'],
       power: 2.25,
       health: 190,
       stats: {
@@ -732,7 +732,7 @@ const monsters = {
     unicorn = {
       name: 'Unicorn',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
+      spawnableBiomes: ['Land', 'Forest'],
       power: 0.90,
       health: 45,
       stats: {
@@ -765,7 +765,7 @@ const monsters = {
     wraith = {
       name: 'Wraith',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Graveyard'],
+      spawnableBiomes: ['Land', 'Graveyard'],
       power: 1.2,
       health: 95,
       stats: {
@@ -798,7 +798,7 @@ const monsters = {
     dragon = {
       name: 'Dragon',
       isSpawnable: true,
-      spawnableMapType: ['Land'],
+      spawnableBiomes: ['Land'],
       power: 3,
       health: 145,
       stats: {
@@ -832,7 +832,7 @@ const monsters = {
       name: 'Yeti',
       isXmasEvent: true,
       isSpawnable: false,
-      spawnableMapType: ['Tundra'],
+      spawnableBiomes: ['Tundra'],
       power: 1.75,
       health: 150,
       stats: {
@@ -865,7 +865,7 @@ const monsters = {
       name: 'Christmas Gnome',
       isXmasEvent: true,
       isSpawnable: false,
-      spawnableMapType: ['Tundra'],
+      spawnableBiomes: ['Tundra'],
       power: 0.75,
       health: 45,
       stats: {
@@ -898,7 +898,7 @@ const monsters = {
     giantSpider = {
       name: 'Giant Spider',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
+      spawnableBiomes: ['Land', 'Forest'],
       power: 1,
       health: 75,
       stats: {
@@ -931,7 +931,7 @@ const monsters = {
     killerBee = {
       name: 'Killer Bee',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest'],
+      spawnableBiomes: ['Land', 'Forest'],
       power: 0.2,
       health: 50,
       stats: {
@@ -964,7 +964,7 @@ const monsters = {
     golem = {
       name: 'Golem',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Mountains', 'Plains'],
+      spawnableBiomes: ['Land', 'Mountains', 'Plains'],
       power: 2,
       health: 200,
       stats: {
@@ -997,7 +997,7 @@ const monsters = {
     centaur = {
       name: 'Centaur',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains'],
+      spawnableBiomes: ['Land', 'Plains'],
       power: 1,
       health: 135,
       stats: {
@@ -1030,7 +1030,7 @@ const monsters = {
     cyclops = {
       name: 'Cyclops',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Mountains', 'Plains'],
+      spawnableBiomes: ['Land', 'Mountains', 'Plains'],
       power: 1,
       health: 160,
       stats: {
@@ -1063,7 +1063,7 @@ const monsters = {
     demon = {
       name: 'Demon',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Graveyard'],
+      spawnableBiomes: ['Land', 'Graveyard'],
       power: 2,
       health: 185,
       stats: {
@@ -1096,7 +1096,7 @@ const monsters = {
     elemental = {
       name: 'Elemental',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Plains', 'Forest', 'Mountains'],
+      spawnableBiomes: ['Land', 'Plains', 'Forest', 'Mountains'],
       power: 1,
       health: 150,
       stats: {
@@ -1129,7 +1129,7 @@ const monsters = {
     sphinx = {
       name: 'Sphinx',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Desert'],
+      spawnableBiomes: ['Land', 'Desert'],
       power: 1.45,
       health: 210,
       stats: {
@@ -1162,7 +1162,7 @@ const monsters = {
     tribalWarrior = {
       name: 'Tribal Warrior',
       isSpawnable: true,
-      spawnableMapType: ['Land', 'Forest', 'Plains'],
+      spawnableBiomes: ['Land', 'Forest', 'Plains'],
       power: 1,
       health: 110,
       stats: {

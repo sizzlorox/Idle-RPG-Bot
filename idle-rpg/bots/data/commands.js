@@ -103,8 +103,8 @@ const commands = [
               return message.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            const inv = Helper.generateInventoryString(playerInventory);
-            message.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`));
+            return Helper.generateInventoryString(playerInventory)
+              .then(inv => message.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`)));
           });
       }
 
@@ -114,8 +114,8 @@ const commands = [
             return message.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          const inv = Helper.generateInventoryString(playerInventory);
-          message.author.send(inv);
+          Helper.generateInventoryString(playerInventory)
+            .then(inv => message.author.send(inv));
         });
     }
   },
@@ -243,7 +243,7 @@ const commands = [
         .map((player) => {
           return player.id;
         });
-      enumHelper.roamingNpcs.forEach(npc => discordOnlinePlayers.push(npc.discordId));
+      // enumHelper.roamingNpcs.forEach(npc => discordOnlinePlayers.push(npc.discordId));
 
       game.getOnlinePlayerMaps(discordOnlinePlayers)
         .then((players) => {
@@ -300,7 +300,7 @@ const commands = [
           game.top10(message.author, { stole: -1 });
           break;
         case 'gold':
-          game.top10(message.author, { gold: -1 });
+          game.top10(message.author, { 'gold.current': -1 });
           break;
         case 'spells':
           game.top10(message.author, { spellCasted: -1 });
@@ -743,7 +743,7 @@ const commands = [
           .then((result) => {
             let definition = 'Urban Dictionary Definition of ****\n```';
             const wordDefinition = result.list.sort((item1, item2) => {
-              return item1.thumbs_up - item2.thumbs_up;
+              return item2.thumbs_up - item1.thumbs_up;
             })[0];
             definition = definition.replace('****', `\`${Helper.capitalizeFirstLetter(wordDefinition.word).replace('+', ' ')}\``);
 

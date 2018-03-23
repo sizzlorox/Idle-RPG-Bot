@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const mapSchema = require('./map');
-const maps = require('../../game/data/maps');
+const Map = require('../../game/utils/Map');
 const { equipment } = require('../../utils/enumHelper');
-const { starterTown } = require('../../../settings');
+
+const MapClass = new Map();
 
 const newPlayerObj = (discordId, name) => {
   return {
@@ -11,10 +12,18 @@ const newPlayerObj = (discordId, name) => {
     class: 'Wanderer',
     health: 105,
     mana: 50,
-    experience: 0,
-    map: maps[starterTown],
+    experience: {
+      current: 0,
+      total: 0
+    },
+    map: MapClass.getRandomTown(),
     level: 1,
-    gold: 0,
+    gold: {
+      current: 0,
+      stolen: 0,
+      stole: 0,
+      total: 0
+    },
     isMentionInDiscord: 'on',
     isPrivateMessage: false,
     isPrivateMessageImportant: false,
@@ -76,10 +85,36 @@ const playerSchema = mongoose.Schema({
     type: Number,
     default: 50
   },
-  experience: Number,
+  experience: {
+    current: {
+      type: Number,
+      default: 0
+    },
+    total: {
+      type: Number,
+      default: 0
+    }
+  },
   map: mapSchema,
   level: Number,
-  gold: Number,
+  gold: {
+    current: {
+      type: Number,
+      default: 0
+    },
+    stolen: {
+      type: Number,
+      default: 0
+    },
+    stole: {
+      type: Number,
+      default: 0
+    },
+    total: {
+      type: Number,
+      default: 0
+    }
+  },
   isMentionInDiscord: {
     type: String,
     default: 'on'

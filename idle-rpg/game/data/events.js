@@ -66,18 +66,18 @@ const events = {
     },
 
     townItem: (InventoryManager, discordHook, selectedPlayer, item, itemCost) => {
-      const purchasedItem = false;
+      let purchasedItem = false;
       if (item.position !== enumHelper.inventory.position) {
         const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
         const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
         if (oldItemRating < newItemRating) {
           purchasedItem = true;
-          selectedPlayer.gold -= itemCost;
+          selectedPlayer.gold.current -= itemCost;
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
         }
       } else if (selectedPlayer.inventory.items.length < enumHelper.inventory.maxItemAmount) {
         purchasedItem = true;
-        selectedPlayer.gold -= itemCost;
+        selectedPlayer.gold.current -= itemCost;
         selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
       }
 
@@ -130,7 +130,9 @@ const events = {
       if (victimPlayer.equipment[itemKey].name !== enumHelper.equipment.empty[itemKey].name) {
         stealingPlayer.equipment[itemKey].position = itemKey;
         victimPlayer.equipment[itemKey].position = itemKey;
-        if (Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKey]) < Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKey])) {
+        const oldItemRating = Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKey]);
+        const newItemRating = Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKey]);
+        if (oldItemRating < newItemRating) {
           stealingPlayer = Helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKey].position, stolenEquip);
           if (victimPlayer.equipment[itemKey].previousOwners.length > 0) {
             stealingPlayer.equipment[itemKey].previousOwners = victimPlayer.equipment[itemKey].previousOwners;

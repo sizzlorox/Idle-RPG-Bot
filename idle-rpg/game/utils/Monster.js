@@ -11,7 +11,7 @@ class Monster {
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
-        && mobType.spawnableMapType.includes(selectedPlayer.map.type.name));
+        && mobType.spawnableBiomes.includes(selectedPlayer.map.type.name));
 
       const randomRarityIndex = Helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = Helper.randomBetween(0, monsterTypeList.length - 1);
@@ -43,9 +43,10 @@ class Monster {
       const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
       console.log(`\n\n\nMOB RT: ${randomTypeChance} - MOB RC: ${randomRarityChance} - LEVEL: ${selectedPlayer.level} - MOB MT: ${randomMonsterType}`);
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
+
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
-        && mobType.spawnableMapType.includes(selectedPlayer.map.type.name));
+        && mobType.spawnableBiomes.includes(selectedPlayer.map.biome.name));
 
       const randomRarityIndex = Helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = Helper.randomBetween(0, monsterTypeList.length - 1);
@@ -83,7 +84,7 @@ class Monster {
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,
         isXmasEvent: monsterTypeList[randomTypeIndex].isXmasEvent,
-        experience: Math.round((monsterRarityList[randomRarityIndex].experience
+        experience: Math.ceil((monsterRarityList[randomRarityIndex].experience
           * monsterTypeList[randomTypeIndex].experience) / 2),
         gold: Math.round((monsterRarityList[randomRarityIndex].gold
           * monsterTypeList[randomTypeIndex].gold))

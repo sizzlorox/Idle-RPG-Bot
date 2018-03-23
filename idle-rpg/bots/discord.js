@@ -56,30 +56,31 @@ const hook = {
 const game = new Game(hook);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
-
 const timeZone = 'America/Los_Angeles';
-
 let minTimer = (minimalTimer * 1000) * 60;
 let maxTimer = (maximumTimer * 1000) * 60;
-
 const tickInMinutes = 2;
 let onlinePlayerList = [];
+let guildName
+
 console.log(`Current ENV: ${process.env.NODE_ENV}`);
 if (!process.env.NODE_ENV.includes('production')) {
   console.log('Mock Players loaded');
   onlinePlayerList = mockPlayers;
+  guildName = 'Idle-RPG-TEST';
 } else {
   onlinePlayerList.push({
     name: 'Pyddur, God of Beer',
     discordId: 'pyddur'
   });
+  guildName = 'Idle-RPG';
 }
 
 const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
 const heartBeat = () => {
   if (process.env.NODE_ENV.includes('production')) {
     const discordUsers = discordBot.guilds.size > 0
-      ? discordBot.guilds.find('name', 'Idle-RPG').members
+      ? discordBot.guilds.find('name', guildName).members
       : undefined;
 
     if (discordUsers) {
@@ -87,7 +88,7 @@ const heartBeat = () => {
         .filter(player => player.presence.status === 'offline' && !player.user.bot)
         .map((player) => {
           return {
-            name: player.displayName,
+            name: player.nickname ? player.nickname : player.displayName,
             discordId: player.id
           };
         });
@@ -98,7 +99,7 @@ const heartBeat = () => {
           || player.presence.status === 'dnd' && !player.user.bot)
         .map((player) => {
           return {
-            name: player.displayName,
+            name: player.nickname ? player.nickname : player.displayName,
             discordId: player.id
           };
         });
@@ -166,11 +167,10 @@ discordBot.on('message', (message) => {
 
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
-    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game && oldMember.presence.status !== 'offline'
-    /*
-      || newMember.presence.game && newMember.presence.game.streaming && oldMember.presence.game && !oldMember.presence.game.streaming && oldMember.presence.status !== 'offline'
-  */) {
-      newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
+    if (newMember.presence.game && !oldMember.presence.game) {
+      if (newMember.presence.game.streaming) {
+        newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
+      }
     }
   });
 }
