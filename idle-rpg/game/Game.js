@@ -46,6 +46,29 @@ class Game {
           this.setPlayerTitles(discordBot, selectedPlayer);
         }
 
+        // TODO: Remove later after release
+        if (!selectedPlayer.map || !selectedPlayer.map.coords || selectedPlayer.map.coords.length === 0) {
+          selectedPlayer.map = Event.MapClass.getRandomTown();
+          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `The land has suddenly shifted with a large Earthquake and deafening sounds. Someone has tinkered with the fabric of reality! ${Helper.generatePlayerName(selectedPlayer)} was teleported by a mysterious wizard to \`${selectedPlayer.map.name}\``);
+          Database.savePlayer(selectedPlayer);
+        }
+        if (!selectedPlayer.gold.current) {
+          selectedPlayer.gold = {
+            current: 0,
+            stole: 0,
+            stolen: 0,
+            total: 0
+          };
+          Database.savePlayer(selectedPlayer);
+        }
+        if (!selectedPlayer.experience.current) {
+          selectedPlayer.experience = {
+            current: 0,
+            total: 0
+          };
+          Database.savePlayer(selectedPlayer);
+        }
+
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
 
@@ -179,18 +202,23 @@ class Game {
   top10(commandAuthor, type = { level: -1 }) {
     return Database.loadTop10(type)
       .then((top10) => {
-        const rankString = `${top10.filter(player => player[Object.keys(type)[0]] > 0)
+        const rankString = `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
           .sort((player1, player2) => {
             if (Object.keys(type)[0] === 'level') {
               return player2.experience.current - player1.experience.current && player2.level - player2.level;
             }
 
+            if (Object.keys(type)[0].includes('.')) {
+              const keys = Object.keys(type)[0].split('.');
+              return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
+            }
+
             return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
           })
-          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`)
+          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`;
 
-        commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0].replace('currentBounty', 'Bounty')}:
+        commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
 ${rankString}
         \`\`\``);
       });

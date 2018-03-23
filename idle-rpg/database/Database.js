@@ -86,8 +86,12 @@ class Database {
 
   loadOnlinePlayerMaps(discordIds) {
     connect();
+    const removeNpcs = enumHelper.mockPlayers.map(npc => npc.name);
+
     return new Promise((resolve, reject) => {
-      return Player.find({}, (err, result) => {
+      return Player.find({
+        name: { $nin: removeNpcs, $exists: true }
+      }, (err, result) => {
         if (err) {
           disconnect();
           return reject(err);
@@ -117,12 +121,11 @@ class Database {
     select[Object.keys(type)[0]] = 1;
 
     if (Object.keys(type)[0] === 'level') {
-      select.experience = 1;
-      type.experience = -1;
+      select['experience.current'] = 1;
+      type['experience.current'] = -1;
     }
     const query = {
-      name: { $nin: removeNpcs, $exists: true },
-      $or: [{ [Object.keys(type)[0]]: { $type: 16 } }, { [Object.keys(type)[0]]: { $type: 18 } }]
+      name: { $nin: removeNpcs, $exists: true }
     };
 
     return new Promise((resolve, reject) => {

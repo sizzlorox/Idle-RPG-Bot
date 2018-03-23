@@ -205,63 +205,69 @@ class Helper {
   }
 
   checkExperience(selectedPlayer, discordHook, twitchBot) {
-    if (selectedPlayer.experience.current >= selectedPlayer.level * 15) {
-      selectedPlayer.level++;
-      selectedPlayer.experience.current = 0;
-      selectedPlayer.health = 100 + (selectedPlayer.level * 5);
-      selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      for (let i = 0; i < 4; i++) {
-        switch (this.randomBetween(0, 3)) {
-          case 0:
-            selectedPlayer.stats.str++;
+    return new Promise((resolve) => {
+      if (selectedPlayer.experience.current >= selectedPlayer.level * 15) {
+        selectedPlayer.level++;
+        selectedPlayer.experience.current = 0;
+        selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+        selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
+        for (let i = 0; i < 4; i++) {
+          switch (this.randomBetween(0, 3)) {
+            case 0:
+              selectedPlayer.stats.str++;
+              break;
+            case 1:
+              selectedPlayer.stats.dex++;
+              break;
+            case 2:
+              selectedPlayer.stats.end++;
+              break;
+            case 3:
+              selectedPlayer.stats.int++;
+              break;
+          }
+        }
+        const oldClass = selectedPlayer.class;
+
+        const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
+          if (['str', 'dex', 'int'].includes(key)) {
+            return {
+              key,
+              value: selectedPlayer.stats[key]
+            };
+          }
+        }).filter(obj => obj !== undefined)
+          .sort((stat1, stat2) => stat2.value - stat1.value);
+
+        switch (playerStats[0].key) {
+          case 'str':
+            selectedPlayer.class = 'Knight';
             break;
-          case 1:
-            selectedPlayer.stats.dex++;
+          case 'dex':
+            selectedPlayer.class = 'Thief';
             break;
-          case 2:
-            selectedPlayer.stats.end++;
-            break;
-          case 3:
-            selectedPlayer.stats.int++;
+          case 'int':
+            selectedPlayer.class = 'Mage';
             break;
         }
-      }
-      const oldClass = selectedPlayer.class;
 
-      const playerStats = Object.keys(selectedPlayer.stats).map((key) => {
-        if (['str', 'dex', 'int'].includes(key)) {
-          return {
-            key,
-            value: selectedPlayer.stats[key]
-          };
+        if (selectedPlayer.class !== oldClass) {
+          this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
+            .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true));
         }
-      }).filter(obj => obj !== undefined)
-        .sort((stat1, stat2) => stat2.value - stat1.value);
 
-      switch (playerStats[0].key) {
-        case 'str':
-          selectedPlayer.class = 'Knight';
-          break;
-        case 'dex':
-          selectedPlayer.class = 'Thief';
-          break;
-        case 'int':
-          selectedPlayer.class = 'Mage';
-          break;
+        const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
+        const eventLog = `Leveled up to level ${selectedPlayer.level}`;
+
+        this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+          .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+        selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+        return resolve(selectedPlayer);
       }
 
-      if (selectedPlayer.class !== oldClass) {
-        this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
-          .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true));
-      }
-
-      const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
-      const eventLog = `Leveled up to level ${selectedPlayer.level}`;
-
-      this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-        .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-      selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
-    }
+      return resolve(selectedPlayer);
+    });
   }
 
   setPlayerEquipment(selectedPlayer, equipment, item) {
@@ -295,90 +301,105 @@ class Helper {
   }
 
   checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
-    if (selectedPlayer.health <= 0) {
-      const expLoss = Math.ceil(selectedPlayer.experience.current / 8);
-      const goldLoss = Math.ceil(selectedPlayer.gold.current / 4);
-      selectedPlayer.health = 100 + (selectedPlayer.level * 5);
-      selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-      selectedPlayer.map = MapClass.getRandomTown();
-      selectedPlayer.experience.current -= expLoss;
-      selectedPlayer.gold.current -= goldLoss;
-      selectedPlayer.inventory = {
-        equipment: [],
-        items: []
-      };
+    return new Promise((resolve) => {
+      if (selectedPlayer.health <= 0) {
+        const expLoss = Math.ceil(selectedPlayer.experience.current / 8);
+        const goldLoss = Math.ceil(selectedPlayer.gold.current / 4);
+        selectedPlayer.health = 100 + (selectedPlayer.level * 5);
+        selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
+        selectedPlayer.map = MapClass.getRandomTown();
+        selectedPlayer.experience.current -= expLoss;
+        selectedPlayer.gold.current -= goldLoss;
+        selectedPlayer.inventory = {
+          equipment: [],
+          items: []
+        };
 
-      const breakChance = this.randomBetween(0, 100);
-      if (breakChance < 15) {
-        switch (this.randomBetween(0, 2)) {
-          case 0:
-            if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
-              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`))
-                .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.helmet.name} just broke!`, true))
-                .then(() => this.setPlayerEquipment(
-                  selectedPlayer,
-                  enumHelper.equipment.types.helmet.position,
-                  enumHelper.equipment.empty.helmet
-                ));
-            }
-            break;
-          case 1:
-            if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
-              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`))
-                .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.armor.name} just broke!`, true))
-                .then(() => this.setPlayerEquipment(
-                  selectedPlayer,
-                  enumHelper.equipment.types.armor.position,
-                  enumHelper.equipment.empty.armor
-                ));
-            }
-            break;
-          case 2:
-            if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-              this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`))
-                .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.weapon.name} just broke!`, true))
-                .then(() => this.setPlayerEquipment(
-                  selectedPlayer,
-                  enumHelper.equipment.types.weapon.position,
-                  enumHelper.equipment.empty.weapon
-                ));
-            }
-            break;
-        }
-      }
-
-      if (selectedPlayer.deaths.firstDeath === 'never') {
-        selectedPlayer.deaths.firstDeath = new Date().getTime();
-      }
-
-      if (!attackerObj.discordId) {
-        selectedPlayer.deaths.mob++;
-      } else {
-        if (selectedPlayer.currentBounty > 0) {
-          const bountyGain = selectedPlayer.currentBounty / 4;
-          const bountyEventLog = `Claimed ${bountyGain} gold for ${selectedPlayer.name}'s head`;
-          attackerObj.gold.current += Number(bountyGain);
-          attackerObj.gold.total += Number(bountyGain);
-          attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastEvents');
-          attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastPvpEvents');
-          this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
-            .then(() => this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
-            .then(() => this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true));
-          selectedPlayer.currentBounty = 0;
+        const breakChance = this.randomBetween(0, 100);
+        if (breakChance < 15) {
+          switch (this.randomBetween(0, 2)) {
+            case 0:
+              if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
+                this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`))
+                  .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.helmet.name} just broke!`, true))
+                  .then(() => this.setPlayerEquipment(
+                    selectedPlayer,
+                    enumHelper.equipment.types.helmet.position,
+                    enumHelper.equipment.empty.helmet
+                  ));
+              }
+              break;
+            case 1:
+              if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
+                this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`))
+                  .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.armor.name} just broke!`, true))
+                  .then(() => this.setPlayerEquipment(
+                    selectedPlayer,
+                    enumHelper.equipment.types.armor.position,
+                    enumHelper.equipment.empty.armor
+                  ));
+              }
+              break;
+            case 2:
+              if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+                this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`))
+                  .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.weapon.name} just broke!`, true))
+                  .then(() => this.setPlayerEquipment(
+                    selectedPlayer,
+                    enumHelper.equipment.types.weapon.position,
+                    enumHelper.equipment.empty.weapon
+                  ));
+              }
+              break;
+          }
         }
 
-        selectedPlayer.deaths.player++;
-        attackerObj.kills.player++;
-        Database.savePlayer(selectedPlayer);
+        if (selectedPlayer.deaths.firstDeath === 'never') {
+          selectedPlayer.deaths.firstDeath = new Date().getTime();
+        }
+
+        if (!attackerObj.discordId) {
+          selectedPlayer.deaths.mob++;
+        } else {
+          if (selectedPlayer.currentBounty > 0) {
+            const bountyGain = selectedPlayer.currentBounty / 4;
+            const bountyEventLog = `Claimed ${bountyGain} gold for ${selectedPlayer.name}'s head`;
+            attackerObj.gold.current += Number(bountyGain);
+            attackerObj.gold.total += Number(bountyGain);
+            attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastEvents');
+            attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastPvpEvents');
+            this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
+              .then(() => this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
+              .then(() => this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true));
+            selectedPlayer.currentBounty = 0;
+          }
+
+          selectedPlayer.deaths.player++;
+          attackerObj.kills.player++;
+          Database.savePlayer(selectedPlayer);
+        }
+
+        let eventMsg = this.setImportantMessage(`${selectedPlayer.name} died and lost ${expLoss} exp and ${goldLoss} gold! Game over man... Game over.`);
+        let eventLog = `You died and lost ${expLoss} exp and ${goldLoss} gold. Game over man... Game over.`;
+
+        if (expLoss === 0) {
+          eventMsg = eventMsg.replace(` and lost ${expLoss} exp`);
+          eventLog = eventLog.replace(` and lost ${expLoss} exp`);
+        }
+        if (goldLoss === 0) {
+          eventMsg = eventMsg.replace(` and lost ${goldLoss} gold`);
+          eventLog = eventLog.replace(` and lost ${goldLoss} gold`);
+        }
+
+        this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg)
+          .then(() => this.sendPrivateMessage(hook, selectedPlayer, eventLog, true));
+        selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+        return resolve(selectedPlayer);
       }
 
-      const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died and lost ${expLoss} exp and ${goldLoss} gold! Game over man... Game over.`);
-      const eventLog = `You died and lost ${expLoss} exp and ${goldLoss} gold. Game over man... Game over.`;
-
-      this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg)
-        .then(() => this.sendPrivateMessage(hook, selectedPlayer, eventLog, true));
-      selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
-    }
+      return resolve(selectedPlayer);
+    });
   }
 
   generateSpellBookString(player) {

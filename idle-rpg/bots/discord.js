@@ -88,7 +88,7 @@ const heartBeat = () => {
         .filter(player => player.presence.status === 'offline' && !player.user.bot)
         .map((player) => {
           return {
-            name: player.displayName,
+            name: player.nickname ? player.nickname : player.displayName,
             discordId: player.id
           };
         });
@@ -99,7 +99,7 @@ const heartBeat = () => {
           || player.presence.status === 'dnd' && !player.user.bot)
         .map((player) => {
           return {
-            name: player.displayName,
+            name: player.nickname ? player.nickname : player.displayName,
             discordId: player.id
           };
         });

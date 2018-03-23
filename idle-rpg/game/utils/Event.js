@@ -40,11 +40,6 @@ class Event {
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     return new Promise((resolve) => {
-      // TODO: Remove later after release
-      if (!selectedPlayer.map) {
-        selectedPlayer.map = this.MapManager.getRandomTown();
-      }
-
       const { map, direction } = this.MapManager.moveToRandomMap(selectedPlayer);
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = map;
@@ -112,13 +107,10 @@ class Event {
 
                   return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
                     .then((stealResult) => {
-                      Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook);
-                      return Database.savePlayer(stealResult.stealingPlayer)
-                        .then(() => {
-                          return stealResult.victimPlayer;
-                        });
-                    })
-                    .catch(err => errorLog.error(err));
+                      return Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
+                        .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+                        .catch(err => errorLog.error(err))
+                    });
                 }
 
                 if (defender.health > 0 && selectedPlayer.health > 0) {
@@ -169,13 +161,10 @@ class Event {
 
                 return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
                   .then((stealResult) => {
-                    Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook);
-                    return Database.savePlayer(stealResult.victimPlayer)
-                      .then(() => {
-                        return stealResult.stealingPlayer;
-                      });
-                  })
-                  .catch(err => errorLog.error(err));
+                    return Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
+                      .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+                      .catch(err => errorLog.error(err))
+                  });
               });
             }
           }
@@ -214,10 +203,9 @@ class Event {
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                   .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-                Helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
                 selectedPlayer.battles.lost++;
 
-                return resolve(selectedPlayer);
+                return Helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
               }
 
               if (defender.health > 0 && selectedPlayer.health > 0) {
@@ -241,9 +229,8 @@ class Event {
                 Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                   .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
                 selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-                Helper.checkExperience(selectedPlayer, discordHook);
 
-                return resolve(selectedPlayer);
+                return Helper.checkExperience(selectedPlayer, discordHook);
               }
               const goldGain = Number(defender.gold * multiplier);
               const expGain = Math.floor((defender.experience * multiplier) + (defenderDamage / 4));
@@ -264,14 +251,10 @@ class Event {
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
                 .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
               selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-              Helper.checkExperience(selectedPlayer, discordHook);
               selectedPlayer.battles.won++;
 
               return this.generateDropItemEvent(discordHook, 'twitch', selectedPlayer, mob)
-                .then((updatedPlayer) => {
-                  selectedPlayer = updatedPlayer;
-                  return resolve(selectedPlayer);
-                });
+                .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook));
             });
         });
     });
@@ -335,12 +318,14 @@ class Event {
     if (selectedPlayer.inventory.equipment.length > 0) {
       let profit = 0;
       Helper.printEventDebug(selectedPlayer.inventory.equipment);
-      infoLog.log({ sell: 'SELLL', equip: selectedPlayer.inventory.equipment });
       selectedPlayer.inventory.equipment.forEach((equipment) => {
-        infoLog.log(equipment);
         Helper.printEventDebug(`Equipment selling: ${equipment.name}`);
         profit += Number(equipment.gold);
       });
+      if (isNaN(profit)) {
+        infoLog.info(selectedPlayer.inventory.equipment);
+        profit = 100;
+      }
       selectedPlayer.inventory.equipment.length = 0;
       profit = Math.floor(profit);
       selectedPlayer.gold.current += profit;
@@ -436,7 +421,6 @@ class Event {
         case 2:
           const luckHealthAmount = Helper.randomBetween(5, 50 + (selectedPlayer.level * 2));
           selectedPlayer.health -= luckHealthAmount;
-          Helper.checkHealth(this.MapClass, selectedPlayer, discordHook);
 
           const eventMsgZeus = `${Helper.generatePlayerName(selectedPlayer, true)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
           const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
@@ -445,7 +429,7 @@ class Event {
             .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, false));
           selectedPlayer = Helper.logEvent(selectedPlayer, eventLogZeus, 'pastEvents');
 
-          return resolve(selectedPlayer);
+          return Helper.checkHealth(this.MapClass, selectedPlayer, discordHook);
 
         case 3:
           const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
@@ -506,7 +490,6 @@ class Event {
           const luckExpAthena = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
           selectedPlayer.experience.current += luckExpAthena;
           selectedPlayer.experience.total += luckExpAthena;
-          Helper.checkExperience(selectedPlayer, discordHook)
 
           const eventMsgAthene = `Athene shared her wisdom with ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAthena} experience!`;
           const eventLogAthene = `Athene shared her wisdom with you making you gain ${luckExpAthena} experience`;
@@ -515,7 +498,7 @@ class Event {
             .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthene, false));
           selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAthene, 'pastEvents');
 
-          return resolve(selectedPlayer);
+          return Helper.checkExperience(selectedPlayer, discordHook);
 
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
@@ -524,7 +507,7 @@ class Event {
               const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
               if (selectedPlayer.spells.length > 0) {
                 let shouldAddToList = false;
-                let tempArray;
+                let tempArray;  
                 selectedPlayer.spells.forEach((ownedSpell, index) => {
                   const spellName = ownedSpell.name.split(/ (.+)/)[1];
                   if (spell.power > ownedSpell.power) {
@@ -652,7 +635,7 @@ class Event {
   generateGamblingEvent(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
       if (selectedPlayer.gold.current < 10) {
-        return resolve(selectedPlayer)
+        return resolve(selectedPlayer);
       }
 
       const luckGambleChance = Helper.randomBetween(0, 100);

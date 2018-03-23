@@ -86,16 +86,34 @@ const playerSchema = mongoose.Schema({
     default: 50
   },
   experience: {
-    current: Number,
-    total: Number
+    current: {
+      type: Number,
+      default: 0
+    },
+    total: {
+      type: Number,
+      default: 0
+    }
   },
   map: mapSchema,
   level: Number,
   gold: {
-    current: Number,
-    stolen: Number,
-    stole: Number,
-    total: Number
+    current: {
+      type: Number,
+      default: 0
+    },
+    stolen: {
+      type: Number,
+      default: 0
+    },
+    stole: {
+      type: Number,
+      default: 0
+    },
+    total: {
+      type: Number,
+      default: 0
+    }
   },
   isMentionInDiscord: {
     type: String,

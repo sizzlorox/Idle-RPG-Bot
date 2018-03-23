@@ -130,7 +130,9 @@ const events = {
       if (victimPlayer.equipment[itemKey].name !== enumHelper.equipment.empty[itemKey].name) {
         stealingPlayer.equipment[itemKey].position = itemKey;
         victimPlayer.equipment[itemKey].position = itemKey;
-        if (Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKey]) < Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKey])) {
+        const oldItemRating = Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKey]);
+        const newItemRating = Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKey]);
+        if (oldItemRating < newItemRating) {
           stealingPlayer = Helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKey].position, stolenEquip);
           if (victimPlayer.equipment[itemKey].previousOwners.length > 0) {
             stealingPlayer.equipment[itemKey].previousOwners = victimPlayer.equipment[itemKey].previousOwners;
