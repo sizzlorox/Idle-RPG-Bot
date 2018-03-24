@@ -5,6 +5,14 @@ const enumHelper = {
     }
   },
 
+  battle: {
+    outcomes: {
+      win: 'win',
+      lost: 'lost',
+      fled: 'fled'
+    }
+  },
+
   inventory: {
     maxEquipmentAmount: 5,
     maxItemAmount: 15,

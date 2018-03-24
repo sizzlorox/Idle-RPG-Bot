@@ -1,9 +1,86 @@
 const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 const messages = require('../data/messages');
-const { infoLog } = require('../../utils/logger');
 
 const events = {
+  battle: {
+    pveResults: (discordHook, MapClass, results, multiplier) => {
+      return new Promise((resolve) => {
+        const mobMaxHealth = results.defender.maxHealth;
+        const playerMaxHealth = 100 + (results.attacker.level * 5);
+
+        selectedPlayer = results.attacker;
+        const battleResult = `Battle Results:
+          ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${results.attackerDamage} damage.
+          ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
+          ${results.defender.name}'s \`${results.defender.equipment.weapon.name}\` did ${results.defenderDamage} damage.
+          ${results.defender.name} has ${results.defender.health} / ${mobMaxHealth} HP left.`;
+
+        Helper.printEventDebug(battleResult);
+
+        if (selectedPlayer.health <= 0) {
+          const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${results.defender.name}\`'s \`${results.defender.equipment.weapon.name}\` just killed ${Helper.generatePlayerName(selectedPlayer, true)}!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg! [\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
+
+          const eventLog = `${results.defender.name}'s ${results.defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+          selectedPlayer.battles.lost++;
+
+          return resolve(enumHelper.battle.outcomes.lost);
+        }
+
+        if (results.defender.health > 0 && selectedPlayer.health > 0) {
+          const expGain = Math.floor(((results.defender.experience * multiplier) + (results.defenderDamage / 4)) / 6);
+          let eventMsg = results.attackerDamage > results.defenderDamage
+            ? `[\`${selectedPlayer.map.name}\`] \`${results.defender.name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`
+            : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from \`${results.defender.name}\`!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
+
+          const eventLog = results.attackerDamage > results.defenderDamage
+            ? `${results.defender.name} fled from you in ${selectedPlayer.map.name}!`
+            : `You fled from ${results.defender.name} in ${selectedPlayer.map.name}!`;
+
+          if (expGain === 0) {
+            eventMsg = eventMsg.replace(` and gained \`${expGain}\` exp`, '');
+          }
+
+          selectedPlayer.experience.current += expGain;
+          selectedPlayer.experience.total += expGain;
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+          return resolve(enumHelper.battle.outcomes.fled);
+        }
+        const goldGain = Number(results.defender.gold * multiplier);
+        const expGain = Math.floor((results.defender.experience * multiplier) + (results.defenderDamage / 4));
+
+        let eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${results.defender.name}\`!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp and \`${goldGain}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
+        const eventLog = `Killed ${results.defender.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}.`;
+
+        if (goldGain === 0) {
+          eventMsg = eventMsg.replace(` and \`${goldGain}\` gold`, '');
+        }
+
+        selectedPlayer.experience.current += expGain;
+        selectedPlayer.experience.total += expGain;
+        selectedPlayer.gold.current += goldGain;
+        selectedPlayer.gold.total += goldGain;
+        selectedPlayer.kills.mob++;
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
+          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+        selectedPlayer.battles.won++;
+
+        return resolve(enumHelper.battle.outcomes.win);
+      });
+    }
+  },
+
   messages: {
     randomCampEventMessage: (selectedPlayer) => {
       const randomEventInt = Helper.randomBetween(0, messages.event.camp.length - 1);
@@ -155,6 +232,6 @@ const events = {
       }
     }
   }
-};
+}
 
 module.exports = events;

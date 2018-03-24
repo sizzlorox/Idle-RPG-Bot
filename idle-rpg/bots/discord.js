@@ -2,7 +2,7 @@ const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
 const { randomBetween } = require('../utils/Helper');
-const { welcomeLog, errorLog } = require('../utils/logger');
+const { welcomeLog, errorLog, infoLog } = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
 const VirusTotal = require('../bots/modules/VirusTotal');
@@ -155,6 +155,7 @@ discordBot.on('message', (message) => {
     return VirusTotal.scanUrl(url)
       .then(VirusTotal.retrieveReport)
       .then((reportResults) => {
+        infoLog.info(reportResults);
         if (reportResults.positives > 0) {
           message.delete();
           message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');
