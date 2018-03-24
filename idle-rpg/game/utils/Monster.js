@@ -55,7 +55,7 @@ class Monster {
       const monsterObj = {
         name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
         health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
-        maxHealth: this.health,
+        maxHealth: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
         stats: {
           str: selectedPlayer.level <= 5
             ? ((monsterRarityList[randomRarityIndex].stats.str
