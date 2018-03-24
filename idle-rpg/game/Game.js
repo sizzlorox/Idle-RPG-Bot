@@ -100,12 +100,14 @@ class Game {
   }
 
   moveEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    const pastMoveCount = selectedPlayer.pastEvents.filter(event => event.event.includes('and arrived in')).length;
-    if (pastMoveCount >= 8) {
-      this.attackEvent(selectedPlayer, onlinePlayers, twitchBot);
-    }
+    return new Promise((resolve) => {
+      const pastMoveCount = selectedPlayer.pastEvents.filter(event => event.event.includes('and arrived in')).length;
+      if (pastMoveCount >= 8) {
+        return resolve(this.attackEvent(selectedPlayer, onlinePlayers, twitchBot));
+      }
 
-    return Event.moveEvent(selectedPlayer, this.discordHook);
+      return resolve(Event.moveEvent(selectedPlayer, this.discordHook));
+    });
   }
 
   /**
@@ -115,27 +117,29 @@ class Game {
    * @param {*} twitchBot
    */
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    const luckDice = Helper.randomBetween(0, 100);
-    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
-      selectedPlayer = Event.sellInTown(this.discordHook, twitchBot, selectedPlayer);
+    return new Promise((resolve) => {
+      const luckDice = Helper.randomBetween(0, 100);
+      if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
+        selectedPlayer = Event.sellInTown(this.discordHook, twitchBot, selectedPlayer);
 
-      return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer);
-    }
-
-    if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
-      && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-      return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
-    }
-
-    if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-      if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
+        return resolve(Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer));
       }
 
-      return Event.campEvent(this.discordHook, selectedPlayer);
-    }
+      if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
+        && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
+        return resolve(Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier));
+      }
 
-    return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);
+      if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+        if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
+          return resolve(Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier));
+        }
+
+        return resolve(Event.campEvent(this.discordHook, selectedPlayer));
+      }
+
+      return resolve(Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer));
+    });
   }
 
   /**
