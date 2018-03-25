@@ -103,19 +103,27 @@ class Event {
         if (battleResults.result) {
           switch (battleResults.result) {
             case enumHelper.battle.outcomes.win:
-              return Helper.checkExperience(battleResults.updatedAttacker, discordHook, twitchBot)
-                .then(updatedAttacker => this.stealPlayerItem(discordHook, twitchBot, updatedAttacker, battleResults.updatedDefender))
-                .then(stealResult => Database.savePlayer(stealResult.victimPlayer))
-                .then(Helper.checkHealth(this.MapClass, battleResults.updatedDefender, battleResults.updatedAttacker, discordHook));
+              return this.stealPlayerItem(discordHook, twitchBot, battleResults.updatedAttacker, battleResults.updatedDefender)
+                .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
+                  .then((updatedVictim) => {
+                    Database.savePlayer(updatedVictim);
+                    return Helper.checkExperience(stealResult.stealingPlayer, discordHook, twitchBot);
+                  }));
 
             case enumHelper.battle.outcomes.fled:
-              return battleResults.updatedAttacker;
+              return Helper.checkExperience(battleResults.updatedDefender, discordHook, twitchBot)
+                .then((updatedDefender) => {
+                  Database.savePlayer(updatedDefender);
+                  return Helper.checkExperience(battleResults.updatedAttacker, discordHook, twitchBot);
+                });
 
             case enumHelper.battle.outcomes.lost:
-              return Helper.checkExperience(battleResults.updatedDefender, discordHook, twitchBot)
-                .then(updatedDefender => this.stealPlayerItem(discordHook, twitchBot, updatedDefender, battleResults.updatedAttacker))
-                .then(stealResult => Database.savePlayer(stealResult.stealingPlayer))
-                .then(Helper.checkHealth(this.MapClass, battleResults.updatedAttacker, battleResults.updatedDefender, discordHook))
+              return this.stealPlayerItem(discordHook, twitchBot, battleResults.updatedDefender, battleResults.updatedAttacker)
+                .then(stealResult => Helper.checkExperience(stealResult.stealingPlayer, discordHook, twitchBot)
+                  .then((updatedDefender) => {
+                    Database.savePlayer(updatedDefender);
+                    return Helper.checkHealth(this.MapClass, stealResult.victimPlayer, updatedDefender, discordHook);
+                  }));
           }
         }
 
@@ -132,10 +140,10 @@ class Event {
         switch (battleResults.result) {
           case enumHelper.battle.outcomes.win:
             return this.generateDropItemEvent(discordHook, 'twitch', battleResults.updatedPlayer, battleResults.updatedMob)
-              .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook));
+              .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook, twitchBot));
 
           case enumHelper.battle.outcomes.fled:
-            return Helper.checkExperience(battleResults.updatedPlayer, discordHook);
+            return Helper.checkExperience(battleResults.updatedPlayer, discordHook, twitchBot);
 
           case enumHelper.battle.outcomes.lost:
             return Helper.checkHealth(this.MapClass, battleResults.updatedPlayer, battleResults.updatedMob, discordHook);
@@ -384,8 +392,7 @@ class Event {
             .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthene, false));
           selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAthene, 'pastEvents');
 
-          return Helper.checkExperience(selectedPlayer, discordHook)
-            .then(updatedPlayer => resolve(updatedPlayer));
+          return resolve(selectedPlayer);
 
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)

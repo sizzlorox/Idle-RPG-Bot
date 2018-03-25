@@ -29,8 +29,8 @@ const events = {
 
     pvpResults: (discordHook, { attacker, defender, attackerDamage, defenderDamage }) => {
       return new Promise((resolve) => {
-        selectedPlayer = attacker;
-        randomPlayer = defender;
+        let selectedPlayer = attacker;
+        let randomPlayer = defender;
         const randomPlayerMaxHealth = 100 + (randomPlayer.level * 5);
         const playerMaxHealth = 100 + (selectedPlayer.level * 5);
 
@@ -65,7 +65,7 @@ const events = {
             Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true),
             Database.savePlayer(randomPlayer)
           ])
-            .then(() => resolve({
+            .then(resolve({
               result: enumHelper.battle.outcomes.lost,
               updatedAttacker: selectedPlayer,
               updatedDefender: randomPlayer
@@ -74,9 +74,9 @@ const events = {
 
         if (defender.health > 0 && selectedPlayer.health > 0) {
           const eventMsg = attackerDamage > defenderDamage
-            ? `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} attacked ${Helper.generatePlayerName(randomPlayer, true)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${Helper.generateGenderString(randomPlayer, 'he')} managed to get away!
+            ? `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} attacked ${Helper.generatePlayerName(randomPlayer, true)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} but ${Helper.generateGenderString(randomPlayer, 'he')} managed to get away!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`
-            : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} attacked ${Helper.generatePlayerName(randomPlayer, true)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${Helper.generatePlayerName(randomPlayer, true)} was too strong!
+            : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} attacked ${Helper.generatePlayerName(randomPlayer, true)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} but ${Helper.generatePlayerName(randomPlayer, true)} was too strong!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
 
           const expGainAttacker = Math.floor(defenderDamage / 8);
@@ -99,7 +99,7 @@ const events = {
             Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true),
             Database.savePlayer(randomPlayer)
           ])
-            .then(() => resolve({
+            .then(resolve({
               result: enumHelper.battle.outcomes.fled,
               updatedAttacker: selectedPlayer,
               updatedDefender: randomPlayer
@@ -127,7 +127,7 @@ const events = {
           Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true),
           Database.savePlayer(randomPlayer)
         ])
-          .then(() => resolve({
+          .then(resolve({
             result: enumHelper.battle.outcomes.win,
             updatedAttacker: selectedPlayer,
             updatedDefender: randomPlayer
@@ -140,7 +140,7 @@ const events = {
         const mobMaxHealth = results.defender.maxHealth;
         const playerMaxHealth = 100 + (results.attacker.level * 5);
 
-        selectedPlayer = results.attacker;
+        let selectedPlayer = results.attacker;
         const battleResult = `Battle Results:
           ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${results.attackerDamage} damage.
           ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
@@ -161,7 +161,7 @@ const events = {
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
           ])
-            .then(() => resolve({
+            .then(resolve({
               result: enumHelper.battle.outcomes.lost,
               updatedPlayer: selectedPlayer,
               updatedMob: results.defender
@@ -193,7 +193,7 @@ const events = {
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
           ])
-            .then(() => resolve({
+            .then(resolve({
               result: enumHelper.battle.outcomes.fled,
               updatedPlayer: selectedPlayer,
               updatedMob: results.defender
@@ -223,7 +223,7 @@ const events = {
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
         ])
-          .then(() => resolve({
+          .then(resolve({
             result: enumHelper.battle.outcomes.win,
             updatedPlayer: selectedPlayer,
             updatedMob: results.defender
