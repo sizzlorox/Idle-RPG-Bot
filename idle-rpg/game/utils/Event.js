@@ -58,7 +58,7 @@ class Event {
       .then(mappedPlayers => events.battle.pvpPreperation(selectedPlayer, mappedPlayers, onlinePlayers))
       .then((prepResults) => {
         if (prepResults.randomPlayer) {
-          return Battle.newSimulateBattle(selectedPlayer, randomPlayer);
+          return Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer);
         }
 
         return this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
