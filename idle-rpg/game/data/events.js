@@ -17,10 +17,7 @@ const events = {
             const randomPlayer = sameMapPlayers[randomPlayerIndex];
 
             if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name && randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-              const randomPlayerMaxHealth = 100 + (randomPlayer.level * 5);
-              const playerMaxHealth = 100 + (selectedPlayer.level * 5);
-
-              return resolve({ randomPlayer, playerMaxHealth, randomPlayerMaxHealth });
+              return resolve({ randomPlayer });
             }
           }
         }
@@ -33,6 +30,9 @@ const events = {
       return new Promise((resolve) => {
         selectedPlayer = attacker;
         randomPlayer = defender;
+        const randomPlayerMaxHealth = 100 + (randomPlayer.level * 5);
+        const playerMaxHealth = 100 + (selectedPlayer.level * 5);
+
         const battleResult = `Battle Results:
           ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
           ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} HP left.
