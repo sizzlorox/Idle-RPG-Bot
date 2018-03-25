@@ -443,7 +443,7 @@ class Helper {
     Gambles: ${player.gambles}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
-    Spells Casted: ${player.spellCasted}
+    Spells Cast: ${player.spellCasted}
     Kills:
       Monsters: ${player.kills.mob}
       Players: ${player.kills.player}

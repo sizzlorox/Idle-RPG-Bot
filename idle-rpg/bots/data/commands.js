@@ -17,11 +17,11 @@ const commands = [
         !top10 - Retrieves top 10 highest level players
         !top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
         !s, !stats - Sends a PM with your stats
-        !s, !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-senstive)
+        !s, !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-sensitive)
         !e, !equip - Sends a PM with your equipment
-        !e, !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-senstive)
+        !e, !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-sensitive)
         !c, !char, !character - Sends PM with your stats and equipment
-        !c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-senstive)
+        !c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-sensitive)
         !m, !map - Displays the worlds locations
         !cs, !castspell - Lists spells available to cast
         !cs, !castspell <spell> - Casts a global spell onto Idle-RPG
