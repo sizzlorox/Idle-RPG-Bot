@@ -398,19 +398,20 @@ class Helper {
         let eventLog = `You died and lost ${expLoss} exp and ${goldLoss} gold. Game over man... Game over.`;
 
         if (expLoss === 0) {
-          eventMsg = eventMsg.replace(` and lost ${expLoss} exp`);
-          eventLog = eventLog.replace(` and lost ${expLoss} exp`);
+          eventMsg = eventMsg.replace(` and lost ${expLoss} exp`, '');
+          eventLog = eventLog.replace(` and lost ${expLoss} exp`, '');
         }
         if (goldLoss === 0) {
-          eventMsg = eventMsg.replace(` and lost ${goldLoss} gold`);
-          eventLog = eventLog.replace(` and lost ${goldLoss} gold`);
+          eventMsg = eventMsg.replace(` and lost ${goldLoss} gold`, '');
+          eventLog = eventLog.replace(` and lost ${goldLoss} gold`, '');
         }
-
-        this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg)
-          .then(() => this.sendPrivateMessage(hook, selectedPlayer, eventLog, true));
         selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
-        return resolve(selectedPlayer);
+        return Promise.all([
+          this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg),
+          this.sendPrivateMessage(hook, selectedPlayer, eventLog, true)
+        ])
+          .then(() => resolve(selectedPlayer));
       }
 
       return resolve(selectedPlayer);

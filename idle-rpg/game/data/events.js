@@ -177,7 +177,7 @@ const events = {
 
           if (expGain === 0) {
             eventMsg = eventMsg.replace(` and gained \`${expGain}\` exp`, '');
-            eventLog = eventlog.replace(` [${expGain} exp]`);
+            eventLog = eventlog.replace(` [${expGain} exp]`, '');
           }
 
           selectedPlayer.experience.current += expGain;
@@ -199,7 +199,7 @@ const events = {
 
         if (goldGain === 0) {
           eventMsg = eventMsg.replace(` and \`${goldGain}\` gold`, '');
-          eventLog = eventLog.replace(`/${goldGain} gold`);
+          eventLog = eventLog.replace(`/${goldGain} gold`, '');
         }
 
         selectedPlayer.experience.current += expGain;

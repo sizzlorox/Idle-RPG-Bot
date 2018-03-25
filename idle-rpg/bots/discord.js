@@ -82,8 +82,10 @@ const processDetails = () => {
   let memoryUsage = util.inspect(process.memoryUsage());
   memoryUsage = JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
 
-  console.log(`Heap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
-  console.log(`Current Up Time: ${Helper.secondsToTimeFormat(Math.floor(process.uptime()))}`);
+  console.log('------------');
+  console.log(`\n\nHeap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
+  console.log(`Current Up Time: ${Helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
+  console.log('------------');
 };
 
 const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
