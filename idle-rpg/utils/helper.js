@@ -273,12 +273,13 @@ class Helper {
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
         const eventLog = `Leveled up to level ${selectedPlayer.level}`;
-
-        this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-          .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
         selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
-        return resolve(selectedPlayer);
+        return Promise.all([
+          this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
+        ])
+          .then(() => resolve(selectedPlayer));
       }
 
       return resolve(selectedPlayer);

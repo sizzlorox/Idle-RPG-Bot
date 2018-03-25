@@ -41,7 +41,6 @@ class Monster {
       const randomRarityChance = Math.round(Helper.randomBetween(0, 100));
       const randomTypeChance = Math.round(Helper.randomBetween(0, 100));
       const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
-      console.log(`\n\n\nMOB RT: ${randomTypeChance} - MOB RC: ${randomRarityChance} - LEVEL: ${selectedPlayer.level} - MOB MT: ${randomMonsterType}`);
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
 
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
@@ -90,7 +89,6 @@ class Monster {
         gold: Math.round((monsterRarityList[randomRarityIndex].gold
           * monsterTypeList[randomTypeIndex].gold))
       };
-      console.log(`MOB POW: ${monsterObj.power} - PLAYER POW: ${playerBalance}`);
 
       return resolve(monsterObj);
     });

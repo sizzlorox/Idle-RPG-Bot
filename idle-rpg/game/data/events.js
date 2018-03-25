@@ -1,6 +1,7 @@
 const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 const messages = require('../data/messages');
+const Database = require('../../database/Database');
 const { pvpLevelRestriction } = require('../../../settings');
 
 const events = {
@@ -61,7 +62,8 @@ const events = {
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-            Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true)
+            Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true),
+            Database.savePlayer(randomPlayer)
           ])
             .then(() => resolve({
               result: enumHelper.battle.outcomes.lost,
@@ -94,7 +96,8 @@ const events = {
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-            Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true)
+            Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true),
+            Database.savePlayer(randomPlayer)
           ])
             .then(() => resolve({
               result: enumHelper.battle.outcomes.fled,
@@ -109,9 +112,6 @@ const events = {
         const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}. [${expGain} exp]`;
         const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
 
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
-          .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
         randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
@@ -124,7 +124,8 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true)
+          Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true),
+          Database.savePlayer(randomPlayer)
         ])
           .then(() => resolve({
             result: enumHelper.battle.outcomes.win,
@@ -160,7 +161,11 @@ const events = {
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
           ])
-            .then(() => resolve(enumHelper.battle.outcomes.lost));
+            .then(() => resolve({
+              result: enumHelper.battle.outcomes.lost,
+              updatedPlayer: selectedPlayer,
+              updatedMob: results.defender
+            }));
         }
 
         if (results.defender.health > 0 && selectedPlayer.health > 0) {
@@ -188,7 +193,11 @@ const events = {
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
           ])
-            .then(() => resolve(enumHelper.battle.outcomes.fled));
+            .then(() => resolve({
+              result: enumHelper.battle.outcomes.fled,
+              updatedPlayer: selectedPlayer,
+              updatedMob: results.defender
+            }));
         }
         const goldGain = Number(results.defender.gold * multiplier);
         const expGain = Math.floor((results.defender.experience * multiplier) + (results.defenderDamage / 4));
@@ -214,7 +223,11 @@ const events = {
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
         ])
-          .then(() => resolve(enumHelper.battle.outcomes.win));
+          .then(() => resolve({
+            result: enumHelper.battle.outcomes.win,
+            updatedPlayer: selectedPlayer,
+            updatedMob: results.defender
+          }));
       });
     }
   },
