@@ -171,13 +171,13 @@ const events = {
             : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from \`${results.defender.name}\`!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
 
-          const eventLog = results.attackerDamage > results.defenderDamage
+          let eventLog = results.attackerDamage > results.defenderDamage
             ? `${results.defender.name} fled from you in ${selectedPlayer.map.name}! [${expGain} exp]`
             : `You fled from ${results.defender.name} in ${selectedPlayer.map.name}! [${expGain} exp]`;
 
           if (expGain === 0) {
             eventMsg = eventMsg.replace(` and gained \`${expGain}\` exp`, '');
-            eventLog = eventlog.replace(` [${expGain} exp]`);
+            eventLog = eventlog.replace(` [${expGain} exp]`, '');
           }
 
           selectedPlayer.experience.current += expGain;
@@ -199,7 +199,7 @@ const events = {
 
         if (goldGain === 0) {
           eventMsg = eventMsg.replace(` and \`${goldGain}\` gold`, '');
-          eventLog = eventLog.replace(`/${goldGain} gold`);
+          eventLog = eventLog.replace(`/${goldGain} gold`, '');
         }
 
         selectedPlayer.experience.current += expGain;
