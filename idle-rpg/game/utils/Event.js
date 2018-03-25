@@ -154,7 +154,9 @@ class Event {
 
           if (item.position !== enumHelper.inventory.position) {
             selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
-            if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) > Helper.calculateItemRating(selectedPlayer, item)) {
+            const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+            const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+            if (oldItemRating > newItemRating) {
               return resolve(selectedPlayer);
             }
           }
