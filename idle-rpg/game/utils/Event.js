@@ -66,12 +66,10 @@ class Event {
        */
 
       .then((prepResults) => {
-        if (prepResults.randomPlayer) {
-          return Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer);
-        }
-
-        return this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
-          .catch(err => errorLog.error(err));
+        return prepResults.randomPlayer
+          ? Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
+          : this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
+            .catch(err => errorLog.error(err));
       })
       /**
        * If PvP battle was executed (Found an online randomplayer in current map)
@@ -86,11 +84,9 @@ class Event {
        */
 
       .then((battleResults) => {
-        if (battleResults.attacker) {
-          return events.battle.pvpResults(discordHook, battleResults);
-        }
-
-        return battleResults;
+        return battleResults.attacker
+          ? events.battle.pvpResults(discordHook, battleResults)
+          : battleResults;
       })
       /**
        * If PvP battle was executed (Found an online randomplayer in current map)
