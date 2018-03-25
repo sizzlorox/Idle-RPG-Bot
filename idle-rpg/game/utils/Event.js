@@ -103,15 +103,19 @@ class Event {
         if (battleResults.result) {
           switch (battleResults.result) {
             case enumHelper.battle.outcomes.win:
-              return this.stealPlayerItem(discordHook, twitchBot, battleResults.updatedAttacker, battleResults.updatedDefender)
-                .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook));
+              return Helper.checkExperience(battleResults.updatedAttacker, discordHook, twitchBot)
+                .then(updatedAttacker => this.stealPlayerItem(discordHook, twitchBot, updatedAttacker, battleResults.updatedDefender))
+                .then(stealResult => Database.savePlayer(stealResult.victimPlayer))
+                .then(Helper.checkHealth(this.MapClass, battleResults.updatedDefender, battleResults.updatedAttacker, discordHook));
 
             case enumHelper.battle.outcomes.fled:
               return battleResults.updatedAttacker;
 
             case enumHelper.battle.outcomes.lost:
-              return this.stealPlayerItem(discordHook, twitchBot, battleResults.updatedDefender, battleResults.updatedAttacker)
-                .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook));
+              return Helper.checkExperience(battleResults.updatedDefender, discordHook, twitchBot)
+                .then(updatedDefender => this.stealPlayerItem(discordHook, twitchBot, updatedDefender, battleResults.updatedAttacker))
+                .then(stealResult => Database.savePlayer(stealResult.stealingPlayer))
+                .then(Helper.checkHealth(this.MapClass, battleResults.updatedAttacker, battleResults.updatedDefender, discordHook))
           }
         }
 
@@ -124,17 +128,17 @@ class Event {
     return this.MonsterManager.generateNewMonster(selectedPlayer)
       .then(mob => Battle.newSimulateBattle(selectedPlayer, mob))
       .then(results => events.battle.pveResults(discordHook, this.MapClass, results, multiplier))
-      .then((results) => {
-        switch (results) {
+      .then((battleResults) => {
+        switch (battleResults.result) {
           case enumHelper.battle.outcomes.win:
-            return this.generateDropItemEvent(discordHook, 'twitch', selectedPlayer, results.defender)
+            return this.generateDropItemEvent(discordHook, 'twitch', battleResults.updatedPlayer, battleResults.updatedMob)
               .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook));
 
           case enumHelper.battle.outcomes.fled:
-            return Helper.checkExperience(selectedPlayer, discordHook);
+            return Helper.checkExperience(battleResults.updatedPlayer, discordHook);
 
           case enumHelper.battle.outcomes.lost:
-            return Helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
+            return Helper.checkHealth(this.MapClass, battleResults.updatedPlayer, battleResults.updatedMob, discordHook);
         }
       });
   }

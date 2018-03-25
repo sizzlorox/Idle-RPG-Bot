@@ -193,7 +193,7 @@ class Game {
     return Database.loadPlayer(playerId)
       .then((updatingPlayer) => {
         updatingPlayer.gold.current += Number(amount);
-        updatedPlayer.gold.total += Number(amount);
+        updatingPlayer.gold.total += Number(amount);
         Database.savePlayer(updatingPlayer);
       });
   }
