@@ -8,7 +8,6 @@ const Spell = require('../utils/Spell');
 const Map = require('../utils/Map');
 const Database = require('../../database/Database');
 const events = require('../data/events');
-const { pvpLevelRestriction } = require('../../../settings');
 const { errorLog, infoLog } = require('../../utils/logger');
 
 class Event {
@@ -56,114 +55,40 @@ class Event {
 
   attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers, multiplier) {
     return Database.getSameMapPlayers(selectedPlayer.map.name)
-      .then((mappedPlayers) => {
-        if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-          const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
-            && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
-            && player.level <= selectedPlayer.level + pvpLevelRestriction && player.level >= selectedPlayer.level - pvpLevelRestriction);
-
-          if (sameMapPlayers.length > 0 && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-            const randomPlayerIndex = Helper.randomBetween(0, sameMapPlayers.length - 1);
-            let randomPlayer = sameMapPlayers[randomPlayerIndex];
-
-            if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name && randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-              const randomPlayerMaxHealth = 100 + (randomPlayer.level * 5);
-              const playerMaxHealth = 100 + (selectedPlayer.level * 5);
-              return Battle.newSimulateBattle(
-                selectedPlayer,
-                randomPlayer
-              ).then(({
-                attacker, defender, attackerDamage, defenderDamage
-              }) => {
-                selectedPlayer = attacker;
-                randomPlayer = defender;
-                const battleResult = `Battle Results:
-                  ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
-                  ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} HP left.
-                  ${Helper.generatePlayerName(randomPlayer, true)} 's \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
-                  ${Helper.generatePlayerName(randomPlayer, true)} has ${randomPlayer.health} HP left.`;
-
-                Helper.printEventDebug(battleResult);
-
-                if (selectedPlayer.health <= 0) {
-                  const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(randomPlayer, true)} just killed ${Helper.generatePlayerName(selectedPlayer, true)} with ${Helper.generateGenderString(randomPlayer, 'his')} \`${randomPlayer.equipment.weapon.name}\`!
-    ${Helper.generatePlayerName(selectedPlayer, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
-
-                  const eventLog = `Died to ${defender.name} in ${selectedPlayer.map.name}.`;
-                  const otherPlayerLog = `Killed ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
-                  const expGain = Math.floor(attackerDamage / 8);
-
-                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-                    .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
-                    .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
-                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
-                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
-                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
-                  selectedPlayer.battles.lost++;
-                  randomPlayer.battles.won++;
-                  randomPlayer.experience.current += expGain;
-                  randomPlayer.experience.total += expGain;
-
-                  return this.stealPlayerItem(discordHook, twitchBot, randomPlayer, selectedPlayer)
-                    .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook));
-                }
-
-                if (defender.health > 0 && selectedPlayer.health > 0) {
-                  const eventMsg = attackerDamage > defenderDamage
-                    ? `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} attacked ${Helper.generatePlayerName(randomPlayer, true)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${Helper.generateGenderString(randomPlayer, 'he')} managed to get away!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`
-                    : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} attacked ${Helper.generatePlayerName(randomPlayer, true)} with ${Helper.generateGenderString(selectedPlayer, 'his')} ${selectedPlayer.equipment.weapon.name} in \`${selectedPlayer.map.name}\` but ${Helper.generatePlayerName(randomPlayer, true)} was too strong!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
-                  // TODO: Find a way of making this visible some other method
-                  // eventMsg = eventMsg.concat(battleResult);
-                  const eventLog = `Attacked ${randomPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and dealt ${attackerDamage} damage!`;
-                  const otherPlayerLog = `Attacked by ${selectedPlayer.name} in ${selectedPlayer.map.name} with ${selectedPlayer.equipment.weapon.name} and received ${attackerDamage} damage!`;
-                  const expGainAttacker = Math.floor(defenderDamage / 8);
-                  const expGainDefender = Math.floor(attackerDamage / 8);
-
-                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-                    .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
-                    .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
-                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
-                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
-                  randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
-                  selectedPlayer.experience.current += expGainAttacker;
-                  selectedPlayer.experience.total += expGainAttacker;
-                  randomPlayer.experience.current += expGainDefender;
-                  randomPlayer.experience.total += expGainDefender;
-
-                  return selectedPlayer;
-                }
-
-                const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just killed \`${randomPlayer.name}\` with ${Helper.generateGenderString(selectedPlayer, 'his')} \`${selectedPlayer.equipment.weapon.name}\`!
-    ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(randomPlayer, true)} HP:${defender.health}/${randomPlayerMaxHealth}]`;
-                const eventLog = `Killed ${randomPlayer.name} in ${selectedPlayer.map.name}.`;
-                const otherPlayerLog = `Died to ${selectedPlayer.name} in ${selectedPlayer.map.name}.`;
-                const expGain = Math.floor(defenderDamage / 8);
-
-                Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-                  .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true))
-                  .then(() => Helper.sendPrivateMessage(discordHook, randomPlayer, otherPlayerLog, true));
-                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastPvpEvents');
-                randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastEvents');
-                randomPlayer = Helper.logEvent(randomPlayer, otherPlayerLog, 'pastPvpEvents');
-                selectedPlayer.battles.won++;
-                randomPlayer.battles.lost++;
-                selectedPlayer.experience.current += expGain;
-                selectedPlayer.experience.total += expGain;
-
-                return this.stealPlayerItem(discordHook, twitchBot, selectedPlayer, randomPlayer)
-                  .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook));
-              });
-            }
-          }
+      .then(mappedPlayers => events.battle.pvpPreperation(selectedPlayer, mappedPlayers, onlinePlayers))
+      .then((prepResults) => {
+        if (prepResults.randomPlayer) {
+          return Battle.newSimulateBattle(selectedPlayer, randomPlayer);
         }
 
         return this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
           .catch(err => errorLog.error(err));
+      })
+      .then((battleResults) => {
+        // attacker, defender, attackerDamage, defenderDamage
+        if (battleResults.attacker) {
+          return events.battle.pvpResults(discordHook, battleResults);
+        }
+
+        return battleResults;
+      })
+      .then((battleResults) => {
+        if (battleResults.result) {
+          switch (battleResults.result) {
+            case enumHelper.battle.outcomes.win:
+              return this.stealPlayerItem(discordHook, twitchBot, battleResults.updatedAttacker, battleResults.updatedDefender)
+                .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook));
+
+            case enumHelper.battle.outcomes.fled:
+              return battleResults.updatedAttacker;
+
+            case enumHelper.battle.outcomes.lost:
+              return this.stealPlayerItem(discordHook, twitchBot, battleResults.updatedDefender, battleResults.updatedAttacker)
+                .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook));
+          }
+        }
+
+        return battleResults;
       });
   }
 
@@ -174,12 +99,14 @@ class Event {
       .then(results => events.battle.pveResults(discordHook, this.MapClass, results, multiplier))
       .then((results) => {
         switch (results) {
-          case 'win':
+          case enumHelper.battle.outcomes.win:
             return this.generateDropItemEvent(discordHook, 'twitch', selectedPlayer, results.defender)
               .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook));
-          case 'fled':
+
+          case enumHelper.battle.outcomes.fled:
             return Helper.checkExperience(selectedPlayer, discordHook);
-          case 'lost':
+
+          case enumHelper.battle.outcomes.lost:
             return Helper.checkHealth(this.MapClass, selectedPlayer, mob, discordHook);
         }
       });
