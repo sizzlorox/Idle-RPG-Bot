@@ -1,10 +1,12 @@
 const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
+const util = require('util');
 const { randomBetween } = require('../utils/Helper');
 const { welcomeLog, errorLog, infoLog } = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
+const Helper = require('../utils/Helper');
 const VirusTotal = require('../bots/modules/VirusTotal');
 const { CronJob } = require('cron');
 const {
@@ -76,6 +78,14 @@ if (!process.env.NODE_ENV.includes('production')) {
   guildName = 'Idle-RPG';
 }
 
+const processDetails = () => {
+  let memoryUsage = util.inspect(process.memoryUsage());
+  memoryUsage = JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
+
+  console.log(`Heap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
+  console.log(`Current Up Time: ${Helper.secondsToTimeFormat(Math.floor(process.uptime()))}`);
+};
+
 const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
 const heartBeat = () => {
   if (process.env.NODE_ENV.includes('production')) {
@@ -127,6 +137,8 @@ const heartBeat = () => {
       }, playerTimer);
     }
   });
+
+  processDetails();
 };
 
 discordBot.on('ready', () => {
