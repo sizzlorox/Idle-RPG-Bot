@@ -102,7 +102,7 @@ class Game {
   moveEvent(selectedPlayer, onlinePlayers, twitchBot) {
     return new Promise((resolve) => {
       const pastMoveCount = selectedPlayer.pastEvents.filter(event => event.event.includes('and arrived in')).length;
-      if (pastMoveCount >= 8) {
+      if (pastMoveCount >= 8 && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         return resolve(this.attackEvent(selectedPlayer, onlinePlayers, twitchBot));
       }
 

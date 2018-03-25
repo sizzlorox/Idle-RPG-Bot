@@ -23,12 +23,14 @@ const events = {
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg! [\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
 
           const eventLog = `${results.defender.name}'s ${results.defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
           selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
           selectedPlayer.battles.lost++;
 
-          return resolve(enumHelper.battle.outcomes.lost);
+          return Promise.all([
+            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
+          ])
+            .then(() => resolve(enumHelper.battle.outcomes.lost));
         }
 
         if (results.defender.health > 0 && selectedPlayer.health > 0) {
@@ -49,11 +51,13 @@ const events = {
 
           selectedPlayer.experience.current += expGain;
           selectedPlayer.experience.total += expGain;
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
           selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
-          return resolve(enumHelper.battle.outcomes.fled);
+          return Promise.all([
+            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
+          ])
+            .then(() => resolve(enumHelper.battle.outcomes.fled));
         }
         const goldGain = Number(results.defender.gold * multiplier);
         const expGain = Math.floor((results.defender.experience * multiplier) + (results.defenderDamage / 4));
@@ -71,12 +75,14 @@ const events = {
         selectedPlayer.gold.current += goldGain;
         selectedPlayer.gold.total += goldGain;
         selectedPlayer.kills.mob++;
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
         selectedPlayer.battles.won++;
 
-        return resolve(enumHelper.battle.outcomes.win);
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
+        ])
+          .then(() => resolve(enumHelper.battle.outcomes.win));
       });
     }
   },
