@@ -128,7 +128,7 @@ class Event {
       .then((battleResults) => {
         switch (battleResults.result) {
           case enumHelper.battle.outcomes.win:
-            return this.generateDropItemEvent(discordHook, 'twitch', battleResults.updatedPlayer, battleResults.updatedMob)
+            return events.battle.dropItem(discordHook, battleResults.updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager)
               .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook, twitchBot));
 
           case enumHelper.battle.outcomes.fled:
@@ -140,39 +140,10 @@ class Event {
       });
   }
 
-  generateDropItemEvent(discordHook, twitchBot, selectedPlayer, mob) {
-    return new Promise((resolve) => {
-      const dropitemChance = Helper.randomBetween(0, 100);
-
-      if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
-        return this.ItemManager.generateItem(selectedPlayer, mob)
-          .then((item) => {
-            events.utils.dropItem(this.InventoryManager, selectedPlayer, item);
-
-            let eventMsg;
-            if (!item.isXmasEvent) {
-              eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.name}!\``;
-            } else {
-              eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.name}!\`**`;
-            }
-            const eventLog = `Received ${item.name} from ${mob.name}`;
-
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-              .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-            selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-
-            return resolve(selectedPlayer);
-          });
-      }
-
-      return resolve(selectedPlayer);
-    });
-  }
-
   // Item Events
   generateTownItemEvent(discordHook, selectedPlayer) {
     return this.ItemManager.generateItem(selectedPlayer)
-      .then(item => events.town.item(discordHook, selectedPlayer, item));
+      .then(item => events.town.item(discordHook, selectedPlayer, item, this.InventoryManager));
   }
 
   sellInTown(discordHook, selectedPlayer) {
@@ -180,16 +151,7 @@ class Event {
   }
 
   campEvent(discordHook, selectedPlayer) {
-    return new Promise((resolve) => {
-      selectedPlayer = Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
-      // TODO: Make more camp event messages to be selected randomly
-      const { eventMsg, eventLog } = events.messages.randomCampEventMessage(selectedPlayer);
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-        .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-
-      return resolve(selectedPlayer);
-    });
+    return events.camp(discordHook, selectedPlayer);
   }
 
   stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {

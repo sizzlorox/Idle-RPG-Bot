@@ -3,6 +3,7 @@ const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog, infoLog } = require('../utils/logger');
 const { battleDebug, eventDebug, guildID } = require('../../settings');
+const messages = require('../game/data/messages');
 
 class Helper {
   printBattleDebug(debugMsg) {
@@ -653,6 +654,50 @@ class Helper {
     }
 
     return { eventMsg, eventLog, selectedPlayer, item, victimPlayer, otherPlayerLog };
+  },
+
+  randomCampEventMessage(selectedPlayer) {
+    const randomEventInt = Helper.randomBetween(0, messages.event.camp.length - 1);
+    let { eventMsg, eventLog } = messages.event.camp[randomEventInt];
+    // TODO: clean up this mess
+    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
+    eventMsg = updatedMessages.eventMsg;
+    eventLog = updatedMessages.eventLog;
+
+    return { eventMsg, eventLog };
+  },
+
+  randomItemEventMessage(selectedPlayer, item) {
+    const randomEventInt = this.randomBetween(0, messages.event.item.length - 1);
+    let { eventMsg, eventLog } = messages.event.item[randomEventInt];
+    // TODO: clean up this mess
+    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
+    eventMsg = updatedMessages.eventMsg;
+    eventLog = updatedMessages.eventLog;
+
+    return { eventMsg, eventLog };
+  },
+
+  randomGambleEventMessage(selectedPlayer, luckGambleGold, isWin) {
+    if (isWin) {
+      const randomEventInt = this.randomBetween(0, messages.event.gamble.win.length - 1);
+      let { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
+      // TODO: clean up this mess
+      const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
+      eventMsg = updatedMessages.eventMsg;
+      eventLog = updatedMessages.eventLog;
+
+      return { eventMsg, eventLog };
+    }
+
+    const randomEventInt = this.randomBetween(0, messages.event.gamble.lose.length - 1);
+    let { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
+    // TODO: clean up this mess
+    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
+    eventMsg = updatedMessages.eventMsg;
+    eventLog = updatedMessages.eventLog;
+
+    return { eventMsg, eventLog };
   }
 }
 module.exports = new Helper();

@@ -120,7 +120,7 @@ class Game {
    * @param {*} twitchBot
    */
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    return new Promise((resolve) => {
+    return new Promise(() => {
       const luckDice = Helper.randomBetween(0, 100);
       if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
         return Event.sellInTown(this.discordHook, selectedPlayer)
@@ -137,8 +137,7 @@ class Game {
           return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
         }
 
-        return Event.campEvent(this.discordHook, selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
+        return Event.campEvent(this.discordHook, selectedPlayer);
       }
 
       return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);

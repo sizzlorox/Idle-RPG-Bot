@@ -1,6 +1,5 @@
 const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
-const messages = require('../data/messages');
 const Database = require('../../database/Database');
 const { pvpLevelRestriction } = require('../../../settings');
 
@@ -20,6 +19,19 @@ const events = {
         .then(resolve(selectedPlayer));
     })
   },
+
+  camp: (discordHook, selectedPlayer) => new Promise((resolve) => {
+    selectedPlayer = Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
+    // TODO: Make more camp event messages to be selected randomly
+    const { eventMsg, eventLog } = Helper.randomCampEventMessage(selectedPlayer);
+    selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+    return Promise.all([
+      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg),
+      Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
+    ])
+      .then(resolve(selectedPlayer));
+  }),
 
   town: {
     sell: (discordHook, selectedPlayer) => new Promise((resolve) => {
@@ -53,7 +65,7 @@ const events = {
       return resolve(selectedPlayer);
     }),
 
-    item: (discordHook, selectedPlayer, item) => new Promise((resolve) => {
+    item: (discordHook, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
       const itemCost = Math.round(item.gold);
 
       if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
@@ -298,13 +310,51 @@ const events = {
           updatedPlayer: selectedPlayer,
           updatedMob: results.defender
         }));
+    }),
+
+    dropItem: (discordHook, selectedPlayer, mob, ItemManager, InventoryManager) => new Promise((resolve) => {
+      const dropitemChance = Helper.randomBetween(0, 100);
+
+      if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
+        return ItemManager.generateItem(selectedPlayer, mob)
+          .then((item) => {
+            if (item.position !== enumHelper.inventory.position) {
+              const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+              const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+              if (oldItemRating > newItemRating) {
+                selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
+              } else {
+                selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
+              }
+            } else {
+              selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
+            }
+
+            let eventMsg;
+            if (!item.isXmasEvent) {
+              eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.name}!\``;
+            } else {
+              eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.name}!\`**`;
+            }
+            const eventLog = `Received ${item.name} from ${mob.name}`;
+            selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+            return Promise.all([
+              Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+              Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+            ])
+              .then(resolve(selectedPlayer));
+          });
+      }
+
+      return resolve(selectedPlayer);
     })
   },
 
   luck: {
     item: {
       spell: (discordHook, selectedPlayer, spell) => new Promise((resolve) => {
-        const { eventMsg, eventLog } = this.messages.randomItemEventMessage(selectedPlayer, spell);
+        const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, spell);
         if (selectedPlayer.spells.length > 0) {
           let shouldAddToList = false;
           let tempArray;
@@ -351,7 +401,7 @@ const events = {
           selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
         }
 
-        const { eventMsg, eventLog } = this.messages.randomItemEventMessage(selectedPlayer, item);
+        const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, item);
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
         return Promise.all([
@@ -399,7 +449,7 @@ const events = {
           selectedPlayer.gold.current = 0;
         }
 
-        const { eventMsg, eventLog } = this.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
+        const { eventMsg, eventLog } = Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
         return Promise.all([
@@ -412,7 +462,7 @@ const events = {
       selectedPlayer.gold.current += luckGambleGold;
       selectedPlayer.gold.total += luckGambleGold;
 
-      const { eventMsg, eventLog } = this.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
+      const { eventMsg, eventLog } = Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
       selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
       return Promise.all([
@@ -597,67 +647,7 @@ const events = {
     })
   },
 
-  messages: {
-    randomCampEventMessage: (selectedPlayer) => {
-      const randomEventInt = Helper.randomBetween(0, messages.event.camp.length - 1);
-      let { eventMsg, eventLog } = messages.event.camp[randomEventInt];
-      // TODO: clean up this mess
-      const updatedMessages = Helper.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
-      eventMsg = updatedMessages.eventMsg;
-      eventLog = updatedMessages.eventLog;
-
-      return { eventMsg, eventLog };
-    },
-
-    randomItemEventMessage: (selectedPlayer, item) => {
-      const randomEventInt = Helper.randomBetween(0, messages.event.item.length - 1);
-      let { eventMsg, eventLog } = messages.event.item[randomEventInt];
-      // TODO: clean up this mess
-      const updatedMessages = Helper.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
-      eventMsg = updatedMessages.eventMsg;
-      eventLog = updatedMessages.eventLog;
-
-      return { eventMsg, eventLog };
-    },
-
-    randomGambleEventMessage: (selectedPlayer, luckGambleGold, isWin) => {
-      if (isWin) {
-        const randomEventInt = Helper.randomBetween(0, messages.event.gamble.win.length - 1);
-        let { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
-        // TODO: clean up this mess
-        const updatedMessages = Helper.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
-        eventMsg = updatedMessages.eventMsg;
-        eventLog = updatedMessages.eventLog;
-
-        return { eventMsg, eventLog };
-      }
-
-      const randomEventInt = Helper.randomBetween(0, messages.event.gamble.lose.length - 1);
-      let { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
-      // TODO: clean up this mess
-      const updatedMessages = Helper.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
-      eventMsg = updatedMessages.eventMsg;
-      eventLog = updatedMessages.eventLog;
-
-      return { eventMsg, eventLog };
-    }
-  },
-
   utils: {
-    dropItem: (InventoryManager, selectedPlayer, item) => {
-      if (item.position !== enumHelper.inventory.position) {
-        const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-        const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
-        if (oldItemRating > newItemRating) {
-          selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-        } else {
-          selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
-        }
-      } else {
-        selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
-      }
-    },
-
     stealEquip: (InventoryManager, discordHook, stealingPlayer, victimPlayer, itemKey) => {
       let stolenEquip;
       if (victimPlayer.equipment[itemKey].previousOwners.length > 0) {
