@@ -424,23 +424,7 @@ class Event {
   }
 
   chanceToCatchSnowflake(discordHook, selectedPlayer) {
-    return new Promise((resolve) => {
-      const snowFlakeDice = Helper.randomBetween(0, 100);
-      if (snowFlakeDice <= 15) {
-        const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
-        if (Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic) < Helper.calculateItemRating(selectedPlayer, snowFlake)) {
-          selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
-          const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
-          const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
-
-          Helper.sendMessage(discordHook, 'twitch', false, eventMsgSnowflake)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true))
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogSnowflake, 'pastEvents');
-        }
-      }
-
-      return resolve(selectedPlayer);
-    });
+    events.special.snowFlake(discordHook, selectedPlayer);
   }
 
   /**

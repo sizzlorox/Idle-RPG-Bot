@@ -233,36 +233,22 @@ const events = {
   },
 
   luck: {
-    gambling: (discordHook, selectedPlayer) => {
-      return new Promise((resolve) => {
-        if (selectedPlayer.gold.current < 10) {
-          return resolve(selectedPlayer);
+    gambling: (discordHook, selectedPlayer) => new Promise((resolve) => {
+      if (selectedPlayer.gold.current < 10) {
+        return resolve(selectedPlayer);
+      }
+
+      const luckGambleChance = Helper.randomBetween(0, 100);
+      const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold.current / 10, selectedPlayer.gold.current / 3));
+      selectedPlayer.gambles++;
+
+      if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
+        selectedPlayer.gold.current -= luckGambleGold;
+        if (selectedPlayer.gold.current <= 0) {
+          selectedPlayer.gold.current = 0;
         }
 
-        const luckGambleChance = Helper.randomBetween(0, 100);
-        const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold.current / 10, selectedPlayer.gold.current / 3));
-        selectedPlayer.gambles++;
-
-        if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
-          selectedPlayer.gold.current -= luckGambleGold;
-          if (selectedPlayer.gold.current <= 0) {
-            selectedPlayer.gold.current = 0;
-          }
-
-          const { eventMsg, eventLog } = this.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-
-          return Promise.all([
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
-          ])
-            .then(resolve(selectedPlayer));
-        }
-
-        selectedPlayer.gold.current += luckGambleGold;
-        selectedPlayer.gold.total += luckGambleGold;
-
-        const { eventMsg, eventLog } = this.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
+        const { eventMsg, eventLog } = this.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
         return Promise.all([
@@ -270,8 +256,20 @@ const events = {
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
         ])
           .then(resolve(selectedPlayer));
-      });
-    },
+      }
+
+      selectedPlayer.gold.current += luckGambleGold;
+      selectedPlayer.gold.total += luckGambleGold;
+
+      const { eventMsg, eventLog } = this.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
+      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+      return Promise.all([
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+      ])
+        .then(resolve(selectedPlayer));
+    }),
 
     gods: {
       hades: (discordHook, selectedPlayer) => new Promise((resolve) => {
@@ -422,6 +420,30 @@ const events = {
           .then(resolve(selectedPlayer));
       })
     }
+  },
+
+  special: {
+    snowFlake: (discordHook, selectedPlayer) => new Promise((resolve) => {
+      const snowFlakeDice = Helper.randomBetween(0, 100);
+      if (snowFlakeDice <= 15) {
+        const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
+        const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
+        const newItemRating = Helper.calculateItemRating(selectedPlayer, snowFlake);
+        if (oldItemRating < newItemRating) {
+          selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
+          const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
+          const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogSnowflake, 'pastEvents');
+          return Promise.all([
+            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgSnowflake),
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, false)
+          ])
+            .then(resolve(selectedPlayer));
+        }
+      }
+
+      return resolve(selectedPlayer);
+    })
   },
 
   messages: {
