@@ -56,8 +56,8 @@ const events = {
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -95,8 +95,8 @@ const events = {
       selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
       ])
         .then(resolve(selectedPlayer));
     })
@@ -445,7 +445,7 @@ const events = {
 
             return Promise.all([
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-              Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+              Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
             ])
               .then(resolve(selectedPlayer));
           });
@@ -487,7 +487,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -510,7 +510,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
         ])
           .then(resolve(selectedPlayer));
       })
@@ -530,7 +530,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -558,7 +558,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -571,7 +571,7 @@ const events = {
 
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
       ])
         .then(resolve(selectedPlayer));
     }),
@@ -590,7 +590,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, true)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -605,7 +605,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, true)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -625,7 +625,7 @@ const events = {
 
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco),
-            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, false)
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, true)
           ])
             .then(resolve(selectedPlayer));
         }
@@ -636,7 +636,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, true)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -651,7 +651,7 @@ const events = {
 
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes),
-            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, false)
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, true)
           ])
             .then(resolve(selectedPlayer));
         }
@@ -668,7 +668,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, true)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -684,7 +684,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthena),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthena, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthena, true)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -720,7 +720,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false)
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true)
         ])
           .then(resolve(selectedPlayer));
       })
@@ -741,7 +741,7 @@ const events = {
           selectedPlayer = Helper.logEvent(selectedPlayer, eventLogSnowflake, 'pastEvents');
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgSnowflake),
-            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, false)
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true)
           ])
             .then(resolve(selectedPlayer));
         }
