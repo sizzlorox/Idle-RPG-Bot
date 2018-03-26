@@ -268,7 +268,7 @@ class Helper {
 
         if (selectedPlayer.class !== oldClass) {
           this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
-            .then(() => this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true));
+            .then(this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true));
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
@@ -279,7 +279,7 @@ class Helper {
           this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
         ])
-          .then(() => resolve(selectedPlayer));
+          .then(resolve(selectedPlayer));
       }
 
       return resolve(selectedPlayer);
@@ -337,8 +337,8 @@ class Helper {
             case 0:
               if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
                 this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`))
-                  .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.helmet.name} just broke!`, true))
-                  .then(() => this.setPlayerEquipment(
+                  .then(this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.helmet.name} just broke!`, true))
+                  .then(this.setPlayerEquipment(
                     selectedPlayer,
                     enumHelper.equipment.types.helmet.position,
                     enumHelper.equipment.empty.helmet
@@ -348,8 +348,8 @@ class Helper {
             case 1:
               if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
                 this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`))
-                  .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.armor.name} just broke!`, true))
-                  .then(() => this.setPlayerEquipment(
+                  .then(this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.armor.name} just broke!`, true))
+                  .then(this.setPlayerEquipment(
                     selectedPlayer,
                     enumHelper.equipment.types.armor.position,
                     enumHelper.equipment.empty.armor
@@ -359,8 +359,8 @@ class Helper {
             case 2:
               if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
                 this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`))
-                  .then(() => this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.weapon.name} just broke!`, true))
-                  .then(() => this.setPlayerEquipment(
+                  .then(this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.weapon.name} just broke!`, true))
+                  .then(this.setPlayerEquipment(
                     selectedPlayer,
                     enumHelper.equipment.types.weapon.position,
                     enumHelper.equipment.empty.weapon
@@ -385,8 +385,8 @@ class Helper {
             attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastEvents');
             attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastPvpEvents');
             this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
-              .then(() => this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
-              .then(() => this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true));
+              .then(this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
+              .then(this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true));
             selectedPlayer.currentBounty = 0;
           }
 
@@ -412,7 +412,7 @@ class Helper {
           this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg),
           this.sendPrivateMessage(hook, selectedPlayer, eventLog, true)
         ])
-          .then(() => resolve(selectedPlayer));
+          .then(resolve(selectedPlayer));
       }
 
       return resolve(selectedPlayer);

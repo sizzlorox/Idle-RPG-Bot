@@ -279,6 +279,10 @@ const events = {
   },
 
   utils: {
+    experienceGain: () => {
+
+    },
+
     dropItem: (InventoryManager, selectedPlayer, item) => {
       if (item.position !== enumHelper.inventory.position) {
         const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
