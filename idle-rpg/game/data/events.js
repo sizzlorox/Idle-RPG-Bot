@@ -5,11 +5,18 @@ const { pvpLevelRestriction } = require('../../../settings');
 
 const events = {
   movement: {
+    /**
+     * Updates player map, sends move event message
+     * @param {Hooks} discordHook
+     * @param {Player} selectedPlayer
+     * @param { map, direction } mapObj
+     * @returns {Player} updatedPlayer
+     */
     movePlayer: (discordHook, selectedPlayer, mapObj) => new Promise((resolve) => {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
-      const eventLog = `Moved ${mapObj.direction} and arrived in ${mapObj.map.name}`;
+      const eventLog = `Moved ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
       selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
       return Promise.all([
@@ -20,6 +27,12 @@ const events = {
     })
   },
 
+  /**
+   * Regenerates HP and MP and sends random camp event message
+   * @param {Hooks} discordHook
+   * @param {Player} selectedPlayer
+   * @returns {Player} updatedPlayer
+   */
   camp: (discordHook, selectedPlayer) => new Promise((resolve) => {
     selectedPlayer = Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
     // TODO: Make more camp event messages to be selected randomly
@@ -34,6 +47,12 @@ const events = {
   }),
 
   town: {
+    /**
+     * Sells equipment inside players inventory
+     * @param {Hooks} discordHook
+     * @param {Player} selectedPlayer
+     * @returns {Player} updatedPlayer
+     */
     sell: (discordHook, selectedPlayer) => new Promise((resolve) => {
       if (selectedPlayer.inventory.equipment.length > 0) {
         let profit = 0;
@@ -65,6 +84,14 @@ const events = {
       return resolve(selectedPlayer);
     }),
 
+    /**
+     * Purchases item from town
+     * @param {Hooks} discordHook
+     * @param {Player} selectedPlayer
+     * @param {Item} item
+     * @param {InventoryManager} InventoryManager
+     * @returns {Player} updatedPlayer
+     */
     item: (discordHook, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
       const itemCost = Math.round(item.gold);
 
@@ -103,6 +130,13 @@ const events = {
   },
 
   battle: {
+    /**
+     * Returns a random player in same map else returns empty object
+     * @param {Player} selectedPlayer
+     * @param {PlayerList} mappedPlayers
+     * @param {PlayerList} onlinePlayers
+     * @returns {Player} randomPlayer
+     */
     pvpPreperation: (selectedPlayer, mappedPlayers, onlinePlayers) => new Promise((resolve) => {
       if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
         const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
@@ -122,6 +156,12 @@ const events = {
       return resolve({});
     }),
 
+    /**
+     * Sends battle result messages and updates player objects
+     * @param {hooks} discordHook
+     * @param { attacker, defender, attackerDamage, defenderDamage } battleResults
+     * @returns { result, updatedAttacker, updatedDefender } updatedBattleResults
+     */
     pvpResults: (discordHook, { attacker, defender, attackerDamage, defenderDamage }) => new Promise((resolve) => {
       let selectedPlayer = attacker;
       let randomPlayer = defender;
@@ -129,7 +169,7 @@ const events = {
       const playerMaxHealth = 100 + (selectedPlayer.level * 5);
 
       const battleResult = `Battle Results:
-          ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+          ${Helper.genesratePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
           ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} HP left.
           ${Helper.generatePlayerName(randomPlayer, true)} 's \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
           ${Helper.generatePlayerName(randomPlayer, true)} has ${randomPlayer.health} HP left.`;
@@ -228,6 +268,14 @@ const events = {
         }));
     }),
 
+    /**
+     * Sends battle result messages and updates player object
+     * @param {hooks} discordHook
+     * @param {MapClass} MapClass
+     * @param {battleResults} results
+     * @param {Number} multiplier
+     * @returns { result, updatedAttacker, updatedDefender } updatedBattleResults
+     */
     pveResults: (discordHook, MapClass, results, multiplier) => new Promise((resolve) => {
       const mobMaxHealth = results.defender.maxHealth;
       const playerMaxHealth = 100 + (results.attacker.level * 5);

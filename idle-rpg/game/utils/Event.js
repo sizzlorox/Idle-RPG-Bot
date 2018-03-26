@@ -45,30 +45,10 @@ class Event {
   attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers, multiplier) {
     return Database.getSameMapPlayers(selectedPlayer.map.name)
       .then(mappedPlayers => events.battle.pvpPreperation(selectedPlayer, mappedPlayers, onlinePlayers))
-      /**
-       * If found an online randomplayer in current map
-       * Returns {
-       *  randomPlayer
-       * }
-       * Else
-       * Returns an empty object
-       */
-
       .then(prepResults => prepResults.randomPlayer
         ? Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
         : this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
           .catch(err => errorLog.error(err)))
-      /**
-       * If PvP battle was executed (Found an online randomplayer in current map)
-       * Returns {
-       *  attacker,
-       *  defender,
-       *  attackerDamage,
-       *  defenderDamage
-       * }
-       * Else
-       * Returns selectedPlayer from this.attackEventMob method
-       */
 
       .then(battleResults => battleResults.attacker
         ? events.battle.pvpResults(discordHook, battleResults)
