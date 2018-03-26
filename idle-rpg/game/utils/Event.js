@@ -92,7 +92,7 @@ class Event {
         if (battleResults.result) {
           switch (battleResults.result) {
             case enumHelper.battle.outcomes.win:
-              return this.stealPlayerItem(discordHook, twitchBot, battleResults.updatedAttacker, battleResults.updatedDefender)
+              return events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
                 .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
                   .then((updatedVictim) => {
                     Database.savePlayer(updatedVictim);
@@ -107,7 +107,7 @@ class Event {
                 });
 
             case enumHelper.battle.outcomes.lost:
-              return this.stealPlayerItem(discordHook, twitchBot, battleResults.updatedDefender, battleResults.updatedAttacker)
+              return events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
                 .then(stealResult => Helper.checkExperience(stealResult.stealingPlayer, discordHook, twitchBot)
                   .then((updatedDefender) => {
                     Database.savePlayer(updatedDefender);
@@ -152,48 +152,6 @@ class Event {
 
   campEvent(discordHook, selectedPlayer) {
     return events.camp(discordHook, selectedPlayer);
-  }
-
-  stealPlayerItem(discordHook, twitchBot, stealingPlayer, victimPlayer) {
-    return new Promise((resolve) => {
-      const luckStealChance = Helper.randomBetween(0, 100);
-      const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
-      const canSteal = !Number.isFinite(chance) ? 0 : chance;
-
-      console.log(`>>>>>>>>>>>>>>>>>>>> CHANCE : ${chance} - LUCKSTEALCHANCE : ${luckStealChance} - BOUNTYLUCK : ${90 - canSteal}`);
-      if (luckStealChance > (90 - canSteal)) {
-        const luckItem = Helper.randomBetween(0, 2);
-        const itemKeys = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
-
-        if (!['Nothing', 'Fist'].includes(victimPlayer.equipment[itemKeys[luckItem]].name)) {
-          events.utils.stealEquip(this.InventoryManager, discordHook, stealingPlayer, victimPlayer, itemKeys[luckItem]);
-        }
-      } else if (victimPlayer.gold.current > victimPlayer.gold.current / 6) {
-        const goldStolen = Math.round(victimPlayer.gold.current / 6);
-        if (goldStolen !== 0) {
-          stealingPlayer.gold.current += goldStolen;
-          stealingPlayer.gold.total += goldStolen;
-          stealingPlayer.gold.stole += goldStolen;
-
-          victimPlayer.gold.current -= goldStolen;
-          victimPlayer.gold.stolen += goldStolen;
-
-          const eventMsg = Helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`);
-          const eventLog = `Stole ${goldStolen} gold from ${victimPlayer.name}`;
-          const otherPlayerLog = `${stealingPlayer.name} stole ${goldStolen} gold from you`;
-
-          Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg)
-            .then(() => Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true))
-            .then(() => Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true));
-          stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastEvents');
-          stealingPlayer = Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents');
-          victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents');
-          victimPlayer = Helper.logEvent(victimPlayer, otherPlayerLog, 'pastPvpEvents');
-        }
-      }
-
-      return resolve({ stealingPlayer, victimPlayer });
-    });
   }
 
   // Luck Events
