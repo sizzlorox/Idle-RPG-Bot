@@ -38,19 +38,8 @@ class Event {
 
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
-    return new Promise((resolve) => {
-      const { map, direction } = this.MapManager.moveToRandomMap(selectedPlayer);
-      const previousMap = selectedPlayer.map;
-      selectedPlayer.map = map;
-      const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${direction}\` from \`${previousMap.name}\` and arrived in \`${map.name}\`.`;
-      const eventLog = `Moved ${direction} and arrived in ${map.name}`;
-
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg)
-        .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false));
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-
-      return resolve(selectedPlayer);
-    });
+    const mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
+    return events.movement.movePlayer(discordHook, selectedPlayer, mapObj);
   }
 
   attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers, multiplier) {

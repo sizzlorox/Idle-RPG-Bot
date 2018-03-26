@@ -5,6 +5,24 @@ const Database = require('../../database/Database');
 const { pvpLevelRestriction } = require('../../../settings');
 
 const events = {
+  movement: {
+    movePlayer: (discordHook, selectedPlayer, mapObj) => {
+      return new Promise((resolve) => {
+        const previousMap = selectedPlayer.map;
+        selectedPlayer.map = mapObj.map;
+        const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
+        const eventLog = `Moved ${mapObj.direction} and arrived in ${mapObj.map.name}`;
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+        ])
+          .then(resolve(selectedPlayer));
+      });
+    }
+  },
+
   battle: {
     pvpPreperation: (selectedPlayer, mappedPlayers, onlinePlayers) => {
       return new Promise((resolve) => {
@@ -170,20 +188,15 @@ const events = {
 
         if (results.defender.health > 0 && selectedPlayer.health > 0) {
           const expGain = Math.floor(((results.defender.experience * multiplier) + (results.defenderDamage / 4)) / 6);
-          let eventMsg = results.attackerDamage > results.defenderDamage
+          const eventMsg = results.attackerDamage > results.defenderDamage
             ? `[\`${selectedPlayer.map.name}\`] \`${results.defender.name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
-  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg\`${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}\`! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`
             : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from \`${results.defender.name}\`!
-  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg\`${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}\` exp! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
 
-          let eventLog = results.attackerDamage > results.defenderDamage
-            ? `${results.defender.name} fled from you in ${selectedPlayer.map.name}! [${expGain} exp]`
-            : `You fled from ${results.defender.name} in ${selectedPlayer.map.name}! [${expGain} exp]`;
-
-          if (expGain === 0) {
-            eventMsg = eventMsg.replace(` and gained \`${expGain}\` exp`, '');
-            eventLog = eventlog.replace(` [${expGain} exp]`, '');
-          }
+          const eventLog = results.attackerDamage > results.defenderDamage
+            ? `${results.defender.name} fled from you in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`
+            : `You fled from ${results.defender.name} in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
 
           selectedPlayer.experience.current += expGain;
           selectedPlayer.experience.total += expGain;
@@ -202,14 +215,9 @@ const events = {
         const goldGain = Number(results.defender.gold * multiplier);
         const expGain = Math.floor((results.defender.experience * multiplier) + (results.defenderDamage / 4));
 
-        let eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${results.defender.name}\`!
-  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp and \`${goldGain}\` gold! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
-        let eventLog = `Killed ${results.defender.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}. [${expGain} exp/${goldGain} gold]`;
-
-        if (goldGain === 0) {
-          eventMsg = eventMsg.replace(` and \`${goldGain}\` gold`, '');
-          eventLog = eventLog.replace(`/${goldGain} gold`, '');
-        }
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${results.defender.name}\`!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
+        const eventLog = `Killed ${results.defender.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]`;
 
         selectedPlayer.experience.current += expGain;
         selectedPlayer.experience.total += expGain;

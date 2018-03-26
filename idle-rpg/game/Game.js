@@ -74,7 +74,7 @@ class Game {
 
         if (selectedPlayer.events % 100 === 0) {
           Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, Helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`))
-            .then(() => Helper.sendPrivateMessage(this.discordHook, selectedPlayer, `You have encountered ${selectedPlayer.events} events!`, true));
+            .then(Helper.sendPrivateMessage(this.discordHook, selectedPlayer, `You have encountered ${selectedPlayer.events} events!`, true));
         }
 
         Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
@@ -101,8 +101,9 @@ class Game {
 
   moveEvent(selectedPlayer, onlinePlayers, twitchBot) {
     return new Promise((resolve) => {
-      const pastMoveCount = selectedPlayer.pastEvents.filter(event => event.event.includes('and arrived in')).length;
-      if (pastMoveCount >= 8 && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+      const pastMoveCount = selectedPlayer.pastEvents.splice(0, 15).filter(event => event.event.includes('and arrived in')).length;
+      if (pastMoveCount >= 5 && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+        console.log(`GAME: ${pastMoveCount} count: from move event ${selectedPlayer.name} activated an attack event.`);
         return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
