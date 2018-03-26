@@ -654,7 +654,7 @@ class Helper {
     }
 
     return { eventMsg, eventLog, selectedPlayer, item, victimPlayer, otherPlayerLog };
-  },
+  }
 
   randomCampEventMessage(selectedPlayer) {
     const randomEventInt = Helper.randomBetween(0, messages.event.camp.length - 1);
@@ -665,7 +665,7 @@ class Helper {
     eventLog = updatedMessages.eventLog;
 
     return { eventMsg, eventLog };
-  },
+  }
 
   randomItemEventMessage(selectedPlayer, item) {
     const randomEventInt = this.randomBetween(0, messages.event.item.length - 1);
@@ -676,7 +676,7 @@ class Helper {
     eventLog = updatedMessages.eventLog;
 
     return { eventMsg, eventLog };
-  },
+  }
 
   randomGambleEventMessage(selectedPlayer, luckGambleGold, isWin) {
     if (isWin) {

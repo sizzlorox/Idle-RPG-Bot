@@ -8,7 +8,7 @@ const Spell = require('../utils/Spell');
 const Map = require('../utils/Map');
 const Database = require('../../database/Database');
 const events = require('../data/events');
-const { errorLog, infoLog } = require('../../utils/logger');
+const { errorLog } = require('../../utils/logger');
 
 class Event {
 
@@ -54,12 +54,10 @@ class Event {
        * Returns an empty object
        */
 
-      .then((prepResults) => {
-        return prepResults.randomPlayer
-          ? Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
-          : this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
-            .catch(err => errorLog.error(err));
-      })
+      .then(prepResults => prepResults.randomPlayer
+        ? Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
+        : this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
+          .catch(err => errorLog.error(err)))
       /**
        * If PvP battle was executed (Found an online randomplayer in current map)
        * Returns {
@@ -72,11 +70,9 @@ class Event {
        * Returns selectedPlayer from this.attackEventMob method
        */
 
-      .then((battleResults) => {
-        return battleResults.attacker
-          ? events.battle.pvpResults(discordHook, battleResults)
-          : battleResults;
-      })
+      .then(battleResults => battleResults.attacker
+        ? events.battle.pvpResults(discordHook, battleResults)
+        : battleResults)
       /**
        * If PvP battle was executed (Found an online randomplayer in current map)
        * Returns {
