@@ -45,30 +45,10 @@ class Event {
   attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers, multiplier) {
     return Database.getSameMapPlayers(selectedPlayer.map.name)
       .then(mappedPlayers => events.battle.pvpPreperation(selectedPlayer, mappedPlayers, onlinePlayers))
-      /**
-       * If found an online randomplayer in current map
-       * Returns {
-       *  randomPlayer
-       * }
-       * Else
-       * Returns an empty object
-       */
-
       .then(prepResults => prepResults.randomPlayer
         ? Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
         : this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
           .catch(err => errorLog.error(err)))
-      /**
-       * If PvP battle was executed (Found an online randomplayer in current map)
-       * Returns {
-       *  attacker,
-       *  defender,
-       *  attackerDamage,
-       *  defenderDamage
-       * }
-       * Else
-       * Returns selectedPlayer from this.attackEventMob method
-       */
 
       .then(battleResults => battleResults.attacker
         ? events.battle.pvpResults(discordHook, battleResults)
@@ -152,28 +132,36 @@ class Event {
 
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
-    const luckEvent = Helper.randomBetween(1, 6);
-    switch (luckEvent) {
-      case 1:
-        return events.luck.gods.hades(discordHook, selectedPlayer);
+    return new Promise((resolve) => {
+      const luckEvent = Helper.randomBetween(1, 6);
+      switch (luckEvent) {
+        case 1:
+          return events.luck.gods.hades(discordHook, selectedPlayer)
+            .then(updatedPlayer => resolve(updatedPlayer));
 
-      case 2:
-        return events.luck.gods.zeus(discordHook, selectedPlayer)
-          .then(updatedPlayer => Helper.checkHealth(this.MapClass, updatedPlayer, discordHook));
+        case 2:
+          return events.luck.gods.zeus(discordHook, selectedPlayer)
+            .then(updatedPlayer => Helper.checkHealth(this.MapClass, updatedPlayer, discordHook))
+            .then(updatedPlayer => resolve(updatedPlayer));
 
-      case 3:
-        return events.luck.gods.aseco(discordHook, selectedPlayer);
+        case 3:
+          return events.luck.gods.aseco(discordHook, selectedPlayer)
+            .then(updatedPlayer => resolve(updatedPlayer));
 
-      case 4:
-        return events.luck.gods.hermes(discordHook, selectedPlayer);
+        case 4:
+          return events.luck.gods.hermes(discordHook, selectedPlayer)
+            .then(updatedPlayer => resolve(updatedPlayer));
 
-      case 5:
-        return events.luck.gods.athena(discordHook, selectedPlayer);
+        case 5:
+          return events.luck.gods.athena(discordHook, selectedPlayer)
+            .then(updatedPlayer => resolve(updatedPlayer));
 
-      case 6:
-        return this.SpellManager.generateSpell(selectedPlayer)
-          .then(spell => events.luck.gods.eris(discordHook, selectedPlayer, spell));
-    }
+        case 6:
+          return this.SpellManager.generateSpell(selectedPlayer)
+            .then(spell => events.luck.gods.eris(discordHook, selectedPlayer, spell))
+            .then(updatedPlayer => resolve(updatedPlayer));
+      }
+    });
   }
 
   generateGoldEvent(discordHook, selectedPlayer, multiplier) {
@@ -181,15 +169,19 @@ class Event {
   }
 
   generateLuckItemEvent(discordHook, twitchBot, selectedPlayer) {
-    const luckItemDice = Helper.randomBetween(0, 100);
+    return new Promise((resolve) => {
+      const luckItemDice = Helper.randomBetween(0, 100);
 
-    if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
-      return this.SpellManager.generateSpell(selectedPlayer)
-        .then(spell => events.luck.item.spell(discordHook, selectedPlayer, spell));
-    } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
-      return this.ItemManager.generateItem(selectedPlayer)
-        .then(item => events.luck.item.item(discordHook, selectedPlayer, item, this.InventoryManager));
-    }
+      if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
+        return this.SpellManager.generateSpell(selectedPlayer)
+          .then(spell => events.luck.item.spell(discordHook, selectedPlayer, spell))
+          .then(updatedPlayer => resolve(updatedPlayer));
+      } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
+        return this.ItemManager.generateItem(selectedPlayer)
+          .then(item => events.luck.item.item(discordHook, selectedPlayer, item, this.InventoryManager))
+          .then(updatedPlayer => resolve(updatedPlayer));
+      }
+    });
   }
 
   generateGamblingEvent(discordHook, selectedPlayer) {

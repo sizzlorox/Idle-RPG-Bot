@@ -100,14 +100,16 @@ class Game {
   }
 
   moveEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    return new Promise(() => {
+    return new Promise((resolve) => {
       const pastMoveCount = selectedPlayer.pastEvents.splice(0, 15).filter(event => event.event.includes('and arrived in')).length;
       if (pastMoveCount >= 5 && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         console.log(`GAME: ${pastMoveCount} count: from move event ${selectedPlayer.name} activated an attack event.`);
-        return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot);
+        return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
+          .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return Event.moveEvent(selectedPlayer, this.discordHook);
+      return Event.moveEvent(selectedPlayer, this.discordHook)
+        .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
 
@@ -118,27 +120,32 @@ class Game {
    * @param {*} twitchBot
    */
   attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    return new Promise(() => {
+    return new Promise((resolve) => {
       const luckDice = Helper.randomBetween(0, 100);
       if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
         return Event.sellInTown(this.discordHook, selectedPlayer)
-          .then(updatedPlayer => Event.generateTownItemEvent(this.discordHook, updatedPlayer));
+          .then(updatedPlayer => Event.generateTownItemEvent(this.discordHook, updatedPlayer))
+          .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
         && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
+        return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier)
+          .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
+          return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier)
+            .then(updatedPlayer => resolve(updatedPlayer));
         }
 
-        return Event.campEvent(this.discordHook, selectedPlayer);
+        return Event.campEvent(this.discordHook, selectedPlayer)
+          .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);
+      return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer)
+        .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
 
@@ -148,25 +155,30 @@ class Game {
    * @param {*} twitchBot
    */
   luckEvent(selectedPlayer, twitchBot) {
-    return new Promise(() => {
+    return new Promise((resolve) => {
       const luckDice = Helper.randomBetween(0, 100);
       if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
-        return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
+        return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer)
+          .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
-        return Event.generateGamblingEvent(this.discordHook, selectedPlayer);
+        return Event.generateGamblingEvent(this.discordHook, selectedPlayer)
+          .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
-        return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer);
+        return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer)
+          .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
-        return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
+        return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer)
+          .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier);
+      return Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier)
+        .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
 

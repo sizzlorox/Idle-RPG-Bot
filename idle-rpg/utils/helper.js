@@ -657,7 +657,7 @@ class Helper {
   }
 
   randomCampEventMessage(selectedPlayer) {
-    const randomEventInt = Helper.randomBetween(0, messages.event.camp.length - 1);
+    const randomEventInt = this.randomBetween(0, messages.event.camp.length - 1);
     let { eventMsg, eventLog } = messages.event.camp[randomEventInt];
     // TODO: clean up this mess
     const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
