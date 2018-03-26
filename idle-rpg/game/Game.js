@@ -100,16 +100,14 @@ class Game {
   }
 
   moveEvent(selectedPlayer, onlinePlayers, twitchBot) {
-    return new Promise((resolve) => {
+    return new Promise(() => {
       const pastMoveCount = selectedPlayer.pastEvents.splice(0, 15).filter(event => event.event.includes('and arrived in')).length;
       if (pastMoveCount >= 5 && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         console.log(`GAME: ${pastMoveCount} count: from move event ${selectedPlayer.name} activated an attack event.`);
-        return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
-          .then(updatedPlayer => resolve(updatedPlayer));
+        return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot);
       }
 
-      return Event.moveEvent(selectedPlayer, this.discordHook)
-        .then(updatedPlayer => resolve(updatedPlayer));
+      return Event.moveEvent(selectedPlayer, this.discordHook);
     });
   }
 
