@@ -172,7 +172,7 @@ class Event {
 
       case 6:
         return this.SpellManager.generateSpell(selectedPlayer)
-          .then(spell => events.gods.eris(discordHook, selectedPlayer, spell));
+          .then(spell => events.luck.gods.eris(discordHook, selectedPlayer, spell));
     }
   }
 
