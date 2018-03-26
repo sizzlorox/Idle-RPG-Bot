@@ -285,142 +285,24 @@ class Event {
       const luckEvent = Helper.randomBetween(1, 6);
       switch (luckEvent) {
         case 1:
-          const luckExpAmount = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
-          selectedPlayer.experience.current -= luckExpAmount;
-          if (selectedPlayer.experience.current < 0) {
-            selectedPlayer.experience.current = 0;
-          }
-
-          const eventMsgHades = `Hades unleashed his wrath upon ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} lose ${luckExpAmount} experience!`;
-          const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
-
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, false));
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHades, 'pastEvents');
-
-          return resolve(selectedPlayer);
+          return events.gods.hades(discordHook, selectedPlayer);
 
         case 2:
-          const luckHealthAmount = Helper.randomBetween(5, 50 + (selectedPlayer.level * 2));
-          selectedPlayer.health -= luckHealthAmount;
-
-          const eventMsgZeus = `${Helper.generatePlayerName(selectedPlayer, true)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
-          const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
-
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, false));
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogZeus, 'pastEvents');
-
-          return Helper.checkHealth(this.MapClass, selectedPlayer, discordHook)
-            .then(updatedPlayer => resolve(updatedPlayer));
+          return events.gods.zeus(discordHook, selectedPlayer)
+            .then(updatedPlayer => Helper.checkHealth(this.MapClass, updatedPlayer, discordHook));
 
         case 3:
-          const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
-
-          if (healthDeficit) {
-            const healAmount = Math.round(healthDeficit / 3);
-
-            const eventMsgAseco = `Fortune smiles upon ${Helper.generatePlayerName(selectedPlayer, true)} as Aseco cured ${Helper.generateGenderString(selectedPlayer, 'his')} sickness and restored ${Helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
-            const eventLogAseco = `Aseco healed you for ${healAmount}`;
-
-            selectedPlayer.health += healAmount;
-
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco)
-              .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, false));
-            selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAseco, 'pastEvents');
-
-            return resolve(selectedPlayer);
-          }
-
-          const eventMsgAsecoFull = `Aseco gave ${Helper.generatePlayerName(selectedPlayer, true)} an elixir of life but it caused no effect on ${Helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
-          const eventLogAsecoFull = 'Aseco wanted to heal you, but you had full health';
-
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAsecoFull)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAsecoFull, false));
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAsecoFull, 'pastEvents');
-
-          return resolve(selectedPlayer);
+          return events.gods.aseco(discordHook, selectedPlayer);
 
         case 4:
-          if (selectedPlayer.gold.current < (selectedPlayer.gold.current / 6)) {
-            const eventMsgHermesFail = `Hermes demanded some gold from ${Helper.generatePlayerName(selectedPlayer, true)} but as ${Helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
-            const eventLogHermesFail = 'Hermes demanded gold from you but you had nothing to give';
-
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermesFail)
-              .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermesFail, false));
-            selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermesFail, 'pastEvents');
-
-            return resolve(selectedPlayer);
-          }
-
-          const goldTaken = Math.round(selectedPlayer.gold.current / 6);
-
-          const eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`
-          const eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
-
-          selectedPlayer.gold.current -= goldTaken;
-          if (selectedPlayer.gold.current < 0) {
-            selectedPlayer.gold.current = 0;
-          }
-
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, false));
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermes, 'pastEvents');
-
-          return resolve(selectedPlayer);
+          return events.gods.hermes(discordHook, selectedPlayer);
 
         case 5:
-          const luckExpAthena = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
-          selectedPlayer.experience.current += luckExpAthena;
-          selectedPlayer.experience.total += luckExpAthena;
-
-          const eventMsgAthene = `Athene shared her wisdom with ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAthena} experience!`;
-          const eventLogAthene = `Athene shared her wisdom with you making you gain ${luckExpAthena} experience`;
-
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthene)
-            .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthene, false));
-          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAthene, 'pastEvents');
-
-          return resolve(selectedPlayer);
+          return events.gods.athena(discordHook, selectedPlayer);
 
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
-            .then((spell) => {
-              const eventMsgEris = `Eris has given ${Helper.generatePlayerName(selectedPlayer, true)} a scroll containing \`${spell.name}\` to add to ${Helper.generateGenderString(selectedPlayer, 'his')} spellbook!`;
-              const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
-              if (selectedPlayer.spells.length > 0) {
-                let shouldAddToList = false;
-                let tempArray;
-                selectedPlayer.spells.forEach((ownedSpell, index) => {
-                  const spellName = ownedSpell.name.split(/ (.+)/)[1];
-                  if (spell.power > ownedSpell.power) {
-                    if (spell.name.includes(spellName)) {
-                      tempArray = selectedPlayer.spells.splice(index, 1);
-                      shouldAddToList = true;
-                    } else {
-                      shouldAddToList = true;
-                    }
-                  }
-                });
-
-                if (shouldAddToList) {
-                  Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsgEris}`)
-                    .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false));
-                  selectedPlayer = Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents');
-                  if (tempArray) {
-                    selectedPlayer.spells = tempArray;
-                  }
-                  selectedPlayer.spells.push(spell);
-                }
-              } else {
-                Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${eventMsgEris}`)
-                  .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false));
-                selectedPlayer = Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents');
-                selectedPlayer.spells.push(spell);
-              }
-
-              return resolve(selectedPlayer);
-            });
+            .then(spell => events.gods.eris(discordHook, selectedPlayer, spell));
       }
     });
   }
