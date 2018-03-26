@@ -170,58 +170,13 @@ class Event {
   }
 
   // Item Events
-  generateTownItemEvent(discordHook, twitchBot, selectedPlayer) {
-    return new Promise((resolve) => {
-      return this.ItemManager.generateItem(selectedPlayer)
-        .then((item) => {
-          const itemCost = Math.round(item.gold);
-
-          if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
-            return resolve(selectedPlayer);
-          }
-
-          if (item.position !== enumHelper.inventory.position) {
-            selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
-            const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-            const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
-            if (oldItemRating > newItemRating) {
-              return resolve(selectedPlayer);
-            }
-          }
-
-          events.utils.townItem(this.InventoryManager, discordHook, selectedPlayer, item, itemCost);
-
-          return resolve(selectedPlayer);
-        });
-    });
+  generateTownItemEvent(discordHook, selectedPlayer) {
+    return this.ItemManager.generateItem(selectedPlayer)
+      .then(item => events.town.item(discordHook, selectedPlayer, item));
   }
 
-  sellInTown(discordHook, twitchBot, selectedPlayer) {
-    if (selectedPlayer.inventory.equipment.length > 0) {
-      let profit = 0;
-      Helper.printEventDebug(selectedPlayer.inventory.equipment);
-      selectedPlayer.inventory.equipment.forEach((equipment) => {
-        Helper.printEventDebug(`Equipment selling: ${equipment.name}`);
-        profit += Number(equipment.gold);
-      });
-      if (isNaN(profit)) {
-        infoLog.info(selectedPlayer.inventory.equipment);
-        profit = 100;
-      }
-      selectedPlayer.inventory.equipment.length = 0;
-      profit = Math.floor(profit);
-      selectedPlayer.gold.current += profit;
-      selectedPlayer.gold.total += profit;
-
-      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just sold what they found adventuring for ${profit} gold!`;
-      const eventLog = `Made ${profit} gold selling what you found adventuring`;
-
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-        .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-    }
-
-    return selectedPlayer;
+  sellInTown(discordHook, selectedPlayer) {
+    return events.town.sell(discordHook, selectedPlayer);
   }
 
   campEvent(discordHook, selectedPlayer) {

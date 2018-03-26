@@ -123,30 +123,25 @@ class Game {
     return new Promise((resolve) => {
       const luckDice = Helper.randomBetween(0, 100);
       if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
-        selectedPlayer = Event.sellInTown(this.discordHook, twitchBot, selectedPlayer);
-
-        return Event.generateTownItemEvent(this.discordHook, twitchBot, selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
+        return Event.sellInTown(this.discordHook, selectedPlayer)
+          .then(updatedPlayer => Event.generateTownItemEvent(this.discordHook, updatedPlayer));
       }
 
       if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
         && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier)
-          .then(updatedPlayer => resolve(updatedPlayer));
+        return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier);
       }
 
       if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier)
-            .then(updatedPlayer => resolve(updatedPlayer));
+          return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier);
         }
 
         return Event.campEvent(this.discordHook, selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer)
-        .then(updatedPlayer => resolve(updatedPlayer));
+      return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer);
     });
   }
 
@@ -156,24 +151,26 @@ class Game {
    * @param {*} twitchBot
    */
   luckEvent(selectedPlayer, twitchBot) {
-    const luckDice = Helper.randomBetween(0, 100);
-    if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
-      return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
-    }
+    return new Promise(() => {
+      const luckDice = Helper.randomBetween(0, 100);
+      if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
+        return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
+      }
 
-    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
-      return Event.generateGamblingEvent(this.discordHook, selectedPlayer);
-    }
+      if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
+        return Event.generateGamblingEvent(this.discordHook, selectedPlayer);
+      }
 
-    if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
-      return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer);
-    }
+      if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
+        return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer);
+      }
 
-    if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
-      return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
-    }
+      if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
+        return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
+      }
 
-    return Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier);
+      return Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier);
+    });
   }
 
   // Event
