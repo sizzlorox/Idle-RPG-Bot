@@ -92,7 +92,7 @@ class Item {
       let randomTypeIndex;
       if (mob && mob.isXmasEvent) {
         do {
-          console.log('generating relic item');
+          // console.log('generating relic item');
           randomTypeIndex = Helper.randomBetween(0, items.type[3].length - 1);
           if (items.type[3][randomTypeIndex].droppedBy.includes(mobName)
             && items.type[3][randomTypeIndex].isDroppable
@@ -102,7 +102,7 @@ class Item {
         } while (itemType === undefined);
       } else {
         do {
-          console.log('generating non relic item');
+          // console.log('generating non relic item');
           randomEquipmentIndex = Helper.randomBetween(0, items.type.length - 1);
           randomTypeIndex = Helper.randomBetween(0, items.type[randomEquipmentIndex].length - 1);
 
@@ -168,6 +168,7 @@ class Item {
             * itemType.gold).toFixed()) * itemType.power
         };
       }
+
       return resolve(itemObj);
     });
   }
