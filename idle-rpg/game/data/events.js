@@ -232,51 +232,103 @@ const events = {
     })
   },
 
-  gods: {
-    hades: (discordHook, selectedPlayer) => new Promise((resolve) => {
-      const luckExpAmount = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
-      selectedPlayer.experience.current -= luckExpAmount;
-      if (selectedPlayer.experience.current < 0) {
-        selectedPlayer.experience.current = 0;
-      }
+  luck: {
+    gambling: (discordHook, selectedPlayer) => {
+      return new Promise((resolve) => {
+        if (selectedPlayer.gold.current < 10) {
+          return resolve(selectedPlayer);
+        }
 
-      const eventMsgHades = `Hades unleashed his wrath upon ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} lose ${luckExpAmount} experience!`;
-      const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHades, 'pastEvents');
+        const luckGambleChance = Helper.randomBetween(0, 100);
+        const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold.current / 10, selectedPlayer.gold.current / 3));
+        selectedPlayer.gambles++;
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, false)
-      ])
-        .then(resolve(selectedPlayer));
-    }),
+        if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
+          selectedPlayer.gold.current -= luckGambleGold;
+          if (selectedPlayer.gold.current <= 0) {
+            selectedPlayer.gold.current = 0;
+          }
 
-    zeus: (discordHook, selectedPlayer) => new Promise((resolve) => {
-      const luckHealthAmount = Helper.randomBetween(5, 50 + (selectedPlayer.level * 2));
-      selectedPlayer.health -= luckHealthAmount;
+          const { eventMsg, eventLog } = this.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
-      const eventMsgZeus = `${Helper.generatePlayerName(selectedPlayer, true)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
-      const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogZeus, 'pastEvents');
+          return Promise.all([
+            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+          ])
+            .then(resolve(selectedPlayer));
+        }
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, false)
-      ])
-        .then(resolve(selectedPlayer));
-    }),
+        selectedPlayer.gold.current += luckGambleGold;
+        selectedPlayer.gold.total += luckGambleGold;
 
-    aseco: (discordHook, selectedPlayer) => new Promise((resolve) => {
-      const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
-      let eventMsgAseco = '';
-      let eventLogAseco = '';
+        const { eventMsg, eventLog } = this.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
-      if (healthDeficit) {
-        const healAmount = Math.round(healthDeficit / 3);
-        eventMsgAseco = `Fortune smiles upon ${Helper.generatePlayerName(selectedPlayer, true)} as Aseco cured ${Helper.generateGenderString(selectedPlayer, 'his')} sickness and restored ${Helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
-        eventLogAseco = `Aseco healed you for ${healAmount}`;
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+        ])
+          .then(resolve(selectedPlayer));
+      });
+    },
 
-        selectedPlayer.health += healAmount;
+    gods: {
+      hades: (discordHook, selectedPlayer) => new Promise((resolve) => {
+        const luckExpAmount = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
+        selectedPlayer.experience.current -= luckExpAmount;
+        if (selectedPlayer.experience.current < 0) {
+          selectedPlayer.experience.current = 0;
+        }
+
+        const eventMsgHades = `Hades unleashed his wrath upon ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} lose ${luckExpAmount} experience!`;
+        const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHades, 'pastEvents');
+
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, false)
+        ])
+          .then(resolve(selectedPlayer));
+      }),
+
+      zeus: (discordHook, selectedPlayer) => new Promise((resolve) => {
+        const luckHealthAmount = Helper.randomBetween(5, 50 + (selectedPlayer.level * 2));
+        selectedPlayer.health -= luckHealthAmount;
+
+        const eventMsgZeus = `${Helper.generatePlayerName(selectedPlayer, true)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`;
+        const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLogZeus, 'pastEvents');
+
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, false)
+        ])
+          .then(resolve(selectedPlayer));
+      }),
+
+      aseco: (discordHook, selectedPlayer) => new Promise((resolve) => {
+        const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
+        let eventMsgAseco = '';
+        let eventLogAseco = '';
+
+        if (healthDeficit) {
+          const healAmount = Math.round(healthDeficit / 3);
+          eventMsgAseco = `Fortune smiles upon ${Helper.generatePlayerName(selectedPlayer, true)} as Aseco cured ${Helper.generateGenderString(selectedPlayer, 'his')} sickness and restored ${Helper.generateGenderString(selectedPlayer, 'him')} ${healAmount} health!`;
+          eventLogAseco = `Aseco healed you for ${healAmount}`;
+
+          selectedPlayer.health += healAmount;
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAseco, 'pastEvents');
+
+          return Promise.all([
+            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco),
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, false)
+          ])
+            .then(resolve(selectedPlayer));
+        }
+
+        eventMsgAseco = `Aseco gave ${Helper.generatePlayerName(selectedPlayer, true)} an elixir of life but it caused no effect on ${Helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
+        eventLogAseco = 'Aseco wanted to heal you, but you had full health';
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAseco, 'pastEvents');
 
         return Promise.all([
@@ -284,25 +336,31 @@ const events = {
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, false)
         ])
           .then(resolve(selectedPlayer));
-      }
+      }),
 
-      eventMsgAseco = `Aseco gave ${Helper.generatePlayerName(selectedPlayer, true)} an elixir of life but it caused no effect on ${Helper.generateGenderString(selectedPlayer, 'him')}. Actually it tasted like wine!`;
-      eventLogAseco = 'Aseco wanted to heal you, but you had full health';
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAseco, 'pastEvents');
+      hermes: (discordHook, selectedPlayer) => new Promise((resolve) => {
+        let eventMsgHermes = '';
+        let eventLogHermes = '';
+        if (selectedPlayer.gold.current < (selectedPlayer.gold.current / 6)) {
+          eventMsgHermes = `Hermes demanded some gold from ${Helper.generatePlayerName(selectedPlayer, true)} but as ${Helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
+          eventLogHermes = 'Hermes demanded gold from you but you had nothing to give';
+          selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermes, 'pastEvents');
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, false)
-      ])
-        .then(resolve(selectedPlayer));
-    }),
+          return Promise.all([
+            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes),
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, false)
+          ])
+            .then(resolve(selectedPlayer));
+        }
 
-    hermes: (discordHook, selectedPlayer) => new Promise((resolve) => {
-      let eventMsgHermes = '';
-      let eventLogHermes = '';
-      if (selectedPlayer.gold.current < (selectedPlayer.gold.current / 6)) {
-        eventMsgHermes = `Hermes demanded some gold from ${Helper.generatePlayerName(selectedPlayer, true)} but as ${Helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
-        eventLogHermes = 'Hermes demanded gold from you but you had nothing to give';
+        const goldTaken = Math.round(selectedPlayer.gold.current / 6);
+        eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`
+        eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
+
+        selectedPlayer.gold.current -= goldTaken;
+        if (selectedPlayer.gold.current < 0) {
+          selectedPlayer.gold.current = 0;
+        }
         selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermes, 'pastEvents');
 
         return Promise.all([
@@ -310,76 +368,60 @@ const events = {
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, false)
         ])
           .then(resolve(selectedPlayer));
-      }
+      }),
 
-      const goldTaken = Math.round(selectedPlayer.gold.current / 6);
-      eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`
-      eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
+      athena: (discordHook, selectedPlayer) => new Promise((resolve) => {
+        const luckExpAthena = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
+        selectedPlayer.experience.current += luckExpAthena;
+        selectedPlayer.experience.total += luckExpAthena;
 
-      selectedPlayer.gold.current -= goldTaken;
-      if (selectedPlayer.gold.current < 0) {
-        selectedPlayer.gold.current = 0;
-      }
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogHermes, 'pastEvents');
+        const eventMsgAthena = `Athena shared her wisdom with ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAthena} experience!`;
+        const eventLogAthena = `Athena shared her wisdom with you making you gain ${luckExpAthena} experience`;
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAthena, 'pastEvents');
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, false)
-      ])
-        .then(resolve(selectedPlayer));
-    }),
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthena),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthena, false)
+        ])
+          .then(resolve(selectedPlayer));
+      }),
 
-    athena: (discordHook, selectedPlayer) => new Promise((resolve) => {
-      const luckExpAthena = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
-      selectedPlayer.experience.current += luckExpAthena;
-      selectedPlayer.experience.total += luckExpAthena;
-
-      const eventMsgAthena = `Athena shared her wisdom with ${Helper.generatePlayerName(selectedPlayer, true)} making ${Helper.generateGenderString(selectedPlayer, 'him')} gain ${luckExpAthena} experience!`;
-      const eventLogAthena = `Athena shared her wisdom with you making you gain ${luckExpAthena} experience`;
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogAthena, 'pastEvents');
-
-      return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthena),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthena, false)
-      ])
-        .then(resolve(selectedPlayer));
-    }),
-
-    eris: (discordHook, selectedPlayer, spell) => new Promise((resolve) => {
-      const eventMsgEris = `Eris has given ${Helper.generatePlayerName(selectedPlayer, true)} a scroll containing \`${spell.name}\` to add to ${Helper.generateGenderString(selectedPlayer, 'his')} spellbook!`;
-      const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
-      if (selectedPlayer.spells.length > 0) {
-        let shouldAddToList = false;
-        let tempArray;
-        selectedPlayer.spells.forEach((ownedSpell, index) => {
-          const spellName = ownedSpell.name.split(/ (.+)/)[1];
-          if (spell.power > ownedSpell.power) {
-            if (spell.name.includes(spellName)) {
-              tempArray = selectedPlayer.spells.splice(index, 1);
-              shouldAddToList = true;
-            } else {
-              shouldAddToList = true;
+      eris: (discordHook, selectedPlayer, spell) => new Promise((resolve) => {
+        const eventMsgEris = `Eris has given ${Helper.generatePlayerName(selectedPlayer, true)} a scroll containing \`${spell.name}\` to add to ${Helper.generateGenderString(selectedPlayer, 'his')} spellbook!`;
+        const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
+        if (selectedPlayer.spells.length > 0) {
+          let shouldAddToList = false;
+          let tempArray;
+          selectedPlayer.spells.forEach((ownedSpell, index) => {
+            const spellName = ownedSpell.name.split(/ (.+)/)[1];
+            if (spell.power > ownedSpell.power) {
+              if (spell.name.includes(spellName)) {
+                tempArray = selectedPlayer.spells.splice(index, 1);
+                shouldAddToList = true;
+              } else {
+                shouldAddToList = true;
+              }
             }
-          }
-        });
+          });
 
-        if (shouldAddToList) {
-          if (tempArray) {
-            selectedPlayer.spells = tempArray;
+          if (shouldAddToList) {
+            if (tempArray) {
+              selectedPlayer.spells = tempArray;
+            }
+            selectedPlayer.spells.push(spell);
           }
+        } else {
           selectedPlayer.spells.push(spell);
         }
-      } else {
-        selectedPlayer.spells.push(spell);
-      }
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents');
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents');
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false)
-      ])
-        .then(resolve(selectedPlayer));
-    })
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, false)
+        ])
+          .then(resolve(selectedPlayer));
+      })
+    }
   },
 
   messages: {

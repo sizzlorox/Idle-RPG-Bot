@@ -281,30 +281,28 @@ class Event {
 
   // Luck Events
   generateGodsEvent(discordHook, twitchBot, selectedPlayer) {
-    return new Promise((resolve) => {
-      const luckEvent = Helper.randomBetween(1, 6);
-      switch (luckEvent) {
-        case 1:
-          return events.gods.hades(discordHook, selectedPlayer);
+    const luckEvent = Helper.randomBetween(1, 6);
+    switch (luckEvent) {
+      case 1:
+        return events.luck.gods.hades(discordHook, selectedPlayer);
 
-        case 2:
-          return events.gods.zeus(discordHook, selectedPlayer)
-            .then(updatedPlayer => Helper.checkHealth(this.MapClass, updatedPlayer, discordHook));
+      case 2:
+        return events.luck.gods.zeus(discordHook, selectedPlayer)
+          .then(updatedPlayer => Helper.checkHealth(this.MapClass, updatedPlayer, discordHook));
 
-        case 3:
-          return events.gods.aseco(discordHook, selectedPlayer);
+      case 3:
+        return events.luck.gods.aseco(discordHook, selectedPlayer);
 
-        case 4:
-          return events.gods.hermes(discordHook, selectedPlayer);
+      case 4:
+        return events.luck.gods.hermes(discordHook, selectedPlayer);
 
-        case 5:
-          return events.gods.athena(discordHook, selectedPlayer);
+      case 5:
+        return events.luck.gods.athena(discordHook, selectedPlayer);
 
-        case 6:
-          return this.SpellManager.generateSpell(selectedPlayer)
-            .then(spell => events.gods.eris(discordHook, selectedPlayer, spell));
-      }
-    });
+      case 6:
+        return this.SpellManager.generateSpell(selectedPlayer)
+          .then(spell => events.gods.eris(discordHook, selectedPlayer, spell));
+    }
   }
 
   generateGoldEvent(discordHook, selectedPlayer, multiplier) {
@@ -398,39 +396,7 @@ class Event {
   }
 
   generateGamblingEvent(discordHook, selectedPlayer) {
-    return new Promise((resolve) => {
-      if (selectedPlayer.gold.current < 10) {
-        return resolve(selectedPlayer);
-      }
-
-      const luckGambleChance = Helper.randomBetween(0, 100);
-      const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold.current / 10, selectedPlayer.gold.current / 3));
-      selectedPlayer.gambles++;
-
-      if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
-        selectedPlayer.gold.current -= luckGambleGold;
-        if (selectedPlayer.gold.current <= 0) {
-          selectedPlayer.gold.current = 0;
-        }
-
-        const { eventMsg, eventLog } = events.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-
-        return resolve(selectedPlayer);
-      }
-
-      selectedPlayer.gold.current += luckGambleGold;
-      selectedPlayer.gold.total += luckGambleGold;
-
-      const { eventMsg, eventLog } = events.messages.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-        .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-      selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-
-      return resolve(selectedPlayer);
-    });
+    return events.luck.gambling(discordHook, selectedPlayer);
   }
 
   /**

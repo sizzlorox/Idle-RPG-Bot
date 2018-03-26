@@ -156,31 +156,24 @@ class Game {
    * @param {*} twitchBot
    */
   luckEvent(selectedPlayer, twitchBot) {
-    return new Promise((resolve) => {
-      const luckDice = Helper.randomBetween(0, 100);
-      if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
-        return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
+    const luckDice = Helper.randomBetween(0, 100);
+    if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
+      return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer);
+    }
 
-      if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
-        return Event.generateGamblingEvent(this.discordHook, selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
+    if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
+      return Event.generateGamblingEvent(this.discordHook, selectedPlayer);
+    }
 
-      if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
-        return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
+    if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
+      return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer);
+    }
 
-      if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
-        return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
+    if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
+      return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer);
+    }
 
-      return Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier)
-        .then(updatedPlayer => resolve(updatedPlayer));
-    });
+    return Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier);
   }
 
   // Event
