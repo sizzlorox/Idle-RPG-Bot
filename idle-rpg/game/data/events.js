@@ -293,6 +293,28 @@ const events = {
       })
     },
 
+    gold: (discordHook, selectedPlayer, multiplier) => new Promise((resolve) => {
+      const luckGoldChance = Helper.randomBetween(0, 100);
+      if (luckGoldChance >= 75) {
+        const luckGoldDice = Helper.randomBetween(5, 100);
+        const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
+        selectedPlayer.gold.current += goldAmount;
+        selectedPlayer.gold.total += goldAmount;
+
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} found ${goldAmount} gold!`;
+        const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+        ])
+          .then(resolve(selectedPlayer));
+      }
+
+      return resolve(selectedPlayer);
+    }),
+
     gambling: (discordHook, selectedPlayer) => new Promise((resolve) => {
       if (selectedPlayer.gold.current < 10) {
         return resolve(selectedPlayer);

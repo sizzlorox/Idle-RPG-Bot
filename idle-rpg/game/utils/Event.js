@@ -306,26 +306,7 @@ class Event {
   }
 
   generateGoldEvent(discordHook, selectedPlayer, multiplier) {
-    return new Promise((resolve) => {
-      const luckGoldChance = Helper.randomBetween(0, 100);
-      if (luckGoldChance >= 75) {
-        const luckGoldDice = Helper.randomBetween(5, 100);
-        const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
-        selectedPlayer.gold.current += goldAmount;
-        selectedPlayer.gold.total += goldAmount;
-
-        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} found ${goldAmount} gold!`;
-        const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
-
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-          .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false));
-        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-
-        return resolve(selectedPlayer);
-      }
-
-      return resolve(selectedPlayer);
-    });
+    return events.luck.gold(discordHook, selectedPlayer, multiplier);
   }
 
   generateLuckItemEvent(discordHook, twitchBot, selectedPlayer) {
