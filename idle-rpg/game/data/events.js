@@ -233,6 +233,66 @@ const events = {
   },
 
   luck: {
+    item: {
+      spell: (discordHook, selectedPlayer, spell) => new Promise((resolve) => {
+        const { eventMsg, eventLog } = this.messages.randomItemEventMessage(selectedPlayer, spell);
+        if (selectedPlayer.spells.length > 0) {
+          let shouldAddToList = false;
+          let tempArray;
+          selectedPlayer.spells.forEach((ownedSpell, index) => {
+            const spellName = ownedSpell.name.split(/ (.+)/)[1];
+            if (spell.power > ownedSpell.power) {
+              if (spell.name.includes(spellName)) {
+                tempArray = selectedPlayer.spells.splice(index, 1);
+                shouldAddToList = true;
+              } else {
+                shouldAddToList = true;
+              }
+            }
+          });
+
+          if (shouldAddToList) {
+            if (tempArray) {
+              selectedPlayer.spells = tempArray;
+            }
+            selectedPlayer.spells.push(spell);
+          }
+        } else {
+          selectedPlayer.spells.push(spell);
+        }
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+        ])
+          .then(resolve(selectedPlayer));
+      }),
+
+      item: (discordHook, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
+        if (item.position !== enumHelper.inventory.position) {
+          const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+          const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+          if (oldItemRating > newItemRating) {
+            selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
+          } else {
+            selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, item.position, item);
+          }
+        } else {
+          selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
+        }
+
+        const { eventMsg, eventLog } = this.messages.randomItemEventMessage(selectedPlayer, item);
+        selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
+
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false)
+        ])
+          .then(resolve(selectedPlayer));
+      })
+    },
+
     gambling: (discordHook, selectedPlayer) => new Promise((resolve) => {
       if (selectedPlayer.gold.current < 10) {
         return resolve(selectedPlayer);

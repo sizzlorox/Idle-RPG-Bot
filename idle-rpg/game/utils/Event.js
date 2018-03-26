@@ -329,70 +329,15 @@ class Event {
   }
 
   generateLuckItemEvent(discordHook, twitchBot, selectedPlayer) {
-    return new Promise((resolve) => {
-      const luckItemDice = Helper.randomBetween(0, 100);
+    const luckItemDice = Helper.randomBetween(0, 100);
 
-      if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
-        return this.SpellManager.generateSpell(selectedPlayer)
-          .then((spell) => {
-            const { eventMsg, eventLog } = events.messages.randomItemEventMessage(selectedPlayer, spell);
-            if (selectedPlayer.spells.length > 0) {
-              let shouldAddToList = false;
-              let tempArray;
-              selectedPlayer.spells.forEach((ownedSpell, index) => {
-                const spellName = ownedSpell.name.split(/ (.+)/)[1];
-                if (spell.power > ownedSpell.power) {
-                  if (spell.name.includes(spellName)) {
-                    tempArray = selectedPlayer.spells.splice(index, 1);
-                    shouldAddToList = true;
-                  } else {
-                    shouldAddToList = true;
-                  }
-                }
-              });
-
-              if (shouldAddToList) {
-                Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-                  .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false));
-                selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-                if (tempArray) {
-                  selectedPlayer.spells = tempArray;
-                }
-                selectedPlayer.spells.push(spell);
-              }
-            } else {
-              Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-                .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false));
-              selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-              selectedPlayer.spells.push(spell);
-            }
-
-            return resolve(selectedPlayer);
-          });
-      } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
-        return this.ItemManager.generateItem(selectedPlayer)
-          .then((item) => {
-            if (item.position !== enumHelper.inventory.position) {
-              const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-              const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
-              if (oldItemRating > newItemRating) {
-                selectedPlayer = this.InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-              } else {
-                selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, item.position, item);
-              }
-            } else {
-              selectedPlayer = this.InventoryManager.addItemIntoInventory(selectedPlayer, item);
-            }
-
-            const { eventMsg, eventLog } = events.messages.randomItemEventMessage(selectedPlayer, item);
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg)
-              .then(() => Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true));
-            selectedPlayer = Helper.logEvent(selectedPlayer, eventLog, 'pastEvents');
-
-            return resolve(selectedPlayer);
-          });
-      }
-    });
+    if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
+      return this.SpellManager.generateSpell(selectedPlayer)
+        .then(spell => events.luck.item.spell(discordHook, selectedPlayer, spell));
+    } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
+      return this.ItemManager.generateItem(selectedPlayer)
+        .then(item => events.luck.item.item(discordHook, selectedPlayer, item, this.InventoryManager));
+    }
   }
 
   generateGamblingEvent(discordHook, selectedPlayer) {
