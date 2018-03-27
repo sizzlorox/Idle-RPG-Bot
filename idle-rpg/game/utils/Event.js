@@ -58,8 +58,8 @@ class Event {
             case enumHelper.battle.outcomes.win:
               return events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
                 .then(stealResult => Helper.checkHealth(this.MapManager, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
-                  .then(updatedVictim => Database.savePlayer(updatedVictim)))
-                .then(Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater'));
+                  .then(updatedVictim => Database.savePlayer(updatedVictim))
+                  .then(() => Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater')));
 
             case enumHelper.battle.outcomes.fled:
               return Helper.checkExperience(battleResults.updatedDefsnder, discordHook, 'ToRemoveLater')
@@ -69,8 +69,8 @@ class Event {
             case enumHelper.battle.outcomes.lost:
               return events.battle.steal(discordHook, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
                 .then(stealResult => Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater')
-                  .then(updatedDefender => Database.savePlayer(updatedDefender)))
-                .then(Helper.checkHealth(this.MapManager, stealResult.victimPlayer, battleResults.updatedDefender, discordHook));
+                  .then(updatedDefender => Database.savePlayer(updatedDefender))
+                  .then(Helper.checkHealth(this.MapManager, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)));
           }
         }
 
