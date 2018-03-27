@@ -169,7 +169,7 @@ const events = {
       const playerMaxHealth = 100 + (selectedPlayer.level * 5);
 
       const battleResult = `Battle Results:
-          ${Helper.genesratePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
+          ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${attackerDamage} damage.
           ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} HP left.
           ${Helper.generatePlayerName(randomPlayer, true)} 's \`${randomPlayer.equipment.weapon.name}\` did ${defenderDamage} damage.
           ${Helper.generatePlayerName(randomPlayer, true)} has ${randomPlayer.health} HP left.`;

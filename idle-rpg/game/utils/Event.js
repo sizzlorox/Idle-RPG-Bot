@@ -49,21 +49,9 @@ class Event {
         ? Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
         : this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
           .catch(err => errorLog.error(err)))
-
       .then(battleResults => battleResults.attacker
         ? events.battle.pvpResults(discordHook, battleResults)
         : battleResults)
-      /**
-       * If PvP battle was executed (Found an online randomplayer in current map)
-       * Returns {
-       *  result,
-       *  updatedAttacker,
-       *  updatedDefender
-       * }
-       * Else
-       * Returns selectedPlayer from this.attackEventMob method
-       */
-
       .then((battleResults) => {
         if (battleResults.result) {
           switch (battleResults.result) {
@@ -83,11 +71,11 @@ class Event {
                 });
 
             case enumHelper.battle.outcomes.lost:
-              return events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
+              return events.battle.steal(discordHook, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
                 .then(stealResult => Helper.checkExperience(stealResult.stealingPlayer, discordHook, twitchBot)
                   .then((updatedDefender) => {
                     Database.savePlayer(updatedDefender);
-                    return Helper.checkHealth(this.MapClass, stealResult.victimPlayer, updatedDefender, discordHook);
+                    return Helper.checkHealth(this.MapClass, stealResult.victimPlayer, battleResults.updatedDefender, discordHook);
                   }));
           }
         }
