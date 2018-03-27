@@ -75,15 +75,17 @@ class Helper {
   }
 
   logEvent(selectedPlayer, msg, eventToLog) {
-    if (selectedPlayer[eventToLog].length === 99) {
-      selectedPlayer[eventToLog].shift();
-    }
-    selectedPlayer[eventToLog].push({
-      event: msg,
-      timeStamp: new Date().getTime()
-    });
+    return new Promise((resolve) => {
+      if (selectedPlayer[eventToLog].length === 99) {
+        selectedPlayer[eventToLog].shift();
+      }
+      selectedPlayer[eventToLog].push({
+        event: msg,
+        timeStamp: new Date().getTime()
+      });
 
-    return selectedPlayer;
+      return resolve(selectedPlayer);
+    });
   }
 
   sendPrivateMessage(discordHook, player, msg, isImportantMessage) {
@@ -269,16 +271,17 @@ class Helper {
 
         if (selectedPlayer.class !== oldClass) {
           this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
-            .then(this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true));
+            .then(this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true))
+            .then(this.logEvent(selectedPlayer, `You have become a ${selectedPlayer.class}`, 'pastEvents'));
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
         const eventLog = `Leveled up to level ${selectedPlayer.level}`;
-        selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
         return Promise.all([
           this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true)
+          this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
+          this.logEvent(selectedPlayer, eventLog, 'pastEvents')
         ])
           .then(resolve(selectedPlayer));
       }
@@ -383,11 +386,11 @@ class Helper {
             const bountyEventLog = `Claimed ${bountyGain} gold for ${selectedPlayer.name}'s head`;
             attackerObj.gold.current += Number(bountyGain);
             attackerObj.gold.total += Number(bountyGain);
-            attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastEvents');
-            attackerObj = this.logEvent(attackerObj, bountyEventLog, 'pastPvpEvents');
             this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
               .then(this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
-              .then(this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true));
+              .then(this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true))
+              .then(this.logEvent(attackerObj, bountyEventLog, 'pastEvents'))
+              .then(this.logEvent(attackerObj, bountyEventLog, 'pastPvpEvents'));
             selectedPlayer.currentBounty = 0;
           }
 
@@ -407,11 +410,11 @@ class Helper {
           eventMsg = eventMsg.replace(` and lost ${goldLoss} gold`, '');
           eventLog = eventLog.replace(` and lost ${goldLoss} gold`, '');
         }
-        selectedPlayer = this.logEvent(selectedPlayer, eventLog, 'pastEvents');
 
         return Promise.all([
           this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg),
-          this.sendPrivateMessage(hook, selectedPlayer, eventLog, true)
+          this.sendPrivateMessage(hook, selectedPlayer, eventLog, true),
+          this.logEvent(selectedPlayer, eventLog, 'pastEvents')
         ])
           .then(resolve(selectedPlayer));
       }

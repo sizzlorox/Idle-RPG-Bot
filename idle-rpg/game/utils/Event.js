@@ -42,12 +42,12 @@ class Event {
     return events.movement.movePlayer(discordHook, selectedPlayer, mapObj);
   }
 
-  attackEventPlayerVsPlayer(discordHook, twitchBot, selectedPlayer, onlinePlayers, multiplier) {
+  attackEventPlayerVsPlayer(discordHook, selectedPlayer, onlinePlayers, multiplier) {
     return Database.getSameMapPlayers(selectedPlayer.map.name)
       .then(mappedPlayers => events.battle.pvpPreperation(selectedPlayer, mappedPlayers, onlinePlayers))
       .then(prepResults => prepResults.randomPlayer
         ? Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
-        : this.attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier)
+        : this.attackEventMob(discordHook, selectedPlayer, multiplier)
           .catch(err => errorLog.error(err)))
       .then(battleResults => battleResults.attacker
         ? events.battle.pvpResults(discordHook, battleResults)
@@ -57,26 +57,20 @@ class Event {
           switch (battleResults.result) {
             case enumHelper.battle.outcomes.win:
               return events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
-                .then(stealResult => Helper.checkHealth(this.MapClass, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
-                  .then((updatedVictim) => {
-                    Database.savePlayer(updatedVictim);
-                    return Helper.checkExperience(stealResult.stealingPlayer, discordHook, twitchBot);
-                  }));
+                .then(stealResult => Helper.checkHealth(this.MapManager, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
+                  .then(updatedVictim => Database.savePlayer(updatedVictim)))
+                .then(Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater'));
 
             case enumHelper.battle.outcomes.fled:
-              return Helper.checkExperience(battleResults.updatedDefender, discordHook, twitchBot)
-                .then((updatedDefender) => {
-                  Database.savePlayer(updatedDefender);
-                  return Helper.checkExperience(battleResults.updatedAttacker, discordHook, twitchBot);
-                });
+              return Helper.checkExperience(battleResults.updatedDefsnder, discordHook, 'ToRemoveLater')
+                .then(updatedDefender => Database.savePlayer(updatedDefender))
+                .then(Helper.checkExperience(battleResults.updatedAttacker, discordHook, 'ToRemoveLater'));
 
             case enumHelper.battle.outcomes.lost:
               return events.battle.steal(discordHook, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
-                .then(stealResult => Helper.checkExperience(stealResult.stealingPlayer, discordHook, twitchBot)
-                  .then((updatedDefender) => {
-                    Database.savePlayer(updatedDefender);
-                    return Helper.checkHealth(this.MapClass, stealResult.victimPlayer, battleResults.updatedDefender, discordHook);
-                  }));
+                .then(stealResult => Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater')
+                  .then(updatedDefender => Database.savePlayer(updatedDefender)))
+                .then(Helper.checkHealth(this.MapManager, stealResult.victimPlayer, battleResults.updatedDefender, discordHook));
           }
         }
 
@@ -84,22 +78,22 @@ class Event {
       });
   }
 
-  attackEventMob(discordHook, twitchBot, selectedPlayer, multiplier) {
-    selectedPlayer.map = this.MapClass.getMapByName(selectedPlayer.map.name);
+  attackEventMob(discordHook, selectedPlayer, multiplier) {
+    selectedPlayer.map = this.MapManager.getMapByName(selectedPlayer.map.name);
     return this.MonsterManager.generateNewMonster(selectedPlayer)
       .then(mob => Battle.newSimulateBattle(selectedPlayer, mob))
-      .then(results => events.battle.pveResults(discordHook, this.MapClass, results, multiplier))
+      .then(results => events.battle.pveResults(discordHook, this.MapManager, results, multiplier))
       .then((battleResults) => {
         switch (battleResults.result) {
           case enumHelper.battle.outcomes.win:
             return events.battle.dropItem(discordHook, battleResults.updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager)
-              .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook, twitchBot));
+              .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook, 'ToRemoveLater'));
 
           case enumHelper.battle.outcomes.fled:
-            return Helper.checkExperience(battleResults.updatedPlayer, discordHook, twitchBot);
+            return Helper.checkExperience(battleResults.updatedPlayer, discordHook, 'ToRemoveLater');
 
           case enumHelper.battle.outcomes.lost:
-            return Helper.checkHealth(this.MapClass, battleResults.updatedPlayer, battleResults.updatedMob, discordHook);
+            return Helper.checkHealth(this.MapManager, battleResults.updatedPlayer, battleResults.updatedMob, discordHook);
         }
       });
   }
@@ -129,7 +123,7 @@ class Event {
 
         case 2:
           return events.luck.gods.zeus(discordHook, selectedPlayer)
-            .then(updatedPlayer => Helper.checkHealth(this.MapClass, updatedPlayer, discordHook))
+            .then(updatedPlayer => Helper.checkHealth(this.MapManager, updatedPlayer, discordHook))
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 3:
