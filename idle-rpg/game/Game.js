@@ -130,13 +130,13 @@ class Game {
 
       if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
         && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return Event.attackEventPlayerVsPlayer(this.discordHook, twitchBot, selectedPlayer, onlinePlayers, this.multiplier)
+        return Event.attackEventPlayerVsPlayer(this.discordHook, selectedPlayer, onlinePlayers, this.multiplier)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return Event.attackEventMob(this.discordHook, twitchBot, selectedPlayer, this.multiplier)
+          return Event.attackEventMob(this.discordHook, selectedPlayer, this.multiplier)
             .then(updatedPlayer => resolve(updatedPlayer));
         }
 
