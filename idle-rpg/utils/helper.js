@@ -396,6 +396,7 @@ class Helper {
 
           selectedPlayer.deaths.player++;
           attackerObj.kills.player++;
+          Database.savePlayer(attackerObj);
           Database.savePlayer(selectedPlayer);
         }
 
