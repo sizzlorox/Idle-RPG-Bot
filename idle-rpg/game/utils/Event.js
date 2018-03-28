@@ -59,10 +59,10 @@ class Event {
               return events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
                 .then(stealResult => Helper.checkHealth(this.MapManager, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
                   .then(updatedVictim => Database.savePlayer(updatedVictim))
-                  .then(() => Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater')));
+                  .then(Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater')));
 
             case enumHelper.battle.outcomes.fled:
-              return Helper.checkExperience(battleResults.updatedDefsnder, discordHook, 'ToRemoveLater')
+              return Helper.checkExperience(battleResults.updatedDefender, discordHook, 'ToRemoveLater')
                 .then(updatedDefender => Database.savePlayer(updatedDefender))
                 .then(Helper.checkExperience(battleResults.updatedAttacker, discordHook, 'ToRemoveLater'));
 
