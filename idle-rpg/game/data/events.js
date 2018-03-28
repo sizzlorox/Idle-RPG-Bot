@@ -495,12 +495,11 @@ const events = {
         const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, spell);
         if (selectedPlayer.spells.length > 0) {
           let shouldAddToList = false;
-          let tempArray;
           selectedPlayer.spells.forEach((ownedSpell, index) => {
             const spellName = ownedSpell.name.split(/ (.+)/)[1];
             if (spell.power > ownedSpell.power) {
               if (spell.name.includes(spellName)) {
-                tempArray = selectedPlayer.spells.splice(index, 1);
+                selectedPlayer.spells.splice(index, 1);
                 shouldAddToList = true;
               } else {
                 shouldAddToList = true;
@@ -509,21 +508,27 @@ const events = {
           });
 
           if (shouldAddToList) {
-            if (tempArray) {
-              selectedPlayer.spells = tempArray;
-            }
             selectedPlayer.spells.push(spell);
+
+            return Promise.all([
+              Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+              Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
+              Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+            ])
+              .then(resolve(selectedPlayer));
           }
         } else {
           selectedPlayer.spells.push(spell);
+
+          return Promise.all([
+            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
+            Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          ])
+            .then(resolve(selectedPlayer));
         }
 
-        return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
-        ])
-          .then(resolve(selectedPlayer));
+        return resolve(selectedPlayer);
       }),
 
       item: (discordHook, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
@@ -724,12 +729,11 @@ const events = {
         const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
         if (selectedPlayer.spells.length > 0) {
           let shouldAddToList = false;
-          let tempArray;
           selectedPlayer.spells.forEach((ownedSpell, index) => {
             const spellName = ownedSpell.name.split(/ (.+)/)[1];
             if (spell.power > ownedSpell.power) {
               if (spell.name.includes(spellName)) {
-                tempArray = selectedPlayer.spells.splice(index, 1);
+                selectedPlayer.spells.splice(index, 1);
                 shouldAddToList = true;
               } else {
                 shouldAddToList = true;
@@ -738,21 +742,27 @@ const events = {
           });
 
           if (shouldAddToList) {
-            if (tempArray) {
-              selectedPlayer.spells = tempArray;
-            }
             selectedPlayer.spells.push(spell);
+
+            return Promise.all([
+              Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
+              Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
+              Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents')
+            ])
+              .then(resolve(selectedPlayer));
           }
         } else {
           selectedPlayer.spells.push(spell);
+
+          return Promise.all([
+            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
+            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
+            Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents')
+          ])
+            .then(resolve(selectedPlayer));
         }
 
-        return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
-          Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents')
-        ])
-          .then(resolve(selectedPlayer));
+        return resolve(selectedPlayer);
       })
     }
   },
