@@ -56,10 +56,14 @@ class Event {
         if (battleResults.result) {
           switch (battleResults.result) {
             case enumHelper.battle.outcomes.win:
-              return events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
-                .then(stealResult => Helper.checkHealth(this.MapManager, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)
-                  .then(updatedVictim => Database.savePlayer(updatedVictim))
-                  .then(Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater')));
+              return Promise.all([
+                events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
+              ])
+                .then((promiseResults) => {
+                  return Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)
+                    .then(updatedVictim => Database.savePlayer(updatedVictim))
+                    .then(Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater'));
+                });
 
             case enumHelper.battle.outcomes.fled:
               return Helper.checkExperience(battleResults.updatedDefender, discordHook, 'ToRemoveLater')
@@ -67,10 +71,14 @@ class Event {
                 .then(Helper.checkExperience(battleResults.updatedAttacker, discordHook, 'ToRemoveLater'));
 
             case enumHelper.battle.outcomes.lost:
-              return events.battle.steal(discordHook, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
-                .then(stealResult => Helper.checkExperience(stealResult.stealingPlayer, discordHook, 'ToRemoveLater')
-                  .then(updatedDefender => Database.savePlayer(updatedDefender))
-                  .then(Helper.checkHealth(this.MapManager, stealResult.victimPlayer, stealResult.stealingPlayer, discordHook)));
+              return Promise.all([
+                events.battle.steal(discordHook, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
+              ])
+                .then((promiseResults) => {
+                  return Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')
+                    .then(updatedDefender => Database.savePlayer(updatedDefender))
+                    .then(Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook));
+                });
           }
         }
 

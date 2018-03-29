@@ -414,6 +414,7 @@ ${rankString}
   }
 
   setPlayerTitles(discordBot, selectedPlayer) {
+    // TODO add to check if selectedPlayer is NPC
     const currentGuild = discordBot.guilds.array()[0];
     const playerDiscordObj = currentGuild.members
       .filterArray(member => member.id === selectedPlayer.discordId)[0];
