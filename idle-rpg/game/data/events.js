@@ -61,7 +61,6 @@ const events = {
           profit += Number(equipment.gold);
         });
         if (isNaN(profit)) {
-          infoLog.info(selectedPlayer.inventory.equipment);
           profit = 100;
         }
         selectedPlayer.inventory.equipment.length = 0;
@@ -588,6 +587,7 @@ const events = {
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
         const { eventMsg, eventLog } = Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
         selectedPlayer.gold.current -= luckGambleGold;
+        selectedPlayer.gold.gambles.lost += luckGambleGold;
         if (selectedPlayer.gold.current <= 0) {
           selectedPlayer.gold.current = 0;
         }
@@ -602,6 +602,7 @@ const events = {
       const { eventMsg, eventLog } = Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
       selectedPlayer.gold.current += luckGambleGold;
       selectedPlayer.gold.total += luckGambleGold;
+      selectedPlayer.gold.gambles.won += luckGambleGold;
 
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
@@ -615,6 +616,7 @@ const events = {
       hades: (discordHook, selectedPlayer) => new Promise((resolve) => {
         const luckExpAmount = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
         selectedPlayer.experience.current -= luckExpAmount;
+        selectedPlayer.experience.lost += luckExpAmount;
         if (selectedPlayer.experience.current < 0) {
           selectedPlayer.experience.current = 0;
         }

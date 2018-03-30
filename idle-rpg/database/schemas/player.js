@@ -52,7 +52,7 @@ const newPlayerObj = (discordId, name) => {
     gambles: 0,
     stole: 0,
     stolen: 0,
-    spellCasted: 0,
+    spellCast: 0,
     currentBounty: 0,
     kills: {
       mob: 0,
@@ -90,6 +90,10 @@ const playerSchema = mongoose.Schema({
       type: Number,
       default: 0
     },
+    lost: {
+      type: Number,
+      default: 0
+    },
     total: {
       type: Number,
       default: 0
@@ -102,6 +106,10 @@ const playerSchema = mongoose.Schema({
       type: Number,
       default: 0
     },
+    lost: {
+      type: Number,
+      default: 0
+    },
     stolen: {
       type: Number,
       default: 0
@@ -109,6 +117,16 @@ const playerSchema = mongoose.Schema({
     stole: {
       type: Number,
       default: 0
+    },
+    gambles: {
+      won: {
+        type: Number,
+        default: 0
+      },
+      lost: {
+        type: Number,
+        default: 0
+      }
     },
     total: {
       type: Number,
@@ -213,7 +231,7 @@ const playerSchema = mongoose.Schema({
     type: Number,
     default: 0
   },
-  spellCasted: {
+  spellCast: {
     type: Number,
     default: 0
   },

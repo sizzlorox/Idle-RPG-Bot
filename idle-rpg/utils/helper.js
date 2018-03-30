@@ -158,6 +158,7 @@ class Helper {
         player.mana = enumHelper.maxMana(player.level);
       }
     }
+
     return player;
   }
 
@@ -291,17 +292,6 @@ class Helper {
   }
 
   setPlayerEquipment(selectedPlayer, equipment, item) {
-    const oldRating = this.calculateItemRating(selectedPlayer, selectedPlayer.equipment[equipment]);
-    const newRating = this.calculateItemRating(selectedPlayer, item);
-    if (oldRating > newRating && item.name !== enumHelper.equipment.empty.weapon.name && item.name !== enumHelper.equipment.empty.armor.name) {
-      infoLog.info({
-        player: selectedPlayer.name,
-        oldEqup: selectedPlayer.equipment[equipment],
-        oldRating,
-        newItem: item,
-        newRating
-      });
-    }
     selectedPlayer.equipment[equipment].name = item.name;
     if (equipment !== enumHelper.equipment.types.relic.position) {
       selectedPlayer.equipment[equipment].power = item.power;
@@ -329,7 +319,9 @@ class Helper {
         selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
         selectedPlayer.map = MapClass.getRandomTown();
         selectedPlayer.experience.current -= expLoss;
+        selectedPlayer.experience.lost += expLoss;
         selectedPlayer.gold.current -= goldLoss;
+        selectedPlayer.gold.lost += goldLoss;
         selectedPlayer.inventory = {
           equipment: [],
           items: []
@@ -441,14 +433,20 @@ class Helper {
     Level: ${player.level}
     Experience: 
       Current: ${player.experience.current}
+      Lost: ${player.experience.lost}
       Total: ${player.experience.total}
-      TNL: ${player.level * 15}
+      TNL: ${(player.level * 15) - player.experience.current}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:
       Current: ${player.gold.current}
+      Lost: ${player.gold.lost}
       Stolen: ${player.gold.stolen}
       Stole: ${player.gold.stole}
+      Gambles: 
+        Count: ${player.gambles}
+        Won: ${player.gold.gambles.won}
+        Lost: ${player.gold.gambles.lost}
       Total: ${player.gold.total}
     Map: ${player.map.name}
     Bounty: ${player.currentBounty}
@@ -462,10 +460,9 @@ class Helper {
 
     Born: ${this.getTimePassed(player.createdAt)}
     Events: ${player.events}
-    Gambles: ${player.gambles}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
-    Spells Cast: ${player.spellCasted}
+    Spells Cast: ${player.spellCast}
     Kills:
       Monsters: ${player.kills.mob}
       Players: ${player.kills.player}
@@ -580,7 +577,7 @@ class Helper {
           BaseAttackPower: ${player.equipment.weapon.power}
           AttackPower: ${Number(weaponRating)}
           AttackType: ${player.equipment.weapon.attackType}
-            ${this.generatePreviousOwnerString(player.equipment.weapon)}
+          ${this.generatePreviousOwnerString(player.equipment.weapon)}
         Relic: ${player.equipment.relic.name}
           Stats:
             Strength: ${player.equipment.relic.str}
@@ -662,46 +659,30 @@ class Helper {
 
   randomCampEventMessage(selectedPlayer) {
     const randomEventInt = this.randomBetween(0, messages.event.camp.length - 1);
-    let { eventMsg, eventLog } = messages.event.camp[randomEventInt];
-    // TODO: clean up this mess
-    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
-    eventMsg = updatedMessages.eventMsg;
-    eventLog = updatedMessages.eventLog;
+    const { eventMsg, eventLog } = messages.event.camp[randomEventInt];
 
-    return { eventMsg, eventLog };
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
   }
 
   randomItemEventMessage(selectedPlayer, item) {
     const randomEventInt = this.randomBetween(0, messages.event.item.length - 1);
-    let { eventMsg, eventLog } = messages.event.item[randomEventInt];
-    // TODO: clean up this mess
-    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
-    eventMsg = updatedMessages.eventMsg;
-    eventLog = updatedMessages.eventLog;
+    const { eventMsg, eventLog } = messages.event.item[randomEventInt];
 
-    return { eventMsg, eventLog };
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
   }
 
   randomGambleEventMessage(selectedPlayer, luckGambleGold, isWin) {
     if (isWin) {
       const randomEventInt = this.randomBetween(0, messages.event.gamble.win.length - 1);
-      let { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
-      // TODO: clean up this mess
-      const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
-      eventMsg = updatedMessages.eventMsg;
-      eventLog = updatedMessages.eventLog;
+      const { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
 
-      return { eventMsg, eventLog };
+      return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
     }
 
     const randomEventInt = this.randomBetween(0, messages.event.gamble.lose.length - 1);
-    let { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
-    // TODO: clean up this mess
-    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
-    eventMsg = updatedMessages.eventMsg;
-    eventLog = updatedMessages.eventLog;
+    const { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
 
-    return { eventMsg, eventLog };
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
   }
 }
 module.exports = new Helper();

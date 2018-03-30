@@ -183,12 +183,16 @@ const enumHelper = {
     mana: 1,
     level: 1,
     'experience.current': 1,
+    'experience.lost': 1,
     'experience.total': 1,
     gender: 1,
     events: 1,
     'gold.current': 1,
+    'gold.lost': 1,
     'gold.stole': 1,
     'gold.stolen': 1,
+    'gold.gambles.won': 1,
+    'gold.gambles.lost': 1,
     'gold.total': 1,
     equipment: 1,
     map: 1,
@@ -203,7 +207,7 @@ const enumHelper = {
     kills: 1,
     battles: 1,
     deaths: 1,
-    spellCasted: 1
+    spellCast: 1
   },
 
   equipSelectFields: {
