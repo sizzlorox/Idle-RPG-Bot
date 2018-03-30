@@ -118,7 +118,7 @@ const playerSchema = mongoose.Schema({
       type: Number,
       default: 0
     },
-    gambled: {
+    gambles: {
       won: {
         type: Number,
         default: 0

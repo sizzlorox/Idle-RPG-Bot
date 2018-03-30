@@ -63,7 +63,7 @@ let minTimer = (minimalTimer * 1000) * 60;
 let maxTimer = (maximumTimer * 1000) * 60;
 const tickInMinutes = 2;
 let onlinePlayerList = [];
-let guildName
+let guildName;
 
 console.log(`Current ENV: ${process.env.NODE_ENV}`);
 if (!process.env.NODE_ENV.includes('production')) {

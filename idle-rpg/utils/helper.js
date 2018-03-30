@@ -435,7 +435,7 @@ class Helper {
       Current: ${player.experience.current}
       Lost: ${player.experience.lost}
       Total: ${player.experience.total}
-      TNL: ${player.experience.current - (player.level * 15)}
+      TNL: ${(player.level * 15) - player.experience.current}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:

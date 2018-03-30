@@ -215,7 +215,7 @@ class Database {
             lost: 0,
             stolen: 0,
             stole: 0,
-            gamble: {
+            gambles: {
               won: 0,
               lost: 0
             },
