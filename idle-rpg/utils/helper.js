@@ -462,7 +462,7 @@ class Helper {
     Events: ${player.events}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
-    Spells Cast: ${player.spellCasted}
+    Spells Cast: ${player.spellCast}
     Kills:
       Monsters: ${player.kills.mob}
       Players: ${player.kills.player}
@@ -577,7 +577,7 @@ class Helper {
           BaseAttackPower: ${player.equipment.weapon.power}
           AttackPower: ${Number(weaponRating)}
           AttackType: ${player.equipment.weapon.attackType}
-            ${this.generatePreviousOwnerString(player.equipment.weapon)}
+          ${this.generatePreviousOwnerString(player.equipment.weapon)}
         Relic: ${player.equipment.relic.name}
           Stats:
             Strength: ${player.equipment.relic.str}
@@ -659,46 +659,30 @@ class Helper {
 
   randomCampEventMessage(selectedPlayer) {
     const randomEventInt = this.randomBetween(0, messages.event.camp.length - 1);
-    let { eventMsg, eventLog } = messages.event.camp[randomEventInt];
-    // TODO: clean up this mess
-    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
-    eventMsg = updatedMessages.eventMsg;
-    eventLog = updatedMessages.eventLog;
+    const { eventMsg, eventLog } = messages.event.camp[randomEventInt];
 
-    return { eventMsg, eventLog };
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
   }
 
   randomItemEventMessage(selectedPlayer, item) {
     const randomEventInt = this.randomBetween(0, messages.event.item.length - 1);
-    let { eventMsg, eventLog } = messages.event.item[randomEventInt];
-    // TODO: clean up this mess
-    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
-    eventMsg = updatedMessages.eventMsg;
-    eventLog = updatedMessages.eventLog;
+    const { eventMsg, eventLog } = messages.event.item[randomEventInt];
 
-    return { eventMsg, eventLog };
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
   }
 
   randomGambleEventMessage(selectedPlayer, luckGambleGold, isWin) {
     if (isWin) {
       const randomEventInt = this.randomBetween(0, messages.event.gamble.win.length - 1);
-      let { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
-      // TODO: clean up this mess
-      const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
-      eventMsg = updatedMessages.eventMsg;
-      eventLog = updatedMessages.eventLog;
+      const { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
 
-      return { eventMsg, eventLog };
+      return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
     }
 
     const randomEventInt = this.randomBetween(0, messages.event.gamble.lose.length - 1);
-    let { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
-    // TODO: clean up this mess
-    const updatedMessages = this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
-    eventMsg = updatedMessages.eventMsg;
-    eventLog = updatedMessages.eventLog;
+    const { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
 
-    return { eventMsg, eventLog };
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
   }
 }
 module.exports = new Helper();

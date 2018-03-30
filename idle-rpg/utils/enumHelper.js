@@ -203,7 +203,7 @@ const enumHelper = {
     kills: 1,
     battles: 1,
     deaths: 1,
-    spellCasted: 1
+    spellCast: 1
   },
 
   equipSelectFields: {

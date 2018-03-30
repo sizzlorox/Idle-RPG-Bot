@@ -308,7 +308,7 @@ ${rankString}
         switch (spell) {
           case 'bless':
             if (castingPlayer.gold.current >= globalSpells.bless.spellCost) {
-              castingPlayer.spellCasted++;
+              castingPlayer.spellCast++;
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
               this.multiplier += 1;
               const blessLogObj = {

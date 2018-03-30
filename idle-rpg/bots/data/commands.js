@@ -303,7 +303,7 @@ const commands = [
           game.top10(message.author, { 'gold.current': -1 });
           break;
         case 'spells':
-          game.top10(message.author, { spellCasted: -1 });
+          game.top10(message.author, { spellCast: -1 });
           break;
         case 'events':
           game.top10(message.author, { events: -1 });

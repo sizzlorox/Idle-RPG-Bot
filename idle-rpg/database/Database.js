@@ -257,7 +257,7 @@ class Database {
           gambles: 0,
           stole: 0,
           stolen: 0,
-          spellCasted: 0,
+          spellCast: 0,
           currentBounty: 0,
           kills: {
             mob: 0,
