@@ -314,7 +314,7 @@ class Helper {
     return new Promise((resolve) => {
       if (selectedPlayer.health <= 0) {
         const expLoss = Math.ceil(selectedPlayer.experience.current / 8);
-        const goldLoss = Math.ceil(selectedPlayer.gold.current / 6);
+        const goldLoss = Math.ceil(selectedPlayer.gold.current / 12);
         selectedPlayer.health = 100 + (selectedPlayer.level * 5);
         selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
         selectedPlayer.map = MapClass.getRandomTown();

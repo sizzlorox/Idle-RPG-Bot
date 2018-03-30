@@ -168,6 +168,8 @@ class Event {
           .then(item => events.luck.item.item(discordHook, selectedPlayer, item, this.InventoryManager))
           .then(updatedPlayer => resolve(updatedPlayer));
       }
+
+      return resolve(selectedPlayer);
     });
   }
 
