@@ -36,6 +36,7 @@ class Game {
               return newPlayer;
             });
         } else if (selectedPlayer.events === 0) {
+          selectedPlayer.map = this.MapClass.getRandomTown();
           Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
         }
 
