@@ -42,34 +42,37 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
+        selectedPlayer.events++;
+        return selectedPlayer;
+      })
+      .then((selectedPlayer) => {
         if (process.env.NODE_ENV === 'production') {
           this.setPlayerTitles(discordBot, selectedPlayer);
         }
 
         selectedPlayer.name = player.name;
-        selectedPlayer.events++;
 
         Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
-            return this.moveEvent(selectedPlayer, onlinePlayers, twitchBot)
+            return this.moveEvent(selectedPlayer, onlinePlayers)
               .then(updatedPlayer => Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 1:
             console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
-            return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
+            return this.attackEvent(selectedPlayer, onlinePlayers)
               .then(updatedPlayer => Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 2:
             console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
-            return this.luckEvent(selectedPlayer, twitchBot)
+            return this.luckEvent(selectedPlayer)
               .then(updatedPlayer => Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
         }
       })
       .then((updatedPlayer) => {
-        if (updatedPlayer.events % 100 === 0) {
+        if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
           Helper.sendMessage(this.discordHook, twitchBot, updatedPlayer, false, Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
             .then(Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
         }
@@ -121,7 +124,7 @@ class Game {
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return Event.generateLuckItemEvent(this.discordHook, 'twitch', selectedPlayer)
+      return Event.generateLuckItemEvent(this.discordHook, selectedPlayer)
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
@@ -149,7 +152,7 @@ class Game {
       }
 
       if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
-        return Event.generateLuckItemEvent(this.discordHook, twitchBot, selectedPlayer)
+        return Event.generateLuckItemEvent(this.discordHook, selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
