@@ -90,6 +90,10 @@ const playerSchema = mongoose.Schema({
       type: Number,
       default: 0
     },
+    lost: {
+      type: Number,
+      default: 0
+    },
     total: {
       type: Number,
       default: 0
@@ -102,6 +106,10 @@ const playerSchema = mongoose.Schema({
       type: Number,
       default: 0
     },
+    lost: {
+      type: Number,
+      default: 0
+    },
     stolen: {
       type: Number,
       default: 0
@@ -109,6 +117,16 @@ const playerSchema = mongoose.Schema({
     stole: {
       type: Number,
       default: 0
+    },
+    gambled: {
+      won: {
+        type: Number,
+        default: 0
+      },
+      lost: {
+        type: Number,
+        default: 0
+      }
     },
     total: {
       type: Number,

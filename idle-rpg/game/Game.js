@@ -46,36 +46,8 @@ class Game {
           this.setPlayerTitles(discordBot, selectedPlayer);
         }
 
-        // TODO: Remove later after release
-        if (!selectedPlayer.map || !selectedPlayer.map.coords || selectedPlayer.map.coords.length === 0) {
-          selectedPlayer.map = Event.MapClass.getRandomTown();
-          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `The land has suddenly shifted with a large Earthquake and deafening sounds. Someone has tinkered with the fabric of reality! ${Helper.generatePlayerName(selectedPlayer)} was teleported by a mysterious wizard to \`${selectedPlayer.map.name}\``);
-          Database.savePlayer(selectedPlayer);
-        }
-        if (!selectedPlayer.gold.current) {
-          selectedPlayer.gold = {
-            current: 0,
-            stole: 0,
-            stolen: 0,
-            total: 0
-          };
-          Database.savePlayer(selectedPlayer);
-        }
-        if (!selectedPlayer.experience.current) {
-          selectedPlayer.experience = {
-            current: 0,
-            total: 0
-          };
-          Database.savePlayer(selectedPlayer);
-        }
-
         selectedPlayer.name = player.name;
         selectedPlayer.events++;
-
-        if (selectedPlayer.events % 100 === 0) {
-          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, Helper.setImportantMessage(`${selectedPlayer.name} has encountered ${selectedPlayer.events} events!`))
-            .then(Helper.sendPrivateMessage(this.discordHook, selectedPlayer, `You have encountered ${selectedPlayer.events} events!`, true));
-        }
 
         Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
         switch (randomEvent) {
@@ -96,15 +68,21 @@ class Game {
               .catch(err => console.log(err));
         }
       })
+      .then((updatedPlayer) => {
+        if (updatedPlayer.events % 100 === 0) {
+          Helper.sendMessage(this.discordHook, twitchBot, updatedPlayer, false, Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
+            .then(Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
+        }
+      })
       .catch(err => console.log(err));
   }
 
-  moveEvent(selectedPlayer, onlinePlayers, twitchBot) {
+  moveEvent(selectedPlayer, onlinePlayers) {
     return new Promise((resolve) => {
       const pastMoveCount = selectedPlayer.pastEvents.slice(Math.max(selectedPlayer.pastEvents.length - 5, 1)).filter(event => event.event.includes('and arrived in')).length;
       if (pastMoveCount >= 5 && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         console.log(`GAME: ${pastMoveCount} count: from move event ${selectedPlayer.name} activated an attack event.`);
-        return this.attackEvent(selectedPlayer, onlinePlayers, twitchBot)
+        return this.attackEvent(selectedPlayer, onlinePlayers)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
@@ -117,9 +95,8 @@ class Game {
    * Rolls dice to select which type of attack event is activated for the player
    * @param {Player} selectedPlayer
    * @param {Array} onlinePlayers
-   * @param {*} twitchBot
    */
-  attackEvent(selectedPlayer, onlinePlayers, twitchBot) {
+  attackEvent(selectedPlayer, onlinePlayers) {
     return new Promise((resolve) => {
       const luckDice = Helper.randomBetween(0, 100);
       if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
@@ -152,13 +129,12 @@ class Game {
   /**
    * Rolls dice to select which type of luck event is activated for the player
    * @param {Player} selectedPlayer
-   * @param {*} twitchBot
    */
-  luckEvent(selectedPlayer, twitchBot) {
+  luckEvent(selectedPlayer) {
     return new Promise((resolve) => {
       const luckDice = Helper.randomBetween(0, 100);
       if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
-        return Event.generateGodsEvent(this.discordHook, twitchBot, selectedPlayer)
+        return Event.generateGodsEvent(this.discordHook, selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 

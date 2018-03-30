@@ -183,7 +183,7 @@ discordBot.on('message', (message) => {
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
     if (newMember.presence.game && !oldMember.presence.game) {
-      if (newMember.presence.game.streaming) {
+      if (newMember.presence.game.streaming && !oldMember.presence.game) {
         newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
       }
     }

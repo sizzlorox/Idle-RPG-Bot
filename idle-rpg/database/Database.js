@@ -205,14 +205,20 @@ class Database {
           mana: 50,
           experience: {
             current: 0,
+            lost: 0,
             total: 0
           },
           map: MapClass.getRandomTown(),
           level: 1,
           gold: {
             current: 0,
+            lost: 0,
             stolen: 0,
             stole: 0,
+            gamble: {
+              won: 0,
+              lost: 0
+            },
             total: 0
           },
           'equipment.helmet': {

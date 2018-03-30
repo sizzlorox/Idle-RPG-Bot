@@ -158,6 +158,7 @@ class Helper {
         player.mana = enumHelper.maxMana(player.level);
       }
     }
+
     return player;
   }
 
@@ -291,17 +292,6 @@ class Helper {
   }
 
   setPlayerEquipment(selectedPlayer, equipment, item) {
-    const oldRating = this.calculateItemRating(selectedPlayer, selectedPlayer.equipment[equipment]);
-    const newRating = this.calculateItemRating(selectedPlayer, item);
-    if (oldRating > newRating && item.name !== enumHelper.equipment.empty.weapon.name && item.name !== enumHelper.equipment.empty.armor.name) {
-      infoLog.info({
-        player: selectedPlayer.name,
-        oldEqup: selectedPlayer.equipment[equipment],
-        oldRating,
-        newItem: item,
-        newRating
-      });
-    }
     selectedPlayer.equipment[equipment].name = item.name;
     if (equipment !== enumHelper.equipment.types.relic.position) {
       selectedPlayer.equipment[equipment].power = item.power;
@@ -329,7 +319,9 @@ class Helper {
         selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
         selectedPlayer.map = MapClass.getRandomTown();
         selectedPlayer.experience.current -= expLoss;
+        selectedPlayer.experience.lost += expLoss;
         selectedPlayer.gold.current -= goldLoss;
+        selectedPlayer.gold.lost += goldLoss;
         selectedPlayer.inventory = {
           equipment: [],
           items: []
@@ -441,14 +433,20 @@ class Helper {
     Level: ${player.level}
     Experience: 
       Current: ${player.experience.current}
+      Lost: ${player.experience.lost}
       Total: ${player.experience.total}
-      TNL: ${player.level * 15}
+      TNL: ${player.experience.current - (player.level * 15)}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:
       Current: ${player.gold.current}
+      Lost: ${player.gold.lost}
       Stolen: ${player.gold.stolen}
       Stole: ${player.gold.stole}
+      Gambles: 
+        Count: ${player.gambles}
+        Won: ${player.gold.gambles.won}
+        Lost: ${player.gold.gambles.lost}
       Total: ${player.gold.total}
     Map: ${player.map.name}
     Bounty: ${player.currentBounty}
@@ -462,7 +460,6 @@ class Helper {
 
     Born: ${this.getTimePassed(player.createdAt)}
     Events: ${player.events}
-    Gambles: ${player.gambles}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
     Spells Cast: ${player.spellCasted}
