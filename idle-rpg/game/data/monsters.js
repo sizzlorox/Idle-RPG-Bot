@@ -173,7 +173,7 @@ const monsters = {
       isSpawnable: true,
       spawnableBiomes: ['Land'],
       power: 1,
-      health: 15,
+      health: 7,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -206,7 +206,7 @@ const monsters = {
       isSpawnable: true,
       spawnableBiomes: ['Land', 'Shores', 'Swamp'],
       power: 1.25,
-      health: 20,
+      health: 9,
       stats: {
         str: 1,
         dex: 0.25,
