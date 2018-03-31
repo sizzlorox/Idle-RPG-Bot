@@ -66,7 +66,7 @@ class Event {
             case enumHelper.battle.outcomes.fled:
               return Helper.checkExperience(battleResults.updatedDefender, discordHook, 'ToRemoveLater')
                 .then(updatedDefender => Database.savePlayer(updatedDefender))
-                .then(Helper.checkExperience(battleResults.updatedAttacker, discordHook, 'ToRemoveLater'));
+                .then(() => Helper.checkExperience(battleResults.updatedAttacker, discordHook, 'ToRemoveLater'));
 
             case enumHelper.battle.outcomes.lost:
               return Promise.all([
@@ -128,7 +128,7 @@ class Event {
 
         case 2:
           return events.luck.gods.zeus(discordHook, selectedPlayer)
-            .then(updatedPlayer => Helper.checkHealth(this.MapManager, updatedPlayer, discordHook))
+            .then(updatedPlayer => Helper.checkHealth(this.MapManager, updatedPlayer, 'zeus', discordHook))
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 3:
@@ -141,6 +141,7 @@ class Event {
 
         case 5:
           return events.luck.gods.athena(discordHook, selectedPlayer)
+            .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook, 'removeLater'))
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 6:

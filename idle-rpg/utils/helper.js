@@ -392,17 +392,8 @@ class Helper {
           Database.savePlayer(selectedPlayer);
         }
 
-        let eventMsg = this.setImportantMessage(`${selectedPlayer.name} died and lost ${expLoss} exp and ${goldLoss} gold! Game over man... Game over.`);
-        let eventLog = `You died and lost ${expLoss} exp and ${goldLoss} gold. Game over man... Game over.`;
-
-        if (expLoss === 0) {
-          eventMsg = eventMsg.replace(` and lost ${expLoss} exp`, '');
-          eventLog = eventLog.replace(` and lost ${expLoss} exp`, '');
-        }
-        if (goldLoss === 0) {
-          eventMsg = eventMsg.replace(` and lost ${goldLoss} gold`, '');
-          eventLog = eventLog.replace(` and lost ${goldLoss} gold`, '');
-        }
+        const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`);
+        const eventLog = `You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`;
 
         return Promise.all([
           this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg),
@@ -435,7 +426,7 @@ class Helper {
       Current: ${player.experience.current}
       Lost: ${player.experience.lost}
       Total: ${player.experience.total}
-      TNL: ${(player.level * 15) - player.experience.current}
+      TNL: ${(player.level * 15) - player.experience.current} / ${(player.level * 15)}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:
