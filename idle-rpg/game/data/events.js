@@ -2,6 +2,8 @@ const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 const { pvpLevelRestriction } = require('../../../settings');
 
+const { infoLog } = require('../../utils/logger');
+
 const events = {
   movement: {
     /**
@@ -107,7 +109,7 @@ const events = {
       } else if (selectedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
         return resolve(selectedPlayer);
       }
-
+      infoLog.info({ old: { item: selectedPlayer.equipment[item.position], power: Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]) }, new: { item, power: Helper.calculateItemRating(selectedPlayer, item) } });
       if (item.position !== enumHelper.inventory.position) {
         selectedPlayer.gold.current -= itemCost;
         selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);

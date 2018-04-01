@@ -632,6 +632,18 @@ const commands = [
     }
   },
 
+  aprilFools = {
+    command: '!aprilfools',
+    operatorOnly: true,
+    function: (game, message, discordBot) => {
+      const aprilfools = discordBot.guilds.find('name', 'Idle-RPG').members
+        .filter(player => player.presence.status === 'online' && !player.user.bot
+          || player.presence.status === 'idle' && !player.user.bot
+          || player.presence.status === 'dnd' && !player.user.bot);
+      aprilfools.forEach(player => player.send('Found a Mythical Alien Relic in Topscros Path'));
+    }
+  },
+
   // MODULE COMMANDS
   giveEquipmentToPlayer = {
     command: '!giveplayer',
