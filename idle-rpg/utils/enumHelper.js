@@ -14,8 +14,8 @@ const enumHelper = {
   },
 
   inventory: {
-    maxEquipmentAmount: 5,
-    maxItemAmount: 15,
+    maxEquipmentAmount: 10,
+    maxItemAmount: 25,
     name: 'Inventory',
     position: 'inventory'
   },
@@ -111,20 +111,20 @@ const enumHelper = {
   ],
 
   mockPlayers: [{
-    name: 'Teversion01',
-    discordId: 'Teversion01'
+    name: 'Tesversion01',
+    discordId: 'Tesversion01'
   },
   {
-    name: 'Teversion02',
-    discordId: 'Teversion02'
+    name: 'Tesversion02',
+    discordId: 'Tesversion02'
   },
   {
-    name: 'Teversion03',
-    discordId: 'Teversion03'
+    name: 'Tesversion03',
+    discordId: 'Tesversion03'
   },
   {
-    name: 'Teversion04',
-    discordId: 'Teversion04'
+    name: 'Tesversion04',
+    discordId: 'Tesversion04'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns

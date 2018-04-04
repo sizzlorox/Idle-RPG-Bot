@@ -245,21 +245,22 @@ const commands = [
         });
       // enumHelper.roamingNpcs.forEach(npc => discordOnlinePlayers.push(npc.discordId));
 
-      game.getOnlinePlayerMaps(discordOnlinePlayers)
-        .then((players) => {
-          let mapInfo = '';
-          maps.forEach((map) => {
-            mapInfo = mapInfo.concat(`\n${map.name} (${map.type.name}):\n`);
-            players.forEach((player) => {
-              if (player.map.name === map.name) {
-                mapInfo = mapInfo.concat(`${player.name.replace(/(\,)/g, '')}, `);
-              }
-            });
-            mapInfo = mapInfo.replace(/,\s*$/, '\n');
-          });
+      // game.getOnlinePlayerMaps(discordOnlinePlayers)
+      //   .then((players) => {
+      //   });
 
-          message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
-        });
+      let mapInfo = '';
+      maps.forEach((map) => {
+        mapInfo = mapInfo.concat(`\n${map.name} (${map.biome.name}) Coordinates: ${map.coords}`);
+        // players.forEach((player) => {
+        //   if (player.map.name === map.name) {
+        //     mapInfo = mapInfo.concat(`${player.name.replace(/(\,)/g, '')}, `);
+        //   }
+        // });
+        // mapInfo = mapInfo.replace(/,\s*$/, '\n');
+      });
+
+      message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
     }
   },
 
