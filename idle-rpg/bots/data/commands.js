@@ -235,29 +235,10 @@ const commands = [
     command: ['!map', '!m'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
-      const discordOnlinePlayers = discordBot.users
-        .filter(player => player.presence.status === 'online' && !player.bot
-          || player.presence.status === 'idle' && !player.bot
-          || player.presence.status === 'dnd' && !player.bot)
-        .map((player) => {
-          return player.id;
-        });
-      // enumHelper.roamingNpcs.forEach(npc => discordOnlinePlayers.push(npc.discordId));
-
-      // game.getOnlinePlayerMaps(discordOnlinePlayers)
-      //   .then((players) => {
-      //   });
-
+    function: (game, message) => {
       let mapInfo = '';
       maps.forEach((map) => {
         mapInfo = mapInfo.concat(`\n${map.name} (${map.biome.name}) Coordinates: ${map.coords}`);
-        // players.forEach((player) => {
-        //   if (player.map.name === map.name) {
-        //     mapInfo = mapInfo.concat(`${player.name.replace(/(\,)/g, '')}, `);
-        //   }
-        // });
-        // mapInfo = mapInfo.replace(/,\s*$/, '\n');
       });
 
       message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);

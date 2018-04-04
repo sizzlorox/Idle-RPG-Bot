@@ -26,9 +26,9 @@ const biome = {
     name: 'Town'
   },
 
-  purple: {
+  haunted: {
     id: 3,
-    name: 'Purple?'
+    name: 'Haunted'
   },
 
   forest: {
@@ -117,7 +117,7 @@ const maps = [
     image: '',
     name: 'Uglyoch Temple',
     type: type.land,
-    biome: biome.purple,
+    biome: biome.haunted,
     levelReq: 1,
     lore: 'Once inhabitted by the monks of the local religion it has fallen into disrepair. Plants grow through the stonework, and sections have collapsed of what was once a sprawling complex. Now monsters roam the dark forgotten halls.'
   },
