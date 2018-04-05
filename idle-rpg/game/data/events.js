@@ -103,7 +103,6 @@ const events = {
         selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
         const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
         const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
-        infoLog.info({ old: { item: selectedPlayer.equipment[item.position], power: oldItemRating }, new: { item, power: newItemRating } });
         if (oldItemRating > newItemRating) {
           return resolve(selectedPlayer);
         }

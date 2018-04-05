@@ -45,7 +45,7 @@ class Monster {
 
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
-        && mobType.spawnableBiomes.includes(selectedPlayer.map.biome.name));
+        && mobType.spawnableBiomes.includes('Land'));
 
       const randomRarityIndex = Helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = Helper.randomBetween(0, monsterTypeList.length - 1);
