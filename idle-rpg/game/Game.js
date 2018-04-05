@@ -412,8 +412,8 @@ ${rankString}
         const lotteryAmount = Helper.randomBetween(500, 5000);
         const eventMsg = Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount}!`);
         const eventLog = `Congratulations! You just won ${lotteryAmount} from the daily lottery!`;
-        player.gold.current += Number(amount);
-        player.gold.total += Number(amount);
+        player.gold.current += Number(lotteryAmount);
+        player.gold.total += Number(lotteryAmount);
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', player, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, player, eventLog, true),

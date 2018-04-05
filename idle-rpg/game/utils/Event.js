@@ -61,7 +61,7 @@ class Event {
               ])
                 .then(promiseResults => Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)
                   .then(updatedVictim => Database.savePlayer(updatedVictim))
-                  .then(Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')));
+                  .then(() => Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')));
 
             case enumHelper.battle.outcomes.fled:
               return Helper.checkExperience(battleResults.updatedDefender, discordHook, 'ToRemoveLater')
@@ -74,7 +74,7 @@ class Event {
               ])
                 .then(promiseResults => Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')
                   .then(updatedDefender => Database.savePlayer(updatedDefender))
-                  .then(Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)));
+                  .then(() => Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)));
           }
         }
 
