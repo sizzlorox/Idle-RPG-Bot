@@ -2,6 +2,8 @@ const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 const { pvpLevelRestriction } = require('../../../settings');
 
+const { infoLog, errorLog } = require('../../utils/logger');
+
 const events = {
   movement: {
     /**
@@ -107,7 +109,6 @@ const events = {
       } else if (selectedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
         return resolve(selectedPlayer);
       }
-
       if (item.position !== enumHelper.inventory.position) {
         selectedPlayer.gold.current -= itemCost;
         selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
@@ -361,6 +362,7 @@ const events = {
       let eventLog = '';
       let otherPlayerLog = '';
 
+      // if (luckStealChance > (90 - canSteal)) {
       if (luckStealChance > (90 - canSteal)) {
         const luckItem = Helper.randomBetween(0, 2);
         const itemKeys = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
@@ -386,8 +388,8 @@ const events = {
           victimPlayer.stolen++;
           stealingPlayer.stole++;
           if (victimPlayer.equipment[itemKeys[luckItem]].name !== enumHelper.equipment.empty[itemKeys[luckItem]].name) {
-            stealingPlayer.equipment[itemKeys[luckItem]].position = itemKeys[luckItem];
-            victimPlayer.equipment[itemKeys[luckItem]].position = itemKeys[luckItem];
+            // stealingPlayer.equipment[itemKeys[luckItem]].position = itemKeys[luckItem];
+            // victimPlayer.equipment[itemKeys[luckItem]].position = itemKeys[luckItem];
             const oldItemRating = Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
             const newItemRating = Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
             if (oldItemRating < newItemRating) {
@@ -404,7 +406,7 @@ const events = {
             if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find(equip => equip.position === enumHelper.equipment.types[itemKeys[luckItem]].position) !== undefined) {
               const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types[itemKeys[luckItem]].position)
                 .sort((item1, item2) => {
-                  return item1.power - item2.power;
+                  return item2.power - item1.power;
                 })[0];
               victimPlayer = Helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, equipFromInventory);
             } else {
@@ -481,7 +483,8 @@ const events = {
               Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
             ])
               .then(resolve(selectedPlayer));
-          });
+          })
+          .catch(err => errorLog.error(err));
       }
 
       return resolve(selectedPlayer);

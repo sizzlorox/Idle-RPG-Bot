@@ -204,7 +204,7 @@ const monsters = {
     crab = {
       name: 'Crab',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Shores', 'Swamp'],
+      spawnableBiomes: ['Land', 'Coast', 'Swamp'],
       power: 1.25,
       health: 9,
       stats: {
@@ -237,7 +237,7 @@ const monsters = {
     bat = {
       name: 'Bat',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Swamp',],
+      spawnableBiomes: ['Land', 'Caves', 'Forest', 'Haunted'],
       power: 1.25,
       health: 45,
       stats: {
@@ -270,7 +270,7 @@ const monsters = {
     slime = {
       name: 'Slime',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Tundra', 'Swamp', 'Plains', 'Forest', 'Barrows'],
+      spawnableBiomes: ['Land', 'Grassland', 'Plains', 'Forest', 'Plateau'],
       power: 1.5,
       health: 35,
       stats: {
@@ -303,7 +303,7 @@ const monsters = {
     pixie = {
       name: 'Pixie',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Sacred'],
+      spawnableBiomes: ['Land', 'Forest'],
       power: 1.5,
       health: 35,
       stats: {
@@ -336,7 +336,7 @@ const monsters = {
     goblin = {
       name: 'Goblin',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Barrows', 'Forest', 'Swamp', 'Plains'],
+      spawnableBiomes: ['Land', 'Forest', 'Plateau', 'Mountains', 'Plains'],
       power: 1.75,
       health: 50,
       stats: {
@@ -369,7 +369,7 @@ const monsters = {
     bandit = {
       name: 'Bandit',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Barrows', 'Forest', 'Plains'],
+      spawnableBiomes: ['Land', 'Plateau', 'Coast', 'Forest', 'Plains', 'Mountains'],
       power: 1.75,
       health: 75,
       stats: {
@@ -402,7 +402,7 @@ const monsters = {
     zombie = {
       name: 'Zombie',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Barren', 'Graveyard'],
+      spawnableBiomes: ['Land', 'Haunted'],
       power: 1.5,
       health: 65,
       stats: {
@@ -435,7 +435,7 @@ const monsters = {
     knight = {
       name: 'Knight',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Plains', 'Beach', 'Barrows', 'Mountains', 'Sacred'],
+      spawnableBiomes: ['Land', 'Forest', 'Plains', 'Coast', 'Plateau', 'Mountains', 'Haunted'],
       power: 1.75,
       health: 100,
       stats: {
@@ -468,7 +468,7 @@ const monsters = {
     necromancer = {
       name: 'Necromancer',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Barrows', 'Mountains', 'Graveyard'],
+      spawnableBiomes: ['Land', 'Haunted', 'Caves'],
       power: 2,
       health: 85,
       stats: {
@@ -501,7 +501,7 @@ const monsters = {
     gargoyle = {
       name: 'Gargoyle',
       isSpawnable: true,
-      spawnableBiomes: ['Graveyard'],
+      spawnableBiomes: ['Haunted', 'Mountains'],
       power: 2,
       health: 160,
       stats: {
@@ -534,7 +534,7 @@ const monsters = {
     bugbear = {
       name: 'Bugbear',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains', 'Forest', 'Barrows', 'Mountains', 'Barren', 'Caves'],
+      spawnableBiomes: ['Land', 'Plains', 'Forest', 'Plateau', 'Mountains', 'Caves'],
       power: 2.25,
       health: 175,
       stats: {
@@ -567,7 +567,7 @@ const monsters = {
     griffin = {
       name: 'Griffin',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains'],
+      spawnableBiomes: ['Land', 'Plains', 'Plateau'],
       power: 2,
       health: 120,
       stats: {
@@ -600,7 +600,7 @@ const monsters = {
     orc = {
       name: 'Orc',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains', 'Forest'],
+      spawnableBiomes: ['Land', 'Plains', 'Mountains', 'Forest'],
       power: 2.5,
       health: 125,
       stats: {
@@ -666,7 +666,7 @@ const monsters = {
     wereWolf = {
       name: 'Werewolf',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest'],
+      spawnableBiomes: ['Land', 'Forest', 'Mountains'],
       power: 2,
       health: 115,
       stats: {
@@ -699,7 +699,7 @@ const monsters = {
     basilisk = {
       name: 'Basilisk',
       isSpawnable: true,
-      spawnableBiomes: ['Mountains'],
+      spawnableBiomes: ['Caves'],
       power: 2.25,
       health: 190,
       stats: {
@@ -765,7 +765,7 @@ const monsters = {
     wraith = {
       name: 'Wraith',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Graveyard'],
+      spawnableBiomes: ['Land', 'Haunted'],
       power: 1.2,
       health: 95,
       stats: {
@@ -798,7 +798,7 @@ const monsters = {
     dragon = {
       name: 'Dragon',
       isSpawnable: true,
-      spawnableBiomes: ['Land'],
+      spawnableBiomes: ['Land', 'Mountains'],
       power: 3,
       health: 145,
       stats: {
@@ -898,7 +898,7 @@ const monsters = {
     giantSpider = {
       name: 'Giant Spider',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest'],
+      spawnableBiomes: ['Land', 'Forest', 'Desert'],
       power: 1,
       health: 75,
       stats: {
@@ -964,7 +964,7 @@ const monsters = {
     golem = {
       name: 'Golem',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Mountains', 'Plains'],
+      spawnableBiomes: ['Land', 'Mountains', 'Plains', 'Caves', 'Desert'],
       power: 2,
       health: 200,
       stats: {
@@ -1063,7 +1063,7 @@ const monsters = {
     demon = {
       name: 'Demon',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Graveyard'],
+      spawnableBiomes: ['Land', 'Haunted'],
       power: 2,
       health: 185,
       stats: {
@@ -1096,7 +1096,7 @@ const monsters = {
     elemental = {
       name: 'Elemental',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains', 'Forest', 'Mountains'],
+      spawnableBiomes: ['Land', 'Plains', 'Forest', 'Mountains', 'Desert'],
       power: 1,
       health: 150,
       stats: {
@@ -1162,7 +1162,7 @@ const monsters = {
     tribalWarrior = {
       name: 'Tribal Warrior',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Plains'],
+      spawnableBiomes: ['Land', 'Forest', 'Plains', 'Plateau'],
       power: 1,
       health: 110,
       stats: {

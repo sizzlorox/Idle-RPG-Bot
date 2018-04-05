@@ -235,31 +235,13 @@ const commands = [
     command: ['!map', '!m'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
-      const discordOnlinePlayers = discordBot.users
-        .filter(player => player.presence.status === 'online' && !player.bot
-          || player.presence.status === 'idle' && !player.bot
-          || player.presence.status === 'dnd' && !player.bot)
-        .map((player) => {
-          return player.id;
-        });
-      // enumHelper.roamingNpcs.forEach(npc => discordOnlinePlayers.push(npc.discordId));
+    function: (game, message) => {
+      let mapInfo = '';
+      maps.forEach((map) => {
+        mapInfo = mapInfo.concat(`\n${map.name} (${map.biome.name}) Coordinates: ${map.coords}`);
+      });
 
-      game.getOnlinePlayerMaps(discordOnlinePlayers)
-        .then((players) => {
-          let mapInfo = '';
-          maps.forEach((map) => {
-            mapInfo = mapInfo.concat(`\n${map.name} (${map.type.name}):\n`);
-            players.forEach((player) => {
-              if (player.map.name === map.name) {
-                mapInfo = mapInfo.concat(`${player.name.replace(/(\,)/g, '')}, `);
-              }
-            });
-            mapInfo = mapInfo.replace(/,\s*$/, '\n');
-          });
-
-          message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
-        });
+      message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
     }
   },
 
@@ -328,7 +310,7 @@ const commands = [
       }
 
       return message.author.send(`\`\`\`List of spells:
-        bless - 1500 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
+        bless - 1200 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
         home - 500 gold - Teleports you back to Kindale.
         \`\`\``);
     }
@@ -629,6 +611,18 @@ const commands = [
         .then(() => {
           message.author.send('Done.');
         });
+    }
+  },
+
+  aprilFools = {
+    command: '!aprilfools',
+    operatorOnly: true,
+    function: (game, message, discordBot) => {
+      const aprilfools = discordBot.guilds.find('name', 'Idle-RPG').members
+        .filter(player => player.presence.status === 'online' && !player.user.bot
+          || player.presence.status === 'idle' && !player.user.bot
+          || player.presence.status === 'dnd' && !player.user.bot);
+      aprilfools.forEach(player => player.send('Found a Mythical Alien Relic in Topscros Path'));
     }
   },
 

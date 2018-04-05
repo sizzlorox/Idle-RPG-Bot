@@ -393,6 +393,36 @@ ${rankString}
       });
   }
 
+  dailyLottery(discordBot, discordHook, guildName) {
+    const discordUsers = discordBot.guilds.size > 0
+      ? discordBot.guilds.find('name', guildName).members.filter(player => player.presence.status === 'online' && !player.user.bot
+        || player.presence.status === 'idle' && !player.user.bot
+        || player.presence.status === 'dnd' && !player.user.bot)
+        .map((player) => {
+          return {
+            name: player.nickname ? player.nickname : player.displayName,
+            discordId: player.id
+          };
+        })
+      : undefined;
+    const randomPlayer = Helper.randomBetween(0, discordUsers.length);
+
+    return Database.loadPlayer(discordUsers[randomPlayer].discordId)
+      .then((player) => {
+        const lotteryAmount = Helper.randomBetween(500, 5000);
+        const eventMsg = Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount}!`);
+        const eventLog = `Congratulations! You just won ${lotteryAmount} from the daily lottery!`;
+        player.gold.current += Number(lotteryAmount);
+        player.gold.total += Number(lotteryAmount);
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', player, false, eventMsg),
+          Helper.sendPrivateMessage(discordHook, player, eventLog, true),
+          Helper.logEvent(player, eventLog, 'pastEvents')
+        ])
+          .then(Database.savePlayer(player));
+      });
+  }
+
   setPlayerTitles(discordBot, selectedPlayer) {
     // TODO add to check if selectedPlayer is NPC
     const currentGuild = discordBot.guilds.array()[0];

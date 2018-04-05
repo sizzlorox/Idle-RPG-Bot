@@ -17,7 +17,7 @@
     "express": "^4.16.3",
     "jade": "^1.11.0",
     "jade-bootstrap": "^1.0.14",
-    "moment": "^2.21.0",
+    "moment": "^2.22.0",
     "mongoose": "^4.13.12",
     "querystring": "^0.2.0",
     "twitch-bot": "^1.2.5",
