@@ -8,16 +8,16 @@ class Monster {
 
   generateMonster(selectedPlayer) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.round(Helper.randomBetween(0, 100));
-      const randomTypeChance = Math.round(Helper.randomBetween(0, 100));
+      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100));
+      const randomTypeChance = Math.round(this.Helper.randomBetween(0, 100));
       const randomMonsterType = randomTypeChance + randomRarityChance > 100 ? 100 : randomTypeChance + randomRarityChance;
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
         && mobType.spawnableBiomes.includes(selectedPlayer.map.type.name));
 
-      const randomRarityIndex = Helper.randomBetween(0, monsterRarityList.length - 1);
-      const randomTypeIndex = Helper.randomBetween(0, monsterTypeList.length - 1);
+      const randomRarityIndex = this.Helper.randomBetween(0, monsterRarityList.length - 1);
+      const randomTypeIndex = this.Helper.randomBetween(0, monsterTypeList.length - 1);
 
       const monsterObj = {
         name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
@@ -41,8 +41,8 @@ class Monster {
 
   generateNewMonster(selectedPlayer) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.round(Helper.randomBetween(0, 100));
-      const randomTypeChance = Math.round(Helper.randomBetween(0, 100));
+      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100));
+      const randomTypeChance = Math.round(this.Helper.randomBetween(0, 100));
       const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
       const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
 
@@ -50,8 +50,8 @@ class Monster {
         && mobType.isSpawnable
         && mobType.spawnableBiomes.includes('Land'));
 
-      const randomRarityIndex = Helper.randomBetween(0, monsterRarityList.length - 1);
-      const randomTypeIndex = Helper.randomBetween(0, monsterTypeList.length - 1);
+      const randomRarityIndex = this.Helper.randomBetween(0, monsterRarityList.length - 1);
+      const randomTypeIndex = this.Helper.randomBetween(0, monsterTypeList.length - 1);
       const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4;
 
       const monsterObj = {
