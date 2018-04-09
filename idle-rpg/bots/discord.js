@@ -6,7 +6,7 @@ const { randomBetween } = require('../utils/Helper');
 const { welcomeLog, errorLog, infoLog } = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
-const Helper = require('../utils/Helper');
+const helper = require('../utils/Helper');
 const VirusTotal = require('../bots/modules/VirusTotal');
 const { CronJob } = require('cron');
 const {
@@ -36,6 +36,8 @@ const webHookOptions = {
   restTimeOffset: 500
 };
 
+const Helper = new helper();
+
 const discordBot = new Discord.Client();
 const actionHook = new Discord.WebhookClient(
   actionWebHookId,
@@ -55,7 +57,7 @@ const hook = {
   discordBot
 };
 
-const game = new Game(hook);
+const game = new Game(hook, Helper);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
 const dailyLotteryTime = '00 00 10 * * 0-6'; 
@@ -133,7 +135,7 @@ const heartBeat = () => {
 
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {
-      const playerTimer = randomBetween(minTimer, maxTimer);
+      const playerTimer = Helper.randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
         game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
         delete player.timer;
@@ -178,7 +180,7 @@ discordBot.on('message', (message) => {
       });
   }
 
-  CommandParser.parseUserCommand(game, discordBot, hook, message);
+  CommandParser.parseUserCommand(game, discordBot, hook, Helper, message);
 });
 
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {

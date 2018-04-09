@@ -1,10 +1,13 @@
 const maps = require('../data/maps');
-const Helper = require('../../utils/helper');
 
 class Map {
 
+  constructor(Helper) {
+    this.Helper = Helper;
+  }
+
   moveToRandomMap(selectedPlayer) {
-    const movement = Helper.randomBetween(0, 3);
+    const movement = this.Helper.randomBetween(0, 3);
     const mapSize = maps[maps.length - 1].coords;
 
     switch (movement) {

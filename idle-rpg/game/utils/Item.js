@@ -1,8 +1,11 @@
-const Helper = require('../../utils/Helper');
 const items = require('../data/items');
 const enumHelper = require('../../utils/enumHelper');
 
 class Item {
+
+  constructor(Helper) {
+    this.Helper = Helper;
+  }
 
   regenerateItemByName(item, position) {
     const itemName = item.name;

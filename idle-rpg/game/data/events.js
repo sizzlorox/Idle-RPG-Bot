@@ -1,8 +1,8 @@
-const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 const { pvpLevelRestriction } = require('../../../settings');
-
 const { infoLog, errorLog } = require('../../utils/logger');
+let Helper = require('../../utils/Helper');
+Helper = new Helper();
 
 const events = {
   movement: {

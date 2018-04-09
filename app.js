@@ -16,5 +16,8 @@ app.use('/', router);
 app.listen(PORT, () => console.log(`Idle RPG web listening on port ${PORT}!`));
 
 process.on('unhandledRejection', (reason, p) => {
-  errorLog.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
+  errorLog.error({
+    promise: p,
+    reason
+  });
 });

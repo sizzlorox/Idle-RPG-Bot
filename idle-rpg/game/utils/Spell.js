@@ -1,7 +1,10 @@
 const spells = require('../data/spells');
-const Helper = require('../../utils/Helper');
 
 class Spell {
+
+  constructor(Helper) {
+    this.Helper = Helper;
+  }
 
   generateSpell(selectedPlayer) {
     return new Promise((resolve) => {

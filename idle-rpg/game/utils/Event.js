@@ -1,23 +1,25 @@
-const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 const Battle = require('../utils/Battle');
 const Monster = require('../utils/Monster');
 const Item = require('../utils/Item');
 const Inventory = require('../utils/Inventory');
 const Spell = require('../utils/Spell');
-const Map = require('../utils/Map');
 const Database = require('../../database/Database');
 const events = require('../data/events');
 const { errorLog } = require('../../utils/logger');
+const Map = require('../utils/Map');
 
 class Event {
 
-  constructor() {
+  constructor(Helper) {
+    this.Helper = Helper;
+    this.Battle = new Battle(Helper);
+
     // Managers
-    this.MonsterManager = new Monster();
-    this.ItemManager = new Item();
-    this.MapManager = new Map();
-    this.SpellManager = new Spell();
+    this.MonsterManager = new Monster(Helper);
+    this.ItemManager = new Item(Helper);
+    this.MapManager = new Map(Helper);
+    this.SpellManager = new Spell(Helper);
     this.InventoryManager = new Inventory();
 
     // Events
@@ -46,7 +48,7 @@ class Event {
     return Database.getSameMapPlayers(selectedPlayer.map.name)
       .then(mappedPlayers => events.battle.pvpPreperation(selectedPlayer, mappedPlayers, onlinePlayers))
       .then(prepResults => prepResults.randomPlayer
-        ? Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
+        ? this.Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
         : this.attackEventMob(discordHook, selectedPlayer, multiplier)
           .catch(err => errorLog.error(err)))
       .then(battleResults => battleResults.attacker
@@ -59,22 +61,22 @@ class Event {
               return Promise.all([
                 events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
               ])
-                .then(promiseResults => Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)
+                .then(promiseResults => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)
                   .then(updatedVictim => Database.savePlayer(updatedVictim))
-                  .then(() => Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')));
+                  .then(() => this.Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')));
 
             case enumHelper.battle.outcomes.fled:
-              return Helper.checkExperience(battleResults.updatedDefender, discordHook, 'ToRemoveLater')
+              return this.Helper.checkExperience(battleResults.updatedDefender, discordHook, 'ToRemoveLater')
                 .then(updatedDefender => Database.savePlayer(updatedDefender))
-                .then(() => Helper.checkExperience(battleResults.updatedAttacker, discordHook, 'ToRemoveLater'));
+                .then(() => this.Helper.checkExperience(battleResults.updatedAttacker, discordHook, 'ToRemoveLater'));
 
             case enumHelper.battle.outcomes.lost:
               return Promise.all([
                 events.battle.steal(discordHook, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
               ])
-                .then(promiseResults => Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')
+                .then(promiseResults => this.Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')
                   .then(updatedDefender => Database.savePlayer(updatedDefender))
-                  .then(() => Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)));
+                  .then(() => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)));
           }
         }
 
@@ -84,7 +86,7 @@ class Event {
 
   attackEventMob(discordHook, selectedPlayer, multiplier) {
     return this.MonsterManager.generateNewMonster(selectedPlayer)
-      .then(mob => Battle.newSimulateBattle(selectedPlayer, mob))
+      .then(mob => this.Battle.newSimulateBattle(selectedPlayer, mob))
       .then(results => events.battle.pveResults(discordHook, this.MapManager, results, multiplier))
       .then((battleResults) => {
         switch (battleResults.result) {
@@ -92,13 +94,13 @@ class Event {
             return Promise.all([
               events.battle.dropItem(discordHook, battleResults.updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager)
             ])
-              .then(promiseResults => Helper.checkExperience(promiseResults[0], discordHook, 'ToRemoveLater'));
+              .then(promiseResults => this.Helper.checkExperience(promiseResults[0], discordHook, 'ToRemoveLater'));
 
           case enumHelper.battle.outcomes.fled:
-            return Helper.checkExperience(battleResults.updatedPlayer, discordHook, 'ToRemoveLater');
+            return this.Helper.checkExperience(battleResults.updatedPlayer, discordHook, 'ToRemoveLater');
 
           case enumHelper.battle.outcomes.lost:
-            return Helper.checkHealth(this.MapManager, battleResults.updatedPlayer, battleResults.updatedMob, discordHook);
+            return this.Helper.checkHealth(this.MapManager, battleResults.updatedPlayer, battleResults.updatedMob, discordHook);
         }
       });
   }
@@ -120,7 +122,7 @@ class Event {
   // Luck Events
   generateGodsEvent(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = Helper.randomBetween(1, 6);
+      const luckEvent = this.Helper.randomBetween(1, 6);
       switch (luckEvent) {
         case 1:
           return events.luck.gods.hades(discordHook, selectedPlayer)
@@ -128,7 +130,7 @@ class Event {
 
         case 2:
           return events.luck.gods.zeus(discordHook, selectedPlayer)
-            .then(updatedPlayer => Helper.checkHealth(this.MapManager, updatedPlayer, 'zeus', discordHook))
+            .then(updatedPlayer => this.Helper.checkHealth(this.MapManager, updatedPlayer, 'zeus', discordHook))
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 3:
@@ -141,7 +143,7 @@ class Event {
 
         case 5:
           return events.luck.gods.athena(discordHook, selectedPlayer)
-            .then(updatedPlayer => Helper.checkExperience(updatedPlayer, discordHook, 'removeLater'))
+            .then(updatedPlayer => this.Helper.checkExperience(updatedPlayer, discordHook, 'removeLater'))
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 6:
@@ -158,7 +160,7 @@ class Event {
 
   generateLuckItemEvent(discordHook, selectedPlayer) {
     return new Promise((resolve) => {
-      const luckItemDice = Helper.randomBetween(0, 100);
+      const luckItemDice = this.Helper.randomBetween(0, 100);
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
         return this.SpellManager.generateSpell(selectedPlayer)
@@ -189,7 +191,7 @@ class Event {
         }
 
         this.isBlizzardActive = true;
-        Helper.sendMessage(discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
+        this.Helper.sendMessage(discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
         return this.isBlizzardActive;
       case 'off':
         if (!this.isBlizzardActive) {
@@ -197,7 +199,7 @@ class Event {
         }
 
         this.isBlizzardActive = false;
-        Helper.sendMessage(discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!\'\`\`\`');
+        this.Helper.sendMessage(discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!\'\`\`\`');
         return this.isBlizzardActive;
     }
   }
@@ -226,4 +228,4 @@ class Event {
   }
 
 }
-module.exports = new Event();
+module.exports = Event;

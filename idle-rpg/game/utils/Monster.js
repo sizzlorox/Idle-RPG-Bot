@@ -1,7 +1,10 @@
-const Helper = require('../../utils/Helper');
 const monsters = require('../data/monsters');
 
 class Monster {
+
+  constructor(Helper) {
+    this.Helper = Helper;
+  }
 
   generateMonster(selectedPlayer) {
     return new Promise((resolve) => {

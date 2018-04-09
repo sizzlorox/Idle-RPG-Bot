@@ -681,4 +681,4 @@ class Helper {
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
   }
 }
-module.exports = new Helper();
+module.exports = Helper;

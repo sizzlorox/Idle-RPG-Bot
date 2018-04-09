@@ -1,7 +1,11 @@
-const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 
 class Battle {
+
+  constructor(Helper) {
+    this.Helper = Helper;
+  }
+
   simulateBattleWithMob(selectedPlayer, mobObj) {
     return new Promise((resolve) => {
       const playerDamage = Helper.sumPlayerTotalStrength(selectedPlayer);
@@ -473,4 +477,4 @@ class Battle {
   }
 
 }
-module.exports = new Battle();
+module.exports = Battle;
