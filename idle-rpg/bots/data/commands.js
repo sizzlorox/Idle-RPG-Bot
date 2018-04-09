@@ -3,7 +3,6 @@ const Space = require('../modules/Space');
 const Crypto = require('../modules/Crypto');
 const Urban = require('../modules/Urban');
 const maps = require('../../game/data/maps');
-const Helper = require('../../utils/Helper');
 const { commandChannel } = require('../../../settings');
 const enumHelper = require('../../utils/enumHelper');
 
@@ -45,7 +44,7 @@ const commands = [
     command: ['!character', '!c', '!char'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
+    function: (game, message, discordBot, Helper) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -87,7 +86,7 @@ const commands = [
     command: ['!inventory', '!inv', '!i'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
+    function: (game, message, discordBot, Helper) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -124,7 +123,7 @@ const commands = [
     command: ['!stats', '!s'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
+    function: (game, message, discordBot, Helper) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -161,7 +160,7 @@ const commands = [
     command: ['!equip', '!e'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
+    function: (game, message, discordBot, Helper) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -198,7 +197,7 @@ const commands = [
     command: ['!spellbook', '!sb'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
+    function: (game, message, discordBot, Helper) => {
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -249,7 +248,7 @@ const commands = [
     command: '!lore',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
+    function: (game, message, Helper) => {
       if (message.content.includes(' ')) {
         const splitMessage = message.content.split(/ (.+)/)[1].toLowerCase();
         const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage)
@@ -304,9 +303,9 @@ const commands = [
     command: ['!castspell', '!cs'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
-        return game.castSpell(message.author, discordHook, message.content.split(/ (.+)/)[1].toLowerCase());
+        return game.castSpell(message.author, message.content.split(/ (.+)/)[1].toLowerCase());
       }
 
       return message.author.send(`\`\`\`List of spells:
@@ -408,15 +407,15 @@ const commands = [
     command: '!pm',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(/ (.+)/);
         switch (splitCommand[1].toLowerCase()) {
           case 'on':
           case 'off':
-            return game.modifyPM(message.author, discordHook, splitCommand[1] === 'on', false);
+            return game.modifyPM(message.author, splitCommand[1] === 'on', false);
           case 'filtered':
-            return game.modifyPM(message.author, discordHook, true, true);
+            return game.modifyPM(message.author, true, true);
         }
       }
 
@@ -435,7 +434,7 @@ const commands = [
     command: '!mention',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
+    function: (game, message, discordBot) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(/ (.+)/);
 
@@ -445,7 +444,7 @@ const commands = [
           case 'off':
           case 'action':
           case 'move':
-            return game.modifyMention(message.author, discordHook, splitCommand[1].toLowerCase());
+            return game.modifyMention(message.author, splitCommand[1].toLowerCase());
         }
       }
 
@@ -465,7 +464,7 @@ const commands = [
     command: '!gender',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(/ (.+)/);
 
@@ -475,7 +474,7 @@ const commands = [
           case 'female':
           case 'neutral':
           case 'neuter':
-            return game.modifyGender(message.author, discordHook, splitCommand[1]);
+            return game.modifyGender(message.author, splitCommand[1]);
         }
       }
 
@@ -729,7 +728,7 @@ const commands = [
   urban = {
     command: '!urban',
     operatorOnly: false,
-    function: (game, message) => {
+    function: (game, message, Helper) => {
       if (message.content.includes(' ')) {
         const word = message.content.split(/ (.+)/)[1].toLowerCase().replace(' ', '+');
 

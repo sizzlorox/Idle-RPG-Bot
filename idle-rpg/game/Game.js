@@ -1,8 +1,6 @@
-const Helper = require('../utils/Helper');
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
-const { errorLog } = require('../utils/logger');
 const { multiplier } = require('../../settings');
 const globalSpells = require('./data/globalSpells');
 
@@ -11,10 +9,14 @@ const globalSpells = require('./data/globalSpells');
  */
 class Game {
 
-  constructor(discordHook) {
+  constructor(discordHook, Helper) {
     this.discordHook = discordHook;
     this.multiplier = multiplier;
     this.activeSpells = [];
+
+    this.Helper = Helper;
+    this.Database = new Database(Helper);
+    this.Event = new Event(this.Database, Helper, discordHook);
   }
 
   /**
@@ -24,20 +26,20 @@ class Game {
    * @param {*} twitchBot
    */
   selectEvent(discordBot, player, onlinePlayers, twitchBot) {
-    const randomEvent = Helper.randomBetween(0, 2);
+    const randomEvent = this.Helper.randomBetween(0, 2);
 
-    Database.loadPlayer(player.discordId)
+    this.Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          return Database.createNewPlayer(player.discordId, player.name)
+          return this.Database.createNewPlayer(player.discordId, player.name)
             .then((newPlayer) => {
-              Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
+              this.Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
 
               return newPlayer;
             });
         } else if (selectedPlayer.events === 0) {
-          selectedPlayer.map = Event.MapClass.getRandomTown();
-          Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
+          selectedPlayer.map = this.Event.MapClass.getRandomTown();
+          this.Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
         }
 
         return selectedPlayer;
@@ -47,36 +49,36 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
-        if (process.env.NODE_ENV === 'production') {
-          this.setPlayerTitles(discordBot, selectedPlayer);
-        }
-
         selectedPlayer.name = player.name;
 
-        Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
+        this.Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
         switch (randomEvent) {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
             return this.moveEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 1:
             console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
             return this.attackEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 2:
             console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
             return this.luckEvent(selectedPlayer)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
         }
       })
       .then((updatedPlayer) => {
         if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
-          Helper.sendMessage(this.discordHook, twitchBot, updatedPlayer, false, Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
-            .then(Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
+          this.Helper.sendMessage(this.discordHook, twitchBot, updatedPlayer, false, this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
+            .then(this.Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
         }
+        return updatedPlayer;
+      })
+      .then((updatedPlayer) => {
+        this.setPlayerTitles(discordBot, updatedPlayer);
       })
       .catch(err => console.log(err));
   }
@@ -84,13 +86,13 @@ class Game {
   moveEvent(selectedPlayer, onlinePlayers) {
     return new Promise((resolve) => {
       const pastMoveCount = selectedPlayer.pastEvents.slice(Math.max(selectedPlayer.pastEvents.length - 5, 1)).filter(event => event.event.includes('and arrived in')).length;
-      if (pastMoveCount >= 5 && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+      if (pastMoveCount >= 5 && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         console.log(`GAME: ${pastMoveCount} count: from move event ${selectedPlayer.name} activated an attack event.`);
         return this.attackEvent(selectedPlayer, onlinePlayers)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return Event.moveEvent(selectedPlayer, this.discordHook)
+      return this.Event.moveEvent(selectedPlayer)
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
@@ -102,30 +104,30 @@ class Game {
    */
   attackEvent(selectedPlayer, onlinePlayers) {
     return new Promise((resolve) => {
-      const luckDice = Helper.randomBetween(0, 100);
-      if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
-        return Event.sellInTown(this.discordHook, selectedPlayer)
-          .then(updatedPlayer => Event.generateTownItemEvent(this.discordHook, updatedPlayer))
+      const luckDice = this.Helper.randomBetween(0, 100);
+      if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
+        return this.Event.sellInTown(selectedPlayer)
+          .then(updatedPlayer => this.Event.generateTownItemEvent(updatedPlayer))
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !Event.MapClass.getTowns().includes(selectedPlayer.map.name)
+      if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)
         && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return Event.attackEventPlayerVsPlayer(this.discordHook, selectedPlayer, onlinePlayers, this.multiplier)
+        return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, this.multiplier)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      if (!Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+      if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return Event.attackEventMob(this.discordHook, selectedPlayer, this.multiplier)
+          return this.Event.attackEventMob(selectedPlayer, this.multiplier)
             .then(updatedPlayer => resolve(updatedPlayer));
         }
 
-        return Event.campEvent(this.discordHook, selectedPlayer)
+        return this.Event.campEvent(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return Event.generateLuckItemEvent(this.discordHook, selectedPlayer)
+      return this.Event.generateLuckItemEvent(selectedPlayer)
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
@@ -136,43 +138,43 @@ class Game {
    */
   luckEvent(selectedPlayer) {
     return new Promise((resolve) => {
-      const luckDice = Helper.randomBetween(0, 100);
+      const luckDice = this.Helper.randomBetween(0, 100);
       if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
-        return Event.generateGodsEvent(this.discordHook, selectedPlayer)
+        return this.Event.generateGodsEvent(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      if (Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
-        return Event.generateGamblingEvent(this.discordHook, selectedPlayer)
+      if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
+        return this.Event.generateGamblingEvent(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      if (Event.isBlizzardActive && Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
-        return Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer)
+      if (this.Event.isBlizzardActive && this.Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
+        return this.Event.chanceToCatchSnowflake(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
-        return Event.generateLuckItemEvent(this.discordHook, selectedPlayer)
+        return this.Event.generateLuckItemEvent(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier)
+      return this.Event.generateGoldEvent(selectedPlayer, this.multiplier)
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
 
   // Event
   powerHourBegin() {
-    Helper.sendMessage(this.discordHook, 'twitch', undefined, false, Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+    this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, this.Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
 
     setTimeout(() => {
-      Helper.sendMessage(this.discordHook, 'twitch', undefined, false, Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+      this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
       this.multiplier += 1;
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
-      Helper.sendMessage(this.discordHook, 'twitch', undefined, false, Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+      this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
       this.multiplier -= 1;
       this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
     }, 5400000); // 1hr 30 minutes
@@ -184,11 +186,11 @@ class Game {
    * @param {Number} amount
    */
   giveGold(playerId, amount) {
-    return Database.loadPlayer(playerId)
+    return this.Database.loadPlayer(playerId)
       .then((updatingPlayer) => {
         updatingPlayer.gold.current += Number(amount);
         updatingPlayer.gold.total += Number(amount);
-        Database.savePlayer(updatingPlayer);
+        this.Database.savePlayer(updatingPlayer);
       });
   }
 
@@ -198,7 +200,7 @@ class Game {
    * @param {String} type
    */
   top10(commandAuthor, type = { level: -1 }) {
-    return Database.loadTop10(type)
+    return this.Database.loadTop10(type)
       .then((top10) => {
         const rankString = `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
           .sort((player1, player2) => {
@@ -225,11 +227,10 @@ ${rankString}
   /**
    * Modify player preference for being @mentionned in events
    * @param {Number} commandAuthor
-   * @param {DiscordHook} hook
    * @param {Boolean} isMentionInDiscord
    */
-  modifyMention(commandAuthor, hook, isMentionInDiscord) {
-    return Database.loadPlayer(commandAuthor.id)
+  modifyMention(commandAuthor, isMentionInDiscord) {
+    return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -238,10 +239,8 @@ ${rankString}
         if (castingPlayer.isMentionInDiscord !== isMentionInDiscord) {
           castingPlayer.isMentionInDiscord = isMentionInDiscord;
 
-          return Database.savePlayer(castingPlayer)
-            .then(() => {
-              return commandAuthor.send('Preference for being @mention has been updated.');
-            });
+          return this.Database.savePlayer(castingPlayer)
+            .then(() => commandAuthor.send('Preference for being @mention has been updated.'));
         }
 
         return commandAuthor.send('Your @mention preference is already set to this value.');
@@ -251,11 +250,10 @@ ${rankString}
   /**
    * Modify player preference for being private messaged in events
    * @param {Number} commandAuthor
-   * @param {DiscordHook} hook
    * @param {Boolean} isMentionInDiscord
    */
-  modifyPM(commandAuthor, hook, isPrivateMessage, filtered) {
-    return Database.loadPlayer(commandAuthor.id)
+  modifyPM(commandAuthor, isPrivateMessage, filtered) {
+    return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -265,10 +263,8 @@ ${rankString}
           castingPlayer.isPrivateMessage = isPrivateMessage;
           castingPlayer.isPrivateMessageImportant = filtered;
 
-          return Database.savePlayer(castingPlayer)
-            .then(() => {
-              return commandAuthor.send('Preference for being PMed has been updated.');
-            });
+          return this.Database.savePlayer(castingPlayer)
+            .then(() => commandAuthor.send('Preference for being PMed has been updated.'));
         }
 
         return commandAuthor.send('Your PM preference is already set to this value.');
@@ -278,11 +274,10 @@ ${rankString}
   /**
    * Modify player gender
    * @param Player commandAuthor
-   * @param DiscordHook hook
    * @param String gender
    */
-  modifyGender(commandAuthor, hook, gender) {
-    return Database.loadPlayer(commandAuthor.id)
+  modifyGender(commandAuthor, gender) {
+    return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -290,10 +285,8 @@ ${rankString}
 
         if (castingPlayer.gender !== gender) {
           castingPlayer.gender = gender;
-          return Database.savePlayer(castingPlayer)
-            .then(() => {
-              return commandAuthor.send('Gender has been updated.');
-            });
+          return this.Database.savePlayer(castingPlayer)
+            .then(() => commandAuthor.send('Gender has been updated.'));
         }
 
         return commandAuthor.send('Your gender is already set to this value.');
@@ -303,11 +296,10 @@ ${rankString}
   /**
    * Casts spell
    * @param {Number} commandAuthor
-   * @param {DiscordHook} hook
    * @param {String} spell
    */
-  castSpell(commandAuthor, hook, spell) {
-    return Database.loadPlayer(commandAuthor.id)
+  castSpell(commandAuthor, spell) {
+    return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
@@ -322,23 +314,19 @@ ${rankString}
 
               this.activeSpells.push(blessLogObj);
 
-              let activeBlessCount = this.activeSpells.filter((bless) => {
-                return bless.spellName === 'Bless';
-              }).length;
+              let activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
 
-              hook.actionHook.send(Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
+              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               setTimeout(() => {
                 this.multiplier -= 1;
                 this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
                 this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
-                activeBlessCount = this.activeSpells.filter((bless) => {
-                  return bless.spellName === 'Bless';
-                }).length;
+                activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
 
-                hook.actionHook.send(Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
+                this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               }, 1800000); // 30 minutes
 
-              Database.savePlayer(castingPlayer)
+              this.Database.savePlayer(castingPlayer)
                 .then(() => {
                   commandAuthor.send('Spell has been casted!');
                 });
@@ -350,11 +338,11 @@ ${rankString}
           case 'home':
             if (castingPlayer.gold.current >= globalSpells.home.spellCost) {
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
-              const Kindale = Event.MapClass.getMapByIndex(4);
+              const Kindale = this.Event.MapClass.getMapByIndex(4);
               castingPlayer.map = Kindale;
-              hook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
+              this.discordHook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
 
-              Database.savePlayer(castingPlayer)
+              this.Database.savePlayer(castingPlayer)
                 .then(() => {
                   commandAuthor.send('Spell has been casted!');
                 });
@@ -372,10 +360,10 @@ ${rankString}
    * @param {Number} amount
    */
   setPlayerBounty(recipient, amount) {
-    return Database.loadPlayer(recipient)
+    return this.Database.loadPlayer(recipient)
       .then((player) => {
         player.currentBounty = amount;
-        return Database.savePlayer(player);
+        return this.Database.savePlayer(player);
       });
   }
 
@@ -385,15 +373,15 @@ ${rankString}
    * @param {Number} amount
    */
   setPlayerGold(recipient, amount) {
-    return Database.loadPlayer(recipient)
+    return this.Database.loadPlayer(recipient)
       .then((player) => {
         player.gold.current = Number(amount);
         player.gold.total += Number(amount);
-        return Database.savePlayer(player);
+        return this.Database.savePlayer(player);
       });
   }
 
-  dailyLottery(discordBot, discordHook, guildName) {
+  dailyLottery(discordBot, guildName) {
     const discordUsers = discordBot.guilds.size > 0
       ? discordBot.guilds.find('name', guildName).members.filter(player => player.presence.status === 'online' && !player.user.bot
         || player.presence.status === 'idle' && !player.user.bot
@@ -405,26 +393,34 @@ ${rankString}
           };
         })
       : undefined;
-    const randomPlayer = Helper.randomBetween(0, discordUsers.length);
+    const randomPlayer = this.Helper.randomBetween(0, discordUsers.length);
 
-    return Database.loadPlayer(discordUsers[randomPlayer].discordId)
+    return this.Database.loadPlayer(discordUsers[randomPlayer].discordId)
       .then((player) => {
-        const lotteryAmount = Helper.randomBetween(500, 5000);
-        const eventMsg = Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount}!`);
+        if (enumHelper.roamingNpcs.includes({ name: player.name }) || enumHelper.mockPlayers.includes({ name: player.name })) {
+          return;
+        }
+
+        const lotteryAmount = this.Helper.randomBetween(500, 5000);
+        const eventMsg = this.Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount}!`);
         const eventLog = `Congratulations! You just won ${lotteryAmount} from the daily lottery!`;
         player.gold.current += Number(lotteryAmount);
         player.gold.total += Number(lotteryAmount);
+        infoLog.info({ dailyLottery: eventMsg });
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', player, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, player, eventLog, true),
-          Helper.logEvent(player, eventLog, 'pastEvents')
+          this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
+          this.Helper.sendPrivateMessage(this.discordHook, player, eventLog, true),
+          this.Helper.logEvent(player, eventLog, 'pastEvents')
         ])
-          .then(Database.savePlayer(player));
+          .then(this.Database.savePlayer(player));
       });
   }
 
   setPlayerTitles(discordBot, selectedPlayer) {
-    // TODO add to check if selectedPlayer is NPC
+    if (enumHelper.roamingNpcs.includes({ name: selectedPlayer.name }) || enumHelper.mockPlayers.includes({ name: selectedPlayer.name })) {
+      return selectedPlayer;
+    }
+
     const currentGuild = discordBot.guilds.array()[0];
     const playerDiscordObj = currentGuild.members
       .filterArray(member => member.id === selectedPlayer.discordId)[0];
@@ -435,60 +431,55 @@ ${rankString}
     const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
     if (selectedPlayer.gold.current >= 10000 && !hasGoldTitle) {
       playerDiscordObj.addRole(goldTitleRole);
-      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
     } else if (selectedPlayer.gold.current < 10000 && hasGoldTitle) {
       playerDiscordObj.removeRole(goldTitleRole);
-      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
     }
 
     const hasThiefTitle = playerDiscordObj.roles.array().includes(thiefTitleRole);
     if (selectedPlayer.stole >= 50 && !hasThiefTitle) {
       playerDiscordObj.addRole(thiefTitleRole);
-      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Thief title!`));
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Thief title!`));
     } else if (selectedPlayer.stole < 50 && hasThiefTitle) {
       playerDiscordObj.removeRole(thiefTitleRole);
-      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} lost the Thief title!`));
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Thief title!`));
     }
 
     const hasVeteranTitle = playerDiscordObj.roles.array().includes(veteranTitleRole);
     if (selectedPlayer.events >= 10000 && !hasVeteranTitle) {
       playerDiscordObj.addRole(veteranTitleRole);
-      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Veteran Idler title!`));
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Veteran Idler title!`));
     } else if (selectedPlayer.events < 10000 && hasVeteranTitle) {
       playerDiscordObj.removeRole(veteranTitleRole);
-      this.discordHook.actionHook.send(Helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
     }
   }
 
   /**
    * places a bounty on specific player
-   * @param {DiscordHook} discordHook
    * @param {Number} playerId
    * @param {Number} recipient
    * @param {Number} amount
    */
-  placeBounty(discordHook, bountyPlacer, recipient, amount) {
-    return Database.loadPlayer(bountyPlacer.id)
+  placeBounty(bountyPlacer, recipient, amount) {
+    return this.Database.loadPlayer(bountyPlacer.id)
       .then((placer) => {
         if (placer.gold.current >= amount) {
           placer.gold.current -= amount;
 
-          return Database.savePlayer(placer)
+          return this.Database.savePlayer(placer)
             .then(() => {
-              return Database.loadPlayer(recipient)
+              return this.Database.loadPlayer(recipient)
                 .then((bountyRecipient) => {
                   if (!bountyRecipient) {
                     return bountyPlacer.send('This player does not exist.');
                   }
                   bountyRecipient.currentBounty += amount;
-                  discordHook.actionHook.send(
-                    Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
-                  );
+                  this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
 
-                  return Database.savePlayer(bountyRecipient)
-                    .then(() => {
-                      return bountyPlacer.send(`Bounty of ${amount} gold has been placed`);
-                    });
+                  return this.Database.savePlayer(bountyRecipient)
+                    .then(() => bountyPlacer.send(`Bounty of ${amount} gold has been placed`));
                 });
             });
         }
@@ -503,13 +494,13 @@ ${rankString}
    * @param {Number} count
    */
   playerEventLog(playerId, count) {
-    return Database.loadPlayer(playerId, enumHelper.playerEventLogSelectFields)
+    return this.Database.loadPlayer(playerId, enumHelper.playerEventLogSelectFields)
       .then((player) => {
         if (!player) {
           return;
         }
 
-        return Helper.generateLog(player, count);
+        return this.Helper.generateLog(player, count);
       });
   }
 
@@ -519,13 +510,13 @@ ${rankString}
    * @param {Number} count
    */
   playerPvpLog(playerId, count) {
-    return Database.loadPlayer(playerId, enumHelper.pvpLogSelectFields)
+    return this.Database.loadPlayer(playerId, enumHelper.pvpLogSelectFields)
       .then((player) => {
         if (!player) {
           return;
         }
 
-        return Helper.generatePvpLog(player, count);
+        return this.Helper.generatePvpLog(player, count);
       });
   }
 
@@ -534,7 +525,7 @@ ${rankString}
    * @param {Number} commandAuthor
    */
   playerStats(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
+    return this.Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
   }
 
   /**
@@ -542,7 +533,7 @@ ${rankString}
    * @param {Number} commandAuthor
    */
   playerInventory(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id, enumHelper.inventorySelectFields);
+    return this.Database.loadPlayer(commandAuthor.id, enumHelper.inventorySelectFields);
   }
 
   /**
@@ -550,7 +541,7 @@ ${rankString}
    * @param {Number} commandAuthor
    */
   playerEquipment(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id, enumHelper.equipSelectFields);
+    return this.Database.loadPlayer(commandAuthor.id, enumHelper.equipSelectFields);
   }
 
   /**
@@ -558,7 +549,7 @@ ${rankString}
    * @param {Array} onlinePlayers
    */
   getOnlinePlayerMaps(onlinePlayers) {
-    return Database.loadOnlinePlayerMaps(onlinePlayers);
+    return this.Database.loadOnlinePlayerMaps(onlinePlayers);
   }
 
   /**
@@ -566,7 +557,7 @@ ${rankString}
    * @param {Number} player
    */
   savePlayer(player) {
-    return Database.savePlayer(player);
+    return this.Database.savePlayer(player);
   }
 
   /**
@@ -574,7 +565,7 @@ ${rankString}
    * @param {Number} playerId
    */
   loadPlayer(playerId) {
-    return Database.loadPlayer(playerId);
+    return this.Database.loadPlayer(playerId);
   }
 
   /**
@@ -582,48 +573,48 @@ ${rankString}
    * @param {Number} playerId
    */
   deletePlayer(playerId) {
-    return Database.deletePlayer(playerId);
+    return this.Database.deletePlayer(playerId);
   }
 
   /**
    * Deletes all players in database
    */
   deleteAllPlayers() {
-    return Database.resetAllPlayers();
+    return this.Database.resetAllPlayers();
   }
 
   /**
    * SPECIAL EVENTS
    */
   blizzardSwitch(blizzardSwitch) {
-    return Event.blizzardSwitch(this.discordHook, blizzardSwitch);
+    return this.Event.blizzardSwitch(this.discordHook, blizzardSwitch);
   }
 
   /**
    * Sends Christmas Pre Event Message and another pre event message after 21 hours
    */
   sendChristmasFirstPreEventMessage() {
-    return Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
+    return this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
   }
 
   sendChristmasSecondPreEventMessage() {
-    return Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
+    return this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
   }
 
   // TODO change to utilize setTimeout
   /**
    * Activates christmas mobs to be spawnable and items droppable
-   * @param {*} isStarting 
+   * @param {*} isStarting
    */
   updateChristmasEvent(isStarting) {
     if (isStarting) {
-      Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
-      Event.MonsterClass.monsters.forEach((mob) => {
+      this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      this.Event.MonsterClass.monsters.forEach((mob) => {
         if (mob.isXmasEvent) {
           mob.isSpawnable = true;
         }
       });
-      Event.ItemClass.items.forEach((type) => {
+      this.Event.ItemClass.items.forEach((type) => {
         type.forEach((item) => {
           if (item.isXmasEvent && item.name !== 'Snowflake') {
             item.isDroppable = true;
@@ -633,13 +624,13 @@ ${rankString}
       return '';
     }
 
-    Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
-    Event.MonsterClass.monsters.forEach((mob) => {
+    this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
+    this.Event.MonsterClass.monsters.forEach((mob) => {
       if (mob.isXmasEvent) {
         mob.isSpawnable = false;
       }
     });
-    Event.ItemClass.items.forEach((type) => {
+    this.Event.ItemClass.items.forEach((type) => {
       type.forEach((item) => {
         if (item.isXmasEvent && item.name !== 'Snowflake') {
           item.isDroppable = false;

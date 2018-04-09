@@ -2,7 +2,6 @@ const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
 const util = require('util');
-const { randomBetween } = require('../utils/Helper');
 const { welcomeLog, errorLog, infoLog } = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
@@ -36,6 +35,8 @@ const webHookOptions = {
   restTimeOffset: 500
 };
 
+const helper = new Helper();
+
 const discordBot = new Discord.Client();
 const actionHook = new Discord.WebhookClient(
   actionWebHookId,
@@ -55,10 +56,10 @@ const hook = {
   discordBot
 };
 
-const game = new Game(hook);
+const game = new Game(hook, helper);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
-const dailyLotteryTime = '00 00 10 * * 0-6'; 
+const dailyLotteryTime = '00 00 10 * * 0-6';
 const timeZone = 'America/Los_Angeles';
 let minTimer = (minimalTimer * 1000) * 60;
 let maxTimer = (maximumTimer * 1000) * 60;
@@ -85,7 +86,7 @@ const processDetails = () => {
 
   console.log('------------');
   console.log(`\n\nHeap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
-  console.log(`Current Up Time: ${Helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
+  console.log(`Current Up Time: ${helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
   console.log('------------');
 };
 
@@ -133,7 +134,7 @@ const heartBeat = () => {
 
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {
-      const playerTimer = randomBetween(minTimer, maxTimer);
+      const playerTimer = helper.randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
         game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
         delete player.timer;
@@ -178,7 +179,7 @@ discordBot.on('message', (message) => {
       });
   }
 
-  CommandParser.parseUserCommand(game, discordBot, hook, message);
+  CommandParser.parseUserCommand(game, discordBot, hook, helper, message);
 });
 
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {
@@ -217,7 +218,7 @@ new CronJob({
 new CronJob({
   cronTime: dailyLotteryTime,
   onTick: () => {
-    game.dailyLottery(discordBot, hook, guildName);
+    game.dailyLottery(discordBot, guildName);
   },
   start: false,
   timeZone,

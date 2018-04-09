@@ -1,5 +1,4 @@
 const fs = require('fs');
-const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog, infoLog } = require('../utils/logger');
 const { battleDebug, eventDebug, guildID } = require('../../settings');
@@ -295,8 +294,8 @@ class Helper {
     selectedPlayer.equipment[equipment].name = item.name;
     const oldItemRating = this.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
     const newItemRating = this.calculateItemRating(selectedPlayer, item);
-    if (oldItemRating < newItemRating) {
-      infoLog.info({ player: selectedPlayer.name, old: { itemName: item.name, power: oldItemRating }, new: { itemName: item.name, power: newItemRating } });
+    if (oldItemRating > newItemRating) {
+      infoLog.info({ player: selectedPlayer.name, old: { itemName: selectedPlayer.equipment[item.position], power: oldItemRating }, new: { itemName: item.name, power: newItemRating } });
     }
     if (equipment !== enumHelper.equipment.types.relic.position) {
       selectedPlayer.equipment[equipment].power = item.power;
@@ -393,8 +392,6 @@ class Helper {
 
           selectedPlayer.deaths.player++;
           attackerObj.kills.player++;
-          Database.savePlayer(attackerObj);
-          Database.savePlayer(selectedPlayer);
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`);
@@ -681,4 +678,4 @@ class Helper {
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
   }
 }
-module.exports = new Helper();
+module.exports = Helper;

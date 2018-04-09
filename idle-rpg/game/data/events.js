@@ -1,8 +1,6 @@
-const Helper = require('../../utils/Helper');
 const enumHelper = require('../../utils/enumHelper');
 const { pvpLevelRestriction } = require('../../../settings');
-
-const { infoLog, errorLog } = require('../../utils/logger');
+const { errorLog } = require('../../utils/logger');
 
 const events = {
   movement: {
@@ -13,7 +11,7 @@ const events = {
      * @param { map, direction } mapObj
      * @returns {Player} updatedPlayer
      */
-    movePlayer: (discordHook, selectedPlayer, mapObj) => new Promise((resolve) => {
+    movePlayer: (discordHook, Helper, selectedPlayer, mapObj) => new Promise((resolve) => {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
@@ -34,7 +32,7 @@ const events = {
    * @param {Player} selectedPlayer
    * @returns {Player} updatedPlayer
    */
-  camp: (discordHook, selectedPlayer) => new Promise((resolve) => {
+  camp: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
     selectedPlayer = Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
     // TODO: Make more camp event messages to be selected randomly
     const { eventMsg, eventLog } = Helper.randomCampEventMessage(selectedPlayer);
@@ -54,7 +52,7 @@ const events = {
      * @param {Player} selectedPlayer
      * @returns {Player} updatedPlayer
      */
-    sell: (discordHook, selectedPlayer) => new Promise((resolve) => {
+    sell: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
       if (selectedPlayer.inventory.equipment.length > 0) {
         let profit = 0;
         Helper.printEventDebug(selectedPlayer.inventory.equipment);
@@ -62,9 +60,6 @@ const events = {
           Helper.printEventDebug(`Equipment selling: ${equipment.name}`);
           profit += Number(equipment.gold);
         });
-        if (isNaN(profit)) {
-          profit = 100;
-        }
         selectedPlayer.inventory.equipment.length = 0;
         profit = Math.floor(profit);
         selectedPlayer.gold.current += profit;
@@ -92,7 +87,7 @@ const events = {
      * @param {InventoryManager} InventoryManager
      * @returns {Player} updatedPlayer
      */
-    item: (discordHook, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
+    item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
       const itemCost = Math.round(item.gold);
 
       if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
@@ -136,7 +131,7 @@ const events = {
      * @param {PlayerList} onlinePlayers
      * @returns {Player} randomPlayer
      */
-    pvpPreperation: (selectedPlayer, mappedPlayers, onlinePlayers) => new Promise((resolve) => {
+    pvpPreperation: (Helper, selectedPlayer, mappedPlayers, onlinePlayers) => new Promise((resolve) => {
       if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
         const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
           && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
@@ -161,7 +156,7 @@ const events = {
      * @param { attacker, defender, attackerDamage, defenderDamage } battleResults
      * @returns { result, updatedAttacker, updatedDefender } updatedBattleResults
      */
-    pvpResults: (discordHook, { attacker, defender, attackerDamage, defenderDamage }) => new Promise((resolve) => {
+    pvpResults: (discordHook, Helper, { attacker, defender, attackerDamage, defenderDamage }) => new Promise((resolve) => {
       const defenderMaxHealth = 100 + (defender.level * 5);
       const playerMaxHealth = 100 + (attacker.level * 5);
 
@@ -270,11 +265,11 @@ const events = {
      * @param {Number} multiplier
      * @returns { result, updatedAttacker, updatedDefender } updatedBattleResults
      */
-    pveResults: (discordHook, MapClass, results, multiplier) => new Promise((resolve) => {
+    pveResults: (discordHook, Helper, MapClass, results, multiplier) => new Promise((resolve) => {
       const mobMaxHealth = results.defender.maxHealth;
       const playerMaxHealth = 100 + (results.attacker.level * 5);
 
-      let selectedPlayer = results.attacker;
+      const selectedPlayer = results.attacker;
       const battleResult = `Battle Results:
           ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${results.attackerDamage} damage.
           ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
@@ -354,7 +349,7 @@ const events = {
         }));
     }),
 
-    steal: (discordHook, stealingPlayer, victimPlayer, InventoryManager) => new Promise((resolve) => {
+    steal: (discordHook, Helper, stealingPlayer, victimPlayer, InventoryManager) => new Promise((resolve) => {
       const luckStealChance = Helper.randomBetween(0, 100);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
@@ -405,9 +400,7 @@ const events = {
             }
             if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find(equip => equip.position === enumHelper.equipment.types[itemKeys[luckItem]].position) !== undefined) {
               const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types[itemKeys[luckItem]].position)
-                .sort((item1, item2) => {
-                  return item2.power - item1.power;
-                })[0];
+                .sort((item1, item2) => item2.power - item1.power)[0];
               victimPlayer = Helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, equipFromInventory);
             } else {
               victimPlayer = Helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, enumHelper.equipment.empty[itemKeys[luckItem]]);
@@ -451,7 +444,7 @@ const events = {
       return resolve({ stealingPlayer, victimPlayer });
     }),
 
-    dropItem: (discordHook, selectedPlayer, mob, ItemManager, InventoryManager) => new Promise((resolve) => {
+    dropItem: (discordHook, Helper, selectedPlayer, mob, ItemManager, InventoryManager) => new Promise((resolve) => {
       const dropitemChance = Helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
@@ -493,7 +486,7 @@ const events = {
 
   luck: {
     item: {
-      spell: (discordHook, selectedPlayer, spell) => new Promise((resolve) => {
+      spell: (discordHook, Helper, selectedPlayer, spell) => new Promise((resolve) => {
         const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, spell);
         if (selectedPlayer.spells.length > 0) {
           let shouldAddToList = false;
@@ -533,7 +526,7 @@ const events = {
         return resolve(selectedPlayer);
       }),
 
-      item: (discordHook, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
+      item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
         const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, item);
         if (item.position !== enumHelper.inventory.position) {
           const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
@@ -556,7 +549,7 @@ const events = {
       })
     },
 
-    gold: (discordHook, selectedPlayer, multiplier) => new Promise((resolve) => {
+    gold: (discordHook, Helper, selectedPlayer, multiplier) => new Promise((resolve) => {
       const luckGoldChance = Helper.randomBetween(0, 100);
       if (luckGoldChance >= 75) {
         const luckGoldDice = Helper.randomBetween(5, 100);
@@ -578,7 +571,7 @@ const events = {
       return resolve(selectedPlayer);
     }),
 
-    gambling: (discordHook, selectedPlayer) => new Promise((resolve) => {
+    gambling: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
       if (selectedPlayer.gold.current < 10) {
         return resolve(selectedPlayer);
       }
@@ -616,7 +609,7 @@ const events = {
     }),
 
     gods: {
-      hades: (discordHook, selectedPlayer) => new Promise((resolve) => {
+      hades: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
         const luckExpAmount = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
         selectedPlayer.experience.current -= luckExpAmount;
         selectedPlayer.experience.lost += luckExpAmount;
@@ -635,7 +628,7 @@ const events = {
           .then(resolve(selectedPlayer));
       }),
 
-      zeus: (discordHook, selectedPlayer) => new Promise((resolve) => {
+      zeus: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
         const luckHealthAmount = Helper.randomBetween(5, 50 + (selectedPlayer.level * 2));
         selectedPlayer.health -= luckHealthAmount;
 
@@ -650,7 +643,7 @@ const events = {
           .then(resolve(selectedPlayer));
       }),
 
-      aseco: (discordHook, selectedPlayer) => new Promise((resolve) => {
+      aseco: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
         const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
         let eventMsgAseco = '';
         let eventLogAseco = '';
@@ -681,7 +674,7 @@ const events = {
           .then(resolve(selectedPlayer));
       }),
 
-      hermes: (discordHook, selectedPlayer) => new Promise((resolve) => {
+      hermes: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
         let eventMsgHermes = '';
         let eventLogHermes = '';
         if (selectedPlayer.gold.current < (selectedPlayer.gold.current / 6)) {
@@ -697,7 +690,7 @@ const events = {
         }
 
         const goldTaken = Math.round(selectedPlayer.gold.current / 6);
-        eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`
+        eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`;
         eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
 
         selectedPlayer.gold.current -= goldTaken;
@@ -713,7 +706,7 @@ const events = {
           .then(resolve(selectedPlayer));
       }),
 
-      athena: (discordHook, selectedPlayer) => new Promise((resolve) => {
+      athena: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
         const luckExpAthena = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
         selectedPlayer.experience.current += luckExpAthena;
         selectedPlayer.experience.total += luckExpAthena;
@@ -729,7 +722,7 @@ const events = {
           .then(resolve(selectedPlayer));
       }),
 
-      eris: (discordHook, selectedPlayer, spell) => new Promise((resolve) => {
+      eris: (discordHook, Helper, selectedPlayer, spell) => new Promise((resolve) => {
         const eventMsgEris = `Eris has given ${Helper.generatePlayerName(selectedPlayer, true)} a scroll containing \`${spell.name}\` to add to ${Helper.generateGenderString(selectedPlayer, 'his')} spellbook!`;
         const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
         if (selectedPlayer.spells.length > 0) {
@@ -773,7 +766,7 @@ const events = {
   },
 
   special: {
-    snowFlake: (discordHook, selectedPlayer) => new Promise((resolve) => {
+    snowFlake: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
       const snowFlakeDice = Helper.randomBetween(0, 100);
       if (snowFlakeDice <= 15) {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
@@ -796,5 +789,4 @@ const events = {
     })
   }
 };
-
 module.exports = events;

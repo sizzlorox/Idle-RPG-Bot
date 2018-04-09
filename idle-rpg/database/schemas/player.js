@@ -2,8 +2,10 @@ const mongoose = require('mongoose');
 const mapSchema = require('./map');
 const Map = require('../../game/utils/Map');
 const { equipment } = require('../../utils/enumHelper');
+const Helper = require('../../utils/Helper');
 
-const MapClass = new Map();
+const helper = new Helper();
+const MapClass = new Map(helper);
 
 const newPlayerObj = (discordId, name) => {
   return {

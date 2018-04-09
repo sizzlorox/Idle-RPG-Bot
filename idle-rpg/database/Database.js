@@ -2,11 +2,9 @@ const mongoose = require('mongoose');
 const { playerSchema, newPlayerObj } = require('./schemas/player');
 const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
-
-const Player = mongoose.model('Player', playerSchema);
 const enumHelper = require('../utils/enumHelper');
 
-const MapClass = new Map();
+const Player = mongoose.model('Player', playerSchema);
 
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 
@@ -48,6 +46,10 @@ function disconnect() {
 }
 
 class Database {
+
+  constructor(Helper) {
+    this.MapClass = new Map(Helper);
+  }
 
   createNewPlayer(discordId, name) {
     connect();
@@ -302,4 +304,4 @@ class Database {
   }
 
 }
-module.exports = new Database();
+module.exports = Database;
