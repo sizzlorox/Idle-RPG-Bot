@@ -36,6 +36,7 @@ const webHookOptions = {
 };
 
 const helper = new Helper();
+const commandParser = new CommandParser(helper);
 
 const discordBot = new Discord.Client();
 const actionHook = new Discord.WebhookClient(
@@ -179,7 +180,7 @@ discordBot.on('message', (message) => {
       });
   }
 
-  CommandParser.parseUserCommand(game, discordBot, hook, helper, message);
+  commandParser.parseUserCommand(game, discordBot, hook, message);
 });
 
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {

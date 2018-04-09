@@ -8,7 +8,11 @@ const commandRegex = new RegExp(commandList);
 
 class CommandParser {
 
-  parseUserCommand(game, discordBot, hook, Helper, messageObj) {
+  constructor(Helper) {
+    this.Helper = Helper;
+  }
+
+  parseUserCommand(game, discordBot, hook, messageObj) {
     const messageContent = messageObj.content;
     const command = messageContent.includes(' ') ? messageContent.split(' ')[0].toLowerCase() : messageContent.toLowerCase();
     const authorId = messageObj.author.id;
@@ -31,7 +35,7 @@ class CommandParser {
           .then(messageObj.author.send('This is a bot operator only command.'));
       }
 
-      return commandObj.function(game, messageObj, discordBot, Helper, hook);
+      return commandObj.function(game, messageObj, discordBot, this.Helper, hook);
     }
 
     if (messageContent.startsWith('!')) {
@@ -40,4 +44,4 @@ class CommandParser {
   }
 
 }
-module.exports = new CommandParser();
+module.exports = CommandParser;
