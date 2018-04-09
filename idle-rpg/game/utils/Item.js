@@ -108,7 +108,7 @@ class Item {
           randomEquipmentIndex = this.Helper.randomBetween(0, items.type.length - 1);
           randomTypeIndex = this.Helper.randomBetween(0, items.type[randomEquipmentIndex].length - 1);
 
-          if (items.type[randomEquipmentIndex][randomTypeIndex].position !== enumthis.Helper.equipment.types.relic.position) {
+          if (items.type[randomEquipmentIndex][randomTypeIndex].position !== enumHelper.equipment.types.relic.position) {
             itemType = items.type[randomEquipmentIndex][randomTypeIndex];
           }
         } while (itemType === undefined);
@@ -116,7 +116,7 @@ class Item {
 
       let itemObj;
 
-      if (itemType.position === enumthis.Helper.equipment.types.relic.position) {
+      if (itemType.position === enumHelper.equipment.types.relic.position) {
         const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4);
 
@@ -148,7 +148,7 @@ class Item {
           gold: Number((itemRarityList[randomRarityIndex].gold
             * itemType.gold).toFixed()) * itemType.power
         };
-      } else if (itemType.position === enumthis.Helper.inventory.position) {
+      } else if (itemType.position === enumHelper.inventory.position) {
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
           position: itemType.position,
