@@ -1,7 +1,6 @@
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
-const { errorLog } = require('../utils/logger');
 const { multiplier } = require('../../settings');
 const globalSpells = require('./data/globalSpells');
 
@@ -17,7 +16,7 @@ class Game {
 
     this.Helper = Helper;
     this.Database = new Database(Helper);
-    this.Event = new Event(this.Database, Helper);
+    this.Event = new Event(this.Database, Helper, discordHook);
   }
 
   /**
@@ -241,9 +240,7 @@ ${rankString}
           castingPlayer.isMentionInDiscord = isMentionInDiscord;
 
           return this.Database.savePlayer(castingPlayer)
-            .then(() => {
-              return commandAuthor.send('Preference for being @mention has been updated.');
-            });
+            .then(() => commandAuthor.send('Preference for being @mention has been updated.'));
         }
 
         return commandAuthor.send('Your @mention preference is already set to this value.');
@@ -267,9 +264,7 @@ ${rankString}
           castingPlayer.isPrivateMessageImportant = filtered;
 
           return this.Database.savePlayer(castingPlayer)
-            .then(() => {
-              return commandAuthor.send('Preference for being PMed has been updated.');
-            });
+            .then(() => commandAuthor.send('Preference for being PMed has been updated.'));
         }
 
         return commandAuthor.send('Your PM preference is already set to this value.');
@@ -291,9 +286,7 @@ ${rankString}
         if (castingPlayer.gender !== gender) {
           castingPlayer.gender = gender;
           return this.Database.savePlayer(castingPlayer)
-            .then(() => {
-              return commandAuthor.send('Gender has been updated.');
-            });
+            .then(() => commandAuthor.send('Gender has been updated.'));
         }
 
         return commandAuthor.send('Your gender is already set to this value.');
@@ -321,18 +314,14 @@ ${rankString}
 
               this.activeSpells.push(blessLogObj);
 
-              let activeBlessCount = this.activeSpells.filter((bless) => {
-                return bless.spellName === 'Bless';
-              }).length;
+              let activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
 
               this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               setTimeout(() => {
                 this.multiplier -= 1;
                 this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
                 this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
-                activeBlessCount = this.activeSpells.filter((bless) => {
-                  return bless.spellName === 'Bless';
-                }).length;
+                activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
 
                 this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               }, 1800000); // 30 minutes
@@ -487,14 +476,10 @@ ${rankString}
                     return bountyPlacer.send('This player does not exist.');
                   }
                   bountyRecipient.currentBounty += amount;
-                  this.discordHook.actionHook.send(
-                    this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
-                  );
+                  this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
 
                   return this.Database.savePlayer(bountyRecipient)
-                    .then(() => {
-                      return bountyPlacer.send(`Bounty of ${amount} gold has been placed`);
-                    });
+                    .then(() => bountyPlacer.send(`Bounty of ${amount} gold has been placed`));
                 });
             });
         }
@@ -619,7 +604,7 @@ ${rankString}
   // TODO change to utilize setTimeout
   /**
    * Activates christmas mobs to be spawnable and items droppable
-   * @param {*} isStarting 
+   * @param {*} isStarting
    */
   updateChristmasEvent(isStarting) {
     if (isStarting) {

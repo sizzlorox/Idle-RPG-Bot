@@ -2,11 +2,10 @@ const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
 const util = require('util');
-const { randomBetween } = require('../utils/Helper');
 const { welcomeLog, errorLog, infoLog } = require('../utils/logger');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
-const helper = require('../utils/Helper');
+const Helper = require('../utils/Helper');
 const VirusTotal = require('../bots/modules/VirusTotal');
 const { CronJob } = require('cron');
 const {
@@ -36,7 +35,7 @@ const webHookOptions = {
   restTimeOffset: 500
 };
 
-const Helper = new helper();
+const helper = new Helper();
 
 const discordBot = new Discord.Client();
 const actionHook = new Discord.WebhookClient(
@@ -57,10 +56,10 @@ const hook = {
   discordBot
 };
 
-const game = new Game(hook, Helper);
+const game = new Game(hook, helper);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
-const dailyLotteryTime = '00 00 10 * * 0-6'; 
+const dailyLotteryTime = '00 00 10 * * 0-6';
 const timeZone = 'America/Los_Angeles';
 let minTimer = (minimalTimer * 1000) * 60;
 let maxTimer = (maximumTimer * 1000) * 60;
@@ -135,7 +134,7 @@ const heartBeat = () => {
 
   onlinePlayerList.forEach((player) => {
     if (!player.timer) {
-      const playerTimer = Helper.randomBetween(minTimer, maxTimer);
+      const playerTimer = helper.randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
         game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
         delete player.timer;

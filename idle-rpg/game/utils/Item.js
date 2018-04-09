@@ -1,4 +1,5 @@
 const items = require('../data/items');
+const enumHelper = require('../../utils/enumHelper');
 
 class Item {
 

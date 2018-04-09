@@ -1,6 +1,6 @@
 const enumHelper = require('../../utils/enumHelper');
 const { pvpLevelRestriction } = require('../../../settings');
-const { infoLog, errorLog } = require('../../utils/logger');
+const { errorLog } = require('../../utils/logger');
 
 const events = {
   movement: {
@@ -60,9 +60,6 @@ const events = {
           Helper.printEventDebug(`Equipment selling: ${equipment.name}`);
           profit += Number(equipment.gold);
         });
-        if (isNaN(profit)) {
-          profit = 100;
-        }
         selectedPlayer.inventory.equipment.length = 0;
         profit = Math.floor(profit);
         selectedPlayer.gold.current += profit;
@@ -272,7 +269,7 @@ const events = {
       const mobMaxHealth = results.defender.maxHealth;
       const playerMaxHealth = 100 + (results.attacker.level * 5);
 
-      let selectedPlayer = results.attacker;
+      const selectedPlayer = results.attacker;
       const battleResult = `Battle Results:
           ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` did ${results.attackerDamage} damage.
           ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
@@ -403,9 +400,7 @@ const events = {
             }
             if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find(equip => equip.position === enumHelper.equipment.types[itemKeys[luckItem]].position) !== undefined) {
               const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types[itemKeys[luckItem]].position)
-                .sort((item1, item2) => {
-                  return item2.power - item1.power;
-                })[0];
+                .sort((item1, item2) => item2.power - item1.power)[0];
               victimPlayer = Helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, equipFromInventory);
             } else {
               victimPlayer = Helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, enumHelper.equipment.empty[itemKeys[luckItem]]);
@@ -695,7 +690,7 @@ const events = {
         }
 
         const goldTaken = Math.round(selectedPlayer.gold.current / 6);
-        eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`
+        eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`;
         eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
 
         selectedPlayer.gold.current -= goldTaken;
