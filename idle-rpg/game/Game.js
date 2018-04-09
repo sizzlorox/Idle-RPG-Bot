@@ -420,6 +420,7 @@ ${rankString}
         const eventLog = `Congratulations! You just won ${lotteryAmount} from the daily lottery!`;
         player.gold.current += Number(lotteryAmount);
         player.gold.total += Number(lotteryAmount);
+        infoLog.info({ dailyLottery: eventMsg });
         return Promise.all([
           this.Helper.sendMessage(discordHook, 'twitch', player, false, eventMsg),
           this.Helper.sendPrivateMessage(discordHook, player, eventLog, true),
