@@ -5,8 +5,11 @@ const Map = require('../game/utils/Map');
 
 const Player = mongoose.model('Player', playerSchema);
 const enumHelper = require('../utils/enumHelper');
+const Helper = require('../utils/Helper');
 
-const MapClass = new Map();
+const helper = new Helper();
+
+const MapClass = new Map(helper);
 
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 
