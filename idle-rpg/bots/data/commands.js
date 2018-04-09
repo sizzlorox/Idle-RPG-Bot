@@ -303,9 +303,9 @@ const commands = [
     command: ['!castspell', '!cs'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
-        return game.castSpell(message.author, discordHook, message.content.split(/ (.+)/)[1].toLowerCase());
+        return game.castSpell(message.author, message.content.split(/ (.+)/)[1].toLowerCase());
       }
 
       return message.author.send(`\`\`\`List of spells:
@@ -407,15 +407,15 @@ const commands = [
     command: '!pm',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(/ (.+)/);
         switch (splitCommand[1].toLowerCase()) {
           case 'on':
           case 'off':
-            return game.modifyPM(message.author, discordHook, splitCommand[1] === 'on', false);
+            return game.modifyPM(message.author, splitCommand[1] === 'on', false);
           case 'filtered':
-            return game.modifyPM(message.author, discordHook, true, true);
+            return game.modifyPM(message.author, true, true);
         }
       }
 
@@ -434,7 +434,7 @@ const commands = [
     command: '!mention',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
+    function: (game, message, discordBot) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(/ (.+)/);
 
@@ -444,7 +444,7 @@ const commands = [
           case 'off':
           case 'action':
           case 'move':
-            return game.modifyMention(message.author, discordHook, splitCommand[1].toLowerCase());
+            return game.modifyMention(message.author, splitCommand[1].toLowerCase());
         }
       }
 
@@ -464,7 +464,7 @@ const commands = [
     command: '!gender',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(/ (.+)/);
 
@@ -474,7 +474,7 @@ const commands = [
           case 'female':
           case 'neutral':
           case 'neuter':
-            return game.modifyGender(message.author, discordHook, splitCommand[1]);
+            return game.modifyGender(message.author, splitCommand[1]);
         }
       }
 

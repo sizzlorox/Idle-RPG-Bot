@@ -93,7 +93,7 @@ class Game {
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return this.Event.moveEvent(selectedPlayer, this.discordHook)
+      return this.Event.moveEvent(selectedPlayer)
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
@@ -107,28 +107,28 @@ class Game {
     return new Promise((resolve) => {
       const luckDice = this.Helper.randomBetween(0, 100);
       if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
-        return this.Event.sellInTown(this.discordHook, selectedPlayer)
-          .then(updatedPlayer => this.Event.generateTownItemEvent(this.discordHook, updatedPlayer))
+        return this.Event.sellInTown(selectedPlayer)
+          .then(updatedPlayer => this.Event.generateTownItemEvent(updatedPlayer))
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)
         && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return this.Event.attackEventPlayerVsPlayer(this.discordHook, selectedPlayer, onlinePlayers, this.multiplier)
+        return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, this.multiplier)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return this.Event.attackEventMob(this.discordHook, selectedPlayer, this.multiplier)
+          return this.Event.attackEventMob(selectedPlayer, this.multiplier)
             .then(updatedPlayer => resolve(updatedPlayer));
         }
 
-        return this.Event.campEvent(this.discordHook, selectedPlayer)
+        return this.Event.campEvent(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return this.Event.generateLuckItemEvent(this.discordHook, selectedPlayer)
+      return this.Event.generateLuckItemEvent(selectedPlayer)
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
@@ -141,26 +141,26 @@ class Game {
     return new Promise((resolve) => {
       const luckDice = this.Helper.randomBetween(0, 100);
       if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
-        return this.Event.generateGodsEvent(this.discordHook, selectedPlayer)
+        return this.Event.generateGodsEvent(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
-        return this.Event.generateGamblingEvent(this.discordHook, selectedPlayer)
+        return this.Event.generateGamblingEvent(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (this.Event.isBlizzardActive && this.Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
-        return this.Event.chanceToCatchSnowflake(this.discordHook, selectedPlayer)
+        return this.Event.chanceToCatchSnowflake(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
-        return this.Event.generateLuckItemEvent(this.discordHook, selectedPlayer)
+        return this.Event.generateLuckItemEvent(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return this.Event.generateGoldEvent(this.discordHook, selectedPlayer, this.multiplier)
+      return this.Event.generateGoldEvent(selectedPlayer, this.multiplier)
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
@@ -228,10 +228,9 @@ ${rankString}
   /**
    * Modify player preference for being @mentionned in events
    * @param {Number} commandAuthor
-   * @param {DiscordHook} hook
    * @param {Boolean} isMentionInDiscord
    */
-  modifyMention(commandAuthor, hook, isMentionInDiscord) {
+  modifyMention(commandAuthor, isMentionInDiscord) {
     return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
@@ -254,10 +253,9 @@ ${rankString}
   /**
    * Modify player preference for being private messaged in events
    * @param {Number} commandAuthor
-   * @param {DiscordHook} hook
    * @param {Boolean} isMentionInDiscord
    */
-  modifyPM(commandAuthor, hook, isPrivateMessage, filtered) {
+  modifyPM(commandAuthor, isPrivateMessage, filtered) {
     return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
@@ -281,10 +279,9 @@ ${rankString}
   /**
    * Modify player gender
    * @param Player commandAuthor
-   * @param DiscordHook hook
    * @param String gender
    */
-  modifyGender(commandAuthor, hook, gender) {
+  modifyGender(commandAuthor, gender) {
     return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
@@ -306,10 +303,9 @@ ${rankString}
   /**
    * Casts spell
    * @param {Number} commandAuthor
-   * @param {DiscordHook} hook
    * @param {String} spell
    */
-  castSpell(commandAuthor, hook, spell) {
+  castSpell(commandAuthor, spell) {
     return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         switch (spell) {
@@ -329,7 +325,7 @@ ${rankString}
                 return bless.spellName === 'Bless';
               }).length;
 
-              hook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
+              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               setTimeout(() => {
                 this.multiplier -= 1;
                 this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
@@ -338,7 +334,7 @@ ${rankString}
                   return bless.spellName === 'Bless';
                 }).length;
 
-                hook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
+                this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               }, 1800000); // 30 minutes
 
               this.Database.savePlayer(castingPlayer)
@@ -355,7 +351,7 @@ ${rankString}
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
               const Kindale = this.Event.MapClass.getMapByIndex(4);
               castingPlayer.map = Kindale;
-              hook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
+              this.discordHook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
 
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
@@ -396,7 +392,7 @@ ${rankString}
       });
   }
 
-  dailyLottery(discordBot, discordHook, guildName) {
+  dailyLottery(discordBot, guildName) {
     const discordUsers = discordBot.guilds.size > 0
       ? discordBot.guilds.find('name', guildName).members.filter(player => player.presence.status === 'online' && !player.user.bot
         || player.presence.status === 'idle' && !player.user.bot
@@ -423,8 +419,8 @@ ${rankString}
         player.gold.total += Number(lotteryAmount);
         infoLog.info({ dailyLottery: eventMsg });
         return Promise.all([
-          this.Helper.sendMessage(discordHook, 'twitch', player, false, eventMsg),
-          this.Helper.sendPrivateMessage(discordHook, player, eventLog, true),
+          this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
+          this.Helper.sendPrivateMessage(this.discordHook, player, eventLog, true),
           this.Helper.logEvent(player, eventLog, 'pastEvents')
         ])
           .then(this.Database.savePlayer(player));
@@ -473,12 +469,11 @@ ${rankString}
 
   /**
    * places a bounty on specific player
-   * @param {DiscordHook} discordHook
    * @param {Number} playerId
    * @param {Number} recipient
    * @param {Number} amount
    */
-  placeBounty(discordHook, bountyPlacer, recipient, amount) {
+  placeBounty(bountyPlacer, recipient, amount) {
     return this.Database.loadPlayer(bountyPlacer.id)
       .then((placer) => {
         if (placer.gold.current >= amount) {
@@ -492,7 +487,7 @@ ${rankString}
                     return bountyPlacer.send('This player does not exist.');
                   }
                   bountyRecipient.currentBounty += amount;
-                  discordHook.actionHook.send(
+                  this.discordHook.actionHook.send(
                     this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
                   );
 

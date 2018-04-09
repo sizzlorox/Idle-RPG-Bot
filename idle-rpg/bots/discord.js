@@ -219,7 +219,7 @@ new CronJob({
 new CronJob({
   cronTime: dailyLotteryTime,
   onTick: () => {
-    game.dailyLottery(discordBot, hook, guildName);
+    game.dailyLottery(discordBot, guildName);
   },
   start: false,
   timeZone,
