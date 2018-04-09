@@ -86,7 +86,7 @@ const processDetails = () => {
 
   console.log('------------');
   console.log(`\n\nHeap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
-  console.log(`Current Up Time: ${Helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
+  console.log(`Current Up Time: ${helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
   console.log('------------');
 };
 
@@ -179,7 +179,7 @@ discordBot.on('message', (message) => {
       });
   }
 
-  CommandParser.parseUserCommand(game, discordBot, hook, Helper, message);
+  CommandParser.parseUserCommand(game, discordBot, hook, helper, message);
 });
 
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {
