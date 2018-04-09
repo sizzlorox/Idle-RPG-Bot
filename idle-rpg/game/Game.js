@@ -47,10 +47,6 @@ class Game {
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
-        if (process.env.NODE_ENV === 'production') {
-          this.setPlayerTitles(discordBot, selectedPlayer);
-        }
-
         selectedPlayer.name = player.name;
 
         Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
@@ -77,6 +73,10 @@ class Game {
           Helper.sendMessage(this.discordHook, twitchBot, updatedPlayer, false, Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
             .then(Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
         }
+        return updatedPlayer;
+      })
+      .then((updatedPlayer) => {
+        this.setPlayerTitles(discordBot, updatedPlayer);
       })
       .catch(err => console.log(err));
   }
