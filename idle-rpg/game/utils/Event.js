@@ -41,25 +41,25 @@ class Event {
   // Move Events
   moveEvent(selectedPlayer, discordHook) {
     const mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
-    return events.movement.movePlayer(discordHook, selectedPlayer, mapObj);
+    return events.movement.movePlayer(discordHook, this.Helper, selectedPlayer, mapObj);
   }
 
   attackEventPlayerVsPlayer(discordHook, selectedPlayer, onlinePlayers, multiplier) {
     return this.Database.getSameMapPlayers(selectedPlayer.map.name)
-      .then(mappedPlayers => events.battle.pvpPreperation(selectedPlayer, mappedPlayers, onlinePlayers))
+      .then(mappedPlayers => events.battle.pvpPreperation(this.Helper, selectedPlayer, mappedPlayers, onlinePlayers))
       .then(prepResults => prepResults.randomPlayer
         ? this.Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
         : this.attackEventMob(discordHook, selectedPlayer, multiplier)
           .catch(err => errorLog.error(err)))
       .then(battleResults => battleResults.attacker
-        ? events.battle.pvpResults(discordHook, battleResults)
+        ? events.battle.pvpResults(discordHook, this.Helper, battleResults)
         : battleResults)
       .then((battleResults) => {
         if (battleResults.result) {
           switch (battleResults.result) {
             case enumHelper.battle.outcomes.win:
               return Promise.all([
-                events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
+                events.battle.steal(discordHook, this.Helper, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
               ])
                 .then(promiseResults => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)
                   .then(updatedVictim => this.Database.savePlayer(updatedVictim))
@@ -72,7 +72,7 @@ class Event {
 
             case enumHelper.battle.outcomes.lost:
               return Promise.all([
-                events.battle.steal(discordHook, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
+                events.battle.steal(discordHook, this.Helper, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
               ])
                 .then(promiseResults => this.Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')
                   .then(updatedDefender => this.Database.savePlayer(updatedDefender))
@@ -87,12 +87,12 @@ class Event {
   attackEventMob(discordHook, selectedPlayer, multiplier) {
     return this.MonsterManager.generateNewMonster(selectedPlayer)
       .then(mob => this.Battle.newSimulateBattle(selectedPlayer, mob))
-      .then(results => events.battle.pveResults(discordHook, this.MapManager, results, multiplier))
+      .then(results => events.battle.pveResults(discordHook, this.Helper, this.MapManager, results, multiplier))
       .then((battleResults) => {
         switch (battleResults.result) {
           case enumHelper.battle.outcomes.win:
             return Promise.all([
-              events.battle.dropItem(discordHook, battleResults.updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager)
+              events.battle.dropItem(discordHook, this.Helper, battleResults.updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager)
             ])
               .then(promiseResults => this.Helper.checkExperience(promiseResults[0], discordHook, 'ToRemoveLater'));
 
@@ -108,15 +108,15 @@ class Event {
   // Item Events
   generateTownItemEvent(discordHook, selectedPlayer) {
     return this.ItemManager.generateItem(selectedPlayer)
-      .then(item => events.town.item(discordHook, selectedPlayer, item, this.InventoryManager));
+      .then(item => events.town.item(discordHook, this.Helper, selectedPlayer, item, this.InventoryManager));
   }
 
   sellInTown(discordHook, selectedPlayer) {
-    return events.town.sell(discordHook, selectedPlayer);
+    return events.town.sell(discordHook, this.Helper, selectedPlayer);
   }
 
   campEvent(discordHook, selectedPlayer) {
-    return events.camp(discordHook, selectedPlayer);
+    return events.camp(discordHook, this.Helper, selectedPlayer);
   }
 
   // Luck Events
@@ -125,37 +125,37 @@ class Event {
       const luckEvent = this.Helper.randomBetween(1, 6);
       switch (luckEvent) {
         case 1:
-          return events.luck.gods.hades(discordHook, selectedPlayer)
+          return events.luck.gods.hades(discordHook, this.Helper, selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 2:
-          return events.luck.gods.zeus(discordHook, selectedPlayer)
+          return events.luck.gods.zeus(discordHook, this.Helper, selectedPlayer)
             .then(updatedPlayer => this.Helper.checkHealth(this.MapManager, updatedPlayer, 'zeus', discordHook))
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 3:
-          return events.luck.gods.aseco(discordHook, selectedPlayer)
+          return events.luck.gods.aseco(discordHook, this.Helper, selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 4:
-          return events.luck.gods.hermes(discordHook, selectedPlayer)
+          return events.luck.gods.hermes(discordHook, this.Helper, selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 5:
-          return events.luck.gods.athena(discordHook, selectedPlayer)
+          return events.luck.gods.athena(discordHook, this.Helper, selectedPlayer)
             .then(updatedPlayer => this.Helper.checkExperience(updatedPlayer, discordHook, 'removeLater'))
             .then(updatedPlayer => resolve(updatedPlayer));
 
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
-            .then(spell => events.luck.gods.eris(discordHook, selectedPlayer, spell))
+            .then(spell => events.luck.gods.eris(discordHook, this.Helper, selectedPlayer, spell))
             .then(updatedPlayer => resolve(updatedPlayer));
       }
     });
   }
 
   generateGoldEvent(discordHook, selectedPlayer, multiplier) {
-    return events.luck.gold(discordHook, selectedPlayer, multiplier);
+    return events.luck.gold(discordHook, this.Helper, selectedPlayer, multiplier);
   }
 
   generateLuckItemEvent(discordHook, selectedPlayer) {
@@ -164,11 +164,11 @@ class Event {
 
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
         return this.SpellManager.generateSpell(selectedPlayer)
-          .then(spell => events.luck.item.spell(discordHook, selectedPlayer, spell))
+          .then(spell => events.luck.item.spell(discordHook, this.Helper, selectedPlayer, spell))
           .then(updatedPlayer => resolve(updatedPlayer));
       } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
         return this.ItemManager.generateItem(selectedPlayer)
-          .then(item => events.luck.item.item(discordHook, selectedPlayer, item, this.InventoryManager))
+          .then(item => events.luck.item.item(discordHook, this.Helper, selectedPlayer, item, this.InventoryManager))
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
@@ -177,7 +177,7 @@ class Event {
   }
 
   generateGamblingEvent(discordHook, selectedPlayer) {
-    return events.luck.gambling(discordHook, selectedPlayer);
+    return events.luck.gambling(discordHook, this.Helper, selectedPlayer);
   }
 
   /**
@@ -205,7 +205,7 @@ class Event {
   }
 
   chanceToCatchSnowflake(discordHook, selectedPlayer) {
-    events.special.snowFlake(discordHook, selectedPlayer);
+    events.special.snowFlake(discordHook, this.Helper, selectedPlayer);
   }
 
   /**
