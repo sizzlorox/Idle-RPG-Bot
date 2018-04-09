@@ -1,5 +1,4 @@
 const items = require('../data/items');
-const enumHelper = require('../../utils/enumHelper');
 
 class Item {
 
@@ -81,13 +80,13 @@ class Item {
 
   generateItem(selectedPlayer, mob) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.round(Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomMaterialChance = Math.round(Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomMaterialChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
       const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
       const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
 
-      const randomRarityIndex = Helper.randomBetween(0, itemRarityList.length - 1);
-      const randomMaterialIndex = Helper.randomBetween(0, itemMaterialList.length - 1);
+      const randomRarityIndex = this.Helper.randomBetween(0, itemRarityList.length - 1);
+      const randomMaterialIndex = this.Helper.randomBetween(0, itemMaterialList.length - 1);
 
       const mobName = mob ? mob.name.replace(' ', '_').split('_')[1] : undefined;
       let itemType;
@@ -96,7 +95,7 @@ class Item {
       if (mob && mob.isXmasEvent) {
         do {
           // console.log('generating relic item');
-          randomTypeIndex = Helper.randomBetween(0, items.type[3].length - 1);
+          randomTypeIndex = this.Helper.randomBetween(0, items.type[3].length - 1);
           if (items.type[3][randomTypeIndex].droppedBy.includes(mobName)
             && items.type[3][randomTypeIndex].isDroppable
           ) {
@@ -106,10 +105,10 @@ class Item {
       } else {
         do {
           // console.log('generating non relic item');
-          randomEquipmentIndex = Helper.randomBetween(0, items.type.length - 1);
-          randomTypeIndex = Helper.randomBetween(0, items.type[randomEquipmentIndex].length - 1);
+          randomEquipmentIndex = this.Helper.randomBetween(0, items.type.length - 1);
+          randomTypeIndex = this.Helper.randomBetween(0, items.type[randomEquipmentIndex].length - 1);
 
-          if (items.type[randomEquipmentIndex][randomTypeIndex].position !== enumHelper.equipment.types.relic.position) {
+          if (items.type[randomEquipmentIndex][randomTypeIndex].position !== enumthis.Helper.equipment.types.relic.position) {
             itemType = items.type[randomEquipmentIndex][randomTypeIndex];
           }
         } while (itemType === undefined);
@@ -117,7 +116,7 @@ class Item {
 
       let itemObj;
 
-      if (itemType.position === enumHelper.equipment.types.relic.position) {
+      if (itemType.position === enumthis.Helper.equipment.types.relic.position) {
         const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
           + itemType.stats.str) / 4);
 
@@ -149,7 +148,7 @@ class Item {
           gold: Number((itemRarityList[randomRarityIndex].gold
             * itemType.gold).toFixed()) * itemType.power
         };
-      } else if (itemType.position === enumHelper.inventory.position) {
+      } else if (itemType.position === enumthis.Helper.inventory.position) {
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
           position: itemType.position,
@@ -179,9 +178,9 @@ class Item {
   // EVENT ITEM
   generateSnowflake(selectedPlayer) {
     const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
-    const randomRarityChance = Math.round(Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
-    const randomRarityIndex = Helper.randomBetween(0, itemRarityList.length - 1);
+    const randomRarityIndex = this.Helper.randomBetween(0, itemRarityList.length - 1);
 
     const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
       + snowFlake.stats.str) / 4);
