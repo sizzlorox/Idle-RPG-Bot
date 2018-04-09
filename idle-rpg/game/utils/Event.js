@@ -4,15 +4,15 @@ const Monster = require('../utils/Monster');
 const Item = require('../utils/Item');
 const Inventory = require('../utils/Inventory');
 const Spell = require('../utils/Spell');
-const Database = require('../../database/Database');
 const events = require('../data/events');
 const { errorLog } = require('../../utils/logger');
 const Map = require('../utils/Map');
 
 class Event {
 
-  constructor(Helper) {
+  constructor(Database, Helper) {
     this.Helper = Helper;
+    this.Database = Database;
     this.Battle = new Battle(Helper);
 
     // Managers
@@ -45,7 +45,7 @@ class Event {
   }
 
   attackEventPlayerVsPlayer(discordHook, selectedPlayer, onlinePlayers, multiplier) {
-    return Database.getSameMapPlayers(selectedPlayer.map.name)
+    return this.Database.getSameMapPlayers(selectedPlayer.map.name)
       .then(mappedPlayers => events.battle.pvpPreperation(selectedPlayer, mappedPlayers, onlinePlayers))
       .then(prepResults => prepResults.randomPlayer
         ? this.Battle.newSimulateBattle(selectedPlayer, prepResults.randomPlayer)
@@ -62,12 +62,12 @@ class Event {
                 events.battle.steal(discordHook, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
               ])
                 .then(promiseResults => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)
-                  .then(updatedVictim => Database.savePlayer(updatedVictim))
+                  .then(updatedVictim => this.Database.savePlayer(updatedVictim))
                   .then(() => this.Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')));
 
             case enumHelper.battle.outcomes.fled:
               return this.Helper.checkExperience(battleResults.updatedDefender, discordHook, 'ToRemoveLater')
-                .then(updatedDefender => Database.savePlayer(updatedDefender))
+                .then(updatedDefender => this.Database.savePlayer(updatedDefender))
                 .then(() => this.Helper.checkExperience(battleResults.updatedAttacker, discordHook, 'ToRemoveLater'));
 
             case enumHelper.battle.outcomes.lost:
@@ -75,7 +75,7 @@ class Event {
                 events.battle.steal(discordHook, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
               ])
                 .then(promiseResults => this.Helper.checkExperience(promiseResults[0].stealingPlayer, discordHook, 'ToRemoveLater')
-                  .then(updatedDefender => Database.savePlayer(updatedDefender))
+                  .then(updatedDefender => this.Database.savePlayer(updatedDefender))
                   .then(() => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, discordHook)));
           }
         }

@@ -1,5 +1,4 @@
 const fs = require('fs');
-const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog, infoLog } = require('../utils/logger');
 const { battleDebug, eventDebug, guildID } = require('../../settings');
@@ -393,8 +392,6 @@ class Helper {
 
           selectedPlayer.deaths.player++;
           attackerObj.kills.player++;
-          Database.savePlayer(attackerObj);
-          Database.savePlayer(selectedPlayer);
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`);

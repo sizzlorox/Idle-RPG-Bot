@@ -16,7 +16,8 @@ class Game {
     this.activeSpells = [];
 
     this.Helper = Helper;
-    this.Event = new Event(Helper);
+    this.Database = new Database(Helper);
+    this.Event = new Event(this.Database, Helper);
   }
 
   /**
@@ -28,10 +29,10 @@ class Game {
   selectEvent(discordBot, player, onlinePlayers, twitchBot) {
     const randomEvent = this.Helper.randomBetween(0, 2);
 
-    Database.loadPlayer(player.discordId)
+    this.Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
-          return Database.createNewPlayer(player.discordId, player.name)
+          return this.Database.createNewPlayer(player.discordId, player.name)
             .then((newPlayer) => {
               this.Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
 
@@ -56,17 +57,17 @@ class Game {
           case 0:
             console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
             return this.moveEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 1:
             console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
             return this.attackEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 2:
             console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
             return this.luckEvent(selectedPlayer)
-              .then(updatedPlayer => Database.savePlayer(updatedPlayer))
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
         }
       })
@@ -186,11 +187,11 @@ class Game {
    * @param {Number} amount
    */
   giveGold(playerId, amount) {
-    return Database.loadPlayer(playerId)
+    return this.Database.loadPlayer(playerId)
       .then((updatingPlayer) => {
         updatingPlayer.gold.current += Number(amount);
         updatingPlayer.gold.total += Number(amount);
-        Database.savePlayer(updatingPlayer);
+        this.Database.savePlayer(updatingPlayer);
       });
   }
 
@@ -200,7 +201,7 @@ class Game {
    * @param {String} type
    */
   top10(commandAuthor, type = { level: -1 }) {
-    return Database.loadTop10(type)
+    return this.Database.loadTop10(type)
       .then((top10) => {
         const rankString = `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
           .sort((player1, player2) => {
@@ -231,7 +232,7 @@ ${rankString}
    * @param {Boolean} isMentionInDiscord
    */
   modifyMention(commandAuthor, hook, isMentionInDiscord) {
-    return Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -240,7 +241,7 @@ ${rankString}
         if (castingPlayer.isMentionInDiscord !== isMentionInDiscord) {
           castingPlayer.isMentionInDiscord = isMentionInDiscord;
 
-          return Database.savePlayer(castingPlayer)
+          return this.Database.savePlayer(castingPlayer)
             .then(() => {
               return commandAuthor.send('Preference for being @mention has been updated.');
             });
@@ -257,7 +258,7 @@ ${rankString}
    * @param {Boolean} isMentionInDiscord
    */
   modifyPM(commandAuthor, hook, isPrivateMessage, filtered) {
-    return Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -267,7 +268,7 @@ ${rankString}
           castingPlayer.isPrivateMessage = isPrivateMessage;
           castingPlayer.isPrivateMessageImportant = filtered;
 
-          return Database.savePlayer(castingPlayer)
+          return this.Database.savePlayer(castingPlayer)
             .then(() => {
               return commandAuthor.send('Preference for being PMed has been updated.');
             });
@@ -284,7 +285,7 @@ ${rankString}
    * @param String gender
    */
   modifyGender(commandAuthor, hook, gender) {
-    return Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -292,7 +293,7 @@ ${rankString}
 
         if (castingPlayer.gender !== gender) {
           castingPlayer.gender = gender;
-          return Database.savePlayer(castingPlayer)
+          return this.Database.savePlayer(castingPlayer)
             .then(() => {
               return commandAuthor.send('Gender has been updated.');
             });
@@ -309,7 +310,7 @@ ${rankString}
    * @param {String} spell
    */
   castSpell(commandAuthor, hook, spell) {
-    return Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id)
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
@@ -340,7 +341,7 @@ ${rankString}
                 hook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
               }, 1800000); // 30 minutes
 
-              Database.savePlayer(castingPlayer)
+              this.Database.savePlayer(castingPlayer)
                 .then(() => {
                   commandAuthor.send('Spell has been casted!');
                 });
@@ -356,7 +357,7 @@ ${rankString}
               castingPlayer.map = Kindale;
               hook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
 
-              Database.savePlayer(castingPlayer)
+              this.Database.savePlayer(castingPlayer)
                 .then(() => {
                   commandAuthor.send('Spell has been casted!');
                 });
@@ -374,10 +375,10 @@ ${rankString}
    * @param {Number} amount
    */
   setPlayerBounty(recipient, amount) {
-    return Database.loadPlayer(recipient)
+    return this.Database.loadPlayer(recipient)
       .then((player) => {
         player.currentBounty = amount;
-        return Database.savePlayer(player);
+        return this.Database.savePlayer(player);
       });
   }
 
@@ -387,11 +388,11 @@ ${rankString}
    * @param {Number} amount
    */
   setPlayerGold(recipient, amount) {
-    return Database.loadPlayer(recipient)
+    return this.Database.loadPlayer(recipient)
       .then((player) => {
         player.gold.current = Number(amount);
         player.gold.total += Number(amount);
-        return Database.savePlayer(player);
+        return this.Database.savePlayer(player);
       });
   }
 
@@ -409,7 +410,7 @@ ${rankString}
       : undefined;
     const randomPlayer = this.Helper.randomBetween(0, discordUsers.length);
 
-    return Database.loadPlayer(discordUsers[randomPlayer].discordId)
+    return this.Database.loadPlayer(discordUsers[randomPlayer].discordId)
       .then((player) => {
         if (enumHelper.roamingNpcs.includes({ name: player.name }) || enumHelper.mockPlayers.includes({ name: player.name })) {
           return;
@@ -426,7 +427,7 @@ ${rankString}
           this.Helper.sendPrivateMessage(discordHook, player, eventLog, true),
           this.Helper.logEvent(player, eventLog, 'pastEvents')
         ])
-          .then(Database.savePlayer(player));
+          .then(this.Database.savePlayer(player));
       });
   }
 
@@ -478,14 +479,14 @@ ${rankString}
    * @param {Number} amount
    */
   placeBounty(discordHook, bountyPlacer, recipient, amount) {
-    return Database.loadPlayer(bountyPlacer.id)
+    return this.Database.loadPlayer(bountyPlacer.id)
       .then((placer) => {
         if (placer.gold.current >= amount) {
           placer.gold.current -= amount;
 
-          return Database.savePlayer(placer)
+          return this.Database.savePlayer(placer)
             .then(() => {
-              return Database.loadPlayer(recipient)
+              return this.Database.loadPlayer(recipient)
                 .then((bountyRecipient) => {
                   if (!bountyRecipient) {
                     return bountyPlacer.send('This player does not exist.');
@@ -495,7 +496,7 @@ ${rankString}
                     this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`)
                   );
 
-                  return Database.savePlayer(bountyRecipient)
+                  return this.Database.savePlayer(bountyRecipient)
                     .then(() => {
                       return bountyPlacer.send(`Bounty of ${amount} gold has been placed`);
                     });
@@ -513,7 +514,7 @@ ${rankString}
    * @param {Number} count
    */
   playerEventLog(playerId, count) {
-    return Database.loadPlayer(playerId, enumHelper.playerEventLogSelectFields)
+    return this.Database.loadPlayer(playerId, enumHelper.playerEventLogSelectFields)
       .then((player) => {
         if (!player) {
           return;
@@ -529,7 +530,7 @@ ${rankString}
    * @param {Number} count
    */
   playerPvpLog(playerId, count) {
-    return Database.loadPlayer(playerId, enumHelper.pvpLogSelectFields)
+    return this.Database.loadPlayer(playerId, enumHelper.pvpLogSelectFields)
       .then((player) => {
         if (!player) {
           return;
@@ -544,7 +545,7 @@ ${rankString}
    * @param {Number} commandAuthor
    */
   playerStats(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
+    return this.Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
   }
 
   /**
@@ -552,7 +553,7 @@ ${rankString}
    * @param {Number} commandAuthor
    */
   playerInventory(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id, enumHelper.inventorySelectFields);
+    return this.Database.loadPlayer(commandAuthor.id, enumHelper.inventorySelectFields);
   }
 
   /**
@@ -560,7 +561,7 @@ ${rankString}
    * @param {Number} commandAuthor
    */
   playerEquipment(commandAuthor) {
-    return Database.loadPlayer(commandAuthor.id, enumHelper.equipSelectFields);
+    return this.Database.loadPlayer(commandAuthor.id, enumHelper.equipSelectFields);
   }
 
   /**
@@ -568,7 +569,7 @@ ${rankString}
    * @param {Array} onlinePlayers
    */
   getOnlinePlayerMaps(onlinePlayers) {
-    return Database.loadOnlinePlayerMaps(onlinePlayers);
+    return this.Database.loadOnlinePlayerMaps(onlinePlayers);
   }
 
   /**
@@ -576,7 +577,7 @@ ${rankString}
    * @param {Number} player
    */
   savePlayer(player) {
-    return Database.savePlayer(player);
+    return this.Database.savePlayer(player);
   }
 
   /**
@@ -584,7 +585,7 @@ ${rankString}
    * @param {Number} playerId
    */
   loadPlayer(playerId) {
-    return Database.loadPlayer(playerId);
+    return this.Database.loadPlayer(playerId);
   }
 
   /**
@@ -592,14 +593,14 @@ ${rankString}
    * @param {Number} playerId
    */
   deletePlayer(playerId) {
-    return Database.deletePlayer(playerId);
+    return this.Database.deletePlayer(playerId);
   }
 
   /**
    * Deletes all players in database
    */
   deleteAllPlayers() {
-    return Database.resetAllPlayers();
+    return this.Database.resetAllPlayers();
   }
 
   /**
