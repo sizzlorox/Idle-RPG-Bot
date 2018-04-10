@@ -417,7 +417,8 @@ ${rankString}
   }
 
   setPlayerTitles(discordBot, selectedPlayer) {
-    if (enumHelper.roamingNpcs.includes({ name: selectedPlayer.name }) || enumHelper.mockPlayers.includes({ name: selectedPlayer.name })) {
+    if (enumHelper.roamingNpcs.filter(npc => npc.discordId === selectedPlayer.discordId).length > 0
+      || enumHelper.mockPlayers.filter(mock => mock.discordId === selectedPlayer.discordId).length > 0) {
       return selectedPlayer;
     }
 

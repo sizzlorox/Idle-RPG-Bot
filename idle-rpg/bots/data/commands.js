@@ -4,7 +4,6 @@ const Crypto = require('../modules/Crypto');
 const Urban = require('../modules/Urban');
 const maps = require('../../game/data/maps');
 const { commandChannel } = require('../../../settings');
-const enumHelper = require('../../utils/enumHelper');
 
 const commands = [
   // RPG COMMANDS
