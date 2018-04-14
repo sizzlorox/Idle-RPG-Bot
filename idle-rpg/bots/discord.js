@@ -124,6 +124,7 @@ const heartBeat = () => {
           index === array.findIndex(p => (
             p.discordId === player.discordId
           ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
+      onlinePlayerList.forEach((player) => discordOfflinePlayers.filter((offPlayer) => offPlayer.discordId === player.discordId));
     }
   }
 

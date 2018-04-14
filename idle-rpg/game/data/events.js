@@ -101,16 +101,15 @@ const events = {
         if (oldItemRating > newItemRating) {
           return resolve(selectedPlayer);
         }
-      } else if (selectedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
-        return resolve(selectedPlayer);
-      }
-      if (item.position !== enumHelper.inventory.position) {
         selectedPlayer.gold.current -= itemCost;
         selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
+      } else if (selectedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
+        return resolve(selectedPlayer);
       } else {
         selectedPlayer.gold.current -= itemCost;
         selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
       }
+
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`;
       const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
@@ -412,6 +411,10 @@ const events = {
           Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true),
           Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true),
+          Helper.logEvent(stealingPlayer, eventLog, 'pastEvents'),
+          Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents'),
+          Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents'),
+          Helper.logEvent(victimPlayer, otherPlayerLog, 'pastPvpEvents')
         ])
           .then(resolve({ stealingPlayer, victimPlayer }));
       } else if (victimPlayer.gold.current > victimPlayer.gold.current / 6) {
