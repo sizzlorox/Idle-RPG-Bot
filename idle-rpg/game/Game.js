@@ -337,7 +337,7 @@ ${rankString}
 
           case 'home':
             if (castingPlayer.gold.current >= globalSpells.home.spellCost) {
-              castingPlayer.gold.current -= globalSpells.bless.spellCost;
+              castingPlayer.gold.current -= globalSpells.home.spellCost;
               const Kindale = this.Event.MapClass.getMapByIndex(4);
               castingPlayer.map = Kindale;
               this.discordHook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
@@ -428,6 +428,7 @@ ${rankString}
     const goldTitleRole = currentGuild.roles.filterArray(role => role.name === 'Gold Hoarder')[0];
     const thiefTitleRole = currentGuild.roles.filterArray(role => role.name === 'Thief')[0];
     const veteranTitleRole = currentGuild.roles.filterArray(role => role.name === 'Veteran Idler')[0];
+    const blesserTitleRole = currentGuild.roles.filterArray(role => role.name === 'Blesser')[0];
 
     const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
     if (selectedPlayer.gold.current >= 10000 && !hasGoldTitle) {
@@ -454,6 +455,15 @@ ${rankString}
     } else if (selectedPlayer.events < 10000 && hasVeteranTitle) {
       playerDiscordObj.removeRole(veteranTitleRole);
       this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Veteran Idler title!`));
+    }
+
+    const hasBlesserTitle = playerDiscordObj.roles.array().includes(blesserTitleRole);
+    if (selectedPlayer.spellCast >= 50 && !hasBlesserTitle) {
+      playerDiscordObj.addRole(blesserTitleRole);
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Blesser title!`));
+    } else if (selectedPlayer.spellCast < 50 && hasBlesserTitle) {
+      playerDiscordObj.removeRole(blesserTitleRole);
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Blesser title!`));
     }
   }
 

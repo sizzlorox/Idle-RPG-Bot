@@ -434,8 +434,8 @@ class Helper {
     Gold:
       Current: ${player.gold.current}
       Lost: ${player.gold.lost}
-      Stolen: ${player.gold.stolen}
-      Stole: ${player.gold.stole}
+      Stolen from you: ${player.gold.stolen}
+      Stole from others: ${player.gold.stole}
       Gambles: 
         Count: ${player.gambles}
         Won: ${player.gold.gambles.won}
