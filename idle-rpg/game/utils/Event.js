@@ -62,9 +62,9 @@ class Event {
               return Promise.all([
                 events.battle.steal(this.discordHook, this.Helper, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
               ])
-                .then(promiseResults => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, this.discordHook)
-                  .then(updatedVictim => this.Database.savePlayer(updatedVictim))
-                  .then(() => this.Helper.checkExperience(promiseResults[0].stealingPlayer, this.discordHook, 'ToRemoveLater')));
+                .then(promiseResults => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, this.discordHook))
+                .then(updatedVictim => this.Database.savePlayer(updatedVictim))
+                .then(() => this.Helper.checkExperience(promiseResults[0].stealingPlayer, this.discordHook, 'ToRemoveLater'));
 
             case enumHelper.battle.outcomes.fled:
               return this.Helper.checkExperience(battleResults.updatedDefender, this.discordHook, 'ToRemoveLater')
@@ -75,9 +75,9 @@ class Event {
               return Promise.all([
                 events.battle.steal(this.discordHook, this.Helper, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
               ])
-                .then(promiseResults => this.Helper.checkExperience(promiseResults[0].stealingPlayer, this.discordHook, 'ToRemoveLater')
-                  .then(updatedDefender => this.Database.savePlayer(updatedDefender))
-                  .then(() => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, this.discordHook)));
+                .then(promiseResults => this.Helper.checkExperience(promiseResults[0].stealingPlayer, this.discordHook, 'ToRemoveLater'))
+                .then(updatedDefender => this.Database.savePlayer(updatedDefender))
+                .then(() => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, this.discordHook));
           }
         }
 
@@ -123,7 +123,7 @@ class Event {
   // Luck Events
   generateGodsEvent(selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = this.Helper.randomBetween(1, 6);
+      const luckEvent = this.Helper.randomBetween(1, 7);
       switch (luckEvent) {
         case 1:
           return events.luck.gods.hades(this.discordHook, this.Helper, selectedPlayer)
@@ -150,6 +150,10 @@ class Event {
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
             .then(spell => events.luck.gods.eris(this.discordHook, this.Helper, selectedPlayer, spell))
+            .then(updatedPlayer => resolve(updatedPlayer));
+
+        case 7:
+          return events.luck.gods.dionysus(this.discordHook, this.Helper, this.Database, selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
       }
     });

@@ -159,15 +159,14 @@ const events = {
       const defenderMaxHealth = 100 + (defender.level * 5);
       const playerMaxHealth = 100 + (attacker.level * 5);
 
-      const battleResult = `Battle Results:
-          ${attacker.name}'s ${attacker.equipment.weapon.name} did ${attackerDamage} damage.
-          ${attacker.name} has ${attacker.health} HP left.
-          ${defender.name} 's ${defender.equipment.weapon.name} did ${defenderDamage} damage.
-          ${defender.name} has ${defender.health} HP left.`;
-
-      Helper.printEventDebug(battleResult);
+      let battleResult = `Battle Results:
+  ${attacker.name}'s ${attacker.equipment.weapon.name} did ${attackerDamage} damage.
+  ${attacker.name} has ${attacker.health}/${playerMaxHealth} HP left.
+  ${defender.name} 's ${defender.equipment.weapon.name} did ${defenderDamage} damage.
+  ${defender.name} has ${defender.health}/${defenderMaxHealth} HP left.`;
 
       if (attacker.health <= 0) {
+        battleResult = battleResult.replace(`  ${attacker.name} has ${attacker.health}/${playerMaxHealth} HP left.`, '');
         const eventMsg = `[\`${attacker.map.name}\`] ${Helper.generatePlayerName(defender, true)} just killed ${Helper.generatePlayerName(attacker, true)} with ${Helper.generateGenderString(defender, 'his')} \`${defender.equipment.weapon.name}\`!
   ${Helper.generatePlayerName(attacker, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
 
@@ -229,6 +228,7 @@ const events = {
           }));
       }
 
+      battleResult = battleResult.replace(`  ${defender.name} has ${defender.health}/${defenderMaxHealth} HP left.`, '');
       const expGain = Math.floor(defenderDamage / 8);
       const eventMsg = `[\`${attacker.map.name}\`] ${Helper.generatePlayerName(attacker, true)} just killed \`${defender.name}\` with ${Helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\`!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
@@ -269,15 +269,14 @@ const events = {
       const playerMaxHealth = 100 + (results.attacker.level * 5);
 
       const selectedPlayer = results.attacker;
-      const battleResult = `Battle Results:
-          ${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} did ${results.attackerDamage} damage.
-          ${selectedPlayer.name} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
-          ${results.defender.name}'s ${results.defender.equipment.weapon.name} did ${results.defenderDamage} damage.
-          ${results.defender.name} has ${results.defender.health} / ${mobMaxHealth} HP left.`;
-
-      Helper.printEventDebug(battleResult);
+      let battleResult = `Battle Results:
+  Your ${selectedPlayer.equipment.weapon.name} did ${results.attackerDamage} damage.
+  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
+  ${results.defender.name}'s ${results.defender.equipment.weapon.name} did ${results.defenderDamage} damage.
+  ${results.defender.name} has ${results.defender.health} / ${mobMaxHealth} HP left.`;
 
       if (selectedPlayer.health <= 0) {
+        battleResult = battleResult.replace(`  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.`, '');
         const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${results.defender.name}\`'s \`${results.defender.equipment.weapon.name}\` just killed ${Helper.generatePlayerName(selectedPlayer, true)}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg! [\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
 
@@ -322,6 +321,8 @@ const events = {
             updatedMob: results.defender
           }));
       }
+
+      battleResult = battleResult.replace(`  ${results.defender.name} has ${results.defender.health} / ${mobMaxHealth} HP left.`, '');
       const goldGain = Number(results.defender.gold * multiplier);
       const expGain = Math.floor((results.defender.experience * multiplier) + (results.defenderDamage / 4));
 
@@ -356,7 +357,6 @@ const events = {
       let eventLog = '';
       let otherPlayerLog = '';
 
-      // if (luckStealChance > (90 - canSteal)) {
       if (luckStealChance > (90 - canSteal)) {
         const luckItem = Helper.randomBetween(0, 2);
         const itemKeys = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
@@ -762,6 +762,34 @@ const events = {
         }
 
         return resolve(selectedPlayer);
+      }),
+
+      dionysus: (discordHook, Helper, Database, selectedPlayer) => new Promise((resolve) => {
+        // TODO: Remove this god after testing if has problem saving via setTimeout
+        // Might overwrite his event if currently saving if he fired and event at the same time.
+        const increaseMult = Helper.randomBetween(1, 3);
+        const timeLimit = Helper.randomBetween(10000, 1800000);
+
+        const eventMsgDionysus = `Dionysus has partied with ${Helper.generatePlayerName(selectedPlayer, true)} increasing ${Helper.generateGenderString(selectedPlayer, 'his')} multiplier by ${increaseMult} for ${timeLimit / 60000} minutes!`;
+        const eventLogDionysus = `Dionysus partied with you increasing your multiplier by ${increaseMult} for ${timeLimit / 60000} minutes!`;
+        selectedPlayer.personalMultiplier = increaseMult;
+        infoLog.info({ player: selectedPlayer, god: 'dionysus', timeLimit, increaseMult });
+        setTimeout(() => {
+          Database.loadPlayer(selectedPlayer.discordId)
+            .then((loadedPlayer) => {
+              loadedPlayer.personalMultiplier = 0;
+              infoLog.info({ player: loadedPlayer, god: 'dionysus', event: 'removed multiplier' });
+              return loadedPlayer;
+            })
+            .then(updatedPlayer => Database.savePlayer(updatedPlayer));
+        }, timeLimit);
+
+        return Promise.all([
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgDionysus),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogDionysus, true),
+          Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents')
+        ])
+          .then(resolve(selectedPlayer));
       })
     }
   },

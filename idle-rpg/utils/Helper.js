@@ -438,6 +438,7 @@ class Helper {
       Lost: ${player.gold.lost}
       Stolen from you: ${player.gold.stolen}
       Stole from others: ${player.gold.stole}
+      Lottery: ${player.gold.dailyLottery}
       Gambles: 
         Count: ${player.gambles}
         Won: ${player.gold.gambles.won}

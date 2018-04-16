@@ -77,6 +77,10 @@ const newPlayerObj = (discordId, name) => {
 
 const playerSchema = mongoose.Schema({
   discordId: String,
+  personalMultiplier: {
+    type: Number,
+    default: 0
+  },
   name: String,
   class: {
     type: String,
@@ -117,6 +121,10 @@ const playerSchema = mongoose.Schema({
       default: 0
     },
     stole: {
+      type: Number,
+      default: 0
+    },
+    dailyLottery: {
       type: Number,
       default: 0
     },
@@ -267,6 +275,10 @@ const playerSchema = mongoose.Schema({
   pastPvpEvents: {
     type: Array,
     default: []
+  },
+  updated_at: {
+    type: Date,
+    default: Date.now
   }
 },
   // TODO remove old createdAt above on next reset
