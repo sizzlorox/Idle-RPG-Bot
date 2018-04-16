@@ -8,7 +8,7 @@ class Spell {
 
   generateSpell(selectedPlayer) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.round(Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
       const randomSpellChance = Math.round(Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
       const spellRarityList = spells.strength.filter(spellRarity => spellRarity.rarity >= randomRarityChance);
       const spellSpellList = spells.spell.filter(spell => spell.rarity >= randomSpellChance);
