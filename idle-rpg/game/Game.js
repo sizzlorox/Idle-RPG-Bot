@@ -1,6 +1,7 @@
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
+const { infoLog } = require('../utils/logger');
 const { multiplier } = require('../../settings');
 const globalSpells = require('./data/globalSpells');
 
@@ -46,6 +47,10 @@ class Game {
       })
       .then((selectedPlayer) => {
         selectedPlayer.events++;
+        if (selectedPlayer.updated_at) {
+          const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
+          console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
+        }
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
@@ -54,17 +59,14 @@ class Game {
         this.Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
         switch (randomEvent) {
           case 0:
-            console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
             return this.moveEvent(selectedPlayer, onlinePlayers)
               .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 1:
-            console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
             return this.attackEvent(selectedPlayer, onlinePlayers)
               .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 2:
-            console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
             return this.luckEvent(selectedPlayer)
               .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
@@ -87,7 +89,6 @@ class Game {
     return new Promise((resolve) => {
       const pastMoveCount = selectedPlayer.pastEvents.slice(Math.max(selectedPlayer.pastEvents.length - 5, 1)).filter(event => event.event.includes('and arrived in')).length;
       if (pastMoveCount >= 5 && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-        console.log(`GAME: ${pastMoveCount} count: from move event ${selectedPlayer.name} activated an attack event.`);
         return this.attackEvent(selectedPlayer, onlinePlayers)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
@@ -402,8 +403,8 @@ ${rankString}
         }
 
         const lotteryAmount = this.Helper.randomBetween(500, 5000);
-        const eventMsg = this.Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount}!`);
-        const eventLog = `Congratulations! You just won ${lotteryAmount} from the daily lottery!`;
+        const eventMsg = this.Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount} gold!`);
+        const eventLog = `Congratulations! You just won ${lotteryAmount} gold from the daily lottery!`;
         player.gold.current += Number(lotteryAmount);
         player.gold.total += Number(lotteryAmount);
         infoLog.info({ dailyLottery: eventMsg });
