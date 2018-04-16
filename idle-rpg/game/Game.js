@@ -47,6 +47,10 @@ class Game {
       })
       .then((selectedPlayer) => {
         selectedPlayer.events++;
+        if (selectedPlayer.updated_at) {
+          console.log(selectedPlayer.updated_at);
+          console.log((new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000);
+        }
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
@@ -55,17 +59,14 @@ class Game {
         this.Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
         switch (randomEvent) {
           case 0:
-            console.log(`GAME: ${selectedPlayer.name} activated a move event.`);
             return this.moveEvent(selectedPlayer, onlinePlayers)
               .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 1:
-            console.log(`GAME: ${selectedPlayer.name} activated an attack event.`);
             return this.attackEvent(selectedPlayer, onlinePlayers)
               .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
           case 2:
-            console.log(`GAME: ${selectedPlayer.name} activated a luck event.`);
             return this.luckEvent(selectedPlayer)
               .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
               .catch(err => console.log(err));
@@ -88,7 +89,6 @@ class Game {
     return new Promise((resolve) => {
       const pastMoveCount = selectedPlayer.pastEvents.slice(Math.max(selectedPlayer.pastEvents.length - 5, 1)).filter(event => event.event.includes('and arrived in')).length;
       if (pastMoveCount >= 5 && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-        console.log(`GAME: ${pastMoveCount} count: from move event ${selectedPlayer.name} activated an attack event.`);
         return this.attackEvent(selectedPlayer, onlinePlayers)
           .then(updatedPlayer => resolve(updatedPlayer));
       }

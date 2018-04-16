@@ -268,7 +268,13 @@ const playerSchema = mongoose.Schema({
     type: Array,
     default: []
   }
-});
+},
+  {
+    timestamps: {
+      updatedAt: 'updated_at'
+    }
+  }
+);
 
 playerSchema.set('autoIndex', false);
 
