@@ -123,7 +123,7 @@ class Event {
   // Luck Events
   generateGodsEvent(selectedPlayer) {
     return new Promise((resolve) => {
-      const luckEvent = this.Helper.randomBetween(1, 6);
+      const luckEvent = this.Helper.randomBetween(1, 7);
       switch (luckEvent) {
         case 1:
           return events.luck.gods.hades(this.discordHook, this.Helper, selectedPlayer)
@@ -150,6 +150,10 @@ class Event {
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
             .then(spell => events.luck.gods.eris(this.discordHook, this.Helper, selectedPlayer, spell))
+            .then(updatedPlayer => resolve(updatedPlayer));
+
+        case 7:
+          return events.luck.gods.dionysus(this.discordHook, this.Helper, this.Database, selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
       }
     });

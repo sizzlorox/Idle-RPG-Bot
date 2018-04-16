@@ -191,6 +191,7 @@ const enumHelper = {
     'gold.lost': 1,
     'gold.stole': 1,
     'gold.stolen': 1,
+    'gold.dailyLottery': 1,
     'gold.gambles.won': 1,
     'gold.gambles.lost': 1,
     'gold.total': 1,

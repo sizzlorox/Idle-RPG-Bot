@@ -114,13 +114,13 @@ class Game {
 
       if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)
         && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, this.multiplier)
+        return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, (this.multiplier + selectedPlayer.personalMultipier))
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return this.Event.attackEventMob(selectedPlayer, this.multiplier)
+          return this.Event.attackEventMob(selectedPlayer, (this.multiplier + selectedPlayer.personalMultipier))
             .then(updatedPlayer => resolve(updatedPlayer));
         }
 
@@ -160,7 +160,7 @@ class Game {
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return this.Event.generateGoldEvent(selectedPlayer, this.multiplier)
+      return this.Event.generateGoldEvent(selectedPlayer, (this.multiplier + selectedPlayer.personalMultipier))
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
@@ -407,6 +407,7 @@ ${rankString}
         const eventLog = `Congratulations! You just won ${lotteryAmount} gold from the daily lottery!`;
         player.gold.current += Number(lotteryAmount);
         player.gold.total += Number(lotteryAmount);
+        player.gold.dailyLottery += Number(lotteryAmount);
         infoLog.info({ dailyLottery: eventMsg });
         return Promise.all([
           this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
