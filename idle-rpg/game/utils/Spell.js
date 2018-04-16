@@ -17,7 +17,6 @@ class Spell {
       let spellType;
       let randomSpellIndex;
       do {
-        console.log('generating spell');
         randomSpellIndex = this.Helper.randomBetween(0, spellSpellList.length - 1);
         spellType = spellSpellList[randomSpellIndex];
       } while (spellType === undefined);

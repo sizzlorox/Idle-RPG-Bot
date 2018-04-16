@@ -48,8 +48,8 @@ class Game {
       .then((selectedPlayer) => {
         selectedPlayer.events++;
         if (selectedPlayer.updated_at) {
-          console.log(selectedPlayer.updated_at);
-          console.log((new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000);
+          const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
+          console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
         }
         return selectedPlayer;
       })
