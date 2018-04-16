@@ -9,16 +9,16 @@ class Spell {
   generateSpell(selectedPlayer) {
     return new Promise((resolve) => {
       const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomSpellChance = Math.round(Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomSpellChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
       const spellRarityList = spells.strength.filter(spellRarity => spellRarity.rarity >= randomRarityChance);
       const spellSpellList = spells.spell.filter(spell => spell.rarity >= randomSpellChance);
-      const randomRarityIndex = Helper.randomBetween(0, spellRarityList.length - 1);
+      const randomRarityIndex = this.Helper.randomBetween(0, spellRarityList.length - 1);
 
       let spellType;
       let randomSpellIndex;
       do {
         console.log('generating spell');
-        randomSpellIndex = Helper.randomBetween(0, spellSpellList.length - 1);
+        randomSpellIndex = this.Helper.randomBetween(0, spellSpellList.length - 1);
         spellType = spellSpellList[randomSpellIndex];
       } while (spellType === undefined);
 
