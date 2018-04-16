@@ -1,6 +1,7 @@
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
+const { infoLog } = require('../utils/logger');
 const { multiplier } = require('../../settings');
 const globalSpells = require('./data/globalSpells');
 

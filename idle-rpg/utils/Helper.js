@@ -316,6 +316,7 @@ class Helper {
 
   checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
     return new Promise((resolve) => {
+      const previousGold = selectedPlayer.gold.current;
       if (selectedPlayer.health <= 0) {
         const expLoss = Math.ceil(selectedPlayer.experience.current / 8);
         const goldLoss = Math.ceil(selectedPlayer.gold.current / 12);
@@ -331,6 +332,7 @@ class Helper {
           items: []
         };
 
+        infoLog.info({ previousGold, currentGold: selectedPlayer.gold.current });
         const breakChance = this.randomBetween(0, 100);
         if (breakChance < 15) {
           switch (this.randomBetween(0, 2)) {
