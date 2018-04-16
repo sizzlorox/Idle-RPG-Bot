@@ -160,10 +160,10 @@ const events = {
       const playerMaxHealth = 100 + (attacker.level * 5);
 
       const battleResult = `Battle Results:
-          ${Helper.generatePlayerName(attacker, true)}'s ${attacker.equipment.weapon.name} did ${attackerDamage} damage.
-          ${Helper.generatePlayerName(attacker, true)} has ${attacker.health} HP left.
-          ${Helper.generatePlayerName(defender, true)} 's ${defender.equipment.weapon.name} did ${defenderDamage} damage.
-          ${Helper.generatePlayerName(defender, true)} has ${defender.health} HP left.`;
+          ${attacker.name}'s ${attacker.equipment.weapon.name} did ${attackerDamage} damage.
+          ${attacker.name} has ${attacker.health} HP left.
+          ${defender.name} 's ${defender.equipment.weapon.name} did ${defenderDamage} damage.
+          ${defender.name} has ${defender.health} HP left.`;
 
       Helper.printEventDebug(battleResult);
 
@@ -182,8 +182,8 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```/n').concat(eventLog), true),
-          Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```/n').concat(otherPlayerLog), true),
+          Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
+          Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
           Helper.logEvent(attacker, eventLog, 'pastEvents'),
           Helper.logEvent(attacker, eventLog, 'pastPvpEvents'),
           Helper.logEvent(defender, otherPlayerLog, 'pastEvents'),
@@ -215,8 +215,8 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```/n').concat(eventLog), true),
-          Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```/n').concat(otherPlayerLog), true),
+          Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
+          Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
           Helper.logEvent(attacker, eventLog, 'pastEvents'),
           Helper.logEvent(attacker, eventLog, 'pastPvpEvents'),
           Helper.logEvent(defender, otherPlayerLog, 'pastEvents'),
@@ -242,8 +242,8 @@ const events = {
 
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
-        Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```/n').concat(eventLog), true),
-        Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```/n').concat(otherPlayerLog), true),
+        Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
+        Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
         Helper.logEvent(attacker, eventLog, 'pastEvents'),
         Helper.logEvent(attacker, eventLog, 'pastPvpEvents'),
         Helper.logEvent(defender, otherPlayerLog, 'pastEvents'),
@@ -270,9 +270,9 @@ const events = {
 
       const selectedPlayer = results.attacker;
       const battleResult = `Battle Results:
-          ${Helper.generatePlayerName(selectedPlayer, true)}'s ${selectedPlayer.equipment.weapon.name} did ${results.attackerDamage} damage.
-          ${Helper.generatePlayerName(selectedPlayer, true)} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
-          ${results.defender.name}'s \`${results.defender.equipment.weapon.name}\` did ${results.defenderDamage} damage.
+          ${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} did ${results.attackerDamage} damage.
+          ${selectedPlayer.name} has ${selectedPlayer.health} / ${playerMaxHealth} HP left.
+          ${results.defender.name}'s ${results.defender.equipment.weapon.name} did ${results.defenderDamage} damage.
           ${results.defender.name} has ${results.defender.health} / ${mobMaxHealth} HP left.`;
 
       Helper.printEventDebug(battleResult);
@@ -313,7 +313,7 @@ const events = {
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult).concat('```/n').concat(eventLog), true),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult).concat('```').concat(eventLog), true),
           Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
         ])
           .then(resolve({
@@ -338,7 +338,7 @@ const events = {
 
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult).concat('```/n').concat(eventLog), true),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult).concat('```').concat(eventLog), true),
         Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
       ])
         .then(resolve({
@@ -382,8 +382,6 @@ const events = {
           victimPlayer.stolen++;
           stealingPlayer.stole++;
           if (victimPlayer.equipment[itemKeys[luckItem]].name !== enumHelper.equipment.empty[itemKeys[luckItem]].name) {
-            // stealingPlayer.equipment[itemKeys[luckItem]].position = itemKeys[luckItem];
-            // victimPlayer.equipment[itemKeys[luckItem]].position = itemKeys[luckItem];
             const oldItemRating = Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
             const newItemRating = Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
             if (oldItemRating < newItemRating) {
