@@ -765,6 +765,8 @@ const events = {
       }),
 
       dionysus: (discordHook, Helper, Database, selectedPlayer) => new Promise((resolve) => {
+        // TODO: Remove this god after testing if has problem saving via setTimeout
+        // Might overwrite his event if currently saving if he fired and event at the same time.
         const increaseMult = Helper.randomBetween(1, 3);
         const timeLimit = Helper.randomBetween(10000, 1800000);
 
