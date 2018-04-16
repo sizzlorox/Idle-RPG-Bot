@@ -62,9 +62,9 @@ class Event {
               return Promise.all([
                 events.battle.steal(this.discordHook, this.Helper, battleResults.updatedAttacker, battleResults.updatedDefender, this.InventoryManager)
               ])
-                .then(promiseResults => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, this.discordHook)
-                  .then(updatedVictim => this.Database.savePlayer(updatedVictim))
-                  .then(() => this.Helper.checkExperience(promiseResults[0].stealingPlayer, this.discordHook, 'ToRemoveLater')));
+                .then(promiseResults => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, this.discordHook))
+                .then(updatedVictim => this.Database.savePlayer(updatedVictim))
+                .then(() => this.Helper.checkExperience(promiseResults[0].stealingPlayer, this.discordHook, 'ToRemoveLater'));
 
             case enumHelper.battle.outcomes.fled:
               return this.Helper.checkExperience(battleResults.updatedDefender, this.discordHook, 'ToRemoveLater')
@@ -75,9 +75,9 @@ class Event {
               return Promise.all([
                 events.battle.steal(this.discordHook, this.Helper, battleResults.updatedDefender, battleResults.updatedAttacker, this.InventoryManager)
               ])
-                .then(promiseResults => this.Helper.checkExperience(promiseResults[0].stealingPlayer, this.discordHook, 'ToRemoveLater')
-                  .then(updatedDefender => this.Database.savePlayer(updatedDefender))
-                  .then(() => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, this.discordHook)));
+                .then(promiseResults => this.Helper.checkExperience(promiseResults[0].stealingPlayer, this.discordHook, 'ToRemoveLater'))
+                .then(updatedDefender => this.Database.savePlayer(updatedDefender))
+                .then(() => this.Helper.checkHealth(this.MapManager, promiseResults[0].victimPlayer, promiseResults[0].stealingPlayer, this.discordHook));
           }
         }
 

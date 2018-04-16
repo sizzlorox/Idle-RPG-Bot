@@ -156,6 +156,7 @@ class Database {
     if (!player) {
       return;
     }
+    player.updated_at = Date.now();
 
     connect();
     return new Promise((resolve, reject) => Player.findOneAndUpdate({ discordId: player.discordId }, player, (err, result) => {
