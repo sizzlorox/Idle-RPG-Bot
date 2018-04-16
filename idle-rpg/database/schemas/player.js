@@ -269,8 +269,10 @@ const playerSchema = mongoose.Schema({
     default: []
   }
 },
+  // TODO remove old createdAt above on next reset
   {
     timestamps: {
+      createdAt: 'created_at',
       updatedAt: 'updated_at'
     }
   }
