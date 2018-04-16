@@ -403,8 +403,8 @@ ${rankString}
         }
 
         const lotteryAmount = this.Helper.randomBetween(500, 5000);
-        const eventMsg = this.Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount}!`);
-        const eventLog = `Congratulations! You just won ${lotteryAmount} from the daily lottery!`;
+        const eventMsg = this.Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount} gold!`);
+        const eventLog = `Congratulations! You just won ${lotteryAmount} gold from the daily lottery!`;
         player.gold.current += Number(lotteryAmount);
         player.gold.total += Number(lotteryAmount);
         infoLog.info({ dailyLottery: eventMsg });
