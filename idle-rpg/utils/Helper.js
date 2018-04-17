@@ -290,10 +290,10 @@ class Helper {
     });
   }
 
-  async setPlayerEquipment(selectedPlayer, equipment, item) {
+  setPlayerEquipment(selectedPlayer, equipment, item) {
     selectedPlayer.equipment[equipment].name = item.name;
-    const oldItemRating = await this.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-    const newItemRating = await this.calculateItemRating(selectedPlayer, item);
+    const oldItemRating = this.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+    const newItemRating = this.calculateItemRating(selectedPlayer, item);
     if (oldItemRating > newItemRating && item.name !== enumHelper.equipment.empty.weapon.name && item.name !== enumHelper.equipment.empty.armor.name) {
       infoLog.info({ player: selectedPlayer.name, old: { itemName: selectedPlayer.equipment[item.position], power: oldItemRating }, new: { itemName: item.name, power: newItemRating } });
     }
@@ -513,7 +513,7 @@ class Helper {
   generateInventoryEquipmentString(player) {
     return new Promise((resolve) => {
       let equipString = '';
-      player.inventory.equipment.forEach(async (equip, index, array) => {
+      player.inventory.equipment.forEach((equip, index, array) => {
         switch (equip.position) {
           case enumHelper.equipment.types.helmet.position:
             equipString = equipString.concat(`${equip.name}:
@@ -528,7 +528,7 @@ class Helper {
             break;
 
           case enumHelper.equipment.types.weapon.position:
-            const weaponRating = await this.calculateItemRating(player, equip);
+            const weaponRating = this.calculateItemRating(player, equip);
             equipString = equipString.concat(`${equip.name}:
             BaseAttackPower: ${equip.power}
             AttackPower: ${Number(weaponRating)}
@@ -558,8 +558,8 @@ class Helper {
       });
   }
 
-  async generateEquipmentsString(player) {
-    const weaponRating = await this.calculateItemRating(player, player.equipment.weapon);
+  generateEquipmentsString(player) {
+    const weaponRating = this.calculateItemRating(player, player.equipment.weapon);
     return `\`\`\`Here is your inventory!
         Helmet: ${player.equipment.helmet.name}
           Defense: ${player.equipment.helmet.power}
