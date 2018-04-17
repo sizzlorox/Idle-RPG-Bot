@@ -787,7 +787,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgDionysus),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogDionysus, true),
-          Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents')
+          Helper.logEvent(selectedPlayer, eventLogDionysus, 'pastEvents')
         ])
           .then(resolve(selectedPlayer));
       })
