@@ -770,8 +770,8 @@ const events = {
         const increaseMult = Helper.randomBetween(1, 3);
         const timeLimit = Helper.randomBetween(10000, 1800000);
 
-        const eventMsgDionysus = `Dionysus has partied with ${Helper.generatePlayerName(selectedPlayer, true)} increasing ${Helper.generateGenderString(selectedPlayer, 'his')} multiplier by ${increaseMult} for ${timeLimit / 60000} minutes!`;
-        const eventLogDionysus = `Dionysus partied with you increasing your multiplier by ${increaseMult} for ${timeLimit / 60000} minutes!`;
+        const eventMsgDionysus = `Dionysus has partied with ${Helper.generatePlayerName(selectedPlayer, true)} increasing ${Helper.generateGenderString(selectedPlayer, 'his')} multiplier by ${increaseMult} for ${Math.floor(timeLimit / 60000)} minutes!`;
+        const eventLogDionysus = `Dionysus partied with you increasing your multiplier by ${increaseMult} for ${Math.floor(timeLimit / 60000)} minutes!`;
         selectedPlayer.personalMultiplier = increaseMult;
         infoLog.info({ player: selectedPlayer, god: 'dionysus', timeLimit, increaseMult });
         setTimeout(() => {
