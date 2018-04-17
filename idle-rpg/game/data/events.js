@@ -87,7 +87,7 @@ const events = {
      * @param {InventoryManager} InventoryManager
      * @returns {Player} updatedPlayer
      */
-    item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
+    item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
       const itemCost = Math.round(item.gold);
 
       if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
@@ -96,8 +96,8 @@ const events = {
 
       if (item.position !== enumHelper.inventory.position) {
         selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
-        const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-        const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+        const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+        const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
         if (oldItemRating > newItemRating) {
           return resolve(selectedPlayer);
         }
@@ -349,7 +349,7 @@ const events = {
         }));
     }),
 
-    steal: (discordHook, Helper, stealingPlayer, victimPlayer, InventoryManager) => new Promise((resolve) => {
+    steal: (discordHook, Helper, stealingPlayer, victimPlayer, InventoryManager) => new Promise(async (resolve) => {
       const luckStealChance = Helper.randomBetween(0, 100);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
@@ -382,8 +382,8 @@ const events = {
           victimPlayer.stolen++;
           stealingPlayer.stole++;
           if (victimPlayer.equipment[itemKeys[luckItem]].name !== enumHelper.equipment.empty[itemKeys[luckItem]].name) {
-            const oldItemRating = Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
-            const newItemRating = Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
+            const oldItemRating = await Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
+            const newItemRating = await Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
             if (oldItemRating < newItemRating) {
               stealingPlayer = Helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, stolenEquip);
               if (victimPlayer.equipment[itemKeys[luckItem]].previousOwners.length > 0) {
@@ -450,10 +450,10 @@ const events = {
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
         return ItemManager.generateItem(selectedPlayer, mob)
-          .then((item) => {
+          .then(async (item) => {
             if (item.position !== enumHelper.inventory.position) {
-              const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-              const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+              const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+              const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
               if (oldItemRating > newItemRating) {
                 selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
               } else {
@@ -527,11 +527,11 @@ const events = {
         return resolve(selectedPlayer);
       }),
 
-      item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
+      item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
         const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, item);
         if (item.position !== enumHelper.inventory.position) {
-          const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-          const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+          const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+          const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
           if (oldItemRating > newItemRating) {
             selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
           } else {
@@ -795,12 +795,12 @@ const events = {
   },
 
   special: {
-    snowFlake: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+    snowFlake: (discordHook, Helper, selectedPlayer) => new Promise(async (resolve) => {
       const snowFlakeDice = Helper.randomBetween(0, 100);
       if (snowFlakeDice <= 15) {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
-        const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
-        const newItemRating = Helper.calculateItemRating(selectedPlayer, snowFlake);
+        const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
+        const newItemRating = await Helper.calculateItemRating(selectedPlayer, snowFlake);
         if (oldItemRating < newItemRating) {
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
           const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
