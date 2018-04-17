@@ -42,7 +42,7 @@ class Event {
   // Move Events
   moveEvent(selectedPlayer) {
     const mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
-    return events.movement.movePlayer(this.discordHook, this.Helper, selectedPlayer, mapObj);
+    return events.movement.movePlayer(this.discordHook, this.Helper, selectedPlayer, mapObj)
   }
 
   attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, multiplier) {
@@ -82,7 +82,8 @@ class Event {
         }
 
         return battleResults;
-      });
+      })
+      .catch(err => console.log);
   }
 
   attackEventMob(selectedPlayer, multiplier) {
@@ -103,21 +104,25 @@ class Event {
           case enumHelper.battle.outcomes.lost:
             return this.Helper.checkHealth(this.MapManager, battleResults.updatedPlayer, battleResults.updatedMob, this.discordHook);
         }
-      });
+      })
+      .catch(err => console.log);
   }
 
   // Item Events
   generateTownItemEvent(selectedPlayer) {
     return this.ItemManager.generateItem(selectedPlayer)
-      .then(item => events.town.item(this.discordHook, this.Helper, selectedPlayer, item, this.InventoryManager));
+      .then(item => events.town.item(this.discordHook, this.Helper, selectedPlayer, item, this.InventoryManager))
+      .catch(err => console.log);
   }
 
   sellInTown(selectedPlayer) {
-    return events.town.sell(this.discordHook, this.Helper, selectedPlayer);
+    return events.town.sell(this.discordHook, this.Helper, selectedPlayer)
+      .catch(err => console.log);
   }
 
   campEvent(selectedPlayer) {
-    return events.camp(this.discordHook, this.Helper, selectedPlayer);
+    return events.camp(this.discordHook, this.Helper, selectedPlayer)
+      .catch(err => console.log);
   }
 
   // Luck Events
@@ -127,34 +132,41 @@ class Event {
       switch (luckEvent) {
         case 1:
           return events.luck.gods.hades(this.discordHook, this.Helper, selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
+            .then(updatedPlayer => resolve(updatedPlayer))
+            .catch(err => console.log);
 
         case 2:
           return events.luck.gods.zeus(this.discordHook, this.Helper, selectedPlayer)
             .then(updatedPlayer => this.Helper.checkHealth(this.MapManager, updatedPlayer, 'zeus', this.discordHook))
-            .then(updatedPlayer => resolve(updatedPlayer));
+            .then(updatedPlayer => resolve(updatedPlayer))
+            .catch(err => console.log);
 
         case 3:
           return events.luck.gods.aseco(this.discordHook, this.Helper, selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
+            .then(updatedPlayer => resolve(updatedPlayer))
+            .catch(err => console.log);
 
         case 4:
           return events.luck.gods.hermes(this.discordHook, this.Helper, selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
+            .then(updatedPlayer => resolve(updatedPlayer))
+            .catch(err => console.log);
 
         case 5:
           return events.luck.gods.athena(this.discordHook, this.Helper, selectedPlayer)
             .then(updatedPlayer => this.Helper.checkExperience(updatedPlayer, this.discordHook, 'removeLater'))
-            .then(updatedPlayer => resolve(updatedPlayer));
+            .then(updatedPlayer => resolve(updatedPlayer))
+            .catch(err => console.log);
 
         case 6:
           return this.SpellManager.generateSpell(selectedPlayer)
             .then(spell => events.luck.gods.eris(this.discordHook, this.Helper, selectedPlayer, spell))
-            .then(updatedPlayer => resolve(updatedPlayer));
+            .then(updatedPlayer => resolve(updatedPlayer))
+            .catch(err => console.log);
 
         case 7:
           return events.luck.gods.dionysus(this.discordHook, this.Helper, this.Database, selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
+            .then(updatedPlayer => resolve(updatedPlayer))
+            .catch(err => console.log);
       }
     });
   }
@@ -170,11 +182,13 @@ class Event {
       if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
         return this.SpellManager.generateSpell(selectedPlayer)
           .then(spell => events.luck.item.spell(this.discordHook, this.Helper, selectedPlayer, spell))
-          .then(updatedPlayer => resolve(updatedPlayer));
+          .then(updatedPlayer => resolve(updatedPlayer))
+          .catch(err => console.log);
       } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
         return this.ItemManager.generateItem(selectedPlayer)
           .then(item => events.luck.item.item(this.discordHook, this.Helper, selectedPlayer, item, this.InventoryManager))
-          .then(updatedPlayer => resolve(updatedPlayer));
+          .then(updatedPlayer => resolve(updatedPlayer))
+          .catch(err => console.log);
       }
 
       return resolve(selectedPlayer);
@@ -182,7 +196,8 @@ class Event {
   }
 
   generateGamblingEvent(selectedPlayer) {
-    return events.luck.gambling(this.discordHook, this.Helper, selectedPlayer);
+    return events.luck.gambling(this.discordHook, this.Helper, selectedPlayer)
+      .catch(err => console.log);
   }
 
   /**
