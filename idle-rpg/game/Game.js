@@ -28,6 +28,8 @@ class Game {
             this.config.spells.activeBless--;
             this.config.multiplier -= 1;
             this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+            infoLog.info({ multiplier: this.multiplier, activeBless: this.config.spells.activeBless });
+            this.Database.updateGame(this.config);
           }, 1800000 + (5000 * i));
         }
       });
