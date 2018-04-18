@@ -152,6 +152,44 @@ class Database {
       .in(discordIds));
   }
 
+  removeLotteryPlayers() {
+    connect();
+    const query = {
+      lottery: {
+        joined: true
+      }
+    };
+
+    return new Promise((resolve, reject) => Player.update(query, { lottery: { joined: false } }, { multi: true }, (err, result) => {
+      if (err) {
+        disconnect();
+        return reject(err);
+      }
+
+      disconnect();
+      return resolve(result);
+    }));
+  }
+
+  loadLotteryPlayers() {
+    connect();
+    const query = {
+      lottery: {
+        joined: true
+      }
+    };
+
+    return new Promise((resolve, reject) => Player.find(query, (err, result) => {
+      if (err) {
+        disconnect();
+        return reject(err);
+      }
+
+      disconnect();
+      return resolve(result);
+    }));
+  }
+
   loadTop10(type) {
     connect();
     const select = {

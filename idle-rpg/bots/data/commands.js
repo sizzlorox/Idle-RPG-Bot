@@ -30,6 +30,8 @@ const commands = [
         !mention <on|off|action|move> - Change if events relating to you will @Mention you
         !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
         !gender <male|female|neutral|neuter> - Change your character's gender
+        !lottery - Joins Daily Lottery (100 gold for entry)
+        !prizepool - Displays how many players have joined the lottery and the prize pool
         !lore <Map Name> - Retrieves the lore of map selected
         !b, !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         !sb, !spellbook - Returns list of spells your character has learned
@@ -226,6 +228,26 @@ const commands = [
           const spellBook = Helper.generateSpellBookString(playerSpells);
           message.author.send(spellBook);
         });
+    }
+  },
+
+  lottery = {
+    command: ['!lottery'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      game.joinLottery(message.author)
+        .then(msg => message.send(msg));
+    }
+  },
+
+  prizePool = {
+    command: ['!prizepool'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      game.prizePool()
+        .then(msg => message.send(msg));
     }
   },
 

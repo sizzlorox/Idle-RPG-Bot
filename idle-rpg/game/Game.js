@@ -315,18 +315,22 @@ ${rankString}
               this.activeSpells.push(blessLogObj);
 
               let activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
-              this.config.activeBless = activeBlessCount;
+              this.config.spells.activeBless = activeBlessCount;
 
               this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               setTimeout(() => {
-                this.config.multiplier -= 1;
-                this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-                this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
-                activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
-                this.config.activeBless = activeBlessCount;
-                this.Database.updateGame(this.config);
+                this.Database.loadGame()
+                  .then((newConfig) => {
+                    this.config = newConfig;
+                    this.config.multiplier -= 1;
+                    this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+                    this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
+                    activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
+                    this.config.spells.activeBless = activeBlessCount;
+                    this.Database.updateGame(this.config);
 
-                this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+                    this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+                  });
               }, 1800000); // 30 minutes
 
               this.Database.savePlayer(castingPlayer)
@@ -385,39 +389,59 @@ ${rankString}
       });
   }
 
-  dailyLottery(discordBot, guildName) {
-    const discordUsers = discordBot.guilds.size > 0
-      ? discordBot.guilds.find('name', guildName).members.filter(player => player.presence.status === 'online' && !player.user.bot
-        || player.presence.status === 'idle' && !player.user.bot
-        || player.presence.status === 'dnd' && !player.user.bot)
-        .map((player) => {
-          return {
-            name: player.nickname ? player.nickname : player.displayName,
-            discordId: player.id
-          };
-        })
-      : undefined;
-    const randomPlayer = this.Helper.randomBetween(0, discordUsers.length);
-
-    return this.Database.loadPlayer(discordUsers[randomPlayer].discordId)
+  joinLottery(discordUser) {
+    return this.Database.loadPlayer(discordUser.id)
       .then((player) => {
-        if (enumHelper.roamingNpcs.includes({ name: player.name }) || enumHelper.mockPlayers.includes({ name: player.name })) {
-          return;
+        if (player.lottery.joined) {
+          return 'You\'ve already joined todays daily lottery!';
         }
+        player.lottery.joined = true;
+        player.lottery.amount += 100;
 
-        const lotteryAmount = this.Helper.randomBetween(500, 5000);
-        const eventMsg = this.Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount} gold!`);
-        const eventLog = `Congratulations! You just won ${lotteryAmount} gold from the daily lottery!`;
-        player.gold.current += Number(lotteryAmount);
-        player.gold.total += Number(lotteryAmount);
-        player.gold.dailyLottery += Number(lotteryAmount);
-        infoLog.info({ dailyLottery: eventMsg });
-        return Promise.all([
-          this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
-          this.Helper.sendPrivateMessage(this.discordHook, player, eventLog, true),
-          this.Helper.logEvent(player, eventLog, 'pastEvents')
-        ])
-          .then(this.Database.savePlayer(player));
+        return this.Database.loadGame()
+          .then((updatedConfig) => {
+            updatedConfig.dailyLottery.prizePool += 100;
+            this.config = updatedConfig;
+
+            return this.Database.updateGame(updatedConfig)
+              .then(() => this.Database.savePlayer(player))
+              .then(() => 'You have joined todays daily lottery! Good luck!');
+          });
+      });
+  }
+
+  prizePool() {
+    return this.Database.loadLotteryPlayers()
+      .then((lotteryPlayers) => {
+        return `There are ${lotteryPlayers.length} contestants for a prize pool of ${this.config.dailyLottery.prizePool} gold!`;
+      });
+  }
+
+  dailyLottery() {
+    return this.Database.loadLotteryPlayers()
+      .then((lotteryPlayers) => {
+        const randomWinner = this.randomBetween(0, lotteryPlayers.length - 1);
+        const winner = lotteryPlayers[randomWinner];
+
+        return this.Database.loadGame()
+          .then((updatedConfig) => {
+            const eventMsg = this.Helper.setImportantMessage(`Out of ${lotteryPlayers.length} contestants, ${winner.name} has won the daily lottery of ${updatedConfig.dailyLottery.prizePool} gold!`);
+            const eventLog = `Congratulations! Out of ${lotteryPlayers.length} contestants, you just won ${updatedConfig.dailyLottery.prizePool} gold from the daily lottery!`;
+            winner.gold.current += updatedConfig.dailyLottery.prizePool;
+            winner.gold.total += updatedConfig.dailyLottery.prizePool;
+            winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
+            updatedConfig.dailyLottery.prizePool = this.randomBetween(1500, 5000);
+            this.config = updatedConfig;
+
+            return Promise.all([
+              this.Database.updateGame(updatedConfig),
+              this.Database.removeLotteryPlayers(),
+              this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
+              this.Helper.sendPrivateMessage(this.discordHook, winner, eventLog, true),
+              this.Helper.logEvent(winner, eventLog, 'pastEvents')
+            ])
+              .then(() => this.Database.savePlayer(winner));
+          });
       });
   }
 
