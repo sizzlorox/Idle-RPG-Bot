@@ -336,7 +336,7 @@ const commands = [
         if (!recipient.match(/^\d+$/)) {
           return message.author.send('Please add a bounty to a player.');
         }
-        return game.placeBounty(discordHook, message.author, recipient, Number(amount));
+        return game.placeBounty(message.author, recipient, Number(amount));
       }
 
       return message.author.send('Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head');
