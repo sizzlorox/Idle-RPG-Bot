@@ -1,8 +1,7 @@
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
-const { infoLog } = require('../utils/logger');
-const { multiplier } = require('../../settings');
+const { infoLog, errorLog } = require('../utils/logger');
 const globalSpells = require('./data/globalSpells');
 
 /**
@@ -12,12 +11,23 @@ class Game {
 
   constructor(discordHook, Helper) {
     this.discordHook = discordHook;
-    this.multiplier = multiplier;
     this.activeSpells = [];
 
     this.Helper = Helper;
     this.Database = new Database(Helper);
     this.Event = new Event(this.Database, Helper, discordHook);
+    this.Database.loadGame()
+      .then(loadedConfig => this.config = loadedConfig)
+      .then(console.log('config loaded'))
+      .then(() => {
+        for (let i = 0; i < this.config.spells.activeBless; i++) {
+          setTimeout(() => {
+            this.config.spells.activeBless--;
+            this.config.multiplier -= 1;
+            this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+          }, 1800000);
+        }
+      });
   }
 
   /**
@@ -30,6 +40,10 @@ class Game {
     const randomEvent = this.Helper.randomBetween(0, 2);
 
     this.Database.loadPlayer(player.discordId)
+      .then((selectedPlayer) => {
+        this.config = this.Database.loadGame();
+        return selectedPlayer;
+      })
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
           return this.Database.createNewPlayer(player.discordId, player.name)
@@ -114,13 +128,13 @@ class Game {
 
       if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)
         && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, (this.multiplier + selectedPlayer.personalMultiplier))
+        return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, (this.config.multiplier + selectedPlayer.personalMultiplier))
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
       if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return this.Event.attackEventMob(selectedPlayer, (this.multiplier + selectedPlayer.personalMultiplier))
+          return this.Event.attackEventMob(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
             .then(updatedPlayer => resolve(updatedPlayer));
         }
 
@@ -160,7 +174,7 @@ class Game {
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      return this.Event.generateGoldEvent(selectedPlayer, (this.multiplier + selectedPlayer.personalMultiplier))
+      return this.Event.generateGoldEvent(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
@@ -171,13 +185,13 @@ class Game {
 
     setTimeout(() => {
       this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
-      this.multiplier += 1;
+      this.config.multiplier += 1;
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
       this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
-      this.multiplier -= 1;
-      this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
+      this.config.multiplier -= 1;
+      this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
     }, 5400000); // 1hr 30 minutes
   }
 
@@ -307,30 +321,29 @@ ${rankString}
             if (castingPlayer.gold.current >= globalSpells.bless.spellCost) {
               castingPlayer.spellCast++;
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
-              this.multiplier += 1;
-              const blessLogObj = {
-                spellName: 'Bless',
-                caster: castingPlayer.discordId
-              };
+              this.config.multiplier += 1;
 
-              this.activeSpells.push(blessLogObj);
+              this.config.spells.activeBless++;
 
-              let activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
-
-              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
+              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               setTimeout(() => {
-                this.multiplier -= 1;
-                this.multiplier = this.multiplier <= 0 ? 1 : this.multiplier;
-                this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
-                activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
+                this.Database.loadGame()
+                  .then((newConfig) => {
+                    this.config = newConfig;
+                    this.config.multiplier -= 1;
+                    this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+                    this.config.spells.activeBless--;
+                    this.Database.updateGame(this.config);
 
-                this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.multiplier}x`));
+                    this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+                  });
               }, 1800000); // 30 minutes
 
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
                   commandAuthor.send('Spell has been casted!');
-                });
+                })
+                .then(() => this.Database.updateGame(this.config));
             } else {
               commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
             }
@@ -382,40 +395,62 @@ ${rankString}
       });
   }
 
-  dailyLottery(discordBot, guildName) {
-    const discordUsers = discordBot.guilds.size > 0
-      ? discordBot.guilds.find('name', guildName).members.filter(player => player.presence.status === 'online' && !player.user.bot
-        || player.presence.status === 'idle' && !player.user.bot
-        || player.presence.status === 'dnd' && !player.user.bot)
-        .map((player) => {
-          return {
-            name: player.nickname ? player.nickname : player.displayName,
-            discordId: player.id
-          };
-        })
-      : undefined;
-    const randomPlayer = this.Helper.randomBetween(0, discordUsers.length);
-
-    return this.Database.loadPlayer(discordUsers[randomPlayer].discordId)
+  joinLottery(discordUser) {
+    return this.Database.loadPlayer(discordUser.id)
       .then((player) => {
-        if (enumHelper.roamingNpcs.includes({ name: player.name }) || enumHelper.mockPlayers.includes({ name: player.name })) {
-          return;
+        if (player.lottery.joined) {
+          return 'You\'ve already joined todays daily lottery!';
         }
+        player.lottery.joined = true;
+        player.lottery.amount += 100;
 
-        const lotteryAmount = this.Helper.randomBetween(500, 5000);
-        const eventMsg = this.Helper.setImportantMessage(`${player.name} has won the daily lottery of ${lotteryAmount} gold!`);
-        const eventLog = `Congratulations! You just won ${lotteryAmount} gold from the daily lottery!`;
-        player.gold.current += Number(lotteryAmount);
-        player.gold.total += Number(lotteryAmount);
-        player.gold.dailyLottery += Number(lotteryAmount);
-        infoLog.info({ dailyLottery: eventMsg });
-        return Promise.all([
-          this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
-          this.Helper.sendPrivateMessage(this.discordHook, player, eventLog, true),
-          this.Helper.logEvent(player, eventLog, 'pastEvents')
-        ])
-          .then(this.Database.savePlayer(player));
+        return this.Database.loadGame()
+          .then((updatedConfig) => {
+            updatedConfig.dailyLottery.prizePool += 100;
+            this.config = updatedConfig;
+
+            return this.Database.updateGame(updatedConfig)
+              .then(() => this.Database.savePlayer(player))
+              .then(() => 'You have joined todays daily lottery! Good luck!');
+          });
       });
+  }
+
+  prizePool() {
+    return this.Database.loadLotteryPlayers()
+      .then((lotteryPlayers) => {
+        return `There are ${lotteryPlayers.length} contestants for a prize pool of ${this.config.dailyLottery.prizePool} gold!`;
+      });
+  }
+
+  dailyLottery() {
+    return this.Database.loadLotteryPlayers()
+      .then((lotteryPlayers) => {
+        const randomWinner = this.Helper.randomBetween(0, lotteryPlayers.length - 1);
+        const winner = lotteryPlayers[randomWinner];
+
+        return this.Database.loadGame()
+          .then((updatedConfig) => {
+            const eventMsg = this.Helper.setImportantMessage(`Out of ${lotteryPlayers.length} contestants, ${winner.name} has won the daily lottery of ${updatedConfig.dailyLottery.prizePool} gold!`);
+            const eventLog = `Congratulations! Out of ${lotteryPlayers.length} contestants, you just won ${updatedConfig.dailyLottery.prizePool} gold from the daily lottery!`;
+            winner.gold.current += updatedConfig.dailyLottery.prizePool;
+            winner.gold.total += updatedConfig.dailyLottery.prizePool;
+            winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
+            updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 5000);
+            this.config = updatedConfig;
+            infoLog({ lottery: eventLog });
+
+            return Promise.all([
+              this.Database.updateGame(updatedConfig),
+              this.Database.removeLotteryPlayers(),
+              this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
+              this.Helper.sendPrivateMessage(this.discordHook, winner, eventLog, true),
+              this.Helper.logEvent(winner, eventLog, 'pastEvents')
+            ])
+              .then(() => this.Database.savePlayer(winner));
+          });
+      })
+      .catch(err, errorLog.error(err));
   }
 
   setPlayerTitles(discordBot, selectedPlayer) {

@@ -22,20 +22,23 @@ const commands = [
         !c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-sensitive)
         !m, !map - Displays the worlds locations
         !cs, !castspell - Lists spells available to cast
-        !cs, !castspell <spell> - Casts a global spell onto Idle-RPG
-        !el, !eventlog - Lists up to 15 past events
+        !cs, !castspell <spell> - Casts a global spell onto Idle-RPG\`\`\``;
+      const helpMsg2 = `\`\`\`        !el, !eventlog - Lists up to 15 past events
         !el, !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !pl, !pvplog - Lists up to 15 past PvP events
         !pl, !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
         !mention <on|off|action|move> - Change if events relating to you will @Mention you
         !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
         !gender <male|female|neutral|neuter> - Change your character's gender
+        !lottery - Joins Daily Lottery (100 gold for entry)
+        !prizepool - Displays how many players have joined the lottery and the prize pool
         !lore <Map Name> - Retrieves the lore of map selected
         !b, !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         !sb, !spellbook - Returns list of spells your character has learned
         !i, !inv, !inventory - Displays what your character has in his/her inventory
         \`\`\``;
-      message.author.send(helpMsg);
+      message.author.send(helpMsg)
+        .then(() => message.author.send(helpMsg2));
     }
   },
 
@@ -229,6 +232,26 @@ const commands = [
     }
   },
 
+  lottery = {
+    command: ['!lottery'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      game.joinLottery(message.author)
+        .then(msg => message.author.send(msg));
+    }
+  },
+
+  prizePool = {
+    command: ['!prizepool'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      game.prizePool()
+        .then(msg => message.author.send(msg));
+    }
+  },
+
   map = {
     command: ['!map', '!m'],
     operatorOnly: false,
@@ -336,7 +359,7 @@ const commands = [
         if (!recipient.match(/^\d+$/)) {
           return message.author.send('Please add a bounty to a player.');
         }
-        return game.placeBounty(discordHook, message.author, recipient, Number(amount));
+        return game.placeBounty(message.author, recipient, Number(amount));
       }
 
       return message.author.send('Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head');
