@@ -1,7 +1,7 @@
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
-const { infoLog } = require('../utils/logger');
+const { infoLog, errorLog } = require('../utils/logger');
 const globalSpells = require('./data/globalSpells');
 
 /**
@@ -17,7 +17,17 @@ class Game {
     this.Database = new Database(Helper);
     this.Event = new Event(this.Database, Helper, discordHook);
     this.Database.loadGame()
-      .then(loadedConfig => this.config = loadedConfig);
+      .then(loadedConfig => this.config = loadedConfig)
+      .then(console.log('config loaded'))
+      .then(() => {
+        for (let i = 0; i < this.config.spells.activeBless; i++) {
+          setTimeout(() => {
+            this.config.spells.activeBless--;
+            this.config.multiplier -= 1;
+            this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+          }, 1800000);
+        }
+      });
   }
 
   /**
@@ -312,29 +322,20 @@ ${rankString}
               castingPlayer.spellCast++;
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
               this.config.multiplier += 1;
-              const blessLogObj = {
-                spellName: 'Bless',
-                caster: castingPlayer.discordId
-              };
 
-              this.activeSpells.push(blessLogObj);
+              this.config.spells.activeBless++;
 
-              let activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
-              this.config.spells.activeBless = activeBlessCount;
-
-              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               setTimeout(() => {
                 this.Database.loadGame()
                   .then((newConfig) => {
                     this.config = newConfig;
                     this.config.multiplier -= 1;
                     this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-                    this.activeSpells.splice(this.activeSpells.indexOf(blessLogObj), 1);
-                    activeBlessCount = this.activeSpells.filter(bless => bless.spellName === 'Bless').length;
-                    this.config.spells.activeBless = activeBlessCount;
+                    this.config.spells.activeBless--;
                     this.Database.updateGame(this.config);
 
-                    this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${activeBlessCount}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+                    this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
                   });
               }, 1800000); // 30 minutes
 
@@ -437,6 +438,7 @@ ${rankString}
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
             updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 5000);
             this.config = updatedConfig;
+            infoLog({ lottery: eventLog });
 
             return Promise.all([
               this.Database.updateGame(updatedConfig),
@@ -447,7 +449,8 @@ ${rankString}
             ])
               .then(() => this.Database.savePlayer(winner));
           });
-      });
+      })
+      .catch(err, errorLog.error(err));
   }
 
   setPlayerTitles(discordBot, selectedPlayer) {
