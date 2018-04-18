@@ -155,9 +155,7 @@ class Database {
   removeLotteryPlayers() {
     connect();
     const query = {
-      lottery: {
-        joined: true
-      }
+      'lottery.joined': true
     };
 
     return new Promise((resolve, reject) => Player.update(query, { lottery: { joined: false } }, { multi: true }, (err, result) => {

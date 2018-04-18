@@ -174,7 +174,6 @@ discordBot.on('message', (message) => {
     return VirusTotal.scanUrl(url)
       .then(VirusTotal.retrieveReport)
       .then((reportResults) => {
-        infoLog.info(reportResults);
         if (reportResults.positives > 0) {
           message.delete();
           message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');

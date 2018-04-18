@@ -435,6 +435,10 @@ ${rankString}
   dailyLottery() {
     return this.Database.loadLotteryPlayers()
       .then((lotteryPlayers) => {
+        if (!lotteryPlayers.length) {
+          return;
+        }
+
         const randomWinner = this.Helper.randomBetween(0, lotteryPlayers.length - 1);
         const winner = lotteryPlayers[randomWinner];
 
@@ -445,21 +449,21 @@ ${rankString}
             winner.gold.current += updatedConfig.dailyLottery.prizePool;
             winner.gold.total += updatedConfig.dailyLottery.prizePool;
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
-            updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 5000);
+            updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
             this.config = updatedConfig;
-            infoLog({ lottery: eventLog });
+            infoLog.info({ lottery: eventLog });
 
             return Promise.all([
               this.Database.updateGame(updatedConfig),
               this.Database.removeLotteryPlayers(),
-              this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
+              this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
               this.Helper.sendPrivateMessage(this.discordHook, winner, eventLog, true),
               this.Helper.logEvent(winner, eventLog, 'pastEvents')
             ])
               .then(() => this.Database.savePlayer(winner));
           });
       })
-      .catch(err, errorLog.error(err));
+      .catch(err => errorLog.error(err));
   }
 
   setPlayerTitles(discordBot, selectedPlayer) {
