@@ -174,9 +174,7 @@ class Database {
   loadLotteryPlayers() {
     connect();
     const query = {
-      lottery: {
-        joined: true
-      }
+      'lottery.joined': true
     };
 
     return new Promise((resolve, reject) => Player.find(query, (err, result) => {
