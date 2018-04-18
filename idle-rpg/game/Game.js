@@ -12,20 +12,23 @@ class Game {
   constructor(discordHook, Helper) {
     this.discordHook = discordHook;
     this.activeSpells = [];
+    this.config = '';
 
     this.Helper = Helper;
     this.Database = new Database(Helper);
     this.Event = new Event(this.Database, Helper, discordHook);
     this.Database.loadGame()
-      .then(loadedConfig => this.config = loadedConfig)
-      .then(console.log('config loaded'))
+      .then((loadedConfig) => {
+        this.config = loadedConfig;
+      })
+      .then(() => console.log(`Config loaded\nMultiplier:${this.config.multiplier}\nActive Bless:${this.config.spells.activeBless}\nPrize Pool:${this.config.dailyLottery.prizePool}`))
       .then(() => {
         for (let i = 0; i < this.config.spells.activeBless; i++) {
           setTimeout(() => {
             this.config.spells.activeBless--;
             this.config.multiplier -= 1;
             this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-          }, 1800000);
+          }, 1800000 + (5000 * i));
         }
       });
   }
@@ -41,7 +44,10 @@ class Game {
 
     this.Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
-        this.config = this.Database.loadGame();
+        this.Database.loadGame()
+          .then((loadedConfig) => {
+            this.config = loadedConfig;
+          });
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
@@ -95,6 +101,7 @@ class Game {
       })
       .then((updatedPlayer) => {
         this.setPlayerTitles(discordBot, updatedPlayer);
+        this.Database.updateGame(this.config);
       })
       .catch(err => console.log(err));
   }
