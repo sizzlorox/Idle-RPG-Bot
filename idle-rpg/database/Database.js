@@ -61,11 +61,11 @@ class Database {
         disconnect();
         return reject(err);
       }
-      if (!result) {
+      if (!result || !result.length) {
         return Game.create({
           multiplier: 1,
           dailyLottery: {
-            prizePool: 0
+            prizePool: 1500
           }
         }, (error, newGame) => {
           if (error) {
@@ -74,18 +74,18 @@ class Database {
           }
 
           disconnect();
-          return resole(newGame);
+          return resolve(newGame[0]);
         });
       }
 
       disconnect();
-      return resolve(result);
+      return resolve(result[0]);
     }));
   }
 
   updateGame(newConfig) {
     connect();
-    return new Promise((resolve, reject) => Player.update({}, newConfig, (err, result) => {
+    return new Promise((resolve, reject) => Game.update({}, newConfig, (err, result) => {
       if (err) {
         disconnect();
         return reject(err);

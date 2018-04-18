@@ -15,8 +15,9 @@ class Game {
 
     this.Helper = Helper;
     this.Database = new Database(Helper);
-    this.config = this.Database.loadGame();
     this.Event = new Event(this.Database, Helper, discordHook);
+    this.Database.loadGame()
+      .then(loadedConfig => this.config = loadedConfig);
   }
 
   /**
@@ -29,6 +30,10 @@ class Game {
     const randomEvent = this.Helper.randomBetween(0, 2);
 
     this.Database.loadPlayer(player.discordId)
+      .then((selectedPlayer) => {
+        this.config = this.Database.loadGame();
+        return selectedPlayer;
+      })
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
           return this.Database.createNewPlayer(player.discordId, player.name)
@@ -420,7 +425,7 @@ ${rankString}
   dailyLottery() {
     return this.Database.loadLotteryPlayers()
       .then((lotteryPlayers) => {
-        const randomWinner = this.randomBetween(0, lotteryPlayers.length - 1);
+        const randomWinner = this.Helper.randomBetween(0, lotteryPlayers.length - 1);
         const winner = lotteryPlayers[randomWinner];
 
         return this.Database.loadGame()
@@ -430,7 +435,7 @@ ${rankString}
             winner.gold.current += updatedConfig.dailyLottery.prizePool;
             winner.gold.total += updatedConfig.dailyLottery.prizePool;
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
-            updatedConfig.dailyLottery.prizePool = this.randomBetween(1500, 5000);
+            updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 5000);
             this.config = updatedConfig;
 
             return Promise.all([

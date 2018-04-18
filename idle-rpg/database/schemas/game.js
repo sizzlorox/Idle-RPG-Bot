@@ -14,7 +14,7 @@ const gameSchema = mongoose.Schema({
   dailyLottery: {
     prizePool: {
       type: Number,
-      default: 0
+      default: 1500
     }
   }
 });

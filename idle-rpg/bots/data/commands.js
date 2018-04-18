@@ -237,7 +237,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       game.joinLottery(message.author)
-        .then(msg => message.send(msg));
+        .then(msg => message.author.send(msg));
     }
   },
 
@@ -247,7 +247,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (game, message) => {
       game.prizePool()
-        .then(msg => message.send(msg));
+        .then(msg => message.author.send(msg));
     }
   },
 
