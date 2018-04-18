@@ -11,6 +11,7 @@ const newPlayerObj = (discordId, name) => {
   return {
     discordId,
     name,
+    personalMultiplier: 0,
     class: 'Wanderer',
     health: 105,
     mana: 50,
@@ -225,6 +226,16 @@ const playerSchema = mongoose.Schema({
   spells: {
     type: Array,
     default: []
+  },
+  lottery: {
+    joined: {
+      type: Boolean,
+      default: false
+    },
+    amount: {
+      type: Number,
+      default: 0
+    }
   },
   isOnline: Boolean,
   createdAt: String,

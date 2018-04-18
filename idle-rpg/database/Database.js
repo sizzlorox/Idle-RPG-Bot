@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 const { playerSchema, newPlayerObj } = require('./schemas/player');
+const gameSchema = require('./schemas/game');
 const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
 
+const Game = mongoose.model('Game', gameSchema);
 const Player = mongoose.model('Player', playerSchema);
 
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
@@ -51,6 +53,50 @@ class Database {
     this.MapClass = new Map(Helper);
   }
 
+  // GAME SETTINGS
+  loadGame() {
+    connect();
+    return new Promise((resolve, reject) => Game.find({}, (err, result) => {
+      if (err) {
+        disconnect();
+        return reject(err);
+      }
+      if (!result) {
+        return Game.create({
+          multiplier: 1,
+          dailyLottery: {
+            prizePool: 0
+          }
+        }, (error, newGame) => {
+          if (error) {
+            disconnect();
+            return reject(error);
+          }
+
+          disconnect();
+          return resole(newGame);
+        });
+      }
+
+      disconnect();
+      return resolve(result);
+    }));
+  }
+
+  updateGame(newConfig) {
+    connect();
+    return new Promise((resolve, reject) => Player.update({}, newConfig, (err, result) => {
+      if (err) {
+        disconnect();
+        return reject(err);
+      }
+
+      disconnect();
+      return resolve(result);
+    }));
+  }
+
+  // PLAYER
   createNewPlayer(discordId, name) {
     connect();
     return new Promise((resolve, reject) => Player.create(newPlayerObj(discordId, name), (err, result) => {
