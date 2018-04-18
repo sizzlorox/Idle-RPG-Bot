@@ -22,8 +22,8 @@ const commands = [
         !c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-sensitive)
         !m, !map - Displays the worlds locations
         !cs, !castspell - Lists spells available to cast
-        !cs, !castspell <spell> - Casts a global spell onto Idle-RPG
-        !el, !eventlog - Lists up to 15 past events
+        !cs, !castspell <spell> - Casts a global spell onto Idle-RPG\`\`\``;
+      const helpMsg2 = `\`\`\`        !el, !eventlog - Lists up to 15 past events
         !el, !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !pl, !pvplog - Lists up to 15 past PvP events
         !pl, !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
@@ -37,7 +37,8 @@ const commands = [
         !sb, !spellbook - Returns list of spells your character has learned
         !i, !inv, !inventory - Displays what your character has in his/her inventory
         \`\`\``;
-      message.author.send(helpMsg);
+      message.author.send(helpMsg)
+        .then(() => message.author.send(helpMsg2));
     }
   },
 
