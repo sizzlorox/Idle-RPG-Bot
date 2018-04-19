@@ -46,13 +46,6 @@ class Game {
 
     this.Database.loadPlayer(player.discordId)
       .then((selectedPlayer) => {
-        this.Database.loadGame()
-          .then((loadedConfig) => {
-            this.config = loadedConfig;
-          });
-        return selectedPlayer;
-      })
-      .then((selectedPlayer) => {
         if (!selectedPlayer) {
           return this.Database.createNewPlayer(player.discordId, player.name)
             .then((newPlayer) => {
@@ -100,10 +93,6 @@ class Game {
             .then(this.Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
         }
         return updatedPlayer;
-      })
-      .then((updatedPlayer) => {
-        this.setPlayerTitles(discordBot, updatedPlayer);
-        this.Database.updateGame(this.config);
       })
       .catch(err => console.log(err));
   }
@@ -336,16 +325,12 @@ ${rankString}
 
               this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               setTimeout(() => {
-                this.Database.loadGame()
-                  .then((newConfig) => {
-                    this.config = newConfig;
-                    this.config.multiplier -= 1;
-                    this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-                    this.config.spells.activeBless--;
-                    this.Database.updateGame(this.config);
+                this.config.multiplier -= 1;
+                this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+                this.config.spells.activeBless--;
+                this.Database.updateGame(this.config);
 
-                    this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
-                  });
+                this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               }, 1800000); // 30 minutes
 
               this.Database.savePlayer(castingPlayer)
