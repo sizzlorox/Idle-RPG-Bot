@@ -319,6 +319,11 @@ ${rankString}
             if (castingPlayer.gold.current >= globalSpells.bless.spellCost) {
               castingPlayer.spellCast++;
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
+              this.Database.savePlayer(castingPlayer)
+                .then(() => {
+                  commandAuthor.send('Spell has been casted!');
+                })
+                .then(() => this.Database.updateGame(this.config));
               this.config.multiplier += 1;
 
               this.config.spells.activeBless++;
@@ -332,12 +337,6 @@ ${rankString}
 
                 this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               }, 1800000); // 30 minutes
-
-              this.Database.savePlayer(castingPlayer)
-                .then(() => {
-                  commandAuthor.send('Spell has been casted!');
-                })
-                .then(() => this.Database.updateGame(this.config));
             } else {
               commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
             }
