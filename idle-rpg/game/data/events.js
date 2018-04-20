@@ -55,9 +55,7 @@ const events = {
     sell: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
       if (selectedPlayer.inventory.equipment.length > 0) {
         let profit = 0;
-        Helper.printEventDebug(selectedPlayer.inventory.equipment);
         selectedPlayer.inventory.equipment.forEach((equipment) => {
-          Helper.printEventDebug(`Equipment selling: ${equipment.name}`);
           profit += Number(equipment.gold);
         });
         selectedPlayer.inventory.equipment.length = 0;

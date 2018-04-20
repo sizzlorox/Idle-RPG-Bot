@@ -294,8 +294,11 @@ class Helper {
     selectedPlayer.equipment[equipment].name = item.name;
     const oldItemRating = this.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
     const newItemRating = this.calculateItemRating(selectedPlayer, item);
-    if (oldItemRating > newItemRating && item.name !== enumHelper.equipment.empty.weapon.name && item.name !== enumHelper.equipment.empty.armor.name) {
-      infoLog.info({ player: selectedPlayer.name, old: { itemName: selectedPlayer.equipment[item.position], power: oldItemRating }, new: { itemName: item.name, power: newItemRating } });
+    if (item.name !== enumHelper.equipment.empty.weapon.name && item.name !== enumHelper.equipment.empty.armor.name) {
+      selectedPlayer.equipment[equipment].gold = item.gold;
+      if (oldItemRating > newItemRating) {
+        infoLog.info({ player: selectedPlayer.name, old: { itemName: selectedPlayer.equipment[item.position], power: oldItemRating }, new: { itemName: item.name, power: newItemRating } });
+      }
     }
     if (equipment !== enumHelper.equipment.types.relic.position) {
       selectedPlayer.equipment[equipment].power = item.power;

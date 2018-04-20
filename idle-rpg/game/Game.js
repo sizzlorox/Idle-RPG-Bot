@@ -28,6 +28,8 @@ class Game {
             this.config.spells.activeBless--;
             this.config.multiplier -= 1;
             this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+            infoLog.info({ multiplier: this.multiplier, activeBless: this.config.spells.activeBless });
+            this.Database.updateGame(this.config);
           }, 1800000 + (5000 * i));
         }
       });
@@ -43,13 +45,6 @@ class Game {
     const randomEvent = this.Helper.randomBetween(0, 2);
 
     this.Database.loadPlayer(player.discordId)
-      .then((selectedPlayer) => {
-        this.Database.loadGame()
-          .then((loadedConfig) => {
-            this.config = loadedConfig;
-          });
-        return selectedPlayer;
-      })
       .then((selectedPlayer) => {
         if (!selectedPlayer) {
           return this.Database.createNewPlayer(player.discordId, player.name)
@@ -98,10 +93,6 @@ class Game {
             .then(this.Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
         }
         return updatedPlayer;
-      })
-      .then((updatedPlayer) => {
-        this.setPlayerTitles(discordBot, updatedPlayer);
-        this.Database.updateGame(this.config);
       })
       .catch(err => console.log(err));
   }
@@ -328,29 +319,24 @@ ${rankString}
             if (castingPlayer.gold.current >= globalSpells.bless.spellCost) {
               castingPlayer.spellCast++;
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
+              this.Database.savePlayer(castingPlayer)
+                .then(() => {
+                  commandAuthor.send('Spell has been casted!');
+                })
+                .then(() => this.Database.updateGame(this.config));
               this.config.multiplier += 1;
 
               this.config.spells.activeBless++;
 
               this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               setTimeout(() => {
-                this.Database.loadGame()
-                  .then((newConfig) => {
-                    this.config = newConfig;
-                    this.config.multiplier -= 1;
-                    this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-                    this.config.spells.activeBless--;
-                    this.Database.updateGame(this.config);
+                this.config.multiplier -= 1;
+                this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+                this.config.spells.activeBless--;
+                this.Database.updateGame(this.config);
 
-                    this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
-                  });
+                this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               }, 1800000); // 30 minutes
-
-              this.Database.savePlayer(castingPlayer)
-                .then(() => {
-                  commandAuthor.send('Spell has been casted!');
-                })
-                .then(() => this.Database.updateGame(this.config));
             } else {
               commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
             }
@@ -433,6 +419,10 @@ ${rankString}
   dailyLottery() {
     return this.Database.loadLotteryPlayers()
       .then((lotteryPlayers) => {
+        if (!lotteryPlayers.length) {
+          return;
+        }
+
         const randomWinner = this.Helper.randomBetween(0, lotteryPlayers.length - 1);
         const winner = lotteryPlayers[randomWinner];
 
@@ -443,21 +433,21 @@ ${rankString}
             winner.gold.current += updatedConfig.dailyLottery.prizePool;
             winner.gold.total += updatedConfig.dailyLottery.prizePool;
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
-            updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 5000);
+            updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
             this.config = updatedConfig;
-            infoLog({ lottery: eventLog });
+            infoLog.info({ lottery: eventLog });
 
             return Promise.all([
               this.Database.updateGame(updatedConfig),
               this.Database.removeLotteryPlayers(),
-              this.Helper.sendMessage(this.discordHook, 'twitch', player, false, eventMsg),
+              this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
               this.Helper.sendPrivateMessage(this.discordHook, winner, eventLog, true),
               this.Helper.logEvent(winner, eventLog, 'pastEvents')
             ])
               .then(() => this.Database.savePlayer(winner));
           });
       })
-      .catch(err, errorLog.error(err));
+      .catch(err => errorLog.error(err));
   }
 
   setPlayerTitles(discordBot, selectedPlayer) {

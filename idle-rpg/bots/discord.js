@@ -3,6 +3,7 @@ const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
 const util = require('util');
 const { welcomeLog, errorLog, infoLog } = require('../utils/logger');
+const Antispam = require('./modules/Antispam');
 const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
 const Helper = require('../utils/Helper');
@@ -163,7 +164,15 @@ discordBot.on('error', (err) => {
   errorLog.error(err);
 });
 
-discordBot.on('message', (message) => {
+discordBot.on('message', async (message) => {
+  await Antispam.logAuthor(message.author.id);
+  await Antispam.logMessage(message.author.id, message.content);
+  const skip = await Antispam.checkMessageInterval(message);
+  if (skip) {
+    infoLog.info(`Spam detected by ${message.author.username}.`);
+    return;
+  }
+
   if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
     return message.reply('┬─┬ノ(ಠ_ಠノ)');
   }
@@ -174,7 +183,6 @@ discordBot.on('message', (message) => {
     return VirusTotal.scanUrl(url)
       .then(VirusTotal.retrieveReport)
       .then((reportResults) => {
-        infoLog.info(reportResults);
         if (reportResults.positives > 0) {
           message.delete();
           message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');
@@ -182,7 +190,7 @@ discordBot.on('message', (message) => {
       });
   }
 
-  commandParser.parseUserCommand(game, discordBot, hook, message);
+  return commandParser.parseUserCommand(game, discordBot, hook, message);
 });
 
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {
