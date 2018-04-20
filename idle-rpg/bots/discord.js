@@ -169,7 +169,7 @@ discordBot.on('message', async (message) => {
   await Antispam.logMessage(message.author.id, message.content);
   const skip = await Antispam.checkMessageInterval(message);
   if (skip) {
-    info.info(`Spam detected by ${message.author.username}.`);
+    infoLog.info(`Spam detected by ${message.author.username}.`);
     return;
   }
 
