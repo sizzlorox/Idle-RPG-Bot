@@ -236,7 +236,7 @@ const commands = [
     command: ['!lottery'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
+    function: (game, message, discordBot) => {
       game.joinLottery(message.author)
         .then(msg => message.author.send(msg));
     }

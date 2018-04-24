@@ -416,7 +416,7 @@ ${rankString}
       });
   }
 
-  dailyLottery() {
+  dailyLottery(discordBot) {
     return this.Database.loadLotteryPlayers()
       .then((lotteryPlayers) => {
         if (!lotteryPlayers.length) {
@@ -433,6 +433,13 @@ ${rankString}
             winner.gold.current += updatedConfig.dailyLottery.prizePool;
             winner.gold.total += updatedConfig.dailyLottery.prizePool;
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
+
+            lotteryPlayers.forEach((player) => {
+              if (player.id !== winner.id) {
+                discordBot.users.find('id', player.discordId).send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
+              }
+            });
+
             updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
             this.config = updatedConfig;
 
