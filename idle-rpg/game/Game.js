@@ -17,22 +17,24 @@ class Game {
     this.Helper = Helper;
     this.Database = new Database(Helper);
     this.Event = new Event(this.Database, Helper, discordHook);
-    this.Database.loadGame()
-      .then((loadedConfig) => {
-        this.config = loadedConfig;
-      })
-      .then(() => console.log(`Config loaded\nMultiplier:${this.config.multiplier}\nActive Bless:${this.config.spells.activeBless}\nPrize Pool:${this.config.dailyLottery.prizePool}`))
-      .then(() => {
-        for (let i = 0; i < this.config.spells.activeBless; i++) {
-          setTimeout(() => {
-            this.config.spells.activeBless--;
-            this.config.multiplier -= 1;
-            this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-            infoLog.info({ multiplier: this.multiplier, activeBless: this.config.spells.activeBless });
-            this.Database.updateGame(this.config);
-          }, 1800000 + (5000 * i));
-        }
-      });
+    if (process.env.NODE_ENV.includes('production')) {
+      this.Database.loadGame()
+        .then((loadedConfig) => {
+          this.config = loadedConfig;
+        })
+        .then(() => console.log(`Config loaded\nMultiplier:${this.config.multiplier}\nActive Bless:${this.config.spells.activeBless}\nPrize Pool:${this.config.dailyLottery.prizePool}`))
+        .then(() => {
+          for (let i = 0; i < this.config.spells.activeBless; i++) {
+            setTimeout(() => {
+              this.config.spells.activeBless--;
+              this.config.multiplier -= 1;
+              this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+              infoLog.info({ multiplier: this.multiplier, activeBless: this.config.spells.activeBless });
+              this.Database.updateGame(this.config);
+            }, 1800000 + (5000 * i));
+          }
+        });
+    }
   }
 
   /**
@@ -237,6 +239,27 @@ ${rankString}
       });
   }
 
+  getRank(commandAuthor, type = { level: -1 }) {
+    return this.Database.loadPlayer(commandAuthor.id)
+      .then(player => this.Database.loadCurrentRank(player, type))
+      .then(currentRank => currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+        .sort((player1, player2) => {
+          if (Object.keys(type)[0] === 'level') {
+            return player2.experience.current - player1.experience.current && player2.level - player2.level;
+          }
+
+          if (Object.keys(type)[0].includes('.')) {
+            const keys = Object.keys(type)[0].split('.');
+            return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
+          }
+
+          return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+        }).findIndex(player => player.discordId === commandAuthor.id))
+      .then((rank) => {
+        commandAuthor.send(`You're currently ranked ${rank} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
+      });
+  }
+
   /**
    * Modify player preference for being @mentionned in events
    * @param {Number} commandAuthor
@@ -416,7 +439,7 @@ ${rankString}
       });
   }
 
-  dailyLottery() {
+  dailyLottery(discordBot) {
     return this.Database.loadLotteryPlayers()
       .then((lotteryPlayers) => {
         if (!lotteryPlayers.length) {
@@ -433,15 +456,22 @@ ${rankString}
             winner.gold.current += updatedConfig.dailyLottery.prizePool;
             winner.gold.total += updatedConfig.dailyLottery.prizePool;
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
+
+            lotteryPlayers.forEach((player) => {
+              if (player.discordId !== winner.discordId) {
+                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
+              } else {
+                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
+              }
+            });
+
             updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
             this.config = updatedConfig;
-            infoLog.info({ lottery: eventLog });
 
             return Promise.all([
               this.Database.updateGame(updatedConfig),
               this.Database.removeLotteryPlayers(),
               this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
-              this.Helper.sendPrivateMessage(this.discordHook, winner, eventLog, true),
               this.Helper.logEvent(winner, eventLog, 'pastEvents')
             ])
               .then(() => this.Database.savePlayer(winner));

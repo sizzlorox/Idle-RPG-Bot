@@ -165,12 +165,14 @@ discordBot.on('error', (err) => {
 });
 
 discordBot.on('message', async (message) => {
-  await Antispam.logAuthor(message.author.id);
-  await Antispam.logMessage(message.author.id, message.content);
-  const skip = await Antispam.checkMessageInterval(message);
-  if (skip) {
-    infoLog.info(`Spam detected by ${message.author.username}.`);
-    return;
+  if (message.content.startsWith('!')) {
+    await Antispam.logAuthor(message.author.id);
+    await Antispam.logMessage(message.author.id, message.content);
+    const skip = await Antispam.checkMessageInterval(message);
+    if (skip) {
+      infoLog.info(`Spam detected by ${message.author.username}.`);
+      return;
+    }
   }
 
   if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
