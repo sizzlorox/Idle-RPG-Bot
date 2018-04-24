@@ -220,7 +220,7 @@ class Game {
         const rankString = `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
           .sort((player1, player2) => {
             if (Object.keys(type)[0] === 'level') {
-              return player2.experience.current - player1.experience.current && player2.level - player2.level;
+              return player2.experience.current - player1.experience.current && player2.level - player1.level;
             }
 
             if (Object.keys(type)[0].includes('.')) {
@@ -245,7 +245,7 @@ ${rankString}
       .then(currentRank => currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
         .sort((player1, player2) => {
           if (Object.keys(type)[0] === 'level') {
-            return player2.experience.current - player1.experience.current && player2.level - player2.level;
+            return player2.experience.current - player1.experience.current && player2.level - player1.level;
           }
 
           if (Object.keys(type)[0].includes('.')) {
