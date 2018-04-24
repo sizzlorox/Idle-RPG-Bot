@@ -242,21 +242,19 @@ ${rankString}
   getRank(commandAuthor, type = { level: -1 }) {
     return this.Database.loadPlayer(commandAuthor.id)
       .then(player => this.Database.loadCurrentRank(player, type))
-      .then((currentRank) => {
-        return currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
-          .sort((player1, player2) => {
-            if (Object.keys(type)[0] === 'level') {
-              return player2.experience.current - player1.experience.current && player2.level - player2.level;
-            }
+      .then(currentRank => currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+        .sort((player1, player2) => {
+          if (Object.keys(type)[0] === 'level') {
+            return player2.experience.current - player1.experience.current && player2.level - player2.level;
+          }
 
-            if (Object.keys(type)[0].includes('.')) {
-              const keys = Object.keys(type)[0].split('.');
-              return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
-            }
+          if (Object.keys(type)[0].includes('.')) {
+            const keys = Object.keys(type)[0].split('.');
+            return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
+          }
 
-            return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
-          }).findIndex(player => player.discordId === commandAuthor.id);
-      })
+          return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+        }).findIndex(player => player.discordId === commandAuthor.id))
       .then((rank) => {
         commandAuthor.send(`You're currently ranked ${rank} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
       });
@@ -461,9 +459,9 @@ ${rankString}
 
             lotteryPlayers.forEach((player) => {
               if (player.id !== winner.id) {
-                discordBot.users.find('id', player.discordId).send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
+                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
               } else {
-                discordBot.users.find('id', player.discordId).send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
+                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
               }
             });
 
