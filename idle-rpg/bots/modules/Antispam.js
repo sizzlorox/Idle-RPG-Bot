@@ -4,6 +4,7 @@ class Antispam {
   constructor() {
     this.authors = [];
     this.messageLog = [];
+    this.interval = 1500;
   }
 
   logAuthor(authorId) {
@@ -37,10 +38,10 @@ class Antispam {
     let skip = false;
     if (msgsMatched >= 2) {
       for (let i = 0; i < this.authors.length; i++) {
-        if (this.authors[i].time > now - 3000) {
+        if (this.authors[i].time > now - this.interval) {
           skip = true;
         }
-        else if (this.authors[i].time < now - 3000) {
+        else if (this.authors[i].time < now - this.interval) {
           this.authors.splice(i);
         }
         if (this.messageLog.length >= 200) {
