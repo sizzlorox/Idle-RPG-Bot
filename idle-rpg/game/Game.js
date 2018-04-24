@@ -435,7 +435,6 @@ ${rankString}
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
             updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
             this.config = updatedConfig;
-            infoLog.info({ lottery: eventLog });
 
             return Promise.all([
               this.Database.updateGame(updatedConfig),
