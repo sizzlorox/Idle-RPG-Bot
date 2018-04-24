@@ -437,6 +437,8 @@ ${rankString}
             lotteryPlayers.forEach((player) => {
               if (player.id !== winner.id) {
                 discordBot.users.find('id', player.discordId).send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
+              } else {
+                discordBot.users.find('id', player.discordId).send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
               }
             });
 
@@ -447,7 +449,6 @@ ${rankString}
               this.Database.updateGame(updatedConfig),
               this.Database.removeLotteryPlayers(),
               this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
-              this.Helper.sendPrivateMessage(this.discordHook, winner, eventLog, true),
               this.Helper.logEvent(winner, eventLog, 'pastEvents')
             ])
               .then(() => this.Database.savePlayer(winner));
