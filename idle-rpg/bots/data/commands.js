@@ -14,6 +14,7 @@ const commands = [
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
         !top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
+        !rank <gold, spells, level, stolen, stole, gambles, events, bounty> - Returns your current rank of selected section
         !s, !stats - Sends a PM with your stats
         !s, !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-sensitive)
         !e, !equip - Sends a PM with your equipment
@@ -316,6 +317,40 @@ const commands = [
           break;
         default:
           game.top10(message.author, { level: -1 });
+          break;
+      }
+    }
+  },
+
+  rank = {
+    command: '!rank',
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      switch ((message.content.split(/ (.+)/)[1] === undefined) ? 'level' : message.content.split(/ (.+)/)[1].toLowerCase()) {
+        case 'gambles':
+          game.getRank(message.author, { gambles: -1 });
+          break;
+        case 'stolen':
+          game.getRank(message.author, { stolen: -1 });
+          break;
+        case 'stole':
+          game.getRank(message.author, { stole: -1 });
+          break;
+        case 'gold':
+          game.getRank(message.author, { 'gold.current': -1 });
+          break;
+        case 'spells':
+          game.getRank(message.author, { spellCast: -1 });
+          break;
+        case 'events':
+          game.getRank(message.author, { events: -1 });
+          break;
+        case 'bounty':
+          game.getRank(message.author, { currentBounty: -1 });
+          break;
+        default:
+          game.getRank(message.author, { level: -1 });
           break;
       }
     }

@@ -218,6 +218,39 @@ class Database {
       .limit(10));
   }
 
+  loadCurrentRank(player, type) {
+    connect();
+    const select = {
+      name: 1
+    };
+    const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.name);
+    enumHelper.mockPlayers.map(npc => npc.name).forEach(npc => removeNpcs.push(npc));
+
+    select[Object.keys(type)[0]] = 1;
+    select.discordId = 1;
+
+    if (Object.keys(type)[0] === 'level') {
+      select['experience.current'] = 1;
+      type['experience.current'] = -1;
+    }
+    const query = {
+      name: { $nin: removeNpcs, $exists: true }
+    };
+    query[Object.keys(type)[0]] = { $gte: Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] };
+
+    return new Promise((resolve, reject) => Player.find(query, (err, result) => {
+      if (err) {
+        disconnect();
+        return reject(err);
+      }
+
+      disconnect();
+      return resolve(result);
+    })
+      .select(select)
+      .sort(type));
+  }
+
   loadPlayer(discordId, selectFields = {}) {
     connect();
     return new Promise((resolve, reject) => Player.findOne({ discordId }, (err, result) => {

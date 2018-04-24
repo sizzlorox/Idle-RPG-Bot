@@ -17,22 +17,24 @@ class Game {
     this.Helper = Helper;
     this.Database = new Database(Helper);
     this.Event = new Event(this.Database, Helper, discordHook);
-    this.Database.loadGame()
-      .then((loadedConfig) => {
-        this.config = loadedConfig;
-      })
-      .then(() => console.log(`Config loaded\nMultiplier:${this.config.multiplier}\nActive Bless:${this.config.spells.activeBless}\nPrize Pool:${this.config.dailyLottery.prizePool}`))
-      .then(() => {
-        for (let i = 0; i < this.config.spells.activeBless; i++) {
-          setTimeout(() => {
-            this.config.spells.activeBless--;
-            this.config.multiplier -= 1;
-            this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-            infoLog.info({ multiplier: this.multiplier, activeBless: this.config.spells.activeBless });
-            this.Database.updateGame(this.config);
-          }, 1800000 + (5000 * i));
-        }
-      });
+    if (process.env.NODE_ENV.includes('production')) {
+      this.Database.loadGame()
+        .then((loadedConfig) => {
+          this.config = loadedConfig;
+        })
+        .then(() => console.log(`Config loaded\nMultiplier:${this.config.multiplier}\nActive Bless:${this.config.spells.activeBless}\nPrize Pool:${this.config.dailyLottery.prizePool}`))
+        .then(() => {
+          for (let i = 0; i < this.config.spells.activeBless; i++) {
+            setTimeout(() => {
+              this.config.spells.activeBless--;
+              this.config.multiplier -= 1;
+              this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+              infoLog.info({ multiplier: this.multiplier, activeBless: this.config.spells.activeBless });
+              this.Database.updateGame(this.config);
+            }, 1800000 + (5000 * i));
+          }
+        });
+    }
   }
 
   /**
@@ -234,6 +236,29 @@ class Game {
         commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
 ${rankString}
         \`\`\``);
+      });
+  }
+
+  getRank(commandAuthor, type = { level: -1 }) {
+    return this.Database.loadPlayer(commandAuthor.id)
+      .then(player => this.Database.loadCurrentRank(player, type))
+      .then((currentRank) => {
+        return currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+          .sort((player1, player2) => {
+            if (Object.keys(type)[0] === 'level') {
+              return player2.experience.current - player1.experience.current && player2.level - player2.level;
+            }
+
+            if (Object.keys(type)[0].includes('.')) {
+              const keys = Object.keys(type)[0].split('.');
+              return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
+            }
+
+            return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+          }).findIndex(player => player.discordId === commandAuthor.id);
+      })
+      .then((rank) => {
+        commandAuthor.send(`You're currently ranked ${rank} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
       });
   }
 
