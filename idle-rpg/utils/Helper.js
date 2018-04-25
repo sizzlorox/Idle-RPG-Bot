@@ -112,22 +112,16 @@ class Helper {
 
       if (isMovement) {
         return discordHook.movementHook.send(msg)
-          .then(debugMsg => moveLog.move(this.formatLog(debugMsg)))
-          .then(() => {
-            return resolve();
-          })
+          .then(debugMsg => moveLog.info(this.formatLog(debugMsg)))
+          .then(resolve())
           .catch(err => console.log(err));
       }
 
       return discordHook.actionHook.send(msg)
-        .then(debugMsg => actionLog.action(this.formatLog(debugMsg)))
-        .then(() => {
-          return resolve();
-        })
+        .then(debugMsg => actionLog.info(this.formatLog(debugMsg)))
+        .then(resolve())
         .catch(err => console.log(err));
     });
-    // Add if to check if channel is streaming
-    // twitchBot.say(msg.replace('/\*/g', ''));
   }
 
   formatLog(json) {

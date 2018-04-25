@@ -212,7 +212,7 @@ discordBot.on('guildMemberAdd', (member) => {
   }
 
   channel.send(`Welcome ${member}! This channel has an Idle-RPG bot! If you have any questions check the <#${faqChannelId}> or PM me !help.`);
-  welcomeLog.welcome(member);
+  welcomeLog.info(member);
 });
 
 discordBot.login(botLoginToken);

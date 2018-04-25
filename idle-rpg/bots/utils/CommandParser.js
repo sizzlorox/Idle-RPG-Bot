@@ -23,7 +23,7 @@ class CommandParser {
       if (!commandObj) {
         return;
       }
-      commandLog.command({ author: messageObj.author.username, command: messageContent, time: moment().utc().toISOString() });
+      commandLog.info({ author: messageObj.author.username, command: messageContent, time: moment().utc().toISOString() });
 
       if (commandObj.channelOnlyId && channelId !== commandObj.channelOnlyId && messageObj.channel.type !== 'dm') {
         return messageObj.delete(1500)
