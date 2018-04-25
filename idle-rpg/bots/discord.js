@@ -165,7 +165,7 @@ discordBot.on('error', (err) => {
 });
 
 discordBot.on('message', async (message) => {
-  if (message.content.startsWith('!')) {
+  if (message.content.startsWith('!cs') || message.content.startsWith('!castspell')) {
     await Antispam.logAuthor(message.author.id);
     await Antispam.logMessage(message.author.id, message.content);
     const skip = await Antispam.checkMessageInterval(message);
@@ -212,7 +212,7 @@ discordBot.on('guildMemberAdd', (member) => {
   }
 
   channel.send(`Welcome ${member}! This channel has an Idle-RPG bot! If you have any questions check the <#${faqChannelId}> or PM me !help.`);
-  welcomeLog.welcome(member);
+  welcomeLog.info(member);
 });
 
 discordBot.login(botLoginToken);

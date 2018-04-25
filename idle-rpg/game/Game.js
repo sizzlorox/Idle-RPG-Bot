@@ -1,7 +1,7 @@
 const Database = require('../database/Database');
 const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
-const { infoLog, errorLog } = require('../utils/logger');
+const { errorLog } = require('../utils/logger');
 const globalSpells = require('./data/globalSpells');
 
 /**
@@ -29,7 +29,6 @@ class Game {
               this.config.spells.activeBless--;
               this.config.multiplier -= 1;
               this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-              infoLog.info({ multiplier: this.multiplier, activeBless: this.config.spells.activeBless });
               this.Database.updateGame(this.config);
             }, 1800000 + (5000 * i));
           }
@@ -459,9 +458,9 @@ ${rankString}
 
             lotteryPlayers.forEach((player) => {
               if (player.discordId !== winner.discordId) {
-                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
+                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
               } else {
-                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length}.`);
+                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
               }
             });
 

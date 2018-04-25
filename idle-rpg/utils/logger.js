@@ -1,163 +1,119 @@
-const winston = require('winston');
+const bunyan = require('bunyan');
 const path = require('path');
+const RotatingFileStream = require('bunyan-rotating-file-stream');
 const { rootPath } = require('../../settings');
-require('winston-daily-rotate-file');
 
 const logger = {
-  infoLog: new winston.Logger({
-    // format: winston.format.json(),
-    levels: {
-      info: 0,
-    },
-    transports: [
-      new winston.transports.DailyRotateFile({
-        name: 'info',
-        level: 'info',
-        filename: 'info.log',
-        dirname: path.join(`${rootPath}`, 'logs'),
-        datePattern: path.normalize('/yyyy-MM-dd/'),
-        localTime: true,
-        prepend: true,
-        maxDays: 15,
-        timestamp: true,
-        prettyPrint: true,
-        createTree: true,
-        json: true
+  infoLog: bunyan.createLogger({
+    name: 'info',
+    streams: [{
+      stream: new RotatingFileStream({
+        path: path.join(rootPath, 'logs/info.%d-%b-%y.log'),
+        period: '15d',          // daily rotation
+        totalFiles: 10,        // keep up to 10 back copies
+        rotateExisting: true,  // Give ourselves a clean file when we start up, based on period
+        threshold: '10m',      // Rotate log files larger than 10 megabytes
+        totalSize: '20m',      // Don't keep more than 20mb of archived log files
       })
-    ],
-    exceptionHandlers: [
-      new winston.transports.DailyRotateFile({
-        name: 'exceptions',
-        filename: 'exceptions.log',
-        dirname: path.join(`${rootPath}`, 'logs'),
-        silent: false,
-        datePattern: path.normalize('/yyyy-MM-dd/'),
-        localTime: true,
-        prepend: true,
-        prepend: true,
-        maxDays: 15,
-        timestamp: true,
-        prettyPrint: true,
-        createTree: true,
-        json: true
-      })
-    ]
+    }]
   }),
 
-  welcomeLog: new winston.Logger({
-    // format: winston.format.json(),
-    levels: {
-      welcome: 0,
+  exceptionLog: bunyan.createLogger({
+    name: 'exception',
+    streams: [{
+      stream: process.stderr
     },
-    transports: [
-      new winston.transports.DailyRotateFile({
-        name: 'welcome',
-        level: 'welcome',
-        filename: 'welcome.log',
-        dirname: path.join(`${rootPath}`, 'logs'),
-        datePattern: path.normalize('/yyyy-MM-dd/'),
-        localTime: true,
-        prepend: true,
-        maxDays: 15,
-        timestamp: true,
-        prettyPrint: true,
-        createTree: true,
-        json: true
+    {
+      stream: new RotatingFileStream({
+        path: path.join(rootPath, 'logs/exception.%d-%b-%y.log'),
+        period: '15d',          // daily rotation
+        totalFiles: 10,        // keep up to 10 back copies
+        rotateExisting: true,  // Give ourselves a clean file when we start up, based on period
+        threshold: '10m',      // Rotate log files larger than 10 megabytes
+        totalSize: '20m',      // Don't keep more than 20mb of archived log files
       })
-    ]
+    }]
   }),
 
-  actionLog: new winston.Logger({
-    // format: winston.format.json(),
-    levels: {
-      action: 0,
-    },
-    transports: [
-      new winston.transports.DailyRotateFile({
-        name: 'action',
-        level: 'action',
-        filename: 'action.log',
-        dirname: path.join(`${rootPath}`, 'logs'),
-        datePattern: path.normalize('/yyyy-MM-dd/'),
-        localTime: true,
-        prepend: true,
-        maxDays: 15,
-        timestamp: true,
-        prettyPrint: true,
-        createTree: true,
-        json: true
+  welcomeLog: bunyan.createLogger({
+    name: 'welcome',
+    streams: [{
+      stream: new RotatingFileStream({
+        path: path.join(rootPath, 'logs/welcome.%d-%b-%y.log'),
+        period: '15d',          // daily rotation
+        totalFiles: 10,        // keep up to 10 back copies
+        rotateExisting: true,  // Give ourselves a clean file when we start up, based on period
+        threshold: '10m',      // Rotate log files larger than 10 megabytes
+        totalSize: '20m',      // Don't keep more than 20mb of archived log files
       })
-    ]
+    }]
   }),
 
-  moveLog: new winston.Logger({
-    // format: winston.format.json(),
-    levels: {
-      move: 0,
-    },
-    transports: [
-      new winston.transports.DailyRotateFile({
-        name: 'move',
-        level: 'move',
-        filename: 'move.log',
-        dirname: path.join(`${rootPath}`, 'logs'),
-        datePattern: path.normalize('/yyyy-MM-dd/'),
-        localTime: true,
-        prepend: true,
-        maxDays: 15,
-        timestamp: true,
-        prettyPrint: true,
-        createTree: true,
-        json: true
+  actionLog: bunyan.createLogger({
+    name: 'action',
+    streams: [{
+      stream: new RotatingFileStream({
+        path: path.join(rootPath, 'logs/action.%d-%b-%y.log'),
+        period: '15d',          // daily rotation
+        totalFiles: 10,        // keep up to 10 back copies
+        rotateExisting: true,  // Give ourselves a clean file when we start up, based on period
+        threshold: '10m',      // Rotate log files larger than 10 megabytes
+        totalSize: '20m',      // Don't keep more than 20mb of archived log files
       })
-    ]
+    }]
   }),
 
-  errorLog: new winston.Logger({
-    // format: winston.format.json(),
-    levels: {
-      error: 0,
-    },
-    transports: [
-      new winston.transports.DailyRotateFile({
-        name: 'error',
-        level: 'error',
-        filename: 'error.log',
-        dirname: path.join(`${rootPath}`, 'logs'),
-        datePattern: path.normalize('/yyyy-MM-dd/'),
-        localTime: true,
-        prepend: true,
-        maxDays: 15,
-        timestamp: true,
-        prettyPrint: true,
-        createTree: true,
-        json: true
+  moveLog: bunyan.createLogger({
+    name: 'move',
+    streams: [{
+      stream: new RotatingFileStream({
+        path: path.join(rootPath, 'logs/move.%d-%b-%y.log'),
+        period: '15d',          // daily rotation
+        totalFiles: 10,        // keep up to 10 back copies
+        rotateExisting: true,  // Give ourselves a clean file when we start up, based on period
+        threshold: '10m',      // Rotate log files larger than 10 megabytes
+        totalSize: '20m',      // Don't keep more than 20mb of archived log files
       })
-    ]
+    }]
   }),
 
-  commandLog: new winston.Logger({
-    // format: winston.format.json(),
-    levels: {
-      command: 0,
-    },
-    transports: [
-      new winston.transports.DailyRotateFile({
-        name: 'command',
-        level: 'command',
-        filename: 'command.log',
-        dirname: path.join(`${rootPath}`, 'logs'),
-        datePattern: path.normalize('/yyyy-MM-dd/'),
-        localTime: true,
-        prepend: true,
-        maxDays: 15,
-        timestamp: true,
-        prettyPrint: true,
-        createTree: true,
-        json: true
+  errorLog: bunyan.createLogger({
+    name: 'error',
+    streams: [{
+      stream: new RotatingFileStream({
+        path: path.join(rootPath, 'logs/error.%d-%b-%y.log'),
+        period: '15d',          // daily rotation
+        totalFiles: 10,        // keep up to 10 back copies
+        rotateExisting: true,  // Give ourselves a clean file when we start up, based on period
+        threshold: '10m',      // Rotate log files larger than 10 megabytes
+        totalSize: '20m',      // Don't keep more than 20mb of archived log files
       })
-    ]
+    }]
+  }),
+
+  commandLog: bunyan.createLogger({
+    name: 'command',
+    streams: [{
+      stream: new RotatingFileStream({
+        path: path.join(rootPath, 'logs/command.%d-%b-%y.log'),
+        period: '15d',          // daily rotation
+        totalFiles: 10,        // keep up to 10 back copies
+        rotateExisting: true,  // Give ourselves a clean file when we start up, based on period
+        threshold: '10m',      // Rotate log files larger than 10 megabytes
+        totalSize: '20m',      // Don't keep more than 20mb of archived log files
+      })
+    }]
   }),
 };
+
+process.on('SIGUSR2', () => {
+  logger.infoLog.reopenFileStreams();
+  logger.welcomeLog.reopenFileStreams();
+  logger.actionLog.reopenFileStreams();
+  logger.moveLog.reopenFileStreams();
+  logger.errorLog.reopenFileStreams();
+  logger.commandLog.reopenFileStreams();
+  logger.exceptionLog.reopenFileStreams();
+});
 
 module.exports = logger;

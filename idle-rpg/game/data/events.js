@@ -448,10 +448,10 @@ const events = {
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
         return ItemManager.generateItem(selectedPlayer, mob)
-          .then((item) => {
+          .then(async (item) => {
             if (item.position !== enumHelper.inventory.position) {
-              const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-              const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+              const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+              const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
               if (oldItemRating > newItemRating) {
                 selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
               } else {
