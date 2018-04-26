@@ -1,6 +1,6 @@
 const enumHelper = require('../../utils/enumHelper');
 const { pvpLevelRestriction } = require('../../../settings');
-const { errorLog, infoLog } = require('../../utils/logger');
+const { errorLog } = require('../../utils/logger');
 
 const events = {
   movement: {
@@ -771,12 +771,10 @@ const events = {
         const eventMsgDionysus = `Dionysus has partied with ${Helper.generatePlayerName(selectedPlayer, true)} increasing ${Helper.generateGenderString(selectedPlayer, 'his')} multiplier by ${increaseMult} for ${Math.floor(timeLimit / 60000)} minutes!`;
         const eventLogDionysus = `Dionysus partied with you increasing your multiplier by ${increaseMult} for ${Math.floor(timeLimit / 60000)} minutes!`;
         selectedPlayer.personalMultiplier = increaseMult;
-        infoLog.info({ player: selectedPlayer, god: 'dionysus', timeLimit, increaseMult });
         setTimeout(() => {
           Database.loadPlayer(selectedPlayer.discordId)
             .then((loadedPlayer) => {
               loadedPlayer.personalMultiplier = 0;
-              infoLog.info({ player: loadedPlayer, god: 'dionysus', event: 'removed multiplier' });
               return loadedPlayer;
             })
             .then(updatedPlayer => Database.savePlayer(updatedPlayer));
