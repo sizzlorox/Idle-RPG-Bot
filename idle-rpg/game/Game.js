@@ -95,6 +95,9 @@ class Game {
         }
         return updatedPlayer;
       })
+      .then((updatedPlayer) => {
+        setPlayerTitles(discordBot, updatedPlayer);
+      })
       .catch(err => console.log(err));
   }
 
@@ -469,11 +472,11 @@ ${rankString}
 
             return Promise.all([
               this.Database.updateGame(updatedConfig),
-              this.Database.removeLotteryPlayers(),
               this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
               this.Helper.logEvent(winner, eventLog, 'pastEvents')
             ])
-              .then(() => this.Database.savePlayer(winner));
+              .then(() => this.Database.savePlayer(winner))
+              .then(() => this.Database.removeLotteryPlayers());
           });
       })
       .catch(err => errorLog.error(err));
