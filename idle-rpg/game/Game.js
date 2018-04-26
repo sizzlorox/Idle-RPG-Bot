@@ -96,7 +96,7 @@ class Game {
         return updatedPlayer;
       })
       .then((updatedPlayer) => {
-        setPlayerTitles(discordBot, updatedPlayer);
+        this.setPlayerTitles(discordBot, updatedPlayer);
       })
       .catch(err => console.log(err));
   }
