@@ -258,7 +258,7 @@ ${rankString}
           return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
         }).findIndex(player => player.discordId === commandAuthor.id))
       .then((rank) => {
-        commandAuthor.send(`You're currently ranked ${rank} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
+        commandAuthor.send(`You're currently ranked ${rank + 1} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
       });
   }
 
