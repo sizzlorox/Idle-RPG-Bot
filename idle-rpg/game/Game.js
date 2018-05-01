@@ -476,7 +476,8 @@ ${rankString}
               this.Helper.logEvent(winner, eventLog, 'pastEvents')
             ])
               .then(() => this.Database.savePlayer(winner))
-              .then(() => this.Database.removeLotteryPlayers());
+              .then(() => this.Database.removeLotteryPlayers())
+              .catch(err => errorLog.error(err));
           });
       })
       .catch(err => errorLog.error(err));
