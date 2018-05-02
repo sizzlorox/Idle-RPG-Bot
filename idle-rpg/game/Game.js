@@ -464,7 +464,7 @@ ${rankString}
               if (player.discordId !== winner.discordId && discordUser) {
                 discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
               } else if (discordUser) {
-                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
+                discordUser.send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
               }
             });
 
