@@ -42,6 +42,7 @@ class Antispam {
           skip = true;
         }
         else if (this.authors[i].time < now - this.interval) {
+          this.messageLog.splice(this.messageLog.findIndex(message => message.author === this.authors[i].author));
           this.authors.splice(i);
         }
         if (this.messageLog.length >= 200) {

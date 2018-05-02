@@ -258,7 +258,7 @@ ${rankString}
           return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
         }).findIndex(player => player.discordId === commandAuthor.id))
       .then((rank) => {
-        commandAuthor.send(`You're currently ranked ${rank} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
+        commandAuthor.send(`You're currently ranked ${rank + 1} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
       });
   }
 
@@ -460,9 +460,10 @@ ${rankString}
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
 
             lotteryPlayers.forEach((player) => {
-              if (player.discordId !== winner.discordId) {
-                discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
-              } else {
+              const discordUser = discordBot.users.find(user => user.id === player.discordId);
+              if (player.discordId !== winner.discordId && discordUser) {
+                discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
+              } else if (discordUser) {
                 discordBot.users.find(user => user.id === player.discordId).send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
               }
             });
@@ -476,7 +477,8 @@ ${rankString}
               this.Helper.logEvent(winner, eventLog, 'pastEvents')
             ])
               .then(() => this.Database.savePlayer(winner))
-              .then(() => this.Database.removeLotteryPlayers());
+              .then(() => this.Database.removeLotteryPlayers())
+              .catch(err => errorLog.error(err));
           });
       })
       .catch(err => errorLog.error(err));
