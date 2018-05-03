@@ -264,13 +264,14 @@ const events = {
      */
     pveResults: (discordHook, Helper, MapClass, results, multiplier) => new Promise((resolve) => {
       const playerMaxHealth = 100 + (results.attacker.level * 5);
-
+      const mobListResult = [];
+      results.defender.forEach(mob => mobListResult.push(`      ${mob.name}'s ${mob.equipment.weapon.name} did ${Math.floor(results.defenderDamage / (results.defender.length + 1))} damage.
+      ${mob.name} has ${mob.health <= 0 ? 0 : mob.health} / ${mob.maxHealth} HP left.`));
       const selectedPlayer = results.attacker;
       let battleResult = `Battle Results:
   Your ${selectedPlayer.equipment.weapon.name} did ${results.attackerDamage} damage.
   You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
-  ${results.defender.forEach(mob => `${mob.name}'s ${mob.equipment.weapon.name} did ${results.defenderDamage / (results.defender.length + 1)} damage.
-    ${mob.name} has ${mob.health} / ${mob.maxHealth} HP left.`)}`;
+${mobListResult.join('\n')}`;
 
       if (selectedPlayer.health <= 0) {
         battleResult = battleResult.replace(`  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.`, '');
@@ -445,7 +446,7 @@ const events = {
       const dropitemChance = Helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
-        return ItemManager.generateItem(selectedPlayer, mob)
+        return ItemManager.generateItem(selectedPlayer, mob[0])
           .then(async (item) => {
             if (item.position !== enumHelper.inventory.position) {
               const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
@@ -461,11 +462,11 @@ const events = {
 
             let eventMsg;
             if (!item.isXmasEvent) {
-              eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.name}!\``;
+              eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob[0].name}!\``;
             } else {
-              eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.name}!\`**`;
+              eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob[0].name}!\`**`;
             }
-            const eventLog = `Received ${item.name} from ${mob.name}`;
+            const eventLog = `Received ${item.name} from ${mob[0].name}`;
 
             return Promise.all([
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
