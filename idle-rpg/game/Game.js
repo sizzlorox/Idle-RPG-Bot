@@ -78,7 +78,6 @@ class Game {
           console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
         }
 
-        console.log(`MONSTER AMOUNT TEST: Level ${selectedPlayer.level} ${Math.floor((selectedPlayer.level * Math.log(2)) / 100) + 1}`);
         return selectedPlayer;
       })
       .then((selectedPlayer) => {

@@ -46,12 +46,25 @@ class Battle {
     return new Promise((resolve) => {
       const maxRounds = 5;
       const battleResults = [];
-      for (let round = 1; round <= maxRounds; round++) {
-        battleResults.push(
-          this.round(attacker, defender)
-        );
-        if (attacker.health <= 0 || defender.health <= 0) {
-          break;
+      if (defender instanceof Array) {
+        defender.forEach((mob) => {
+          for (let round = 1; round <= maxRounds; round++) {
+            battleResults.push(
+              this.round(attacker, mob)
+            );
+            if (attacker.health <= 0 || mob.health <= 0) {
+              break;
+            }
+          }
+        });
+      } else {
+        for (let round = 1; round <= maxRounds; round++) {
+          battleResults.push(
+            this.round(attacker, defender)
+          );
+          if (attacker.health <= 0 || defender.health <= 0) {
+            break;
+          }
         }
       }
 
@@ -66,8 +79,10 @@ class Battle {
           if (attacker.health < 0) {
             attacker.health = 0;
           }
-          if (defender.health < 0) {
-            defender.health = 0;
+          if (defender instanceof Object) {
+            if (defender.health < 0) {
+              defender.health = 0;
+            }
           }
 
           return resolve({ attacker, defender, attackerDamage, defenderDamage });

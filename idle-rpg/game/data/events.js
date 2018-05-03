@@ -85,7 +85,7 @@ const events = {
      * @param {InventoryManager} InventoryManager
      * @returns {Player} updatedPlayer
      */
-    item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
+    item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
       const itemCost = Math.round(item.gold);
 
       if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
@@ -94,8 +94,8 @@ const events = {
 
       if (item.position !== enumHelper.inventory.position) {
         selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
-        const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-        const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+        const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+        const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
         if (oldItemRating > newItemRating) {
           return resolve(selectedPlayer);
         }
@@ -263,22 +263,21 @@ const events = {
      * @returns { result, updatedAttacker, updatedDefender } updatedBattleResults
      */
     pveResults: (discordHook, Helper, MapClass, results, multiplier) => new Promise((resolve) => {
-      const mobMaxHealth = results.defender.maxHealth;
       const playerMaxHealth = 100 + (results.attacker.level * 5);
 
       const selectedPlayer = results.attacker;
       let battleResult = `Battle Results:
   Your ${selectedPlayer.equipment.weapon.name} did ${results.attackerDamage} damage.
   You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
-  ${results.defender.name}'s ${results.defender.equipment.weapon.name} did ${results.defenderDamage} damage.
-  ${results.defender.name} has ${results.defender.health} / ${mobMaxHealth} HP left.`;
+  ${results.defender.forEach(mob => `${mob.name}'s ${mob.equipment.weapon.name} did ${results.defenderDamage / (results.defender.length + 1)} damage.
+    ${mob.name} has ${mob.health} / ${mob.maxHealth} HP left.`)}`;
 
       if (selectedPlayer.health <= 0) {
         battleResult = battleResult.replace(`  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.`, '');
-        const eventMsg = `[\`${selectedPlayer.map.name}\`] \`${results.defender.name}\`'s \`${results.defender.equipment.weapon.name}\` just killed ${Helper.generatePlayerName(selectedPlayer, true)}!
-  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg! [\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${results.defender.length + 1}x \`${results.defender[0].name}\`'s \`${results.defender[0].equipment.weapon.name}\` just killed ${Helper.generatePlayerName(selectedPlayer, true)}!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg!`;
 
-        const eventLog = `${results.defender.name}'s ${results.defender.equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
+        const eventLog = `${results.defender.length + 1}x ${results.defender[0].name}'s ${results.defender[0].equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
         selectedPlayer.battles.lost++;
 
         return Promise.all([
@@ -294,16 +293,16 @@ const events = {
       }
 
       if (results.defender.health > 0 && selectedPlayer.health > 0) {
-        const expGain = Math.floor(((results.defender.experience * multiplier) + (results.defenderDamage / 4)) / 6);
+        const expGain = Math.floor(((results.defender.experience * multiplier) + (results.defenderDamage / 4)) / 6) * (results.defender.length + 1);
         const eventMsg = results.attackerDamage > results.defenderDamage
-          ? `[\`${selectedPlayer.map.name}\`] \`${results.defender.name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
-  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`
-          : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from \`${results.defender.name}\`!
-  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
+          ? `[\`${selectedPlayer.map.name}\`] ${results.defender.length + 1}x \`${results.defender[0].name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`
+          : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from ${results.defender.length + 1}x \`${results.defender[0].name}\`!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
 
         const eventLog = results.attackerDamage > results.defenderDamage
-          ? `${results.defender.name} fled from you in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`
-          : `You fled from ${results.defender.name} in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
+          ? `${results.defender.length + 1}x ${results.defender[0].name} fled from you in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`
+          : `You fled from ${results.defender.length + 1}x ${results.defender[0].name} in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
 
         selectedPlayer.experience.current += expGain;
         selectedPlayer.experience.total += expGain;
@@ -320,13 +319,12 @@ const events = {
           }));
       }
 
-      battleResult = battleResult.replace(`  ${results.defender.name} has ${results.defender.health} / ${mobMaxHealth} HP left.`, '');
-      const goldGain = Number(results.defender.gold * multiplier);
-      const expGain = Math.floor((results.defender.experience * multiplier) + (results.defenderDamage / 4));
+      const goldGain = Number(results.defender.gold * multiplier) * (results.defender.length + 1);
+      const expGain = Math.floor((results.defender.experience * multiplier) + (results.defenderDamage / 4)) * (results.defender.length + 1);
 
-      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed \`${results.defender.name}\`!
-  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]-[\`${results.defender.name}\` HP:${results.defender.health}/${mobMaxHealth}]`;
-      const eventLog = `Killed ${results.defender.name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]`;
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed ${results.defender.length + 1}x \`${results.defender[0].name}\`!
+  ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
+      const eventLog = `Killed ${results.defender.length + 1}x ${results.defender[0].name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]`;
 
       selectedPlayer.experience.current += expGain;
       selectedPlayer.experience.total += expGain;
@@ -336,8 +334,8 @@ const events = {
       selectedPlayer.battles.won++;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult).concat('```').concat(eventLog), true),
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length + 1}x`, '')),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length + 1}x`, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
         Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
       ])
         .then(resolve({
@@ -347,7 +345,7 @@ const events = {
         }));
     }),
 
-    steal: (discordHook, Helper, stealingPlayer, victimPlayer, InventoryManager) => new Promise((resolve) => {
+    steal: (discordHook, Helper, stealingPlayer, victimPlayer, InventoryManager) => new Promise(async (resolve) => {
       const luckStealChance = Helper.randomBetween(0, 100);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
@@ -380,8 +378,8 @@ const events = {
           victimPlayer.stolen++;
           stealingPlayer.stole++;
           if (victimPlayer.equipment[itemKeys[luckItem]].name !== enumHelper.equipment.empty[itemKeys[luckItem]].name) {
-            const oldItemRating = Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
-            const newItemRating = Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
+            const oldItemRating = await Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
+            const newItemRating = await Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
             if (oldItemRating < newItemRating) {
               stealingPlayer = Helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, stolenEquip);
               if (victimPlayer.equipment[itemKeys[luckItem]].previousOwners.length > 0) {
@@ -525,11 +523,11 @@ const events = {
         return resolve(selectedPlayer);
       }),
 
-      item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise((resolve) => {
+      item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
         const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, item);
         if (item.position !== enumHelper.inventory.position) {
-          const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-          const newItemRating = Helper.calculateItemRating(selectedPlayer, item);
+          const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+          const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
           if (oldItemRating > newItemRating) {
             selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
           } else {
@@ -791,12 +789,12 @@ const events = {
   },
 
   special: {
-    snowFlake: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+    snowFlake: (discordHook, Helper, selectedPlayer) => new Promise(async (resolve) => {
       const snowFlakeDice = Helper.randomBetween(0, 100);
       if (snowFlakeDice <= 15) {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
-        const oldItemRating = Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
-        const newItemRating = Helper.calculateItemRating(selectedPlayer, snowFlake);
+        const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
+        const newItemRating = await Helper.calculateItemRating(selectedPlayer, snowFlake);
         if (oldItemRating < newItemRating) {
           selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
           const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
