@@ -65,10 +65,8 @@ const commands = [
 
             const stats = Helper.generateStatsString(playerStats);
             const equip = Helper.generateEquipmentsString(playerStats);
-            message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`)
-              .concat('\n')
-              .concat(equip)
-              .replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`));
+            message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`))
+              .then(() => message.author.send(equip.replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`)));
           });
       }
 
@@ -80,7 +78,8 @@ const commands = [
 
           const stats = Helper.generateStatsString(playerStats);
           const equip = Helper.generateEquipmentsString(playerStats);
-          message.author.send(stats.concat('\n').concat(equip));
+          message.author.send(stats)
+            .then(() => message.author.send(equip));
         });
     }
   },

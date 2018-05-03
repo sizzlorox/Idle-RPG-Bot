@@ -33,6 +33,16 @@ class Game {
             }, 1800000 + (5000 * i));
           }
         });
+    } else {
+      this.config = {
+        multiplier: 1,
+        spells: {
+          activeBless: 0
+        },
+        dailyLottery: {
+          prizePool: 1500
+        }
+      };
     }
   }
 
@@ -67,6 +77,7 @@ class Game {
           const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
           console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
         }
+
         return selectedPlayer;
       })
       .then((selectedPlayer) => {
