@@ -281,8 +281,8 @@ const events = {
         selectedPlayer.battles.lost++;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length + 1}x `, '')),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length + 1}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
           Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
         ])
           .then(resolve({
@@ -308,8 +308,8 @@ const events = {
         selectedPlayer.experience.total += expGain;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult).concat('```').concat(eventLog), true),
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length + 1}x `, '')),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length + 1}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
           Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
         ])
           .then(resolve({
@@ -334,8 +334,8 @@ const events = {
       selectedPlayer.battles.won++;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length + 1}x`, '')),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length + 1}x`, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length + 1}x `, '')),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length + 1}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
         Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
       ])
         .then(resolve({
