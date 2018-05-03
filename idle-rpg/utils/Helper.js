@@ -40,7 +40,7 @@ class Helper {
   }
 
   getTimePassed(timeStamp) {
-    return this.toTimeFormat(new Date().getTime() - timeStamp);
+    return this.secondsToTimeFormat((new Date().getTime() - timeStamp) / 1000);
   }
 
   toTimeFormat(duration) {
@@ -62,9 +62,9 @@ class Helper {
   secondsToTimeFormat(duration) {
     const secNum = parseInt(duration, 10); // don't forget the second param
     let days = Math.floor(secNum / 86400);
-    let hours = Math.floor(secNum / 3600);
-    let minutes = Math.floor((secNum - (hours * 3600)) / 60);
-    let seconds = secNum - (hours * 3600) - (minutes * 60);
+    let hours = Math.floor(secNum / 3600) % 24;
+    let minutes = Math.floor((secNum - (hours * 3600)) / 60) % 60;
+    let seconds = secNum % 60;
 
     days = days < 10 ? `0${days}` : days;
     hours = hours < 10 ? `0${hours}` : hours;
