@@ -293,7 +293,7 @@ const events = {
       }
 
       if (results.defender.health > 0 && selectedPlayer.health > 0) {
-        const expGain = Math.floor(((results.defender.experience * multiplier) + (results.defenderDamage / 4)) / 6) * (results.defender.length + 1);
+        const expGain = Math.floor(((results.defender[0].experience * multiplier) + (results.defenderDamage / 4)) / 6) * (results.defender.length + 1);
         const eventMsg = results.attackerDamage > results.defenderDamage
           ? `[\`${selectedPlayer.map.name}\`] ${results.defender.length + 1}x \`${results.defender[0].name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`
@@ -319,8 +319,8 @@ const events = {
           }));
       }
 
-      const goldGain = Number(results.defender.gold * multiplier) * (results.defender.length + 1);
-      const expGain = Math.floor((results.defender.experience * multiplier) + (results.defenderDamage / 4)) * (results.defender.length + 1);
+      const goldGain = Math.floor((results.defender[0].gold * multiplier) * (results.defender.length + 1));
+      const expGain = Math.floor((results.defender[0].experience * multiplier) + (results.defenderDamage / 4) * (results.defender.length + 1));
 
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed ${results.defender.length + 1}x \`${results.defender[0].name}\`!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
