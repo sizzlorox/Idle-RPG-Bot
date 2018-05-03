@@ -53,7 +53,8 @@ class Monster {
       const randomRarityIndex = this.Helper.randomBetween(0, monsterRarityList.length - 1);
       const randomTypeIndex = this.Helper.randomBetween(0, monsterTypeList.length - 1);
       const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4;
-      const mobAmount = this.Helper.randomBetween(1, Math.floor((selectedPlayer.level * Math.log(1.2)) / 2) + 1);
+      const mobAmountChance = this.Helper.randomBetween(0, 100);
+      const mobAmount = mobAmountChance >= 75 ? this.Helper.randomBetween(1, Math.floor((selectedPlayer.level * Math.log(1.2)) / 2) + 1) : 1;
       const mobList = [];
       for (let currentAmount = 0; currentAmount <= mobAmount; currentAmount++) {
         const monsterObj = {
