@@ -265,8 +265,8 @@ const events = {
     pveResults: (discordHook, Helper, MapClass, results, multiplier) => new Promise((resolve) => {
       const playerMaxHealth = 100 + (results.attacker.level * 5);
       const mobListResult = [];
-      results.defender.forEach(mob => mobListResult.push(`      ${mob.name}'s ${mob.equipment.weapon.name} did ${Math.floor(results.defenderDamage / (results.defender.length + 1))} damage.
-      ${mob.name} has ${mob.health <= 0 ? 0 : mob.health} / ${mob.maxHealth} HP left.`));
+      results.defender.forEach(mob => mobListResult.push(`  ${mob.name}'s ${mob.equipment.weapon.name} did ${Math.floor(results.defenderDamage / (results.defender.length + 1))} damage.
+  ${mob.name} has ${mob.health <= 0 ? 0 : mob.health} / ${mob.maxHealth} HP left.`));
       const selectedPlayer = results.attacker;
       let battleResult = `Battle Results:
   Your ${selectedPlayer.equipment.weapon.name} did ${results.attackerDamage} damage.
