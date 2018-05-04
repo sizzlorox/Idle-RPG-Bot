@@ -56,7 +56,7 @@ class Monster {
       const mobAmountChance = this.Helper.randomBetween(0, 100);
       const mobAmount = mobAmountChance >= 75 ? this.Helper.randomBetween(1, Math.floor((selectedPlayer.level * Math.log(1.2)) / 2) + 1) : 1;
       const mobList = [];
-      for (let currentAmount = 0; currentAmount <= mobAmount; currentAmount++) {
+      for (let currentAmount = 0; currentAmount < mobAmount; currentAmount++) {
         const monsterObj = {
           name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
           health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
