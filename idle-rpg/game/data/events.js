@@ -275,15 +275,15 @@ ${mobListResult.join('\n')}`;
 
       if (selectedPlayer.health <= 0) {
         battleResult = battleResult.replace(`  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.`, '');
-        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${results.defender.length + 1}x \`${results.defender[0].name}\`'s \`${results.defender[0].equipment.weapon.name}\` just killed ${Helper.generatePlayerName(selectedPlayer, true)}!
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${results.defender.length}x \`${results.defender[0].name}\`'s \`${results.defender[0].equipment.weapon.name}\` just killed ${Helper.generatePlayerName(selectedPlayer, true)}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg!`;
 
-        const eventLog = `${results.defender.length + 1}x ${results.defender[0].name}'s ${results.defender[0].equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
+        const eventLog = `${results.defender.length}x ${results.defender[0].name}'s ${results.defender[0].equipment.weapon.name} just killed you in ${selectedPlayer.map.name}!`;
         selectedPlayer.battles.lost++;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length + 1}x `, '')),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length + 1}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length}x `, '')),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length}x`, '')), true),
           Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
         ])
           .then(resolve({
@@ -294,23 +294,23 @@ ${mobListResult.join('\n')}`;
       }
 
       if (results.defender.health > 0 && selectedPlayer.health > 0) {
-        const expGain = Math.floor(((results.defender[0].experience * multiplier) + (results.defenderDamage / 4)) / 6) * (results.defender.length + 1);
+        const expGain = Math.floor(((results.defender[0].experience * multiplier) + (results.defenderDamage / 4)) / 6) * (results.defender.length);
         const eventMsg = results.attackerDamage > results.defenderDamage
-          ? `[\`${selectedPlayer.map.name}\`] ${results.defender.length + 1}x \`${results.defender[0].name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
+          ? `[\`${selectedPlayer.map.name}\`] ${results.defender.length}x \`${results.defender[0].name}\` just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`
-          : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from ${results.defender.length + 1}x \`${results.defender[0].name}\`!
+          : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from ${results.defender.length}x \`${results.defender[0].name}\`!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
 
         const eventLog = results.attackerDamage > results.defenderDamage
-          ? `${results.defender.length + 1}x ${results.defender[0].name} fled from you in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`
-          : `You fled from ${results.defender.length + 1}x ${results.defender[0].name} in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
+          ? `${results.defender.length}x ${results.defender[0].name} fled from you in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`
+          : `You fled from ${results.defender.length}x ${results.defender[0].name} in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
 
         selectedPlayer.experience.current += expGain;
         selectedPlayer.experience.total += expGain;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length + 1}x `, '')),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length + 1}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
+          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length}x `, '')),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length}x`, '')), true),
           Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
         ])
           .then(resolve({
@@ -320,12 +320,12 @@ ${mobListResult.join('\n')}`;
           }));
       }
 
-      const goldGain = Math.floor((results.defender[0].gold * multiplier) * (results.defender.length + 1));
-      const expGain = Math.floor((results.defender[0].experience * multiplier) + (results.defenderDamage / 4) * (results.defender.length + 1));
+      const goldGain = Math.floor((results.defender[0].gold * multiplier) * (results.defender.length));
+      const expGain = Math.floor((results.defender[0].experience * multiplier) + (results.defenderDamage / 4) * (results.defender.length));
 
-      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed ${results.defender.length + 1}x \`${results.defender[0].name}\`!
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed ${results.defender.length}x \`${results.defender[0].name}\`!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
-      const eventLog = `Killed ${results.defender.length + 1}x ${results.defender[0].name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]`;
+      const eventLog = `Killed ${results.defender.length}x ${results.defender[0].name} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]`;
 
       selectedPlayer.experience.current += expGain;
       selectedPlayer.experience.total += expGain;
@@ -335,8 +335,8 @@ ${mobListResult.join('\n')}`;
       selectedPlayer.battles.won++;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length + 1}x `, '')),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length + 1}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, results.defender.length > 1 ? eventMsg : eventMsg.replace(`${results.defender.length}x `, '')),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(results.defender.length > 1 ? battleResult : battleResult.replace(`${results.defender.length}x `, '')).concat('```').concat(results.defender.length > 1 ? eventLog : eventLog.replace(`${results.defender.length + 1}x`, '')), true),
         Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
       ])
         .then(resolve({
