@@ -21,6 +21,10 @@ class Game {
       this.Database.loadGame()
         .then((loadedConfig) => {
           this.config = loadedConfig;
+          if (this.config.spells.activeBless === 0) {
+            this.config.multiplier = 1;
+            this.Database.updateGame(this.config);
+          }
         })
         .then(() => console.log(`Config loaded\nMultiplier:${this.config.multiplier}\nActive Bless:${this.config.spells.activeBless}\nPrize Pool:${this.config.dailyLottery.prizePool}`))
         .then(() => {
@@ -29,6 +33,9 @@ class Game {
               this.config.spells.activeBless--;
               this.config.multiplier -= 1;
               this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+              if (this.config.spells.activeBless === 0) {
+                this.config.multiplier = 1;
+              }
               this.Database.updateGame(this.config);
             }, 1800000 + (5000 * i));
           }
