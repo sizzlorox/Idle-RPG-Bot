@@ -1,7 +1,7 @@
 
 const globalSpells = {
   bless: {
-    spellCost: 1200,
+    spellCost: 1750,
   },
 
   home: {
