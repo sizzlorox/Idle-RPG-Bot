@@ -521,10 +521,10 @@ ${rankString}
     const blesserTitleRole = currentGuild.roles.filterArray(role => role.name === 'Blesser')[0];
 
     const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
-    if (selectedPlayer.gold.current >= 10000 && !hasGoldTitle) {
+    if (selectedPlayer.gold.current >= 50000 && !hasGoldTitle) {
       playerDiscordObj.addRole(goldTitleRole);
       this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
-    } else if (selectedPlayer.gold.current < 10000 && hasGoldTitle) {
+    } else if (selectedPlayer.gold.current < 50000 && hasGoldTitle) {
       playerDiscordObj.removeRole(goldTitleRole);
       this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
     }
