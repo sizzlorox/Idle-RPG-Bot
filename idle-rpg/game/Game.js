@@ -460,6 +460,10 @@ ${rankString}
   }
 
   dailyLottery(discordBot) {
+    if (!process.env.NODE_ENV.includes('production')) {
+      return;
+    }
+
     return this.Database.loadLotteryPlayers()
       .then((lotteryPlayers) => {
         if (!lotteryPlayers.length) {
