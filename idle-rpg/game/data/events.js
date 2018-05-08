@@ -281,7 +281,7 @@ const events = {
             count: 1
           });
         }
-        expGain += Math.floor(((mob.experience * multiplier) + (mob.dmgDealt / 4)) / 6);
+        expGain += Math.ceil(((mob.experience * multiplier) + (mob.dmgDealt / 4)) / 6);
         goldGain += Math.floor((mob.gold * multiplier));
 
         if (Math.floor(results.defenderDamage / (results.defender.length)) > 0 || mob.health > 0) {
