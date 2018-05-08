@@ -447,8 +447,10 @@ ${rankString}
 
             return this.Database.updateGame(updatedConfig)
               .then(() => this.Database.savePlayer(player))
-              .then(() => 'You have joined todays daily lottery! Good luck!');
-          });
+              .then(() => 'You have joined todays daily lottery! Good luck!')
+              .catch(err => errorLog.error(err));
+          })
+          .catch(err => errorLog.error(err));
       });
   }
 
