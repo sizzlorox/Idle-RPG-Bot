@@ -148,6 +148,7 @@ class Battle {
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
+          defender.dmgDealt += defenderDamage;
 
           attacker.health -= defenderDamage;
           this.Helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
@@ -156,6 +157,7 @@ class Battle {
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
+          defender.dmgDealt += defenderDamage;
 
           attacker.health -= defenderDamage;
           this.Helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
@@ -169,6 +171,7 @@ class Battle {
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
+          defender.dmgDealt += defenderDamage;
 
           attacker.health -= defenderDamage;
           this.Helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
@@ -177,6 +180,7 @@ class Battle {
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
+          defender.dmgDealt += defenderDamage;
 
           attacker.health -= defenderDamage;
           this.Helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
@@ -232,6 +236,7 @@ class Battle {
                 }
                 if (defenderDamage > (attackerSpellToCast.power * 2)) {
                   defenderDamage -= (attackerSpellToCast.power * 2);
+                  defender.dmgDealt -= (attackerSpellToCast.power * 2);
                 }
               }
               break;
@@ -241,7 +246,7 @@ class Battle {
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
-                defenderDamage += spellDamage;
+                attackerDamage += spellDamage;
                 defender.health -= spellDamage;
                 attacker.mana -= attackerSpellToCast.power;
                 this.Helper.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
@@ -274,7 +279,8 @@ class Battle {
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
-                attackerDamage += spellDamage;
+                defenderDamage += spellDamage;
+                defender.dmgDealt += spellDamage;
                 attacker.health -= spellDamage;
                 defender.mana -= defenderSpellToCast.power;
                 this.Helper.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
@@ -309,7 +315,8 @@ class Battle {
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
-                attackerDamage += spellDamage;
+                defenderDamage += spellDamage;
+                defender.dmgDealt += spellDamage;
                 attacker.health -= spellDamage;
                 defender.mana -= defenderSpellToCast.power;
                 this.Helper.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
@@ -342,7 +349,7 @@ class Battle {
                 if (spellDamage < 0) {
                   spellDamage = 0;
                 }
-                defenderDamage += spellDamage;
+                attackerDamage += spellDamage;
                 defender.health -= spellDamage;
                 attacker.mana -= attackerSpellToCast.power;
                 this.Helper.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
@@ -373,6 +380,7 @@ class Battle {
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
           if (defenderDamage > healAmount) {
             defenderDamage -= healAmount;
+            defender.dmgDealt -= healAmount;
           }
 
           this.Helper.printBattleDebug(`${attacker.name} drank a health potion and healed ${healAmount} health`);
@@ -420,6 +428,7 @@ class Battle {
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
           if (defenderDamage > healAmount) {
             defenderDamage -= healAmount;
+            defender.dmgDealt -= healAmount;
           }
 
           this.Helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);

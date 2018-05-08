@@ -85,6 +85,7 @@ class Monster {
             luk: (monsterRarityList[randomRarityIndex].stats.luk
               * monsterTypeList[randomTypeIndex].stats.luk)
           },
+          dmgDealt: 0,
           power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + playerBalance,
           equipment: monsterTypeList[randomTypeIndex].equipment,
           inventory: monsterTypeList[randomTypeIndex].inventory,
