@@ -21,6 +21,10 @@ class Game {
       this.Database.loadGame()
         .then((loadedConfig) => {
           this.config = loadedConfig;
+          if (this.config.spells.activeBless === 0) {
+            this.config.multiplier = 1;
+            this.Database.updateGame(this.config);
+          }
         })
         .then(() => console.log(`Config loaded\nMultiplier:${this.config.multiplier}\nActive Bless:${this.config.spells.activeBless}\nPrize Pool:${this.config.dailyLottery.prizePool}`))
         .then(() => {
@@ -29,6 +33,9 @@ class Game {
               this.config.spells.activeBless--;
               this.config.multiplier -= 1;
               this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
+              if (this.config.spells.activeBless === 0) {
+                this.config.multiplier = 1;
+              }
               this.Database.updateGame(this.config);
             }, 1800000 + (5000 * i));
           }
@@ -440,8 +447,10 @@ ${rankString}
 
             return this.Database.updateGame(updatedConfig)
               .then(() => this.Database.savePlayer(player))
-              .then(() => 'You have joined todays daily lottery! Good luck!');
-          });
+              .then(() => 'You have joined todays daily lottery! Good luck!')
+              .catch(err => errorLog.error(err));
+          })
+          .catch(err => errorLog.error(err));
       });
   }
 
@@ -453,6 +462,10 @@ ${rankString}
   }
 
   dailyLottery(discordBot) {
+    if (!process.env.NODE_ENV.includes('production')) {
+      return;
+    }
+
     return this.Database.loadLotteryPlayers()
       .then((lotteryPlayers) => {
         if (!lotteryPlayers.length) {
@@ -510,10 +523,10 @@ ${rankString}
     const blesserTitleRole = currentGuild.roles.filterArray(role => role.name === 'Blesser')[0];
 
     const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
-    if (selectedPlayer.gold.current >= 10000 && !hasGoldTitle) {
+    if (selectedPlayer.gold.current >= 50000 && !hasGoldTitle) {
       playerDiscordObj.addRole(goldTitleRole);
       this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Gold Hoarder title!`));
-    } else if (selectedPlayer.gold.current < 10000 && hasGoldTitle) {
+    } else if (selectedPlayer.gold.current < 50000 && hasGoldTitle) {
       playerDiscordObj.removeRole(goldTitleRole);
       this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Gold Hoarder title!`));
     }

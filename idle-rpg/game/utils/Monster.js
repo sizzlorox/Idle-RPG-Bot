@@ -50,13 +50,13 @@ class Monster {
         && mobType.isSpawnable
         && mobType.spawnableBiomes.includes('Land'));
 
-      const randomRarityIndex = this.Helper.randomBetween(0, monsterRarityList.length - 1);
-      const randomTypeIndex = this.Helper.randomBetween(0, monsterTypeList.length - 1);
       const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4;
       const mobAmountChance = this.Helper.randomBetween(0, 100);
       const mobAmount = mobAmountChance >= 75 ? this.Helper.randomBetween(1, Math.floor((selectedPlayer.level * Math.log(1.2)) / 2) + 1) : 1;
       const mobList = [];
       for (let currentAmount = 0; currentAmount < mobAmount; currentAmount++) {
+        const randomRarityIndex = this.Helper.randomBetween(0, monsterRarityList.length - 1);
+        const randomTypeIndex = this.Helper.randomBetween(0, monsterTypeList.length - 1);
         const monsterObj = {
           name: `${monsterRarityList[randomRarityIndex].name} ${monsterTypeList[randomTypeIndex].name}`,
           health: monsterRarityList[randomRarityIndex].health + monsterTypeList[randomTypeIndex].health,
@@ -85,6 +85,7 @@ class Monster {
             luk: (monsterRarityList[randomRarityIndex].stats.luk
               * monsterTypeList[randomTypeIndex].stats.luk)
           },
+          dmgDealt: 0,
           power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + playerBalance,
           equipment: monsterTypeList[randomTypeIndex].equipment,
           inventory: monsterTypeList[randomTypeIndex].inventory,
