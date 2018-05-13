@@ -3,6 +3,7 @@ const Space = require('../modules/Space');
 const Crypto = require('../modules/Crypto');
 const Urban = require('../modules/Urban');
 const maps = require('../../game/data/maps');
+const spells = require('../../game/data/globalSpells');
 const { commandChannel } = require('../../../settings');
 
 const commands = [
@@ -363,11 +364,10 @@ const commands = [
       if (message.content.includes(' ')) {
         return game.castSpell(message.author, message.content.split(/ (.+)/)[1].toLowerCase());
       }
+      let spellsString = '```List of Spells:\n  ';
+      spellsString = spellsString.concat(Object.keys(spells).map(spell => `${spell} - ${spells[spell].spellCost} gold - ${spells[spell].description}`).join('\n  '));
 
-      return message.author.send(`\`\`\`List of spells:
-        bless - 1750 gold - Increases global EXP/GOLD multiplier by 1 for 30 minutes.
-        home - 500 gold - Teleports you back to Kindale.
-        \`\`\``);
+      return message.author.send(spellsString.concat('```'));
     }
   },
 
