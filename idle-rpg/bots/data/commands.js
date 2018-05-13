@@ -365,7 +365,7 @@ const commands = [
         return game.castSpell(message.author, message.content.split(/ (.+)/)[1].toLowerCase());
       }
       let spellsString = '```List of Spells:\n  ';
-      spellsString = spellsString.concat(Object.keys(spells).map(spell => `${spell} - ${spells[spell].spellCost} - ${spells[spell].description}`).join('\n  '));
+      spellsString = spellsString.concat(Object.keys(spells).map(spell => `${spell} - ${spells[spell].spellCost} gold - ${spells[spell].description}`).join('\n  '));
 
       return message.author.send(spellsString.concat('```'));
     }
