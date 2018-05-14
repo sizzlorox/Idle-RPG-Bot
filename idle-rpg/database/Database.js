@@ -272,8 +272,6 @@ class Database {
   }
 
   getSameMapPlayers(playerMap, selectFields = {
-    pastEvents: 0,
-    pastPvpEvents: 0
   }) {
     if (!playerMap) {
       return;
