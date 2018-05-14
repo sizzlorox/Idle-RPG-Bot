@@ -498,10 +498,10 @@ ${rankString}
             return Promise.all([
               this.Database.updateGame(updatedConfig),
               this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
-              this.Helper.logEvent(winner, eventLog, 'pastEvents')
+              this.Helper.logEvent(winner, eventLog, 'pastEvents'),
+              this.Database.savePlayer(winner),
+              this.Database.removeLotteryPlayers()
             ])
-              .then(() => this.Database.savePlayer(winner))
-              .then(() => this.Database.removeLotteryPlayers())
               .catch(err => errorLog.error(err));
           });
       })

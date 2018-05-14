@@ -462,11 +462,7 @@ class Helper {
       Lost: ${player.battles.lost}
     Deaths:
       By Monsters: ${player.deaths.mob}
-      By Players: ${player.deaths.player}
-
-    Past Events:
-      ${this.generateLog(player, 5).replace('Heres what you have done so far:\n      ', '')}
-      \`\`\``;
+      By Players: ${player.deaths.player}\`\`\``;
   }
 
   generatePreviousOwnerString(equipment) {

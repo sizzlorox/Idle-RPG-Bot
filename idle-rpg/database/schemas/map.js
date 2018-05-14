@@ -16,4 +16,7 @@ const mapSchema = mongoose.Schema({
   levelReq: Number,
   lore: String
 });
+
+mapSchema.set('autoIndex', false);
+
 module.exports = mapSchema;

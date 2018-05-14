@@ -301,6 +301,6 @@ const playerSchema = mongoose.Schema({
   }
 );
 
-playerSchema.set('autoIndex', false);
+playerSchema.set('autoIndex', true);
 
 module.exports = { playerSchema, newPlayerObj };

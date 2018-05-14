@@ -200,7 +200,6 @@ const enumHelper = {
     currentBounty: 1,
     stats: 1,
     createdAt: 1,
-    pastEvents: 1,
     gambles: 1,
     stole: 1,
     stolen: 1,
