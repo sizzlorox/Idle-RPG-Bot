@@ -243,8 +243,6 @@ class Database {
   }
 
   loadPlayer(discordId, selectFields = {
-    pastEvents: 0,
-    pastPvpEvents: 0
   }) {
     return new Promise((resolve, reject) => Player.findOne({ discordId }, (err, result) => {
       if (err) {

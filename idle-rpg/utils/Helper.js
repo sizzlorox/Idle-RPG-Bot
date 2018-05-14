@@ -75,8 +75,11 @@ class Helper {
 
   logEvent(selectedPlayer, msg, eventToLog) {
     return new Promise((resolve) => {
-      if (selectedPlayer[eventToLog].length === 99) {
+      if (selectedPlayer[eventToLog].length === 50) {
         selectedPlayer[eventToLog].shift();
+      }
+      if (selectedPlayer[eventToLog].length > 50) {
+        selectedPlayer[eventToLog].splice(49, 50);
       }
       selectedPlayer[eventToLog].push({
         event: msg,
