@@ -352,7 +352,7 @@ ${rankString}
    * @param {String} spell
    */
   castSpell(commandAuthor, spell) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
