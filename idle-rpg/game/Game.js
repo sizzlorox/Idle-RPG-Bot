@@ -94,16 +94,13 @@ class Game {
         switch (randomEvent) {
           case 0:
             return this.moveEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => console.log(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
           case 1:
             return this.attackEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => console.log(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
           case 2:
             return this.luckEvent(selectedPlayer)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => console.log(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
         }
       })
       .then((updatedPlayer) => {
@@ -116,7 +113,7 @@ class Game {
       .then((updatedPlayer) => {
         this.setPlayerTitles(discordBot, updatedPlayer);
       })
-      .catch(err => console.log(err));
+      .catch(err => errorLog.error(err));
   }
 
   moveEvent(selectedPlayer, onlinePlayers) {
