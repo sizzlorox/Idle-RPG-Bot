@@ -94,16 +94,13 @@ class Game {
         switch (randomEvent) {
           case 0:
             return this.moveEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => console.log(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
           case 1:
             return this.attackEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => console.log(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
           case 2:
             return this.luckEvent(selectedPlayer)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => console.log(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
         }
       })
       .then((updatedPlayer) => {
@@ -116,7 +113,7 @@ class Game {
       .then((updatedPlayer) => {
         this.setPlayerTitles(discordBot, updatedPlayer);
       })
-      .catch(err => console.log(err));
+      .catch(err => errorLog.error(err));
   }
 
   moveEvent(selectedPlayer, onlinePlayers) {
@@ -498,10 +495,10 @@ ${rankString}
             return Promise.all([
               this.Database.updateGame(updatedConfig),
               this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
-              this.Helper.logEvent(winner, eventLog, 'pastEvents')
+              this.Helper.logEvent(winner, eventLog, 'pastEvents'),
+              this.Database.savePlayer(winner),
+              this.Database.removeLotteryPlayers()
             ])
-              .then(() => this.Database.savePlayer(winner))
-              .then(() => this.Database.removeLotteryPlayers())
               .catch(err => errorLog.error(err));
           });
       })

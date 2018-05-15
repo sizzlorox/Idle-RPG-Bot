@@ -75,8 +75,11 @@ class Helper {
 
   logEvent(selectedPlayer, msg, eventToLog) {
     return new Promise((resolve) => {
-      if (selectedPlayer[eventToLog].length === 99) {
+      if (selectedPlayer[eventToLog].length === 25) {
         selectedPlayer[eventToLog].shift();
+      }
+      if (selectedPlayer[eventToLog].length > 25) {
+        selectedPlayer[eventToLog].length = 0;
       }
       selectedPlayer[eventToLog].push({
         event: msg,
@@ -462,11 +465,7 @@ class Helper {
       Lost: ${player.battles.lost}
     Deaths:
       By Monsters: ${player.deaths.mob}
-      By Players: ${player.deaths.player}
-
-    Past Events:
-      ${this.generateLog(player, 5).replace('Heres what you have done so far:\n      ', '')}
-      \`\`\``;
+      By Players: ${player.deaths.player}\`\`\``;
   }
 
   generatePreviousOwnerString(equipment) {

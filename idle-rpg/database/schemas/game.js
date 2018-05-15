@@ -18,4 +18,7 @@ const gameSchema = mongoose.Schema({
     }
   }
 });
+
+gameSchema.set('autoIndex', false);
+
 module.exports = gameSchema;
