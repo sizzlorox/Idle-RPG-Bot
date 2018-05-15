@@ -218,7 +218,7 @@ class Game {
    * @param {Number} amount
    */
   giveGold(playerId, amount) {
-    return this.Database.loadPlayer(playerId)
+    return this.Database.loadPlayer(playerId, { pastEvents: 0, pastPvpEvents: 0 })
       .then((updatingPlayer) => {
         updatingPlayer.gold.current += Number(amount);
         updatingPlayer.gold.total += Number(amount);
@@ -257,7 +257,7 @@ ${rankString}
   }
 
   getRank(commandAuthor, type = { level: -1 }) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then(player => this.Database.loadCurrentRank(player, type))
       .then(currentRank => currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
         .sort((player1, player2) => {
@@ -283,7 +283,7 @@ ${rankString}
    * @param {Boolean} isMentionInDiscord
    */
   modifyMention(commandAuthor, isMentionInDiscord) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -306,7 +306,7 @@ ${rankString}
    * @param {Boolean} isMentionInDiscord
    */
   modifyPM(commandAuthor, isPrivateMessage, filtered) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -330,7 +330,7 @@ ${rankString}
    * @param String gender
    */
   modifyGender(commandAuthor, gender) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -407,7 +407,7 @@ ${rankString}
    * @param {Number} amount
    */
   setPlayerBounty(recipient, amount) {
-    return this.Database.loadPlayer(recipient)
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         player.currentBounty = amount;
         return this.Database.savePlayer(player);
@@ -420,7 +420,7 @@ ${rankString}
    * @param {Number} amount
    */
   setPlayerGold(recipient, amount) {
-    return this.Database.loadPlayer(recipient)
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         player.gold.current = Number(amount);
         player.gold.total += Number(amount);
@@ -429,7 +429,7 @@ ${rankString}
   }
 
   joinLottery(discordUser) {
-    return this.Database.loadPlayer(discordUser.id)
+    return this.Database.loadPlayer(discordUser.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         if (player.lottery.joined) {
           return 'You\'ve already joined todays daily lottery!';
@@ -563,7 +563,7 @@ ${rankString}
    * @param {Number} amount
    */
   placeBounty(bountyPlacer, recipient, amount) {
-    return this.Database.loadPlayer(bountyPlacer.id)
+    return this.Database.loadPlayer(bountyPlacer.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((placer) => {
         if (placer.gold.current >= amount) {
           placer.gold.current -= amount;
