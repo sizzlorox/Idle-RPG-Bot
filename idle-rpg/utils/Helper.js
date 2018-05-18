@@ -76,7 +76,7 @@ class Helper {
   logEvent(selectedPlayer, Database, msg, eventType) {
     return new Promise((resolve) => {
       switch (eventType) {
-        case 'MOVE':
+        case enumHelper.logTypes.move:
           Database.loadMoveLog(selectedPlayer.discordId)
             .then((playerMoveLog) => {
               if (playerMoveLog.log.length > 25) {
@@ -96,7 +96,7 @@ class Helper {
             });
           break;
 
-        case 'ACTION':
+        case enumHelper.logTypes.action:
           Database.loadActionLog(selectedPlayer.discordId)
             .then((playerActionLog) => {
               if (playerActionLog.log.length > 25) {
@@ -113,7 +113,7 @@ class Helper {
             .then(playerActionLog => Database.saveActionLog(selectedPlayer.discordId, playerActionLog));
           break;
 
-        case 'PVP':
+        case enumHelper.logTypes.pvp:
           Database.loadPvpLog(selectedPlayer.discordId)
             .then((playerPvpLog) => {
               if (playerPvpLog.log.length > 25) {
