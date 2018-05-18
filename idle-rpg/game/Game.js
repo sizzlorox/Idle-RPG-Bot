@@ -94,13 +94,16 @@ class Game {
         switch (randomEvent) {
           case 0:
             return this.moveEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
+              .catch(err => errorLog.error(err));
           case 1:
             return this.attackEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
+              .catch(err => errorLog.error(err));
           case 2:
             return this.luckEvent(selectedPlayer)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
+              .catch(err => errorLog.error(err));
         }
       })
       .then((updatedPlayer) => {
@@ -112,14 +115,12 @@ class Game {
       })
       .then((updatedPlayer) => {
         this.setPlayerTitles(discordBot, updatedPlayer);
-      })
-      .catch(err => errorLog.error(err));
+      });
   }
 
   moveEvent(selectedPlayer, onlinePlayers) {
     return new Promise((resolve) => {
-      const pastMoveCount = selectedPlayer.pastEvents.slice(Math.max(selectedPlayer.pastEvents.length - 5, 1)).filter(event => event.event.includes('and arrived in')).length;
-      if (pastMoveCount >= 5 && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+      if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         return this.attackEvent(selectedPlayer, onlinePlayers)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
@@ -495,7 +496,7 @@ ${rankString}
             return Promise.all([
               this.Database.updateGame(updatedConfig),
               this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
-              this.Helper.logEvent(winner, eventLog, 'pastEvents'),
+              this.Helper.logEvent(winner, this.Database, eventLog, 'ACTION'),
               this.Database.savePlayer(winner),
               this.Database.removeLotteryPlayers()
             ])
@@ -594,13 +595,13 @@ ${rankString}
    * @param {Number} count
    */
   playerEventLog(playerId, count) {
-    return this.Database.loadPlayer(playerId, enumHelper.playerEventLogSelectFields)
-      .then((player) => {
-        if (!player) {
+    return this.Database.loadActionLog(playerId)
+      .then((playerLog) => {
+        if (!playerLog.log.length) {
           return;
         }
 
-        return this.Helper.generateLog(player, count);
+        return this.Helper.generateLog(playerLog, count);
       });
   }
 
@@ -610,7 +611,7 @@ ${rankString}
    * @param {Number} count
    */
   playerPvpLog(playerId, count) {
-    return this.Database.loadPlayer(playerId, enumHelper.pvpLogSelectFields)
+    return this.Database.loadPvpLog(playerId)
       .then((player) => {
         if (!player) {
           return;

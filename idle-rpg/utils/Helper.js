@@ -73,18 +73,63 @@ class Helper {
     return `${days}d ${hours}h ${minutes}m ${seconds}s`;
   }
 
-  logEvent(selectedPlayer, msg, eventToLog) {
+  logEvent(selectedPlayer, Database, msg, eventType) {
     return new Promise((resolve) => {
-      if (selectedPlayer[eventToLog].length === 25) {
-        selectedPlayer[eventToLog].shift();
+      switch (eventType) {
+        case 'MOVE':
+          Database.loadMoveLog(selectedPlayer.discordId)
+            .then((playerMoveLog) => {
+              if (playerMoveLog.log.length > 25) {
+                playerMoveLog.log.shift();
+              }
+
+              playerMoveLog.log.push({
+                event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
+                timeStamp: new Date().getTime()
+              });
+
+              return playerMoveLog;
+            })
+            .then(playerMoveLog => Database.saveMoveLog(selectedPlayer.discordId, playerMoveLog))
+            .catch((err) => {
+              errorLog.error(err);
+            });
+          break;
+
+        case 'ACTION':
+          Database.loadActionLog(selectedPlayer.discordId)
+            .then((playerActionLog) => {
+              if (playerActionLog.log.length > 25) {
+                playerActionLog.log.shift();
+              }
+
+              playerActionLog.log.push({
+                event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
+                timeStamp: new Date().getTime()
+              });
+
+              return playerActionLog;
+            })
+            .then(playerActionLog => Database.saveActionLog(selectedPlayer.discordId, playerActionLog));
+          break;
+
+        case 'PVP':
+          Database.loadPvpLog(selectedPlayer.discordId)
+            .then((playerPvpLog) => {
+              if (playerPvpLog.log.length > 25) {
+                playerPvpLog.log.shift();
+              }
+
+              playerPvpLog.log.push({
+                event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
+                timeStamp: new Date().getTime()
+              });
+
+              return playerPvpLog;
+            })
+            .then(playerPvpLog => Database.savePvpLog(selectedPlayer.discordId, playerPvpLog));
+          break;
       }
-      if (selectedPlayer[eventToLog].length > 25) {
-        selectedPlayer[eventToLog].length = 0;
-      }
-      selectedPlayer[eventToLog].push({
-        event: msg,
-        timeStamp: new Date().getTime()
-      });
 
       return resolve(selectedPlayer);
     });
@@ -219,7 +264,7 @@ class Helper {
       + player.equipment.relic.luk;
   }
 
-  checkExperience(selectedPlayer, discordHook, twitchBot) {
+  checkExperience(selectedPlayer, Database, discordHook, twitchBot) {
     return new Promise((resolve) => {
       if (selectedPlayer.experience.current >= selectedPlayer.level * 15) {
         selectedPlayer.level++;
@@ -269,7 +314,7 @@ class Helper {
         if (selectedPlayer.class !== oldClass) {
           this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
             .then(this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true))
-            .then(this.logEvent(selectedPlayer, `You have become a ${selectedPlayer.class}`, 'pastEvents'));
+            .then(this.logEvent(selectedPlayer, Database, `You have become a ${selectedPlayer.class}`, 'ACTION'));
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
@@ -278,7 +323,7 @@ class Helper {
         return Promise.all([
           this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          this.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          this.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }
@@ -314,7 +359,7 @@ class Helper {
     return selectedPlayer;
   }
 
-  checkHealth(MapClass, selectedPlayer, attackerObj, hook) {
+  checkHealth(MapClass, selectedPlayer, attackerObj, Database, hook) {
     return new Promise((resolve) => {
       if (selectedPlayer.health <= 0) {
         const expLoss = Math.ceil(selectedPlayer.experience.current / 8);
@@ -385,8 +430,7 @@ class Helper {
             this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
               .then(this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
               .then(this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true))
-              .then(this.logEvent(attackerObj, bountyEventLog, 'pastEvents'))
-              .then(this.logEvent(attackerObj, bountyEventLog, 'pastPvpEvents'));
+              .then(this.logEvent(attackerObj, Database, bountyEventLog, 'ACTION'));
             selectedPlayer.currentBounty = 0;
           }
 
@@ -400,7 +444,7 @@ class Helper {
         return Promise.all([
           this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg),
           this.sendPrivateMessage(hook, selectedPlayer, eventLog, true),
-          this.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          this.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }
@@ -580,18 +624,18 @@ class Helper {
   }
 
   generateLog(player, count) {
-    if (player.pastEvents.length === 0) {
+    if (player.log.length === 0) {
       return '';
     }
 
     let logResult = 'Heres what you have done so far:\n      ';
     let logCount = 0;
-    for (let i = player.pastEvents.length - 1; i >= 0; i--) {
+    for (let i = player.log.length - 1; i >= 0; i--) {
       if (logCount === count) {
         break;
       }
 
-      logResult = logResult.concat(`${player.pastEvents[i].event} [${this.getTimePassed(player.pastEvents[i].timeStamp)} ago]\n      `);
+      logResult = logResult.concat(`${player.log[i].event} [${this.getTimePassed(player.log[i].timeStamp)} ago]\n      `);
       logCount++;
     }
 
@@ -599,18 +643,18 @@ class Helper {
   }
 
   generatePvpLog(player, count) {
-    if (player.pastPvpEvents.length === 0) {
+    if (player.log.length === 0) {
       return '';
     }
 
     let logResult = 'Heres what you have done so far:\n      ';
     let logCount = 0;
-    for (let i = player.pastPvpEvents.length - 1; i >= 0; i--) {
+    for (let i = player.log.length - 1; i >= 0; i--) {
       if (logCount === count) {
         break;
       }
 
-      logResult = logResult.concat(`${player.pastPvpEvents[i].event} [${this.getTimePassed(player.pastPvpEvents[i].timeStamp)} ago]\n      `);
+      logResult = logResult.concat(`${player.log[i].event} [${this.getTimePassed(player.log[i].timeStamp)} ago]\n      `);
       logCount++;
     }
 
