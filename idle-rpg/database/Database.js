@@ -1,12 +1,19 @@
 const mongoose = require('mongoose');
-const { playerSchema, newPlayerObj } = require('./schemas/player');
-const gameSchema = require('./schemas/game');
 const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
 
+const gameSchema = require('./schemas/game');
+const { playerSchema, newPlayerObj } = require('./schemas/player');
+const actionLogSchema = require('./schemas/actionLog');
+const moveLogSchema = require('./schemas/moveLog');
+const pvpLogSchema = require('./schemas/pvpLog');
+
 const Game = mongoose.model('Game', gameSchema);
 const Player = mongoose.model('Player', playerSchema);
+const ActionLog = mongoose.model('ActionLog', actionLogSchema);
+const MoveLog = mongoose.model('MoveLog', moveLogSchema);
+const PvpLog = mongoose.model('PvpLog', pvpLogSchema);
 
 mongoose.connection.on('open', () => {
   console.log('\nDATABASE: Connected!');
@@ -102,6 +109,75 @@ class Database {
         return reject(err);
       }
       // console.log(`DATABASE: ${discordId} has been created.`);
+      return resolve(result);
+    }));
+  }
+
+  loadActionLog(discordId) {
+    return new Promise((resolve, reject) => ActionLog.findOne({ playerId: discordId }, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      if (!result) {
+        return ActionLog.create({ playerId: discordId });
+      }
+
+      return resolve(result);
+    }));
+  }
+
+  saveActionLog(discordId, updatedActionLog) {
+    return new Promise((resolve, reject) => ActionLog.updateOne({ playerId: discordId }, updatedActionLog, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve(result);
+    }));
+  }
+
+  loadPvpLog(discordId) {
+    return new Promise((resolve, reject) => PvpLog.findOne({ playerId: discordId }, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      if (!result) {
+        return PvpLog.create({ playerId: discordId });
+      }
+
+      return resolve(result);
+    }));
+  }
+
+  savePvpLog(discordId, updatedPvpLog) {
+    return new Promise((resolve, reject) => PvpLog.updateOne({ playerId: discordId }, updatedPvpLog, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve(result);
+    }));
+  }
+
+  loadMoveLog(discordId) {
+    return new Promise((resolve, reject) => MoveLog.findOne({ playerId: discordId }, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      if (!result) {
+        return MoveLog.create({ playerId: discordId });
+      }
+
+      return resolve(result);
+    }));
+  }
+
+  saveMoveLog(discordId, updatedMoveLog) {
+    return new Promise((resolve, reject) => MoveLog.updateOne({ playerId: discordId }, updatedMoveLog, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+
       return resolve(result);
     }));
   }
@@ -309,13 +385,14 @@ class Database {
             lost: 0,
             total: 0
           },
-          map: MapClass.getRandomTown(),
+          map: this.MapClass.getRandomTown(),
           level: 1,
           gold: {
             current: 0,
             lost: 0,
             stolen: 0,
             stole: 0,
+            dailyLottery: 0,
             gambles: {
               won: 0,
               lost: 0
@@ -352,6 +429,10 @@ class Database {
             luk: 1
           },
           spells: [],
+          lottery: {
+            joined: false,
+            amount: 0
+          },
           isOnline: true,
           createdAt: new Date().getTime(),
           events: 0,

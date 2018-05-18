@@ -94,13 +94,16 @@ class Game {
         switch (randomEvent) {
           case 0:
             return this.moveEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
+              .catch(err => errorLog.error(err));
           case 1:
             return this.attackEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
+              .catch(err => errorLog.error(err));
           case 2:
             return this.luckEvent(selectedPlayer)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
+              .catch(err => errorLog.error(err));
         }
       })
       .then((updatedPlayer) => {
@@ -112,14 +115,12 @@ class Game {
       })
       .then((updatedPlayer) => {
         this.setPlayerTitles(discordBot, updatedPlayer);
-      })
-      .catch(err => errorLog.error(err));
+      });
   }
 
   moveEvent(selectedPlayer, onlinePlayers) {
     return new Promise((resolve) => {
-      const pastMoveCount = selectedPlayer.pastEvents.slice(Math.max(selectedPlayer.pastEvents.length - 5, 1)).filter(event => event.event.includes('and arrived in')).length;
-      if (pastMoveCount >= 5 && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+      if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
         return this.attackEvent(selectedPlayer, onlinePlayers)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
@@ -218,7 +219,7 @@ class Game {
    * @param {Number} amount
    */
   giveGold(playerId, amount) {
-    return this.Database.loadPlayer(playerId)
+    return this.Database.loadPlayer(playerId, { pastEvents: 0, pastPvpEvents: 0 })
       .then((updatingPlayer) => {
         updatingPlayer.gold.current += Number(amount);
         updatingPlayer.gold.total += Number(amount);
@@ -257,7 +258,7 @@ ${rankString}
   }
 
   getRank(commandAuthor, type = { level: -1 }) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then(player => this.Database.loadCurrentRank(player, type))
       .then(currentRank => currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
         .sort((player1, player2) => {
@@ -283,7 +284,7 @@ ${rankString}
    * @param {Boolean} isMentionInDiscord
    */
   modifyMention(commandAuthor, isMentionInDiscord) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -306,7 +307,7 @@ ${rankString}
    * @param {Boolean} isMentionInDiscord
    */
   modifyPM(commandAuthor, isPrivateMessage, filtered) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -330,7 +331,7 @@ ${rankString}
    * @param String gender
    */
   modifyGender(commandAuthor, gender) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         if (!castingPlayer) {
           return commandAuthor.send('Please set this after you have been born');
@@ -352,7 +353,7 @@ ${rankString}
    * @param {String} spell
    */
   castSpell(commandAuthor, spell) {
-    return this.Database.loadPlayer(commandAuthor.id)
+    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         switch (spell) {
           case 'bless':
@@ -407,7 +408,7 @@ ${rankString}
    * @param {Number} amount
    */
   setPlayerBounty(recipient, amount) {
-    return this.Database.loadPlayer(recipient)
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         player.currentBounty = amount;
         return this.Database.savePlayer(player);
@@ -420,7 +421,7 @@ ${rankString}
    * @param {Number} amount
    */
   setPlayerGold(recipient, amount) {
-    return this.Database.loadPlayer(recipient)
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         player.gold.current = Number(amount);
         player.gold.total += Number(amount);
@@ -429,7 +430,7 @@ ${rankString}
   }
 
   joinLottery(discordUser) {
-    return this.Database.loadPlayer(discordUser.id)
+    return this.Database.loadPlayer(discordUser.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         if (player.lottery.joined) {
           return 'You\'ve already joined todays daily lottery!';
@@ -495,7 +496,7 @@ ${rankString}
             return Promise.all([
               this.Database.updateGame(updatedConfig),
               this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
-              this.Helper.logEvent(winner, eventLog, 'pastEvents'),
+              this.Helper.logEvent(winner, this.Database, eventLog, 'ACTION'),
               this.Database.savePlayer(winner),
               this.Database.removeLotteryPlayers()
             ])
@@ -563,7 +564,7 @@ ${rankString}
    * @param {Number} amount
    */
   placeBounty(bountyPlacer, recipient, amount) {
-    return this.Database.loadPlayer(bountyPlacer.id)
+    return this.Database.loadPlayer(bountyPlacer.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((placer) => {
         if (placer.gold.current >= amount) {
           placer.gold.current -= amount;
@@ -594,13 +595,13 @@ ${rankString}
    * @param {Number} count
    */
   playerEventLog(playerId, count) {
-    return this.Database.loadPlayer(playerId, enumHelper.playerEventLogSelectFields)
-      .then((player) => {
-        if (!player) {
+    return this.Database.loadActionLog(playerId)
+      .then((playerLog) => {
+        if (!playerLog.log.length) {
           return;
         }
 
-        return this.Helper.generateLog(player, count);
+        return this.Helper.generateLog(playerLog, count);
       });
   }
 
@@ -610,7 +611,7 @@ ${rankString}
    * @param {Number} count
    */
   playerPvpLog(playerId, count) {
-    return this.Database.loadPlayer(playerId, enumHelper.pvpLogSelectFields)
+    return this.Database.loadPvpLog(playerId)
       .then((player) => {
         if (!player) {
           return;

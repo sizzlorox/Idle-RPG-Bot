@@ -11,7 +11,7 @@ const events = {
      * @param { map, direction } mapObj
      * @returns {Player} updatedPlayer
      */
-    movePlayer: (discordHook, Helper, selectedPlayer, mapObj) => new Promise((resolve) => {
+    movePlayer: (discordHook, Database, Helper, selectedPlayer, mapObj) => new Promise((resolve) => {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
@@ -20,7 +20,7 @@ const events = {
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false),
-        Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+        Helper.logEvent(selectedPlayer, Database, eventLog, 'MOVE')
       ])
         .then(resolve(selectedPlayer));
     })
@@ -32,15 +32,15 @@ const events = {
    * @param {Player} selectedPlayer
    * @returns {Player} updatedPlayer
    */
-  camp: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+  camp: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
     selectedPlayer = Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
     // TODO: Make more camp event messages to be selected randomly
     const { eventMsg, eventLog } = Helper.randomCampEventMessage(selectedPlayer);
 
     return Promise.all([
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg),
+      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
       Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-      Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+      Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
     ])
       .then(resolve(selectedPlayer));
   }),
@@ -52,7 +52,7 @@ const events = {
      * @param {Player} selectedPlayer
      * @returns {Player} updatedPlayer
      */
-    sell: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+    sell: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
       if (selectedPlayer.inventory.equipment.length > 0) {
         let profit = 0;
         selectedPlayer.inventory.equipment.forEach((equipment) => {
@@ -69,7 +69,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }
@@ -85,7 +85,7 @@ const events = {
      * @param {InventoryManager} InventoryManager
      * @returns {Player} updatedPlayer
      */
-    item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
+    item: (discordHook, Database, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
       const itemCost = Math.round(item.gold);
 
       if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
@@ -114,7 +114,7 @@ const events = {
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
       ])
         .then(resolve(selectedPlayer));
     })
@@ -153,7 +153,7 @@ const events = {
      * @param { attacker, defender, attackerDamage, defenderDamage } battleResults
      * @returns { result, updatedAttacker, updatedDefender } updatedBattleResults
      */
-    pvpResults: (discordHook, Helper, { attacker, defender, attackerDamage, defenderDamage }) => new Promise((resolve) => {
+    pvpResults: (discordHook, Database, Helper, { attacker, defender, attackerDamage, defenderDamage }) => new Promise((resolve) => {
       const defenderMaxHealth = 100 + (defender.level * 5);
       const playerMaxHealth = 100 + (attacker.level * 5);
 
@@ -181,10 +181,10 @@ const events = {
           Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
           Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
-          Helper.logEvent(attacker, eventLog, 'pastEvents'),
-          Helper.logEvent(attacker, eventLog, 'pastPvpEvents'),
-          Helper.logEvent(defender, otherPlayerLog, 'pastEvents'),
-          Helper.logEvent(defender, otherPlayerLog, 'pastPvpEvents')
+          Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
+          Helper.logEvent(defender, Database, otherPlayerLog, 'ACTION'),
+          Helper.logEvent(attacker, Database, eventLog, 'PVP'),
+          Helper.logEvent(defender, Database, otherPlayerLog, 'PVP')
         ])
           .then(resolve({
             result: enumHelper.battle.outcomes.lost,
@@ -214,10 +214,10 @@ const events = {
           Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
           Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
-          Helper.logEvent(attacker, eventLog, 'pastEvents'),
-          Helper.logEvent(attacker, eventLog, 'pastPvpEvents'),
-          Helper.logEvent(defender, otherPlayerLog, 'pastEvents'),
-          Helper.logEvent(defender, otherPlayerLog, 'pastPvpEvents')
+          Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
+          Helper.logEvent(defender, Database, otherPlayerLog, 'ACTION'),
+          Helper.logEvent(attacker, Database, eventLog, 'PVP'),
+          Helper.logEvent(defender, Database, otherPlayerLog, 'PVP')
         ])
           .then(resolve({
             result: enumHelper.battle.outcomes.fled,
@@ -242,10 +242,10 @@ const events = {
         Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
         Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
-        Helper.logEvent(attacker, eventLog, 'pastEvents'),
-        Helper.logEvent(attacker, eventLog, 'pastPvpEvents'),
-        Helper.logEvent(defender, otherPlayerLog, 'pastEvents'),
-        Helper.logEvent(defender, otherPlayerLog, 'pastPvpEvents')
+        Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
+        Helper.logEvent(defender, Database, otherPlayerLog, 'ACTION'),
+        Helper.logEvent(attacker, Database, eventLog, 'PVP'),
+        Helper.logEvent(defender, Database, otherPlayerLog, 'PVP')
       ])
         .then(resolve({
           result: enumHelper.battle.outcomes.win,
@@ -262,7 +262,7 @@ const events = {
      * @param {Number} multiplier
      * @returns { result, updatedAttacker, updatedDefender } updatedBattleResults
      */
-    pveResults: (discordHook, Helper, MapClass, results, multiplier) => new Promise((resolve) => {
+    pveResults: (discordHook, Database, Helper, MapClass, results, multiplier) => new Promise((resolve) => {
       const playerMaxHealth = 100 + (results.attacker.level * 5);
       const mobListResult = [];
       const mobListInfo = {
@@ -308,7 +308,7 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg.replace(/1x /g, '')),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '')), true),
-          Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve({
             result: enumHelper.battle.outcomes.lost,
@@ -334,7 +334,7 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg.replace(/1x /g, '')),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '')), true),
-          Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve({
             result: enumHelper.battle.outcomes.fled,
@@ -357,7 +357,7 @@ ${mobListResult.join('\n')}`;
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg.replace(/1x /g, '')),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '')), true),
-        Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
       ])
         .then(resolve({
           result: enumHelper.battle.outcomes.win,
@@ -366,7 +366,7 @@ ${mobListResult.join('\n')}`;
         }));
     }),
 
-    steal: (discordHook, Helper, stealingPlayer, victimPlayer, InventoryManager) => new Promise(async (resolve) => {
+    steal: (discordHook, Database, Helper, stealingPlayer, victimPlayer, InventoryManager) => new Promise(async (resolve) => {
       const luckStealChance = Helper.randomBetween(0, 100);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
@@ -426,10 +426,10 @@ ${mobListResult.join('\n')}`;
           Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true),
           Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true),
-          Helper.logEvent(stealingPlayer, eventLog, 'pastEvents'),
-          Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents'),
-          Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents'),
-          Helper.logEvent(victimPlayer, otherPlayerLog, 'pastPvpEvents')
+          Helper.logEvent(stealingPlayer, Database, eventLog, 'ACTION'),
+          Helper.logEvent(victimPlayer, Database, otherPlayerLog, 'ACTION'),
+          Helper.logEvent(stealingPlayer, Database, eventLog, 'PVP'),
+          Helper.logEvent(victimPlayer, Database, otherPlayerLog, 'PVP')
         ])
           .then(resolve({ stealingPlayer, victimPlayer }));
       } else if (victimPlayer.gold.current > victimPlayer.gold.current / 6) {
@@ -450,10 +450,10 @@ ${mobListResult.join('\n')}`;
             Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true),
             Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true),
-            Helper.logEvent(stealingPlayer, eventLog, 'pastEvents'),
-            Helper.logEvent(stealingPlayer, eventLog, 'pastPvpEvents'),
-            Helper.logEvent(victimPlayer, otherPlayerLog, 'pastEvents'),
-            Helper.logEvent(victimPlayer, otherPlayerLog, 'pastPvpEvents')
+            Helper.logEvent(stealingPlayer, Database, eventLog, 'ACTION'),
+            Helper.logEvent(victimPlayer, Database, otherPlayerLog, 'ACTION'),
+            Helper.logEvent(stealingPlayer, Database, eventLog, 'PVP'),
+            Helper.logEvent(victimPlayer, Database, otherPlayerLog, 'PVP')
           ])
             .then(resolve({ stealingPlayer, victimPlayer }));
         }
@@ -462,7 +462,7 @@ ${mobListResult.join('\n')}`;
       return resolve({ stealingPlayer, victimPlayer });
     }),
 
-    dropItem: (discordHook, Helper, selectedPlayer, mob, ItemManager, InventoryManager) => new Promise((resolve) => {
+    dropItem: (discordHook, Database, Helper, selectedPlayer, mob, ItemManager, InventoryManager) => new Promise((resolve) => {
       const dropitemChance = Helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
@@ -491,11 +491,10 @@ ${mobListResult.join('\n')}`;
             return Promise.all([
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-              Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+              Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
             ])
               .then(resolve(selectedPlayer));
-          })
-          .catch(err => errorLog.error(err));
+          });
       }
 
       return resolve(selectedPlayer);
@@ -504,7 +503,7 @@ ${mobListResult.join('\n')}`;
 
   luck: {
     item: {
-      spell: (discordHook, Helper, selectedPlayer, spell) => new Promise((resolve) => {
+      spell: (discordHook, Database, Helper, selectedPlayer, spell) => new Promise((resolve) => {
         const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, spell);
         if (selectedPlayer.spells.length > 0) {
           let shouldAddToList = false;
@@ -526,7 +525,7 @@ ${mobListResult.join('\n')}`;
             return Promise.all([
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-              Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+              Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
             ])
               .then(resolve(selectedPlayer));
           }
@@ -536,7 +535,7 @@ ${mobListResult.join('\n')}`;
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-            Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+            Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
           ])
             .then(resolve(selectedPlayer));
         }
@@ -544,7 +543,7 @@ ${mobListResult.join('\n')}`;
         return resolve(selectedPlayer);
       }),
 
-      item: (discordHook, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
+      item: (discordHook, Database, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
         const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, item);
         if (item.position !== enumHelper.inventory.position) {
           const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
@@ -561,13 +560,13 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       })
     },
 
-    gold: (discordHook, Helper, selectedPlayer, multiplier) => new Promise((resolve) => {
+    gold: (discordHook, Database, Helper, selectedPlayer, multiplier) => new Promise((resolve) => {
       const luckGoldChance = Helper.randomBetween(0, 100);
       if (luckGoldChance >= 75) {
         const luckGoldDice = Helper.randomBetween(5, 100);
@@ -581,7 +580,7 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }
@@ -589,7 +588,7 @@ ${mobListResult.join('\n')}`;
       return resolve(selectedPlayer);
     }),
 
-    gambling: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+    gambling: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
       if (selectedPlayer.gold.current < 10) {
         return resolve(selectedPlayer);
       }
@@ -609,7 +608,7 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }
@@ -621,13 +620,13 @@ ${mobListResult.join('\n')}`;
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, eventLog, 'pastEvents')
+        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
       ])
         .then(resolve(selectedPlayer));
     }),
 
     gods: {
-      hades: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+      hades: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         const luckExpAmount = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
         selectedPlayer.experience.current -= luckExpAmount;
         selectedPlayer.experience.lost += luckExpAmount;
@@ -641,12 +640,12 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, true),
-          Helper.logEvent(selectedPlayer, eventLogHades, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLogHades, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }),
 
-      zeus: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+      zeus: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         const luckHealthAmount = Helper.randomBetween(5, 50 + (selectedPlayer.level * 2));
         selectedPlayer.health -= luckHealthAmount;
 
@@ -656,12 +655,12 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, true),
-          Helper.logEvent(selectedPlayer, eventLogZeus, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLogZeus, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }),
 
-      aseco: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+      aseco: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         const healthDeficit = (100 + (selectedPlayer.level * 5)) - selectedPlayer.health;
         let eventMsgAseco = '';
         let eventLogAseco = '';
@@ -676,7 +675,7 @@ ${mobListResult.join('\n')}`;
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, true),
-            Helper.logEvent(selectedPlayer, eventLogAseco, 'pastEvents')
+            Helper.logEvent(selectedPlayer, Database, eventLogAseco, 'ACTION')
           ])
             .then(resolve(selectedPlayer));
         }
@@ -687,12 +686,12 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, true),
-          Helper.logEvent(selectedPlayer, eventLogAseco, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLogAseco, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }),
 
-      hermes: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+      hermes: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         let eventMsgHermes = '';
         let eventLogHermes = '';
         if (selectedPlayer.gold.current < (selectedPlayer.gold.current / 6)) {
@@ -702,7 +701,7 @@ ${mobListResult.join('\n')}`;
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, true),
-            Helper.logEvent(selectedPlayer, eventLogHermes, 'pastEvents')
+            Helper.logEvent(selectedPlayer, Database, eventLogHermes, 'ACTION')
           ])
             .then(resolve(selectedPlayer));
         }
@@ -719,12 +718,12 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, true),
-          Helper.logEvent(selectedPlayer, eventLogHermes, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLogHermes, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }),
 
-      athena: (discordHook, Helper, selectedPlayer) => new Promise((resolve) => {
+      athena: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         const luckExpAthena = Helper.randomBetween(5, 15 + (selectedPlayer.level * 2));
         selectedPlayer.experience.current += luckExpAthena;
         selectedPlayer.experience.total += luckExpAthena;
@@ -735,12 +734,12 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthena),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthena, true),
-          Helper.logEvent(selectedPlayer, eventLogAthena, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLogAthena, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       }),
 
-      eris: (discordHook, Helper, selectedPlayer, spell) => new Promise((resolve) => {
+      eris: (discordHook, Database, Helper, selectedPlayer, spell) => new Promise((resolve) => {
         const eventMsgEris = `Eris has given ${Helper.generatePlayerName(selectedPlayer, true)} a scroll containing \`${spell.name}\` to add to ${Helper.generateGenderString(selectedPlayer, 'his')} spellbook!`;
         const eventLogEris = `Eris gave you a scroll of ${spell.name}`;
         if (selectedPlayer.spells.length > 0) {
@@ -763,7 +762,7 @@ ${mobListResult.join('\n')}`;
             return Promise.all([
               Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
-              Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents')
+              Helper.logEvent(selectedPlayer, Database, eventLogEris, 'ACTION')
             ])
               .then(resolve(selectedPlayer));
           }
@@ -773,7 +772,7 @@ ${mobListResult.join('\n')}`;
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
-            Helper.logEvent(selectedPlayer, eventLogEris, 'pastEvents')
+            Helper.logEvent(selectedPlayer, Database, eventLogEris, 'ACTION')
           ])
             .then(resolve(selectedPlayer));
         }
@@ -781,7 +780,7 @@ ${mobListResult.join('\n')}`;
         return resolve(selectedPlayer);
       }),
 
-      dionysus: (discordHook, Helper, Database, selectedPlayer) => new Promise((resolve) => {
+      dionysus: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         // TODO: Remove this god after testing if has problem saving via setTimeout
         // Might overwrite his event if currently saving if he fired and event at the same time.
         const increaseMult = Helper.randomBetween(1, 3);
@@ -802,7 +801,7 @@ ${mobListResult.join('\n')}`;
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgDionysus),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogDionysus, true),
-          Helper.logEvent(selectedPlayer, eventLogDionysus, 'pastEvents')
+          Helper.logEvent(selectedPlayer, Database, eventLogDionysus, 'ACTION')
         ])
           .then(resolve(selectedPlayer));
       })
@@ -810,7 +809,7 @@ ${mobListResult.join('\n')}`;
   },
 
   special: {
-    snowFlake: (discordHook, Helper, selectedPlayer) => new Promise(async (resolve) => {
+    snowFlake: (discordHook, Database, Helper, selectedPlayer) => new Promise(async (resolve) => {
       const snowFlakeDice = Helper.randomBetween(0, 100);
       if (snowFlakeDice <= 15) {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
@@ -823,7 +822,7 @@ ${mobListResult.join('\n')}`;
           return Promise.all([
             Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgSnowflake),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true),
-            Helper.logEvent(selectedPlayer, eventLogSnowflake, 'pastEvents')
+            Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
           ])
             .then(resolve(selectedPlayer));
         }

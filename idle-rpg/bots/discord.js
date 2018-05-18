@@ -19,7 +19,8 @@ const {
   streamChannelId,
   botLoginToken,
   minimalTimer,
-  maximumTimer
+  maximumTimer,
+  guildID
 } = require('../../settings');
 
 const webHookOptions = {
@@ -96,7 +97,7 @@ const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1
 const heartBeat = () => {
   if (process.env.NODE_ENV.includes('production')) {
     const discordUsers = discordBot.guilds.size > 0
-      ? discordBot.guilds.find('name', guildName).members
+      ? discordBot.guilds.find('id', guildID).members
       : undefined;
 
     if (discordUsers) {
