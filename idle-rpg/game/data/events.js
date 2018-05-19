@@ -160,7 +160,7 @@ const events = {
       let battleResult = `Battle Results:
   ${attacker.name}'s ${attacker.equipment.weapon.name} did ${attackerDamage} damage.
   ${attacker.name} has ${attacker.health}/${playerMaxHealth} HP left.
-  ${defender.name} 's ${defender.equipment.weapon.name} did ${defenderDamage} damage.
+  ${defender.name}'s ${defender.equipment.weapon.name} did ${defenderDamage} damage.
   ${defender.name} has ${defender.health}/${defenderMaxHealth} HP left.`;
 
       if (attacker.health <= 0) {
@@ -319,14 +319,14 @@ ${mobListResult.join('\n')}`;
 
       if (results.defender.filter(mob => mob.health > 0).length > 0 && selectedPlayer.health > 0) {
         const eventMsg = results.attackerDamage > results.defenderDamage
-          ? `[\`${selectedPlayer.map.name}\`] ${mobCountString}just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
+          ? `[\`${selectedPlayer.map.name}\`] ${mobCountString} just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`
           : `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just fled from ${mobCountString}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
 
         const eventLog = results.attackerDamage > results.defenderDamage
-          ? `${results.defender.length}x ${results.defender[0].name} fled from you in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`
-          : `You fled from ${results.defender.length}x ${results.defender[0].name} in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
+          ? `${mobCountString} fled from you in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`
+          : `You fled from ${mobCountString} in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
 
         selectedPlayer.experience.current += expGain;
         selectedPlayer.experience.total += expGain;
