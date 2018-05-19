@@ -317,7 +317,7 @@ ${mobListResult.join('\n')}`;
           }));
       }
 
-      if (results.defender.health > 0 && selectedPlayer.health > 0) {
+      if (results.defender.filter(mob => mob.health > 0).length > 0 && selectedPlayer.health > 0) {
         const eventMsg = results.attackerDamage > results.defenderDamage
           ? `[\`${selectedPlayer.map.name}\`] ${mobCountString}just fled from ${Helper.generatePlayerName(selectedPlayer, true)}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`
