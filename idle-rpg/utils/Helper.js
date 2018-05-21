@@ -1,8 +1,11 @@
 const fs = require('fs');
+const seedrandom = require('seedrandom');
 const enumHelper = require('../utils/enumHelper');
 const { moveLog, actionLog, errorLog, infoLog } = require('../utils/logger');
 const { battleDebug, eventDebug, guildID } = require('../../settings');
 const messages = require('../game/data/messages');
+
+const RNG = seedrandom();
 
 class Helper {
   printBattleDebug(debugMsg) {
@@ -19,7 +22,7 @@ class Helper {
 
   randomBetween(min, max, decimal, exclude) {
     // https://stackoverflow.com/questions/15594332/unbiased-random-range-generator-in-javascript
-    if (arguments.length < 2) return (Math.random() >= 0.5);
+    if (arguments.length < 2) return (RNG() >= 0.5);
 
     let factor = 1;
     let result;
@@ -28,9 +31,7 @@ class Helper {
     }
 
     do {
-      //result = (Math.random() * (max - min)) + min;
-      // https://en.wikipedia.org/wiki/Power_law
-      result = Math.ceil(Math.exp(Math.random() * (Math.log(max) - Math.log(min))) * min);
+      result = (RNG() * (max - min)) + min;
       result = Math.round(result * factor) / factor;
     } while (result === exclude);
     return result;
