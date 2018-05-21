@@ -284,16 +284,16 @@ const events = {
         expGain += Math.ceil(((mob.experience * multiplier) + (mob.dmgDealt / 4)) / 6);
         goldGain += Math.floor((mob.gold * multiplier));
 
-        if (Math.floor(results.defenderDamage / (results.defender.length)) > 0 || mob.health > 0) {
+        if (Math.floor(results.defenderDamage / (results.defender.length)) > 0) {
           mobListResult.push(`  ${mob.name}'s ${mob.equipment.weapon.name} did ${mob.dmgDealt} damage.
-  ${mob.health <= 0 ? `${mob.name} died.` : `${mob.name} has ${mob.health} / ${mob.maxHealth} HP left.`}`);
+  ${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`);
         }
       });
       mobListInfo.mobs.forEach((mobInfo, i) => mobCountString = i > 0 ? mobCountString.concat(`, ${mobInfo.count}x \`${mobInfo.mob}\``) : mobCountString.concat(`${mobInfo.count}x \`${mobInfo.mob}\``));
 
       const selectedPlayer = results.attacker;
       let battleResult = `Battle Results:
-  Your ${selectedPlayer.equipment.weapon.name} did ${results.attackerDamage} damage.
+  Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}
   You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
 ${mobListResult.join('\n')}`;
 
@@ -302,7 +302,7 @@ ${mobListResult.join('\n')}`;
         const eventMsg = `[\`${selectedPlayer.map.name}\`] ${mobCountString} just killed ${Helper.generatePlayerName(selectedPlayer, true)}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg!`;
 
-        const eventLog = `${mobCountString}just killed you in ${selectedPlayer.map.name}!`;
+        const eventLog = `${mobCountString} just killed you!`;
         selectedPlayer.battles.lost++;
 
         return Promise.all([
@@ -325,8 +325,8 @@ ${mobListResult.join('\n')}`;
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg${expGain === 0 ? '' : ` and gained \`${expGain}\` exp`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
 
         const eventLog = results.attackerDamage > results.defenderDamage
-          ? `${mobCountString} fled from you in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`
-          : `You fled from ${mobCountString} in ${selectedPlayer.map.name}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
+          ? `${mobCountString} fled from you!${expGain === 0 ? '' : ` [${expGain} exp]`}`
+          : `You fled from ${mobCountString}!${expGain === 0 ? '' : ` [${expGain} exp]`}`;
 
         selectedPlayer.experience.current += expGain;
         selectedPlayer.experience.total += expGain;
@@ -345,7 +345,7 @@ ${mobListResult.join('\n')}`;
 
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed ${mobCountString}!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
-      const eventLog = `Killed ${mobCountString} with your ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]`;
+      const eventLog = `Killed ${mobCountString}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]`;
 
       selectedPlayer.experience.current += expGain;
       selectedPlayer.experience.total += expGain;

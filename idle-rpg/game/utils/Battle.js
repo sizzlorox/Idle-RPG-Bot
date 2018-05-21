@@ -127,6 +127,9 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
+          if (this.isMonster(defender)) {
+            defender.dmgReceived += attackerDamage;
+          }
           this.Helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
           attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.magicDefensePower / 100));
@@ -135,6 +138,9 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
+          if (this.isMonster(defender)) {
+            defender.dmgReceived += attackerDamage;
+          }
           this.Helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         }
 
@@ -148,7 +154,9 @@ class Battle {
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
-          defender.dmgDealt += defenderDamage;
+          if (this.isMonster(defender)) {
+            defender.dmgDealt += defenderDamage;
+          }
 
           attacker.health -= defenderDamage;
           this.Helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
@@ -157,7 +165,9 @@ class Battle {
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
-          defender.dmgDealt += defenderDamage;
+          if (this.isMonster(defender)) {
+            defender.dmgDealt += defenderDamage;
+          }
 
           attacker.health -= defenderDamage;
           this.Helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
@@ -171,7 +181,9 @@ class Battle {
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
-          defender.dmgDealt += defenderDamage;
+          if (this.isMonster(defender)) {
+            defender.dmgDealt += defenderDamage;
+          }
 
           attacker.health -= defenderDamage;
           this.Helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
@@ -180,7 +192,9 @@ class Battle {
           if (defenderDamage < 0) {
             defenderDamage = 0;
           }
-          defender.dmgDealt += defenderDamage;
+          if (this.isMonster(defender)) {
+            defender.dmgDealt += defenderDamage;
+          }
 
           attacker.health -= defenderDamage;
           this.Helper.printBattleDebug(`HEALTH ${attacker.health + defenderDamage} -> ${attacker.health}`);
@@ -198,6 +212,9 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
+          if (this.isMonster(defender)) {
+            defender.dmgReceived += attackerDamage;
+          }
           this.Helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         } else {
           attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.magicDefensePower / 100));
@@ -206,6 +223,9 @@ class Battle {
           }
 
           defender.health -= attackerDamage;
+          if (this.isMonster(defender)) {
+            defender.dmgReceived += attackerDamage;
+          }
           this.Helper.printBattleDebug(`HEALTH ${defender.health + attackerDamage} -> ${defender.health}`);
         }
 
@@ -236,7 +256,10 @@ class Battle {
                 }
                 if (defenderDamage > (attackerSpellToCast.power * 2)) {
                   defenderDamage -= (attackerSpellToCast.power * 2);
-                  defender.dmgDealt -= (attackerSpellToCast.power * 2);
+
+                  if (this.isMonster(defender)) {
+                    defender.dmgDealt -= (attackerSpellToCast.power * 2);
+                  }
                 }
               }
               break;
@@ -248,6 +271,9 @@ class Battle {
                 }
                 attackerDamage += spellDamage;
                 defender.health -= spellDamage;
+                if (this.isMonster(defender)) {
+                  defender.dmgReceived += spellDamage;
+                }
                 attacker.mana -= attackerSpellToCast.power;
                 this.Helper.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
@@ -270,6 +296,9 @@ class Battle {
                 }
                 if (attackerDamage > (defenderSpellToCast.power * 2)) {
                   attackerDamage -= (defenderSpellToCast.power * 2);
+                  if (this.isMonster(defender)) {
+                    defender.dmgReceived -= (defenderSpellToCast.power * 2);
+                  }
                 }
               }
               break;
@@ -280,7 +309,9 @@ class Battle {
                   spellDamage = 0;
                 }
                 defenderDamage += spellDamage;
-                defender.dmgDealt += spellDamage;
+                if (this.isMonster(defender)) {
+                  defender.dmgDealt += spellDamage;
+                }
                 attacker.health -= spellDamage;
                 defender.mana -= defenderSpellToCast.power;
                 this.Helper.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
@@ -306,6 +337,9 @@ class Battle {
                 }
                 if (attackerDamage > (defenderSpellToCast.power * 2)) {
                   attackerDamage -= (defenderSpellToCast.power * 2);
+                  if (this.isMonster(defender)) {
+                    defender.dmgReceived -= (defenderSpellToCast.power * 2);
+                  }
                 }
               }
               break;
@@ -316,7 +350,9 @@ class Battle {
                   spellDamage = 0;
                 }
                 defenderDamage += spellDamage;
-                defender.dmgDealt += spellDamage;
+                if (this.isMonster(defender)) {
+                  defender.dmgDealt += spellDamage;
+                }
                 attacker.health -= spellDamage;
                 defender.mana -= defenderSpellToCast.power;
                 this.Helper.printBattleDebug(`${attacker.name} took a fireball to the face for ${spellDamage} damage
@@ -351,6 +387,9 @@ class Battle {
                 }
                 attackerDamage += spellDamage;
                 defender.health -= spellDamage;
+                if (this.isMonster(defender)) {
+                  defender.dmgReceived += spellDamage;
+                }
                 attacker.mana -= attackerSpellToCast.power;
                 this.Helper.printBattleDebug(`${defender.name} took a fireball to the face for ${spellDamage} damage
                 HEALTH ${defender.health + spellDamage} -> ${defender.health}`);
@@ -380,7 +419,9 @@ class Battle {
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
           if (defenderDamage > healAmount) {
             defenderDamage -= healAmount;
-            defender.dmgDealt -= healAmount;
+            if (this.isMonster(defender)) {
+              defender.dmgDealt -= healAmount;
+            }
           }
 
           this.Helper.printBattleDebug(`${attacker.name} drank a health potion and healed ${healAmount} health`);
@@ -396,6 +437,9 @@ class Battle {
           defender.inventory.items = defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
           if (attackerDamage > healAmount) {
             attackerDamage -= healAmount;
+            if (this.isMonster(defender)) {
+              defender.dmgReceived -= healAmount;
+            }
           }
 
           this.Helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
@@ -413,6 +457,9 @@ class Battle {
           defender.inventory.items = defender.inventory.items.splice(defender.inventory.items.indexOf(potion), 1);
           if (attackerDamage > healAmount) {
             attackerDamage -= healAmount;
+            if (this.isMonster(defender)) {
+              defender.dmgReceived -= healAmount;
+            }
           }
 
           this.Helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
@@ -428,7 +475,9 @@ class Battle {
           attacker.inventory.items = attacker.inventory.items.splice(attacker.inventory.items.indexOf(potion), 1);
           if (defenderDamage > healAmount) {
             defenderDamage -= healAmount;
-            defender.dmgDealt -= healAmount;
+            if (this.isMonster(defender)) {
+              defender.dmgDealt -= healAmount;
+            }
           }
 
           this.Helper.printBattleDebug(`${defender.name} drank a health potion and healed ${healAmount} health`);
