@@ -28,7 +28,9 @@ class Helper {
     }
 
     do {
-      result = (Math.random() * (max - min)) + min;
+      //result = (Math.random() * (max - min)) + min;
+      // https://en.wikipedia.org/wiki/Power_law
+      result = Math.ceil(Math.exp(Math.random() * (Math.log(max) - Math.log(min))) * min);
       result = Math.round(result * factor) / factor;
     } while (result === exclude);
     return result;
