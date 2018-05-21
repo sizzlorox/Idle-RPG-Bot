@@ -1,4 +1,10 @@
 const enumHelper = {
+  logTypes: {
+    action: 'ACTION',
+    move: 'MOVE',
+    pvp: 'PVP'
+  },
+
   map: {
     types: {
       town: 'Town'
