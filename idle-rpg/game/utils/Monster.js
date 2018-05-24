@@ -48,7 +48,7 @@ class Monster {
 
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
-        && mobType.spawnableBiomes.includes('Land'));
+        && mobType.spawnableBiomes.includes(selectedPlayer.map.biome.name));
 
       const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4;
       const mobAmountChance = this.Helper.randomBetween(0, 100);

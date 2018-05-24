@@ -8,6 +8,21 @@ const enumHelper = {
   map: {
     types: {
       town: 'Town'
+    },
+    biomes: {
+      land: 'Land',
+      coast: 'Coast',
+      town: 'Town',
+      haunted: 'Haunted',
+      forest: 'Forest',
+      plains: 'Plains',
+      mountains: 'Mountains',
+      swamp: 'Swamp',
+      grassland: 'Grassland',
+      caves: 'Caves',
+      plateau: 'Plateau',
+      moors: 'Moors',
+      desert: 'Desert'
     }
   },
 
