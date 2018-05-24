@@ -1306,6 +1306,79 @@ const monsters = {
       experience: 15,
       gold: 5,
       rarity: 33
+    },
+
+    chaoticTriceratops = {
+      name: 'Will-o\'-the-wisp',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.forest
+      ],
+      power: 1,
+      health: 75,
+      stats: {
+        str: 0.75,
+        dex: 2.15,
+        end: 1,
+        int: 2.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'magic',
+          power: 2
+        },
+        armor: {
+          name: '',
+          power: 0.95
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 10,
+      gold: 25,
+      rarity: 20
+    },
+
+    chaoticTriceratops = {
+      name: 'Chaotic Triceratops',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.swamp,
+        map.biomes.grassland
+      ],
+      power: 1,
+      health: 235,
+      stats: {
+        str: 2.15,
+        dex: 0.5,
+        end: 2.15,
+        int: 0.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'claws',
+          power: 1.2
+        },
+        armor: {
+          name: '',
+          power: 0.95
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 20,
+      gold: 5,
+      rarity: 15
     }
   ]
 };
