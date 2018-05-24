@@ -228,6 +228,7 @@ const enumHelper = {
     kills: 1,
     battles: 1,
     deaths: 1,
+    quest: 1,
     spellCast: 1
   },
 

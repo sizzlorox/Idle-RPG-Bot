@@ -125,6 +125,11 @@ class Event {
       .catch(err => console.log);
   }
 
+  generateQuestEvent(selectedPlayer) {
+    return this.MonsterManager.generateQuestMonster(selectedPlayer)
+      .then(mob => events.quest(this.discordHook, this.Database, this.Helper, selectedPlayer, mob));
+  }
+
   // Luck Events
   generateGodsEvent(selectedPlayer) {
     return new Promise((resolve) => {

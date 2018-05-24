@@ -263,6 +263,7 @@ const events = {
      * @returns { result, updatedAttacker, updatedDefender } updatedBattleResults
      */
     pveResults: (discordHook, Database, Helper, MapClass, results, multiplier) => new Promise((resolve) => {
+      let isQuestCompleted = false;
       const playerMaxHealth = 100 + (results.attacker.level * 5);
       const mobListResult = [];
       const mobListInfo = {
@@ -271,6 +272,8 @@ const events = {
       let mobCountString = '';
       let expGain = 0;
       let goldGain = 0;
+      let questExpGain = 0;
+      let questGoldGain = 0;
       results.defender.forEach((mob) => {
         const infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
         if (infoList !== -1) {
@@ -283,6 +286,19 @@ const events = {
         }
         expGain += Math.ceil(((mob.experience * multiplier) + (mob.dmgDealt / 4)) / 6);
         goldGain += Math.floor((mob.gold * multiplier));
+
+        if (!results.attacker.quest.questMob.name.includes('None') && mob.name.includes(results.attacker.quest.questMob.name) && mob.health <= 0) {
+          results.attacker.quest.questMob.killCount++;
+          if (results.attacker.quest.questMob.killCount >= results.attacker.quest.questMob.count) {
+            isQuestCompleted = true;
+            questExpGain = (expGain * results.attacker.quest.questMob.count) / 2;
+            questGoldGain = (goldGain * results.attacker.quest.questMob.count) / 2;
+            results.attacker.quest.questMob.name = 'None';
+            results.attacker.quest.questMob.count = 0;
+            results.attacker.quest.questMob.killCount = 0;
+            results.attacker.quest.completed++;
+          }
+        }
 
         if (Math.floor(results.defenderDamage / (results.defender.length)) > 0) {
           mobListResult.push(`  ${mob.name}'s ${mob.equipment.weapon.name} did ${mob.dmgDealt} damage.
@@ -347,17 +363,20 @@ ${mobListResult.join('\n')}`;
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
       const eventLog = `Killed ${mobCountString}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]`;
 
-      selectedPlayer.experience.current += expGain;
-      selectedPlayer.experience.total += expGain;
-      selectedPlayer.gold.current += goldGain;
-      selectedPlayer.gold.total += goldGain;
+      selectedPlayer.experience.current += expGain + questExpGain;
+      selectedPlayer.experience.total += expGain + questExpGain;
+      selectedPlayer.gold.current += goldGain + questGoldGain;
+      selectedPlayer.gold.total += goldGain + questGoldGain;
       selectedPlayer.kills.mob++;
       selectedPlayer.battles.won++;
 
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg.replace(/1x /g, '')),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '')), true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION'),
+        isQuestCompleted ? Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`) : '',
+        isQuestCompleted ? Helper.sendPrivateMessage(discordHook, selectedPlayer, 'test', true) : `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`,
+        isQuestCompleted ? Helper.logEvent(discordHook, Database, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, 'ACTION') : ''
       ])
         .then(resolve({
           result: enumHelper.battle.outcomes.win,
@@ -460,6 +479,21 @@ ${mobListResult.join('\n')}`;
       }
 
       return resolve({ stealingPlayer, victimPlayer });
+    }),
+
+    quest: (discordHook, Database, Helper, selectedPlayer, mob) => new Promise((resolve) => {
+      selectedPlayer.quest.questMob = mob;
+      selectedPlayer.quest.count = Helper.randomBetween(1, 15);
+      selectedPlayer.quest.killCount = 0;
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] Quest Master has asked ${Helper.generatePlayerName(selectedPlayer, true)} to kill ${selectedPlayer.quest.count === 1 ? 'a' : selectedPlayer.quest.count} ${mob}!`;
+      const eventLog = `Quest Master in ${selectedPlayer.map.name} asked you to kill ${selectedPlayer.quest.count === 1 ? 'a' : selectedPlayer.quest.count} ${mob}.`;
+
+      return Promise.all([
+        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
+        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+      ])
+        .then(resolve(selectedPlayer));
     }),
 
     dropItem: (discordHook, Database, Helper, selectedPlayer, mob, ItemManager, InventoryManager) => new Promise((resolve) => {

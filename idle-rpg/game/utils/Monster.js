@@ -39,6 +39,17 @@ class Monster {
     });
   }
 
+  generateQuestMonster(selectedPlayer) {
+    return new Promise((resolve) => {
+      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100));
+      const randomTypeChance = Math.round(this.Helper.randomBetween(0, 100));
+      const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
+      const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType);
+
+      return resolve(monsterTypeList[randomTypeIndex].name);
+    });
+  }
+
   generateNewMonster(selectedPlayer) {
     return new Promise((resolve) => {
       const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100));

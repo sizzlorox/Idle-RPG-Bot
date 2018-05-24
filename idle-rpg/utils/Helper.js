@@ -499,6 +499,13 @@ class Helper {
       Intelligence: ${player.stats.int} (${this.sumPlayerTotalIntelligence(player)})
       Luck: ${player.stats.luk} (${this.sumPlayerTotalLuck(player)})
 
+    Quest:
+      Monster: ${player.quest.questMob.name}
+      Count: ${player.quest.questMob.count}
+      Kills Left: ${player.quest.questMob.count - player.quest.questMob.killCount}
+      Completed: ${player.quest.completed}
+      Last Update: ${this.secondsToTimeFormat(Math.floor((new Date().getTime() - player.quest.updated_at.getTime()) / 1000))}
+
     Born: ${this.getTimePassed(player.createdAt)}
     Events: ${player.events}
     Items Stolen: ${player.stole}
