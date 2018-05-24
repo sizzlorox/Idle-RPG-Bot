@@ -1,3 +1,5 @@
+const { map } = require('../../utils/enumHelper');
+
 const monsters = {
   rarity: [
     starving = {
@@ -171,7 +173,19 @@ const monsters = {
     rat = {
       name: 'Rat',
       isSpawnable: true,
-      spawnableBiomes: ['Land'],
+      spawnableBiomes: [
+        map.biomes.coast,
+        map.biomes.haunted,
+        map.biomes.forest,
+        map.biomes.plains,
+        map.biomes.mountains,
+        map.biomes.swamp,
+        map.biomes.grassland,
+        map.biomes.caves,
+        map.biomes.plateau,
+        map.biomes.moors,
+        map.biomes.desert
+      ],
       power: 1,
       health: 7,
       stats: {
@@ -204,7 +218,10 @@ const monsters = {
     crab = {
       name: 'Crab',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Coast', 'Swamp'],
+      spawnableBiomes: [
+        map.biomes.coast,
+        map.biomes.swamp
+      ],
       power: 1.25,
       health: 9,
       stats: {
@@ -237,7 +254,11 @@ const monsters = {
     bat = {
       name: 'Bat',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Caves', 'Forest', 'Haunted'],
+      spawnableBiomes: [
+        map.biomes.caves,
+        map.biomes.forest,
+        map.biomes.haunted
+      ],
       power: 1.25,
       health: 45,
       stats: {
@@ -270,7 +291,13 @@ const monsters = {
     slime = {
       name: 'Slime',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Grassland', 'Plains', 'Forest', 'Plateau'],
+      spawnableBiomes: [
+        map.biomes.grassland,
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.plateau,
+        map.biomes.moors
+      ],
       power: 1.5,
       health: 35,
       stats: {
@@ -303,7 +330,9 @@ const monsters = {
     pixie = {
       name: 'Pixie',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest'],
+      spawnableBiomes: [
+        map.biomes.forest
+      ],
       power: 1.5,
       health: 35,
       stats: {
@@ -336,7 +365,13 @@ const monsters = {
     goblin = {
       name: 'Goblin',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Plateau', 'Mountains', 'Plains'],
+      spawnableBiomes: [
+        map.biomes.forest,
+        map.biomes.plateau,
+        map.biomes.mountains,
+        map.biomes.plains,
+        map.biomes.moors
+      ],
       power: 1.75,
       health: 50,
       stats: {
@@ -369,7 +404,14 @@ const monsters = {
     bandit = {
       name: 'Bandit',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plateau', 'Coast', 'Forest', 'Plains', 'Mountains'],
+      spawnableBiomes: [
+        map.biomes.plateau,
+        map.biomes.coast,
+        map.biomes.forest,
+        map.biomes.plains,
+        map.biomes.mountains,
+        map.biomes.moors
+      ],
       power: 1.75,
       health: 75,
       stats: {
@@ -402,7 +444,9 @@ const monsters = {
     zombie = {
       name: 'Zombie',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Haunted'],
+      spawnableBiomes: [
+        map.biomes.haunted
+      ],
       power: 1.5,
       health: 65,
       stats: {
@@ -435,7 +479,14 @@ const monsters = {
     knight = {
       name: 'Knight',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Plains', 'Coast', 'Plateau', 'Mountains', 'Haunted'],
+      spawnableBiomes: [
+        map.biomes.forest,
+        map.biomes.plains,
+        map.biomes.coast,
+        map.biomes.plateau,
+        map.biomes.mountains,
+        map.biomes.haunted
+      ],
       power: 1.75,
       health: 100,
       stats: {
@@ -468,7 +519,10 @@ const monsters = {
     necromancer = {
       name: 'Necromancer',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Haunted', 'Caves'],
+      spawnableBiomes: [
+        map.biomes.haunted,
+        map.biomes.caves
+      ],
       power: 2,
       health: 85,
       stats: {
@@ -501,7 +555,10 @@ const monsters = {
     gargoyle = {
       name: 'Gargoyle',
       isSpawnable: true,
-      spawnableBiomes: ['Haunted', 'Mountains'],
+      spawnableBiomes: [
+        map.biomes.haunted,
+        map.biomes.mountains
+      ],
       power: 2,
       health: 160,
       stats: {
@@ -534,7 +591,13 @@ const monsters = {
     bugbear = {
       name: 'Bugbear',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains', 'Forest', 'Plateau', 'Mountains', 'Caves'],
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.plateau,
+        map.biomes.mountains,
+        map.biomes.caves
+      ],
       power: 2.25,
       health: 175,
       stats: {
@@ -567,7 +630,10 @@ const monsters = {
     griffin = {
       name: 'Griffin',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains', 'Plateau'],
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.plateau
+      ],
       power: 2,
       health: 120,
       stats: {
@@ -600,7 +666,12 @@ const monsters = {
     orc = {
       name: 'Orc',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains', 'Mountains', 'Forest'],
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.mountains,
+        map.biomes.forest,
+        map.biomes.moors
+      ],
       power: 2.5,
       health: 125,
       stats: {
@@ -633,7 +704,9 @@ const monsters = {
     elf = {
       name: 'Elf',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest'],
+      spawnableBiomes: [
+        map.biomes.forest
+      ],
       power: 2,
       health: 90,
       stats: {
@@ -666,7 +739,10 @@ const monsters = {
     wereWolf = {
       name: 'Werewolf',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Mountains'],
+      spawnableBiomes: [
+        map.biomes.forest,
+        map.biomes.mountains
+      ],
       power: 2,
       health: 115,
       stats: {
@@ -699,7 +775,9 @@ const monsters = {
     basilisk = {
       name: 'Basilisk',
       isSpawnable: true,
-      spawnableBiomes: ['Caves'],
+      spawnableBiomes: [
+        map.biomes.caves
+      ],
       power: 2.25,
       health: 190,
       stats: {
@@ -732,7 +810,9 @@ const monsters = {
     unicorn = {
       name: 'Unicorn',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest'],
+      spawnableBiomes: [
+        map.biomes.forest
+      ],
       power: 0.90,
       health: 45,
       stats: {
@@ -765,7 +845,9 @@ const monsters = {
     wraith = {
       name: 'Wraith',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Haunted'],
+      spawnableBiomes: [
+        map.biomes.haunted
+      ],
       power: 1.2,
       health: 95,
       stats: {
@@ -798,7 +880,9 @@ const monsters = {
     dragon = {
       name: 'Dragon',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Mountains'],
+      spawnableBiomes: [
+        map.biomes.mountains
+      ],
       power: 3,
       health: 145,
       stats: {
@@ -832,7 +916,9 @@ const monsters = {
       name: 'Yeti',
       isXmasEvent: true,
       isSpawnable: false,
-      spawnableBiomes: ['Tundra'],
+      spawnableBiomes: [
+        'Tundra'
+      ],
       power: 1.75,
       health: 150,
       stats: {
@@ -865,7 +951,9 @@ const monsters = {
       name: 'Christmas Gnome',
       isXmasEvent: true,
       isSpawnable: false,
-      spawnableBiomes: ['Tundra'],
+      spawnableBiomes: [
+        'Tundra'
+      ],
       power: 0.75,
       health: 45,
       stats: {
@@ -898,7 +986,10 @@ const monsters = {
     giantSpider = {
       name: 'Giant Spider',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Desert'],
+      spawnableBiomes: [
+        map.biomes.forest,
+        map.biomes.desert
+      ],
       power: 1,
       health: 75,
       stats: {
@@ -931,7 +1022,9 @@ const monsters = {
     killerBee = {
       name: 'Killer Bee',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest'],
+      spawnableBiomes: [
+        map.biomes.forest
+      ],
       power: 0.2,
       health: 50,
       stats: {
@@ -964,7 +1057,12 @@ const monsters = {
     golem = {
       name: 'Golem',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Mountains', 'Plains', 'Caves', 'Desert'],
+      spawnableBiomes: [
+        map.biomes.mountains,
+        map.biomes.plains,
+        map.biomes.caves,
+        map.biomes.desert
+      ],
       power: 2,
       health: 200,
       stats: {
@@ -997,7 +1095,9 @@ const monsters = {
     centaur = {
       name: 'Centaur',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains'],
+      spawnableBiomes: [
+        map.biomes.plains
+      ],
       power: 1,
       health: 135,
       stats: {
@@ -1030,7 +1130,10 @@ const monsters = {
     cyclops = {
       name: 'Cyclops',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Mountains', 'Plains'],
+      spawnableBiomes: [
+        map.biomes.mountains,
+        map.biomes.plains
+      ],
       power: 1,
       health: 160,
       stats: {
@@ -1063,7 +1166,9 @@ const monsters = {
     demon = {
       name: 'Demon',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Haunted'],
+      spawnableBiomes: [
+        map.biomes.haunted
+      ],
       power: 2,
       health: 185,
       stats: {
@@ -1096,7 +1201,12 @@ const monsters = {
     elemental = {
       name: 'Elemental',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Plains', 'Forest', 'Mountains', 'Desert'],
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.mountains,
+        map.biomes.desert
+      ],
       power: 1,
       health: 150,
       stats: {
@@ -1129,7 +1239,9 @@ const monsters = {
     sphinx = {
       name: 'Sphinx',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Desert'],
+      spawnableBiomes: [
+        map.biomes.desert
+      ],
       power: 1.45,
       health: 210,
       stats: {
@@ -1162,7 +1274,11 @@ const monsters = {
     tribalWarrior = {
       name: 'Tribal Warrior',
       isSpawnable: true,
-      spawnableBiomes: ['Land', 'Forest', 'Plains', 'Plateau'],
+      spawnableBiomes: [
+        map.biomes.forest,
+        map.biomes.plains,
+        map.biomes.plateau
+      ],
       power: 1,
       health: 110,
       stats: {
@@ -1190,6 +1306,79 @@ const monsters = {
       experience: 15,
       gold: 5,
       rarity: 33
+    },
+
+    chaoticTriceratops = {
+      name: 'Will-o\'-the-wisp',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.forest
+      ],
+      power: 1,
+      health: 75,
+      stats: {
+        str: 0.75,
+        dex: 2.15,
+        end: 1,
+        int: 2.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'magic',
+          power: 2
+        },
+        armor: {
+          name: '',
+          power: 0.95
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 10,
+      gold: 25,
+      rarity: 20
+    },
+
+    chaoticTriceratops = {
+      name: 'Chaotic Triceratops',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.swamp,
+        map.biomes.grassland
+      ],
+      power: 1,
+      health: 235,
+      stats: {
+        str: 2.15,
+        dex: 0.5,
+        end: 2.15,
+        int: 0.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'claws',
+          power: 1.2
+        },
+        armor: {
+          name: '',
+          power: 0.95
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 20,
+      gold: 5,
+      rarity: 15
     }
   ]
 };

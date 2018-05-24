@@ -39,6 +39,17 @@ class Monster {
     });
   }
 
+  generateQuestMonster(selectedPlayer) {
+    return new Promise((resolve) => {
+      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100));
+      const randomTypeChance = Math.round(this.Helper.randomBetween(0, 100));
+      const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
+      const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType);
+
+      return resolve(monsterTypeList[randomTypeIndex].name);
+    });
+  }
+
   generateNewMonster(selectedPlayer) {
     return new Promise((resolve) => {
       const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100));
@@ -48,7 +59,7 @@ class Monster {
 
       const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
         && mobType.isSpawnable
-        && mobType.spawnableBiomes.includes('Land'));
+        && mobType.spawnableBiomes.includes(selectedPlayer.map.biome.name));
 
       const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 4;
       const mobAmountChance = this.Helper.randomBetween(0, 100);
@@ -86,6 +97,7 @@ class Monster {
               * monsterTypeList[randomTypeIndex].stats.luk)
           },
           dmgDealt: 0,
+          dmgReceived: 0,
           power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + playerBalance,
           equipment: monsterTypeList[randomTypeIndex].equipment,
           inventory: monsterTypeList[randomTypeIndex].inventory,

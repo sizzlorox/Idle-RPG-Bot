@@ -1,3 +1,5 @@
+const { map } = require('../../utils/enumHelper');
+
 const type = {
   land: {
     id: 0,
@@ -13,67 +15,67 @@ const type = {
 const biome = {
   land: {
     id: 0,
-    name: 'Land'
+    name: map.biomes.land
   },
 
   coast: {
     id: 1,
-    name: 'Coast'
+    name: map.biomes.coast
   },
 
   town: {
     id: 2,
-    name: 'Town'
+    name: map.biomes.town
   },
 
   haunted: {
     id: 3,
-    name: 'Haunted'
+    name: map.biomes.haunted
   },
 
   forest: {
     id: 4,
-    name: 'Forest'
+    name: map.biomes.forest
   },
 
   plains: {
     id: 5,
-    name: 'Plains'
+    name: map.biomes.plains
   },
 
   mountains: {
     id: 6,
-    name: 'Mountains'
+    name: map.biomes.mountains
   },
 
   swamp: {
     id: 7,
-    name: 'Swamp'
+    name: map.biomes.swamp
   },
 
   grassland: {
     id: 8,
-    name: 'Grassland'
+    name: map.biomes.grassland
   },
 
   caves: {
     id: 9,
-    name: 'Caves'
+    name: map.biomes.caves
   },
 
   plateau: {
     id: 10,
-    name: 'Plateau'
+    name: map.biomes.plateau
   },
 
   moors: {
     id: 11,
-    name: 'Moors'
+    name: map.biomes.moors
   },
 
   desert: {
     id: 12,
-    name: 'Desert'
+    name: map.biomes.desert
   }
 };
 

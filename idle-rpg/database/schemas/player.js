@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const mapSchema = require('./map');
+const { questSchema, newQuest } = require('./quest');
 const Map = require('../../game/utils/Map');
 const { equipment } = require('../../utils/enumHelper');
 const Helper = require('../../utils/Helper');
@@ -276,6 +277,11 @@ const playerSchema = mongoose.Schema({
     mob: Number,
     player: Number,
     firstDeath: String
+  },
+  quest: {
+    type: questSchema,
+    default: newQuest,
+    ref: 'Quest'
   },
   updated_at: {
     type: Date,

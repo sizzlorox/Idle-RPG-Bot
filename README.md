@@ -5,6 +5,9 @@ This is an open-source project and is currently still in development. A lot is s
 This is a project to practice and learn more on how to create bots for Discord/Twitch and to practice javascript.
 Anyobody who is willing to join in on this project is welcome to do so!
 
+To see this bot in action it is currently running at this discord server:
+[Idle-RPG Discord Server](https://discord.gg/nAEBTcj)
+
 # Setup
 Created a .env file in the project root directory with these env variables: (Without < >)
 ```
@@ -39,4 +42,6 @@ mongodb
 ```
 npm install
 npm run start
+(if on windows)
+npm run start:windows
 ```
