@@ -37,6 +37,15 @@ class Helper {
     return result;
   }
 
+  intBag(min, max, size) {
+    const bag = [];
+    for (let i = 0; i < size; i++) {
+      bag.push(this.randomBetween(min, max));
+    }
+
+    return bag;
+  }
+
   capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase()
       .concat(string.slice(1));
@@ -274,8 +283,9 @@ class Helper {
         selectedPlayer.experience.current = 0;
         selectedPlayer.health = 100 + (selectedPlayer.level * 5);
         selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
+        const intBag = this.intbag(0, 3, 10);
         for (let i = 0; i < 4; i++) {
-          switch (this.randomBetween(0, 3)) {
+          switch (intBag[this.randomBetween(0, intBag.length - 1)]) {
             case 0:
               selectedPlayer.stats.str++;
               break;
