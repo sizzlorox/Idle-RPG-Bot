@@ -482,6 +482,10 @@ ${mobListResult.join('\n')}`;
     }),
 
     quest: (discordHook, Database, Helper, selectedPlayer, mob) => new Promise((resolve) => {
+      if (!selectedPlayer.quest.questMob.includes('None')) {
+        return resolve(selectedPlayer);
+      }
+
       selectedPlayer.quest.questMob = mob;
       selectedPlayer.quest.count = Helper.randomBetween(1, 15);
       selectedPlayer.quest.killCount = 0;
