@@ -271,38 +271,38 @@ const events = {
         mobs: []
       };
 
+      // TODO: Seperate message generating to own function
       let eventMsg = `[\`${results.attacker.map.name}\`] `;
       let mobCountString = '';
+      let mobKillCountString = '';
+      let mobFleeCountString = '';
       let expGain = 0;
       let goldGain = 0;
       let questExpGain = 0;
       let questGoldGain = 0;
       let eventLog = '';
       results.defender.forEach((mob) => {
-        const infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
+        let infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
         if (infoList !== -1) {
-          mobListInfo.mobs[infoList].count++;
+          mobListInfo.mobs[infoList].totalCount++;
         } else {
           mobListInfo.mobs.push({
             mob: mob.name,
-            count: 1
+            totalCount: 0,
+            event: {
+              killed: 0,
+              fled: 0
+            }
           });
         }
+        infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
         expGain += Math.ceil(((mob.experience * multiplier) + (mob.dmgDealt / 4)) / 6);
 
         if (mob.health <= 0) {
           goldGain += Math.floor((mob.gold * multiplier));
-          eventMsg = eventMsg.concat(`${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed ${mob.name}\n`);
-          eventLog = eventLog.concat(`You killed ${mob.name}!\n`);
+          mobListInfo.mobs[infoList].event.killed++;
         } else if (mob.health > 0 && selectedPlayer.health > 0) {
-          eventMsg = eventMsg.concat(results.attackerDamage > results.defenderDamage
-            ? `${mob.name} just fled from ${Helper.generatePlayerName(results.attacker, true)}!\n`
-            : `${Helper.generatePlayerName(results.attacker, true)} just fled from ${mob.name}!\n`);
-
-
-          eventLog = eventLog.concat(results.attackerDamage > results.defenderDamage
-            ? `${mob.name} fled from you!\n`
-            : `You fled from ${mob.name}!\n`);
+          mobListInfo.mobs[infoList].event.fled++;
         }
 
         if (!selectedPlayer.quest.questMob.name.includes('None') && mob.name.includes(selectedPlayer.quest.questMob.name) && mob.health <= 0) {
@@ -333,23 +333,36 @@ const events = {
         }).join(', ').replace(/,$/g, '');
         eventMsg = eventMsg.concat(`${killerMob} just killed ${Helper.generatePlayerName(selectedPlayer, true)}!\n`);
         eventLog = eventLog.concat(`${killerMob} just killed you!\n`);
-      } else if (results.defender.filter(mob => mob.health <= 0) > 0) {
-        const killedMobs = results.defender.map((mob) => {
-          if (mob.health <= 0) {
-            return mob.name;
-          }
-
-          return '';
-        }).join(', ').replace(/,$/g, '');
-        eventLog = eventLog.concat(`Killed ${killedMobs}. [${expGain} exp${goldGain === 0 ? '' : `/${goldGain} gold`}]\n`);
       }
-      mobListInfo.mobs.forEach((mobInfo, i) => mobCountString = i > 0 ? mobCountString.concat(`, ${mobInfo.count}x \`${mobInfo.mob}\``) : mobCountString.concat(`${mobInfo.count}x \`${mobInfo.mob}\``));
       const eventMsgResults = `↳ ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
 
       let battleResult = `Battle Results:
   Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}
   You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
 ${mobListResult.join('\n')}`;
+
+      mobListInfo.mobs.forEach((mobInfo, i) => {
+        if (mobInfo.event.killed > 0) {
+          mobKillCountString = i > 0 ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
+        }
+        if (mobInfo.event.fled > 0) {
+          mobFleeCountString = i > 0 ? mobFleeCountString.concat(`, ${mobInfo.event.fled}x \`${mobInfo.mob}\``) : mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
+        }
+      });
+
+      if (mobFleeCountString) {
+        eventMsg = eventMsg.concat(results.attackerDamage > results.defenderDamage
+          ? `${mobFleeCountString} just fled from ${Helper.generatePlayerName(results.attacker, true)}!\n`
+          : `${Helper.generatePlayerName(results.attacker, true)} just fled from ${mobFleeCountString}!\n`);
+        eventLog = eventLog.concat(results.attackerDamage > results.defenderDamage
+          ? `${mobFleeCountString} fled from you!\n`
+          : `You fled from ${mobFleeCountString}!\n`);
+      }
+
+      if (mobKillCountString) {
+        eventMsg = eventMsg.concat(`${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed ${mobKillCountString}\n`);
+        eventLog = eventLog.concat(`You killed ${mobKillCountString}! [\`${expGain}\` exp${goldGain === 0 ? '' : ` / \`${goldGain}\` gold`}]\n`);
+      }
 
       if (selectedPlayer.health <= 0) {
         battleResult = battleResult.replace(`  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.`, '');
@@ -526,7 +539,7 @@ ${mobListResult.join('\n')}`;
       const dropitemChance = Helper.randomBetween(0, 100);
 
       if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
-        return ItemManager.generateItem(selectedPlayer, mob[0])
+        return ItemManager.generateItem(selectedPlayer, mob.find(obj => obj.health <= 0))
           .then(async (item) => {
             if (item.position !== enumHelper.inventory.position) {
               const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
@@ -542,9 +555,9 @@ ${mobListResult.join('\n')}`;
 
             let eventMsg;
             if (!item.isXmasEvent) {
-              eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob[0].name}!\``;
+              eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\``;
             } else {
-              eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob[0].name}!\`**`;
+              eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`;
             }
             const eventLog = `Received ${item.name} from ${mob[0].name}`;
 
