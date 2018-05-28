@@ -19,7 +19,7 @@
     "dotenv": "^4.0.0",
     "express": "^4.16.3",
     "moment": "^2.22.1",
-    "mongoose": "^4.13.13",
+    "mongoose": "^4.13.14",
     "querystring": "^0.2.0",
     "seedrandom": "^2.4.3"
   },

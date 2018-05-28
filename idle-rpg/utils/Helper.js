@@ -283,7 +283,7 @@ class Helper {
         selectedPlayer.experience.current = 0;
         selectedPlayer.health = 100 + (selectedPlayer.level * 5);
         selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-        const intBag = this.intbag(0, 3, 10);
+        const intBag = this.intBag(0, 3, 10);
         for (let i = 0; i < 4; i++) {
           switch (intBag[this.randomBetween(0, intBag.length - 1)]) {
             case 0:
