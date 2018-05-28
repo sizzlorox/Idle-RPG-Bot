@@ -707,6 +707,10 @@ ${rankString}
     return this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
   }
 
+  helperGetter() {
+    return this.Helper;
+  }
+
   // TODO change to utilize setTimeout
   /**
    * Activates christmas mobs to be spawnable and items droppable
