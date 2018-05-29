@@ -336,12 +336,8 @@ const events = {
       }
       const eventMsgResults = `↳ ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
 
-      let battleResult = `Battle Results:
-  Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}
-  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
-${mobListResult.join('\n')}`;
-
       mobListInfo.mobs.forEach((mobInfo, i) => {
+        mobCountString = i > 0 ? mobCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
         if (mobInfo.event.killed > 0) {
           mobKillCountString = i > 0 ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
         }
@@ -363,6 +359,11 @@ ${mobListResult.join('\n')}`;
         eventMsg = eventMsg.concat(`${Helper.generatePlayerName(selectedPlayer, true)}'s \`${selectedPlayer.equipment.weapon.name}\` just killed ${mobKillCountString}\n`);
         eventLog = eventLog.concat(`You killed ${mobKillCountString}! [\`${expGain}\` exp${goldGain === 0 ? '' : ` / \`${goldGain}\` gold`}]\n`);
       }
+
+      let battleResult = `Battle Results:
+  Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}
+  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
+${mobListResult.join('\n')}`;
 
       if (selectedPlayer.health <= 0) {
         battleResult = battleResult.replace(`  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.`, '');
