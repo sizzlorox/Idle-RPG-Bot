@@ -366,14 +366,14 @@ ${rankString}
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
-                  commandAuthor.send('Spell has been casted!');
+                  commandAuthor.send('Spell has been cast!');
                 })
                 .then(() => this.Database.updateGame(this.config));
               this.config.multiplier += 1;
 
               this.config.spells.activeBless++;
 
-              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just cast ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               setTimeout(() => {
                 this.config.multiplier -= 1;
                 this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
@@ -392,11 +392,11 @@ ${rankString}
               castingPlayer.gold.current -= globalSpells.home.spellCost;
               const Kindale = this.Event.MapClass.getMapByIndex(4);
               castingPlayer.map = Kindale;
-              this.discordHook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
+              this.discordHook.actionHook.send(`${castingPlayer.name} just cast ${spell}!\nTeleported back to ${Kindale.name}.`);
 
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
-                  commandAuthor.send('Spell has been casted!');
+                  commandAuthor.send('Spell has been cast!');
                 });
             } else {
               commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold.current} gold.`);
