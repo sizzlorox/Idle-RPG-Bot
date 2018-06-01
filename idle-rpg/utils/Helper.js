@@ -21,6 +21,8 @@ class Helper {
   }
 
   randomBetween(min, max, decimal, exclude) {
+    // Adding + 1 to max due to trunc
+    max += 1;
     // https://stackoverflow.com/questions/15594332/unbiased-random-range-generator-in-javascript
     if (arguments.length < 2) return (RNG() >= 0.5);
 
@@ -29,10 +31,9 @@ class Helper {
     if (typeof decimal === 'number') {
       factor = decimal ** 10;
     }
-
     do {
       result = (RNG() * (max - min)) + min;
-      result = Math.round(result * factor) / factor;
+      result = Math.trunc(result * factor) / factor;
     } while (result === exclude);
     return result;
   }
@@ -283,9 +284,8 @@ class Helper {
         selectedPlayer.experience.current = 0;
         selectedPlayer.health = 100 + (selectedPlayer.level * 5);
         selectedPlayer.mana = 50 + (selectedPlayer.level * 5);
-        const intBag = this.intBag(0, 3, 10);
         for (let i = 0; i < 4; i++) {
-          switch (intBag[this.randomBetween(0, intBag.length - 1)]) {
+          switch (this.randomBetween(0, 3)) {
             case 0:
               selectedPlayer.stats.str++;
               break;

@@ -132,20 +132,20 @@ const enumHelper = {
   ],
 
   mockPlayers: [{
-    name: 'Tesversion01',
-    discordId: 'Tesversion01'
+    name: 'Statcheck01',
+    discordId: 'Statcheck01'
   },
   {
-    name: 'Tesversion02',
-    discordId: 'Tesversion02'
+    name: 'Statcheck02',
+    discordId: 'Statcheck02'
   },
   {
-    name: 'Tesversion03',
-    discordId: 'Tesversion03'
+    name: 'Statcheck03',
+    discordId: 'Statcheck03'
   },
   {
-    name: 'Tesversion04',
-    discordId: 'Tesversion04'
+    name: 'Statcheck04',
+    discordId: 'Statcheck04'
   }],
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns

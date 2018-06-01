@@ -80,6 +80,7 @@ class Game {
       })
       .then((selectedPlayer) => {
         selectedPlayer.events++;
+        console.log(`${selectedPlayer.name} - ${selectedPlayer.level} - ${selectedPlayer.class}`);
         if (selectedPlayer.updated_at) {
           const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
           console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
@@ -94,16 +95,13 @@ class Game {
         switch (randomEvent) {
           case 0:
             return this.moveEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => errorLog.error(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
           case 1:
             return this.attackEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => errorLog.error(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
           case 2:
             return this.luckEvent(selectedPlayer)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer))
-              .catch(err => errorLog.error(err));
+              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
         }
       })
       .then((updatedPlayer) => {
@@ -178,11 +176,12 @@ class Game {
       }
 
       if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+        if (luckDice <= 15 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
+          return this.Event.generateQuestEvent(selectedPlayer)
+            .then(updatedPlayer => resolve(updatedPlayer));
+        }
         if (luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
           return this.Event.generateGamblingEvent(selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
-        } else if (luckDice <= 5 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
-          return this.Event.generateQuestEvent(selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
         }
       }
@@ -524,6 +523,7 @@ ${rankString}
     const thiefTitleRole = currentGuild.roles.filterArray(role => role.name === 'Thief')[0];
     const veteranTitleRole = currentGuild.roles.filterArray(role => role.name === 'Veteran Idler')[0];
     const blesserTitleRole = currentGuild.roles.filterArray(role => role.name === 'Blesser')[0];
+    const adventurerTitleRole = currentGuild.roles.filterArray(role => role.name === 'Adventurer')[0];
 
     const hasGoldTitle = playerDiscordObj.roles.array().includes(goldTitleRole);
     if (selectedPlayer.gold.current >= 50000 && !hasGoldTitle) {
@@ -557,6 +557,15 @@ ${rankString}
       playerDiscordObj.addRole(blesserTitleRole);
       this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Blesser title!`));
     } else if (selectedPlayer.spellCast < 50 && hasBlesserTitle) {
+      playerDiscordObj.removeRole(blesserTitleRole);
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Blesser title!`));
+    }
+
+    const hasAdventurerTitle = playerDiscordObj.roles.array().includes(adventurerTitleRole);
+    if (selectedPlayer.quest.completed >= 50 && !hasAdventurerTitle) {
+      playerDiscordObj.addRole(blesserTitleRole);
+      this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} has just earned the Blesser title!`));
+    } else if (selectedPlayer.quest.completed < 50 && hasAdventurerTitle) {
       playerDiscordObj.removeRole(blesserTitleRole);
       this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${selectedPlayer.name} lost the Blesser title!`));
     }
