@@ -176,12 +176,12 @@ class Game {
       }
 
       if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-        if (luckDice <= 15 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
-          return this.Event.generateQuestEvent(selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
-        }
         if (luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
           return this.Event.generateGamblingEvent(selectedPlayer)
+            .then(updatedPlayer => resolve(updatedPlayer));
+        }
+        if (luckDice <= 45 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
+          return this.Event.generateQuestEvent(selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
         }
       }
