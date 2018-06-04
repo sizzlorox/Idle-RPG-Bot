@@ -361,7 +361,6 @@ const events = {
       }
 
       let battleResult = `Battle Results:
-  Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}
   You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
 ${mobListResult.join('\n')}`;
 
@@ -371,7 +370,7 @@ ${mobListResult.join('\n')}`;
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg.concat(eventMsgResults).replace(/1x /g, '').replace(/\n$/g, '')),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '').replace(/\n$/g, '')), true),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, `Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}\n\`\`\``.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '').replace(/\n$/g, '')), true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve({
