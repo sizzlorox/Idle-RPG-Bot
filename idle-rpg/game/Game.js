@@ -179,26 +179,27 @@ class Game {
         if (luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
           return this.Event.generateGamblingEvent(selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
-
-          if (luckDice <= 45 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
-            return this.Event.generateQuestEvent(selectedPlayer)
-              .then(updatedPlayer => resolve(updatedPlayer));
-          }
         }
 
-        if (this.Event.isBlizzardActive && luckDice <= 10 + (selectedPlayer.stats.luk / 4)) {
-          return this.Event.chanceToCatchSnowflake(selectedPlayer)
+        if (luckDice <= 45 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
+          return this.Event.generateQuestEvent(selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
         }
+      }
 
-        if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
-          return this.Event.generateLuckItemEvent(selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
-        }
-
-        return this.Event.generateGoldEvent(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
+      if (this.Event.isBlizzardActive && luckDice <= 10 + (selectedPlayer.stats.luk / 4)) {
+        return this.Event.chanceToCatchSnowflake(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
-      });
+      }
+
+      if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
+        return this.Event.generateLuckItemEvent(selectedPlayer)
+          .then(updatedPlayer => resolve(updatedPlayer));
+      }
+
+      return this.Event.generateGoldEvent(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
+        .then(updatedPlayer => resolve(updatedPlayer));
+    });
   }
 
   // Event
