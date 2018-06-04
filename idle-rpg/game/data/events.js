@@ -885,7 +885,7 @@ ${mobListResult.join('\n')}`;
   special: {
     snowFlake: (discordHook, Database, Helper, selectedPlayer) => new Promise(async (resolve) => {
       const snowFlakeDice = Helper.randomBetween(0, 100);
-      if (snowFlakeDice <= 15) {
+      if (snowFlakeDice <= 5) {
         const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
         const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
         const newItemRating = await Helper.calculateItemRating(selectedPlayer, snowFlake);

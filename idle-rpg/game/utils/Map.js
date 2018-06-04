@@ -99,7 +99,7 @@ class Map {
   }
 
   getMapsByType(type) {
-    return maps.filter(area => area.type.name === type).map(area => area.name);
+    return maps.filter(area => area.biome === type).map(area => area.name);
   }
 
 }
