@@ -363,6 +363,7 @@ const events = {
       let battleResult = `Battle Results:
   You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
 ${mobListResult.join('\n')}`;
+      const attackedMsg = `Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}\n`;
 
       if (selectedPlayer.health <= 0) {
         battleResult = battleResult.replace(`  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.`, '');
@@ -370,7 +371,7 @@ ${mobListResult.join('\n')}`;
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg.concat(eventMsgResults).replace(/1x /g, '').replace(/\n$/g, '')),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, `Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}\n\`\`\``.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '').replace(/\n$/g, '')), true),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, attackedMsg.concat('```').concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '').replace(/\n$/g, '')), true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve({
@@ -388,7 +389,7 @@ ${mobListResult.join('\n')}`;
 
         return Promise.all([
           Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg.concat(eventMsgResults).replace(/1x /g, '').replace(/\n$/g, '')),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '').replace(/\n$/g, '')), true),
+          Helper.sendPrivateMessage(discordHook, selectedPlayer, attackedMsg.concat('```').concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '').replace(/\n$/g, '')), true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
           .then(resolve({
@@ -407,7 +408,7 @@ ${mobListResult.join('\n')}`;
 
       return Promise.all([
         Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg.concat(eventMsgResults).replace(/1x /g, '').replace(/\n$/g, '')),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, '```'.concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '').replace(/\n$/g, '')), true),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, attackedMsg.concat('```').concat(battleResult.replace(/1x /g, '')).concat('```').concat(eventLog.replace(/1x /g, '').replace(/\n$/g, '')), true),
         Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION'),
         isQuestCompleted ? Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`) : '',
         isQuestCompleted ? Helper.sendPrivateMessage(discordHook, selectedPlayer, 'test', true) : `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`,
