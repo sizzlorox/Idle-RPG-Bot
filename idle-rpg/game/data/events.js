@@ -363,7 +363,7 @@ const events = {
       let battleResult = `Battle Results:
   You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
 ${mobListResult.join('\n')}`;
-      const attackedMsg = `Attacked ${mobCountString.replace(/`/g, '')} with ${selectedPlayer.equipment.weapon.name} in ${selectedPlayer.map.name}\n`;
+      const attackedMsg = `Attacked ${mobCountString.replace(/`/g, '')} with \`${selectedPlayer.equipment.weapon.name}\` in \`${selectedPlayer.map.name}\`\n`;
 
       if (selectedPlayer.health <= 0) {
         battleResult = battleResult.replace(`  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.`, '');
