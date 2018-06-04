@@ -63,6 +63,7 @@ const game = new Game(hook, helper);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
 const dailyLotteryTime = '00 00 10 * * 0-6';
+const blizzardRandomTime = '00 00 9 * * 0-6';
 const timeZone = 'America/Los_Angeles';
 let minTimer = (minimalTimer * 1000) * 60;
 let maxTimer = (maximumTimer * 1000) * 60;
@@ -233,6 +234,16 @@ new CronJob({
   cronTime: dailyLotteryTime,
   onTick: () => {
     game.dailyLottery(discordBot, guildName);
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+new CronJob({
+  cronTime: blizzardRandomTime,
+  onTick: () => {
+    game.blizzardRandom();
   },
   start: false,
   timeZone,

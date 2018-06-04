@@ -229,6 +229,15 @@ class Event {
     }
   }
 
+  blizzardRandom() {
+    if (!this.isBlizzardActive) {
+      this.isBlizzardActive = true;
+      setTimeout(() => {
+        this.isBlizzardActive = false;
+      }, this.Helper.randomBetween(7200000, 72000000)); // 2-20hrs
+    }
+  }
+
   chanceToCatchSnowflake(selectedPlayer) {
     events.special.snowFlake(this.discordHook, this.Database, this.Helper, selectedPlayer);
   }

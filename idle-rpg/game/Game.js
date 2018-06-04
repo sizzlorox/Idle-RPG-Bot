@@ -186,7 +186,7 @@ class Game {
         }
       }
 
-      if (this.Event.isBlizzardActive && this.Event.MapClass.getMapsByType('mountains').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
+      if (this.Event.isBlizzardActive && luckDice <= 10 + (selectedPlayer.stats.luk / 4)) {
         return this.Event.chanceToCatchSnowflake(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
@@ -703,6 +703,10 @@ ${rankString}
    */
   blizzardSwitch(blizzardSwitch) {
     return this.Event.blizzardSwitch(blizzardSwitch);
+  }
+
+  blizzardRandom() {
+    return this.Event.blizzardRandom();
   }
 
   /**
