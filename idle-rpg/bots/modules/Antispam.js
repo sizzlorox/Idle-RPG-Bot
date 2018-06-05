@@ -4,7 +4,7 @@ class Antispam {
   constructor() {
     this.authors = [];
     this.messageLog = [];
-    this.interval = 3000;
+    this.interval = 1750;
   }
 
   logAuthor(authorId) {
