@@ -75,6 +75,89 @@ const newPlayerObj = (discordId, name) => {
   };
 };
 
+// TODO: update resetplayerobj with new database
+const resetPlayerObj = {
+  class: 'Wanderer',
+  health: 105,
+  mana: 50,
+  experience: {
+    current: 0,
+    lost: 0,
+    total: 0
+  },
+  level: 1,
+  gold: {
+    current: 0,
+    lost: 0,
+    stolen: 0,
+    stole: 0,
+    dailyLottery: 0,
+    gambles: {
+      won: 0,
+      lost: 0
+    },
+    total: 0
+  },
+  'equipment.helmet': {
+    name: 'Nothing',
+    power: 0.15,
+    previousOwners: []
+  },
+  'equipment.armor': {
+    name: 'Linen Shirt',
+    power: 0.75,
+    position: 'armor',
+    previousOwners: []
+  },
+  'equipment.weapon': {
+    name: 'Training Sword',
+    power: 0.75,
+    position: 'weapon',
+    attackType: 'melee',
+    previousOwners: []
+  },
+  inventory: {
+    equipment: [],
+    items: []
+  },
+  stats: {
+    str: 1,
+    dex: 1,
+    end: 1,
+    int: 1,
+    luk: 1
+  },
+  spells: [],
+  lottery: {
+    joined: false,
+    amount: 0
+  },
+  isOnline: true,
+  createdAt: new Date().getTime(),
+  events: 0,
+  gambles: 0,
+  stole: 0,
+  stolen: 0,
+  spellCast: 0,
+  currentBounty: 0,
+  kills: {
+    mob: 0,
+    player: 0
+  },
+  battles: {
+    won: 0,
+    lost: 0,
+    firstDeath: 0
+  },
+  deaths: {
+    mob: 0,
+    player: 0,
+    firstDeath: 'never'
+  },
+  pastEvents: [],
+  pastPvpEvents: []
+};
+
 const playerSchema = mongoose.Schema({
   discordId: String,
   personalMultiplier: {
@@ -299,4 +382,4 @@ const playerSchema = mongoose.Schema({
 
 playerSchema.set('autoIndex', true);
 
-module.exports = { playerSchema, newPlayerObj };
+module.exports = { playerSchema, newPlayerObj, resetPlayerObj };

@@ -59,14 +59,15 @@ class Database {
 
   constructor(Helper) {
     this.MapClass = new Map(Helper);
-    connect();
   }
 
   // GAME SETTINGS
   loadGame() {
+    connect();
     return new Promise((resolve, reject) => Game.find({}, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
       if (!result || !result.length) {
@@ -78,117 +79,158 @@ class Database {
         }, (error, newGame) => {
           if (error) {
 
+            disconnect();
             return reject(error);
           }
 
-
+          disconnect();
           return resolve(newGame[0]);
         });
       }
 
+      disconnect();
       return resolve(result[0]);
     }));
   }
 
   updateGame(newConfig) {
+    connect();
     return new Promise((resolve, reject) => Game.update({}, newConfig, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     }));
   }
 
   // PLAYER
   createNewPlayer(discordId, name) {
+    connect();
     return new Promise((resolve, reject) => Player.create(newPlayerObj(discordId, name), (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
-      // console.log(`DATABASE: ${discordId} has been created.`);
+
+      disconnect();
       return resolve(result);
     }));
   }
 
   loadActionLog(discordId) {
+    connect();
     return new Promise((resolve, reject) => ActionLog.findOne({ playerId: discordId }, (err, result) => {
       if (err) {
+
+        disconnect();
         return reject(err);
       }
       if (!result) {
+
+        disconnect();
         return ActionLog.create({ playerId: discordId });
       }
 
+      disconnect();
       return resolve(result);
     }));
   }
 
   saveActionLog(discordId, updatedActionLog) {
+    connect();
     return new Promise((resolve, reject) => ActionLog.updateOne({ playerId: discordId }, updatedActionLog, (err, result) => {
       if (err) {
+
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     }));
   }
 
   loadPvpLog(discordId) {
+    connect();
     return new Promise((resolve, reject) => PvpLog.findOne({ playerId: discordId }, (err, result) => {
       if (err) {
+
+        disconnect();
         return reject(err);
       }
       if (!result) {
+
+        disconnect();
         return PvpLog.create({ playerId: discordId });
       }
 
+      disconnect();
       return resolve(result);
     }));
   }
 
   savePvpLog(discordId, updatedPvpLog) {
+    connect();
     return new Promise((resolve, reject) => PvpLog.updateOne({ playerId: discordId }, updatedPvpLog, (err, result) => {
       if (err) {
+
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     }));
   }
 
   loadMoveLog(discordId) {
+    connect();
     return new Promise((resolve, reject) => MoveLog.findOne({ playerId: discordId }, (err, result) => {
       if (err) {
+
+        disconnect();
         return reject(err);
       }
       if (!result) {
+
+        disconnect();
         return MoveLog.create({ playerId: discordId });
       }
 
+      disconnect();
       return resolve(result);
     }));
   }
 
   saveMoveLog(discordId, updatedMoveLog) {
+    connect();
     return new Promise((resolve, reject) => MoveLog.updateOne({ playerId: discordId }, updatedMoveLog, (err, result) => {
       if (err) {
+
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     }));
   }
 
   loadOnlinePlayers(discordId) {
+    connect();
     return new Promise((resolve, reject) => Player.find({}, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     })
       .where('discordId')
@@ -202,14 +244,17 @@ class Database {
   loadOnlinePlayerMaps(discordIds) {
     const removeNpcs = enumHelper.mockPlayers.map(npc => npc.name);
 
+    connect();
     return new Promise((resolve, reject) => Player.find({
       name: { $nin: removeNpcs, $exists: true }
     }, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
-      // console.log('DATABASE: Multiple IDs has been loaded from the Database.');
+
+      disconnect();
       return resolve(result);
     })
       .where('discordId')
@@ -227,13 +272,15 @@ class Database {
     const query = {
       'lottery.joined': true
     };
-
+    connect();
     return new Promise((resolve, reject) => Player.update(query, { lottery: { joined: false } }, { multi: true }, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     }));
   }
@@ -246,12 +293,15 @@ class Database {
       'lottery.joined': true
     };
 
+    connect();
     return new Promise((resolve, reject) => Player.find(query, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     })
       .select(selectFields));
@@ -274,12 +324,15 @@ class Database {
       name: { $nin: removeNpcs, $exists: true }
     };
 
+    connect();
     return new Promise((resolve, reject) => Player.find(query, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     })
       .select(select)
@@ -306,26 +359,31 @@ class Database {
     };
     query[Object.keys(type)[0]] = { $gte: Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] };
 
+    connect();
     return new Promise((resolve, reject) => Player.find(query, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
 
+      disconnect();
       return resolve(result);
     })
       .select(select)
       .sort(type));
   }
 
-  loadPlayer(discordId, selectFields = {
-  }) {
+  loadPlayer(discordId, selectFields = {}) {
+    connect();
     return new Promise((resolve, reject) => Player.findOne({ discordId }, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
-      // console.log(`DATABASE: ${discordId} has been loaded from the Database.`);
+
+      disconnect();
       return resolve(result);
     })
       .select(selectFields));
@@ -337,146 +395,85 @@ class Database {
     }
     player.updated_at = Date.now();
 
+    connect();
     return new Promise((resolve, reject) => Player.findOneAndUpdate({ discordId: player.discordId }, player, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
-      // console.log(`DATABASE: ${player.discordId} has been saved into the Database.`);
+
+      disconnect();
       return resolve(result);
     }));
   }
 
-  getSameMapPlayers(playerMap, selectFields = {
-  }) {
+  getSameMapPlayers(playerMap, selectFields = {}) {
     if (!playerMap) {
       return;
     }
 
+    connect();
     return new Promise((resolve, reject) => Player.find({ 'map.name': playerMap }, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
+
+      disconnect();
       return resolve(result);
     })
       .select(selectFields));
   }
 
   deletePlayer(playerId) {
+    connect();
     return new Promise((resolve, reject) => Player.remove({ discordId: playerId }, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
+
+      disconnect();
       return resolve(result);
     }));
   }
 
   resetAllPlayers() {
+    const resetObj = Player.resetPlayerObj;
+    resetObj.map = this.MapClass.getRandomTown();
+
+    connect();
     return new Promise((resolve, reject) => Player.update({},
       {
-        $set: {
-          class: 'Wanderer',
-          health: 105,
-          mana: 50,
-          experience: {
-            current: 0,
-            lost: 0,
-            total: 0
-          },
-          map: this.MapClass.getRandomTown(),
-          level: 1,
-          gold: {
-            current: 0,
-            lost: 0,
-            stolen: 0,
-            stole: 0,
-            dailyLottery: 0,
-            gambles: {
-              won: 0,
-              lost: 0
-            },
-            total: 0
-          },
-          'equipment.helmet': {
-            name: 'Nothing',
-            power: 0.15,
-            previousOwners: []
-          },
-          'equipment.armor': {
-            name: 'Linen Shirt',
-            power: 0.75,
-            position: 'armor',
-            previousOwners: []
-          },
-          'equipment.weapon': {
-            name: 'Training Sword',
-            power: 0.75,
-            position: 'weapon',
-            attackType: 'melee',
-            previousOwners: []
-          },
-          inventory: {
-            equipment: [],
-            items: []
-          },
-          stats: {
-            str: 1,
-            dex: 1,
-            end: 1,
-            int: 1,
-            luk: 1
-          },
-          spells: [],
-          lottery: {
-            joined: false,
-            amount: 0
-          },
-          isOnline: true,
-          createdAt: new Date().getTime(),
-          events: 0,
-          gambles: 0,
-          stole: 0,
-          stolen: 0,
-          spellCast: 0,
-          currentBounty: 0,
-          kills: {
-            mob: 0,
-            player: 0
-          },
-          battles: {
-            won: 0,
-            lost: 0,
-            firstDeath: 0
-          },
-          deaths: {
-            mob: 0,
-            player: 0,
-            firstDeath: 'never'
-          },
-          pastEvents: [],
-          pastPvpEvents: []
-        }
+        $set: resetObj
       },
       {
         multi: true
       }, (err, result) => {
         if (err) {
 
+          disconnect();
           return reject(err);
         }
 
+        disconnect();
         return resolve(result);
       }));
   }
 
   deleteAllPlayers() {
+    connect();
     return new Promise((resolve, reject) => Player.remove({}, (err, result) => {
       if (err) {
 
+        disconnect();
         return reject(err);
       }
+
+      disconnect();
       return resolve(result);
     }));
   }
