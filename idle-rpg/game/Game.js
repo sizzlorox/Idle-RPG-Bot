@@ -500,7 +500,7 @@ ${rankString}
             return Promise.all([
               this.Database.updateGame(updatedConfig),
               this.Helper.sendMessage(this.discordHook, winner, false, eventMsg),
-              this.Helper.logEvent(winner, this.Database, eventLog, 'ACTION'),
+              this.Helper.logEvent(winner, this.Database, eventLog, enumHelper.logTypes.action),
               this.Database.savePlayer(winner),
               this.Database.removeLotteryPlayers()
             ])

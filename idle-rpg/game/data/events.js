@@ -135,7 +135,7 @@ const events = {
       return Promise.all([
         Helper.sendMessage(discordHook, selectedPlayer, true, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false),
-        Helper.logEvent(selectedPlayer, Database, eventLog, 'MOVE')
+        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.move)
       ])
         .then(resolve(selectedPlayer));
     })
@@ -155,7 +155,7 @@ const events = {
     return Promise.all([
       Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
       Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-      Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+      Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
     ])
       .then(resolve(selectedPlayer));
   }),
@@ -184,7 +184,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -229,7 +229,7 @@ const events = {
       return Promise.all([
         Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
       ])
         .then(resolve(selectedPlayer));
     })
@@ -296,10 +296,10 @@ const events = {
           Helper.sendMessage(discordHook, attacker, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
           Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
-          Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
-          Helper.logEvent(defender, Database, otherPlayerLog, 'ACTION'),
-          Helper.logEvent(attacker, Database, eventLog, 'PVP'),
-          Helper.logEvent(defender, Database, otherPlayerLog, 'PVP')
+          Helper.logEvent(attacker, Database, eventLog, enumHelper.logTypes.action),
+          Helper.logEvent(defender, Database, otherPlayerLog, enumHelper.logTypes.action),
+          Helper.logEvent(attacker, Database, eventLog, enumHelper.logTypes.pvp),
+          Helper.logEvent(defender, Database, otherPlayerLog, enumHelper.logTypes.pvp)
         ])
           .then(resolve({
             result: enumHelper.battle.outcomes.lost,
@@ -329,10 +329,10 @@ const events = {
           Helper.sendMessage(discordHook, attacker, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
           Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
-          Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
-          Helper.logEvent(defender, Database, otherPlayerLog, 'ACTION'),
-          Helper.logEvent(attacker, Database, eventLog, 'PVP'),
-          Helper.logEvent(defender, Database, otherPlayerLog, 'PVP')
+          Helper.logEvent(attacker, Database, eventLog, enumHelper.logTypes.action),
+          Helper.logEvent(defender, Database, otherPlayerLog, enumHelper.logTypes.action),
+          Helper.logEvent(attacker, Database, eventLog, enumHelper.logTypes.pvp),
+          Helper.logEvent(defender, Database, otherPlayerLog, enumHelper.logTypes.pvp)
         ])
           .then(resolve({
             result: enumHelper.battle.outcomes.fled,
@@ -357,10 +357,10 @@ const events = {
         Helper.sendMessage(discordHook, attacker, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
         Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
-        Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
-        Helper.logEvent(defender, Database, otherPlayerLog, 'ACTION'),
-        Helper.logEvent(attacker, Database, eventLog, 'PVP'),
-        Helper.logEvent(defender, Database, otherPlayerLog, 'PVP')
+        Helper.logEvent(attacker, Database, eventLog, enumHelper.logTypes.action),
+        Helper.logEvent(defender, Database, otherPlayerLog, enumHelper.logTypes.action),
+        Helper.logEvent(attacker, Database, eventLog, enumHelper.logTypes.pvp),
+        Helper.logEvent(defender, Database, otherPlayerLog, enumHelper.logTypes.pvp)
       ])
         .then(resolve({
           result: enumHelper.battle.outcomes.win,
@@ -397,7 +397,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, pmMsg, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve({
             result: enumHelper.battle.outcomes.lost,
@@ -415,7 +415,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, pmMsg, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve({
             result: enumHelper.battle.outcomes.fled,
@@ -434,10 +434,10 @@ const events = {
       return Promise.all([
         Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, pmMsg, true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION'),
+        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action),
         isQuestCompleted ? Helper.sendMessage(discordHook, selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`) : '',
         isQuestCompleted ? Helper.sendPrivateMessage(discordHook, selectedPlayer, 'test', true) : `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`,
-        isQuestCompleted ? Helper.logEvent(discordHook, Database, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, 'ACTION') : ''
+        isQuestCompleted ? Helper.logEvent(discordHook, Database, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, enumHelper.logTypes.action) : ''
       ])
         .then(resolve({
           result: enumHelper.battle.outcomes.win,
@@ -506,10 +506,10 @@ const events = {
           Helper.sendMessage(discordHook, stealingPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true),
           Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true),
-          Helper.logEvent(stealingPlayer, Database, eventLog, 'ACTION'),
-          Helper.logEvent(victimPlayer, Database, otherPlayerLog, 'ACTION'),
-          Helper.logEvent(stealingPlayer, Database, eventLog, 'PVP'),
-          Helper.logEvent(victimPlayer, Database, otherPlayerLog, 'PVP')
+          Helper.logEvent(stealingPlayer, Database, eventLog, enumHelper.logTypes.action),
+          Helper.logEvent(victimPlayer, Database, otherPlayerLog, enumHelper.logTypes.action),
+          Helper.logEvent(stealingPlayer, Database, eventLog, enumHelper.logTypes.pvp),
+          Helper.logEvent(victimPlayer, Database, otherPlayerLog, enumHelper.logTypes.pvp)
         ])
           .then(resolve({ stealingPlayer, victimPlayer }));
       } else if (victimPlayer.gold.current > victimPlayer.gold.current / 6) {
@@ -530,10 +530,10 @@ const events = {
             Helper.sendMessage(discordHook, stealingPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true),
             Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true),
-            Helper.logEvent(stealingPlayer, Database, eventLog, 'ACTION'),
-            Helper.logEvent(victimPlayer, Database, otherPlayerLog, 'ACTION'),
-            Helper.logEvent(stealingPlayer, Database, eventLog, 'PVP'),
-            Helper.logEvent(victimPlayer, Database, otherPlayerLog, 'PVP')
+            Helper.logEvent(stealingPlayer, Database, eventLog, enumHelper.logTypes.action),
+            Helper.logEvent(victimPlayer, Database, otherPlayerLog, enumHelper.logTypes.action),
+            Helper.logEvent(stealingPlayer, Database, eventLog, enumHelper.logTypes.pvp),
+            Helper.logEvent(victimPlayer, Database, otherPlayerLog, enumHelper.logTypes.pvp)
           ])
             .then(resolve({ stealingPlayer, victimPlayer }));
         }
@@ -556,7 +556,7 @@ const events = {
       return Promise.all([
         Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
       ])
         .then(resolve(selectedPlayer));
     }),
@@ -590,7 +590,7 @@ const events = {
             return Promise.all([
               Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-              Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+              Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
             ])
               .then(resolve(selectedPlayer));
           });
@@ -624,7 +624,7 @@ const events = {
             return Promise.all([
               Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-              Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+              Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
             ])
               .then(resolve(selectedPlayer));
           }
@@ -634,7 +634,7 @@ const events = {
           return Promise.all([
             Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-            Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+            Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
           ])
             .then(resolve(selectedPlayer));
         }
@@ -659,7 +659,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       })
@@ -679,7 +679,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -707,7 +707,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -719,7 +719,7 @@ const events = {
       return Promise.all([
         Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
       ])
         .then(resolve(selectedPlayer));
     }),
@@ -739,7 +739,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgHades),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, true),
-          Helper.logEvent(selectedPlayer, Database, eventLogHades, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLogHades, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -754,7 +754,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgZeus),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, true),
-          Helper.logEvent(selectedPlayer, Database, eventLogZeus, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLogZeus, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -774,7 +774,7 @@ const events = {
           return Promise.all([
             Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgAseco),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, true),
-            Helper.logEvent(selectedPlayer, Database, eventLogAseco, 'ACTION')
+            Helper.logEvent(selectedPlayer, Database, eventLogAseco, enumHelper.logTypes.action)
           ])
             .then(resolve(selectedPlayer));
         }
@@ -785,7 +785,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgAseco),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, true),
-          Helper.logEvent(selectedPlayer, Database, eventLogAseco, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLogAseco, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -800,7 +800,7 @@ const events = {
           return Promise.all([
             Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgHermes),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, true),
-            Helper.logEvent(selectedPlayer, Database, eventLogHermes, 'ACTION')
+            Helper.logEvent(selectedPlayer, Database, eventLogHermes, enumHelper.logTypes.action)
           ])
             .then(resolve(selectedPlayer));
         }
@@ -817,7 +817,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgHermes),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, true),
-          Helper.logEvent(selectedPlayer, Database, eventLogHermes, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLogHermes, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -833,7 +833,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgAthena),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthena, true),
-          Helper.logEvent(selectedPlayer, Database, eventLogAthena, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLogAthena, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }),
@@ -861,7 +861,7 @@ const events = {
             return Promise.all([
               Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgEris),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
-              Helper.logEvent(selectedPlayer, Database, eventLogEris, 'ACTION')
+              Helper.logEvent(selectedPlayer, Database, eventLogEris, enumHelper.logTypes.action)
             ])
               .then(resolve(selectedPlayer));
           }
@@ -871,7 +871,7 @@ const events = {
           return Promise.all([
             Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgEris),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
-            Helper.logEvent(selectedPlayer, Database, eventLogEris, 'ACTION')
+            Helper.logEvent(selectedPlayer, Database, eventLogEris, enumHelper.logTypes.action)
           ])
             .then(resolve(selectedPlayer));
         }
@@ -900,7 +900,7 @@ const events = {
         return Promise.all([
           Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgDionysus),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogDionysus, true),
-          Helper.logEvent(selectedPlayer, Database, eventLogDionysus, 'ACTION')
+          Helper.logEvent(selectedPlayer, Database, eventLogDionysus, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       })
@@ -921,7 +921,7 @@ const events = {
           return Promise.all([
             Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgSnowflake),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true),
-            Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+            Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
           ])
             .then(resolve(selectedPlayer));
         }

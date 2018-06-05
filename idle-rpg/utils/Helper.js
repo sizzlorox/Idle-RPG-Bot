@@ -327,7 +327,7 @@ class Helper {
         if (selectedPlayer.class !== oldClass) {
           this.sendMessage(discordHook, selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
             .then(this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true))
-            .then(this.logEvent(selectedPlayer, Database, `You have become a ${selectedPlayer.class}`, 'ACTION'));
+            .then(this.logEvent(selectedPlayer, Database, `You have become a ${selectedPlayer.class}`, enumHelper.logTypes.action));
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
@@ -336,7 +336,7 @@ class Helper {
         return Promise.all([
           this.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          this.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          this.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -443,7 +443,7 @@ class Helper {
             this.sendMessage(hook, selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
               .then(this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
               .then(this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true))
-              .then(this.logEvent(attackerObj, Database, bountyEventLog, 'ACTION'));
+              .then(this.logEvent(attackerObj, Database, bountyEventLog, enumHelper.logTypes.action));
             selectedPlayer.currentBounty = 0;
           }
 
@@ -457,7 +457,7 @@ class Helper {
         return Promise.all([
           this.sendMessage(hook, selectedPlayer, false, eventMsg),
           this.sendPrivateMessage(hook, selectedPlayer, eventLog, true),
-          this.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          this.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -551,7 +551,7 @@ class Helper {
   generatePlayerName(player, isAction) {
     if (
       player.isMentionInDiscord === 'off'
-      || player.isMentionInDiscord === 'action' && !isAction
+      || player.isMentionInDiscord === enumHelper.logTypes.action && !isAction
       || player.isMentionInDiscord === 'move' && isAction
     ) {
       return `\`${player.name}\``;
