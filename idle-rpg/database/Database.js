@@ -15,13 +15,13 @@ const ActionLog = mongoose.model('ActionLog', actionLogSchema);
 const MoveLog = mongoose.model('MoveLog', moveLogSchema);
 const PvpLog = mongoose.model('PvpLog', pvpLogSchema);
 
-mongoose.connection.on('open', () => {
-  console.log('\nDATABASE: Connected!');
-});
+// mongoose.connection.on('open', () => {
+//   console.log('\nDATABASE: Connected!');
+// });
 
-mongoose.connection.on('close', () => {
-  console.log('DATABASE: Disconnected!\n');
-});
+// mongoose.connection.on('close', () => {
+//   console.log('DATABASE: Disconnected!\n');
+// });
 
 process.on('close', () => {
   console.log('Database disconnecting on app termination');
