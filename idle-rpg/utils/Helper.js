@@ -165,7 +165,7 @@ class Helper {
     });
   }
 
-  sendMessage(discordHook, twitchBot, player, isMovement, msg) {
+  sendMessage(discordHook, player, isMovement, msg) {
     return new Promise((resolve) => {
       if (msg.toLowerCase().includes('pyddur')) {
         msg = msg.replace(new RegExp('<@!pyddur>', 'g'), '\`Pyddur, God Of Beer\`');
@@ -277,7 +277,7 @@ class Helper {
       + player.equipment.relic.luk;
   }
 
-  checkExperience(selectedPlayer, Database, discordHook, twitchBot) {
+  checkExperience(selectedPlayer, Database, discordHook) {
     return new Promise((resolve) => {
       if (selectedPlayer.experience.current >= selectedPlayer.level * 15) {
         selectedPlayer.level++;
@@ -325,18 +325,18 @@ class Helper {
         }
 
         if (selectedPlayer.class !== oldClass) {
-          this.sendMessage(discordHook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
+          this.sendMessage(discordHook, selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name} has decided to become a ${selectedPlayer.class}!`))
             .then(this.sendPrivateMessage(discordHook, selectedPlayer, `You have become a ${selectedPlayer.class}`, true))
-            .then(this.logEvent(selectedPlayer, Database, `You have become a ${selectedPlayer.class}`, 'ACTION'));
+            .then(this.logEvent(selectedPlayer, Database, `You have become a ${selectedPlayer.class}`, enumHelper.logTypes.action));
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} is now level ${selectedPlayer.level}!`);
         const eventLog = `Leveled up to level ${selectedPlayer.level}`;
 
         return Promise.all([
-          this.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          this.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           this.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          this.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          this.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -394,7 +394,7 @@ class Helper {
           switch (this.randomBetween(0, 2)) {
             case 0:
               if (selectedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
-                this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`))
+                this.sendMessage(hook, selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.helmet.name} just broke!`))
                   .then(this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.helmet.name} just broke!`, true))
                   .then(this.setPlayerEquipment(
                     selectedPlayer,
@@ -405,7 +405,7 @@ class Helper {
               break;
             case 1:
               if (selectedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
-                this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`))
+                this.sendMessage(hook, selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.armor.name} just broke!`))
                   .then(this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.armor.name} just broke!`, true))
                   .then(this.setPlayerEquipment(
                     selectedPlayer,
@@ -416,7 +416,7 @@ class Helper {
               break;
             case 2:
               if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-                this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`))
+                this.sendMessage(hook, selectedPlayer, false, this.setImportantMessage(`${selectedPlayer.name}'s ${selectedPlayer.equipment.weapon.name} just broke!`))
                   .then(this.sendPrivateMessage(hook, selectedPlayer, `Your ${selectedPlayer.equipment.weapon.name} just broke!`, true))
                   .then(this.setPlayerEquipment(
                     selectedPlayer,
@@ -440,10 +440,10 @@ class Helper {
             const bountyEventLog = `Claimed ${bountyGain} gold for ${selectedPlayer.name}'s head`;
             attackerObj.gold.current += Number(bountyGain);
             attackerObj.gold.total += Number(bountyGain);
-            this.sendMessage(hook, 'twitch', selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
+            this.sendMessage(hook, selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
               .then(this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
               .then(this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true))
-              .then(this.logEvent(attackerObj, Database, bountyEventLog, 'ACTION'));
+              .then(this.logEvent(attackerObj, Database, bountyEventLog, enumHelper.logTypes.action));
             selectedPlayer.currentBounty = 0;
           }
 
@@ -455,9 +455,9 @@ class Helper {
         const eventLog = `You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`;
 
         return Promise.all([
-          this.sendMessage(hook, 'twitch', selectedPlayer, false, eventMsg),
+          this.sendMessage(hook, selectedPlayer, false, eventMsg),
           this.sendPrivateMessage(hook, selectedPlayer, eventLog, true),
-          this.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
+          this.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
         ])
           .then(resolve(selectedPlayer));
       }
@@ -551,7 +551,7 @@ class Helper {
   generatePlayerName(player, isAction) {
     if (
       player.isMentionInDiscord === 'off'
-      || player.isMentionInDiscord === 'action' && !isAction
+      || player.isMentionInDiscord === enumHelper.logTypes.action && !isAction
       || player.isMentionInDiscord === 'move' && isAction
     ) {
       return `\`${player.name}\``;

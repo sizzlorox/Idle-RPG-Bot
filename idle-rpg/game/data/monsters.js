@@ -1379,6 +1379,261 @@ const monsters = {
       experience: 20,
       gold: 5,
       rarity: 15
+    },
+
+    earthSpirit = {
+      name: 'Earth Spirit',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.grassland,
+        map.biomes.mountains,
+        map.biomes.moors
+      ],
+      power: 1.3,
+      health: 120,
+      stats: {
+        str: 1,
+        dex: 1.15,
+        end: 1,
+        int: 2,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'magic',
+          power: 2.2
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 15,
+      gold: 5,
+      rarity: 35
+    },
+
+    airSpirit = {
+      name: 'Air Spirit',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.grassland,
+        map.biomes.mountains,
+        map.biomes.moors
+      ],
+      power: 2,
+      health: 135,
+      stats: {
+        str: 1,
+        dex: 1.15,
+        end: 1,
+        int: 2.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'magic',
+          power: 2.2
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 25,
+      gold: 5,
+      rarity: 35
+    },
+
+    fireSpirit = {
+      name: 'Fire Spirit',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.desert
+      ],
+      power: 2,
+      health: 175,
+      stats: {
+        str: 1,
+        dex: 1.15,
+        end: 1,
+        int: 2.75,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'magic',
+          power: 2.5
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 35,
+      gold: 5,
+      rarity: 35
+    },
+
+    waterSpirit = {
+      name: 'Water Spirit',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.coast,
+        map.biomes.swamp
+      ],
+      power: 1,
+      health: 125,
+      stats: {
+        str: 1,
+        dex: 1.15,
+        end: 1,
+        int: 2,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'magic',
+          power: 2
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 15,
+      gold: 5,
+      rarity: 35
+    },
+
+    caveTroll = {
+      name: 'Cave Troll',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.caves
+      ],
+      power: 3,
+      health: 225,
+      stats: {
+        str: 3,
+        dex: 0.5,
+        end: 2.45,
+        int: 0.15,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'club',
+          power: 3.2
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 45,
+      gold: 5,
+      rarity: 25
+    },
+
+    caveTroll = {
+      name: 'Cave Troll',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.caves
+      ],
+      power: 3,
+      health: 225,
+      stats: {
+        str: 3,
+        dex: 0.5,
+        end: 2.45,
+        int: 0.15,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'club',
+          power: 3.2
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 45,
+      gold: 5,
+      rarity: 25
+    },
+
+    mountainTroll = {
+      name: 'Mountain Troll',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.mountains
+      ],
+      power: 2.75,
+      health: 185,
+      stats: {
+        str: 2.75,
+        dex: 0.75,
+        end: 2,
+        int: 0.2,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'club',
+          power: 2.8
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 40,
+      gold: 7,
+      rarity: 25
     }
   ]
 };

@@ -63,6 +63,7 @@ const game = new Game(hook, helper);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
 const dailyLotteryTime = '00 00 10 * * 0-6';
+const blizzardRandomTime = '00 00 9 * * 0-6';
 const timeZone = 'America/Los_Angeles';
 let minTimer = (minimalTimer * 1000) * 60;
 let maxTimer = (maximumTimer * 1000) * 60;
@@ -141,7 +142,7 @@ const heartBeat = () => {
     if (!player.timer) {
       const playerTimer = helper.randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
-        game.selectEvent(discordBot, player, onlinePlayerList, 'twitchBot');
+        game.selectEvent(discordBot, player, onlinePlayerList);
         delete player.timer;
       }, playerTimer);
     }
@@ -198,10 +199,8 @@ discordBot.on('message', async (message) => {
 
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
-    if (newMember.presence.game && !oldMember.presence.game) {
-      if (newMember.presence.game.streaming && !oldMember.presence.game) {
-        newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
-      }
+    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game) {
+      newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
     }
   });
 }
@@ -233,6 +232,16 @@ new CronJob({
   cronTime: dailyLotteryTime,
   onTick: () => {
     game.dailyLottery(discordBot, guildName);
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+new CronJob({
+  cronTime: blizzardRandomTime,
+  onTick: () => {
+    game.blizzardRandom();
   },
   start: false,
   timeZone,

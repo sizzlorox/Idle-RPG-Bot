@@ -595,7 +595,6 @@ const commands = [
   christmasEventCommand = {
     command: '!xmas',
     operatorOnly: true,
-    channelOnlyId: commandChannel,
     function: (game, message) => {
       if (message.content.includes(' ')) {
         switch (message.content.split(/ (.+)/)[1].toLowerCase()) {
@@ -611,7 +610,6 @@ const commands = [
   activateBlizzard = {
     command: '!blizzard',
     operatorOnly: true,
-    channelOnlyId: commandChannel,
     function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitCommand = message.content.split(/ (.+)/);

@@ -57,9 +57,8 @@ class Game {
    * Loads player by discordID and rolls a dice to select which type of event to activate
    * @param {Number} player
    * @param {Array} onlinePlayers
-   * @param {*} twitchBot
    */
-  selectEvent(discordBot, player, onlinePlayers, twitchBot) {
+  selectEvent(discordBot, player, onlinePlayers) {
     const randomEvent = this.Helper.randomBetween(0, 2);
 
     this.Database.loadPlayer(player.discordId)
@@ -67,13 +66,13 @@ class Game {
         if (!selectedPlayer) {
           return this.Database.createNewPlayer(player.discordId, player.name)
             .then((newPlayer) => {
-              this.Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
+              this.Helper.sendMessage(this.discordHook, selectedPlayer, false, `${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
 
               return newPlayer;
             });
         } else if (selectedPlayer.events === 0) {
           selectedPlayer.map = this.Event.MapClass.getRandomTown();
-          this.Helper.sendMessage(this.discordHook, twitchBot, selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
+          this.Helper.sendMessage(this.discordHook, selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
         }
 
         return selectedPlayer;
@@ -106,7 +105,7 @@ class Game {
       })
       .then((updatedPlayer) => {
         if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
-          this.Helper.sendMessage(this.discordHook, twitchBot, updatedPlayer, false, this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
+          this.Helper.sendMessage(this.discordHook, updatedPlayer, false, this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
             .then(this.Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
         }
         return updatedPlayer;
@@ -176,17 +175,18 @@ class Game {
       }
 
       if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-        if (luckDice <= 15 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
-          return this.Event.generateQuestEvent(selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
-        }
         if (luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
           return this.Event.generateGamblingEvent(selectedPlayer)
             .then(updatedPlayer => resolve(updatedPlayer));
         }
+
+        if (luckDice <= 45 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
+          return this.Event.generateQuestEvent(selectedPlayer)
+            .then(updatedPlayer => resolve(updatedPlayer));
+        }
       }
 
-      if (this.Event.isBlizzardActive && this.Event.MapClass.getMapsByType('Snow').includes(selectedPlayer.map.name) && luckDice <= 35 + (selectedPlayer.stats.luk / 4)) {
+      if (this.Event.isBlizzardActive && luckDice <= 10 + (selectedPlayer.stats.luk / 4)) {
         return this.Event.chanceToCatchSnowflake(selectedPlayer)
           .then(updatedPlayer => resolve(updatedPlayer));
       }
@@ -203,15 +203,15 @@ class Game {
 
   // Event
   powerHourBegin() {
-    this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, this.Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+    this.Helper.sendMessage(this.discordHook, undefined, false, this.Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
 
     setTimeout(() => {
-      this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+      this.Helper.sendMessage(this.discordHook, undefined, false, this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
       this.config.multiplier += 1;
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
-      this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+      this.Helper.sendMessage(this.discordHook, undefined, false, this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
       this.config.multiplier -= 1;
       this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
     }, 5400000); // 1hr 30 minutes
@@ -366,14 +366,14 @@ ${rankString}
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
-                  commandAuthor.send('Spell has been casted!');
+                  commandAuthor.send('Spell has been cast!');
                 })
                 .then(() => this.Database.updateGame(this.config));
               this.config.multiplier += 1;
 
               this.config.spells.activeBless++;
 
-              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just casted ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+              this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name} just cast ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               setTimeout(() => {
                 this.config.multiplier -= 1;
                 this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
@@ -392,11 +392,11 @@ ${rankString}
               castingPlayer.gold.current -= globalSpells.home.spellCost;
               const Kindale = this.Event.MapClass.getMapByIndex(4);
               castingPlayer.map = Kindale;
-              this.discordHook.actionHook.send(`${castingPlayer.name} just casted ${spell}!\nTeleported back to ${Kindale.name}.`);
+              this.discordHook.actionHook.send(`${castingPlayer.name} just cast ${spell}!\nTeleported back to ${Kindale.name}.`);
 
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
-                  commandAuthor.send('Spell has been casted!');
+                  commandAuthor.send('Spell has been cast!');
                 });
             } else {
               commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold.current} gold.`);
@@ -499,8 +499,8 @@ ${rankString}
 
             return Promise.all([
               this.Database.updateGame(updatedConfig),
-              this.Helper.sendMessage(this.discordHook, 'twitch', winner, false, eventMsg),
-              this.Helper.logEvent(winner, this.Database, eventLog, 'ACTION'),
+              this.Helper.sendMessage(this.discordHook, winner, false, eventMsg),
+              this.Helper.logEvent(winner, this.Database, eventLog, enumHelper.logTypes.action),
               this.Database.savePlayer(winner),
               this.Database.removeLotteryPlayers()
             ])
@@ -702,18 +702,27 @@ ${rankString}
    * SPECIAL EVENTS
    */
   blizzardSwitch(blizzardSwitch) {
-    return this.Event.blizzardSwitch(this.discordHook, blizzardSwitch);
+    return this.Event.blizzardSwitch(blizzardSwitch);
+  }
+
+  blizzardRandom() {
+    const blizzardDice = this.Helper.randomBetween(0, 100);
+    if (blizzardDice <= 15) {
+      return this.Event.blizzardRandom();
+    }
+
+    return;
   }
 
   /**
    * Sends Christmas Pre Event Message and another pre event message after 21 hours
    */
   sendChristmasFirstPreEventMessage() {
-    return this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
+    return this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
   }
 
   sendChristmasSecondPreEventMessage() {
-    return this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
+    return this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
   }
 
   helperGetter() {
@@ -727,7 +736,7 @@ ${rankString}
    */
   updateChristmasEvent(isStarting) {
     if (isStarting) {
-      this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
       this.Event.MonsterClass.monsters.forEach((mob) => {
         if (mob.isXmasEvent) {
           mob.isSpawnable = true;
@@ -743,7 +752,7 @@ ${rankString}
       return '';
     }
 
-    this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
+    this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
     this.Event.MonsterClass.monsters.forEach((mob) => {
       if (mob.isXmasEvent) {
         mob.isSpawnable = false;

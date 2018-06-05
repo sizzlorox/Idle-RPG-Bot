@@ -216,7 +216,7 @@ class Event {
         }
 
         this.isBlizzardActive = true;
-        this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
+        this.Helper.sendMessage(this.discordHook, undefined, false, '\`\`\`python\n\'Heroes, sit near a fireplace at your home or take a beer with your friends at the inn. It\`s better to stay in cozy place as lots of heroes are in the midst of a violent snowstorm across the lands fighting mighty Yetis!\'\`\`\`');
         return this.isBlizzardActive;
       case 'off':
         if (!this.isBlizzardActive) {
@@ -224,8 +224,17 @@ class Event {
         }
 
         this.isBlizzardActive = false;
-        this.Helper.sendMessage(this.discordHook, 'twitch', undefined, false, '@everyone\`\`\`python\n\'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!\'\`\`\`');
+        this.Helper.sendMessage(this.discordHook, undefined, false, '\`\`\`python\n\'It seems that blizzard has ended, you can safely travel to other realms. Do not walk away from the road as evil creatures may wait for you in dark forests!\'\`\`\`');
         return this.isBlizzardActive;
+    }
+  }
+
+  blizzardRandom() {
+    if (!this.isBlizzardActive) {
+      this.isBlizzardActive = true;
+      setTimeout(() => {
+        this.isBlizzardActive = false;
+      }, this.Helper.randomBetween(7200000, 72000000)); // 2-20hrs
     }
   }
 
