@@ -133,7 +133,7 @@ const events = {
       const eventLog = `Moved ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, true, eventMsg),
+        Helper.sendMessage(discordHook, selectedPlayer, true, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false),
         Helper.logEvent(selectedPlayer, Database, eventLog, 'MOVE')
       ])
@@ -153,7 +153,7 @@ const events = {
     const { eventMsg, eventLog } = Helper.randomCampEventMessage(selectedPlayer);
 
     return Promise.all([
-      Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+      Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
       Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
       Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
     ])
@@ -182,7 +182,7 @@ const events = {
         const eventLog = `Made ${profit} gold selling what you found adventuring`;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
@@ -227,7 +227,7 @@ const events = {
       const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
         Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
       ])
@@ -293,7 +293,7 @@ const events = {
         defender.experience.total += expGain;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
+          Helper.sendMessage(discordHook, attacker, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
           Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
           Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
@@ -326,7 +326,7 @@ const events = {
         defender.experience.total += expGainDefender;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
+          Helper.sendMessage(discordHook, attacker, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
           Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
           Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
@@ -354,7 +354,7 @@ const events = {
       attacker.experience.total += expGain;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', attacker, false, eventMsg),
+        Helper.sendMessage(discordHook, attacker, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, attacker, '```'.concat(battleResult).concat('```').concat(eventLog), true),
         Helper.sendPrivateMessage(discordHook, defender, '```'.concat(battleResult).concat('```').concat(otherPlayerLog), true),
         Helper.logEvent(attacker, Database, eventLog, 'ACTION'),
@@ -395,7 +395,7 @@ const events = {
         selectedPlayer.battles.lost++;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, pmMsg, true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
@@ -413,7 +413,7 @@ const events = {
         selectedPlayer.gold.total += goldGain + questGoldGain;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, pmMsg, true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
@@ -432,10 +432,10 @@ const events = {
       selectedPlayer.battles.won++;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, pmMsg, true),
         Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION'),
-        isQuestCompleted ? Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`) : '',
+        isQuestCompleted ? Helper.sendMessage(discordHook, selectedPlayer, false, `${Helper.generatePlayerName(selectedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`) : '',
         isQuestCompleted ? Helper.sendPrivateMessage(discordHook, selectedPlayer, 'test', true) : `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`,
         isQuestCompleted ? Helper.logEvent(discordHook, Database, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, 'ACTION') : ''
       ])
@@ -503,7 +503,7 @@ const events = {
         }
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg),
+          Helper.sendMessage(discordHook, stealingPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true),
           Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true),
           Helper.logEvent(stealingPlayer, Database, eventLog, 'ACTION'),
@@ -527,7 +527,7 @@ const events = {
           otherPlayerLog = `${stealingPlayer.name} stole ${goldStolen} gold from you`;
 
           return Promise.all([
-            Helper.sendMessage(discordHook, 'twitch', stealingPlayer, false, eventMsg),
+            Helper.sendMessage(discordHook, stealingPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, stealingPlayer, eventLog, true),
             Helper.sendPrivateMessage(discordHook, victimPlayer, otherPlayerLog, true),
             Helper.logEvent(stealingPlayer, Database, eventLog, 'ACTION'),
@@ -554,7 +554,7 @@ const events = {
       const eventLog = `Quest Master in ${selectedPlayer.map.name} asked you to kill ${selectedPlayer.quest.count === 1 ? 'a' : selectedPlayer.quest.count} ${mob}.`;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
         Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
       ])
@@ -588,7 +588,7 @@ const events = {
             const eventLog = `Received ${item.name} from ${mob[0].name}`;
 
             return Promise.all([
-              Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+              Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
               Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
             ])
@@ -622,7 +622,7 @@ const events = {
             selectedPlayer.spells.push(spell);
 
             return Promise.all([
-              Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+              Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
               Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
             ])
@@ -632,7 +632,7 @@ const events = {
           selectedPlayer.spells.push(spell);
 
           return Promise.all([
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+            Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
             Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
           ])
@@ -657,7 +657,7 @@ const events = {
         }
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
@@ -677,7 +677,7 @@ const events = {
         const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
@@ -705,7 +705,7 @@ const events = {
         }
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
           Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
         ])
@@ -717,7 +717,7 @@ const events = {
       selectedPlayer.gold.gambles.won += luckGambleGold;
 
       return Promise.all([
-        Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsg),
+        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
         Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
         Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
       ])
@@ -737,7 +737,7 @@ const events = {
         const eventLogHades = `Hades unleashed his wrath upon you making you lose ${luckExpAmount} experience`;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHades),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgHades),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHades, true),
           Helper.logEvent(selectedPlayer, Database, eventLogHades, 'ACTION')
         ])
@@ -752,7 +752,7 @@ const events = {
         const eventLogZeus = `Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgZeus),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgZeus),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogZeus, true),
           Helper.logEvent(selectedPlayer, Database, eventLogZeus, 'ACTION')
         ])
@@ -772,7 +772,7 @@ const events = {
           selectedPlayer.health += healAmount;
 
           return Promise.all([
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco),
+            Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgAseco),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, true),
             Helper.logEvent(selectedPlayer, Database, eventLogAseco, 'ACTION')
           ])
@@ -783,7 +783,7 @@ const events = {
         eventLogAseco = 'Aseco wanted to heal you, but you had full health';
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAseco),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgAseco),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAseco, true),
           Helper.logEvent(selectedPlayer, Database, eventLogAseco, 'ACTION')
         ])
@@ -798,7 +798,7 @@ const events = {
           eventLogHermes = 'Hermes demanded gold from you but you had nothing to give';
 
           return Promise.all([
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes),
+            Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgHermes),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, true),
             Helper.logEvent(selectedPlayer, Database, eventLogHermes, 'ACTION')
           ])
@@ -815,7 +815,7 @@ const events = {
         }
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgHermes),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgHermes),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogHermes, true),
           Helper.logEvent(selectedPlayer, Database, eventLogHermes, 'ACTION')
         ])
@@ -831,7 +831,7 @@ const events = {
         const eventLogAthena = `Athena shared her wisdom with you making you gain ${luckExpAthena} experience`;
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgAthena),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgAthena),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogAthena, true),
           Helper.logEvent(selectedPlayer, Database, eventLogAthena, 'ACTION')
         ])
@@ -859,7 +859,7 @@ const events = {
             selectedPlayer.spells.push(spell);
 
             return Promise.all([
-              Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
+              Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgEris),
               Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
               Helper.logEvent(selectedPlayer, Database, eventLogEris, 'ACTION')
             ])
@@ -869,7 +869,7 @@ const events = {
           selectedPlayer.spells.push(spell);
 
           return Promise.all([
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgEris),
+            Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgEris),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogEris, true),
             Helper.logEvent(selectedPlayer, Database, eventLogEris, 'ACTION')
           ])
@@ -898,7 +898,7 @@ const events = {
         }, timeLimit);
 
         return Promise.all([
-          Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgDionysus),
+          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgDionysus),
           Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogDionysus, true),
           Helper.logEvent(selectedPlayer, Database, eventLogDionysus, 'ACTION')
         ])
@@ -919,7 +919,7 @@ const events = {
           const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
           const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
           return Promise.all([
-            Helper.sendMessage(discordHook, 'twitch', selectedPlayer, false, eventMsgSnowflake),
+            Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgSnowflake),
             Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true),
             Helper.logEvent(selectedPlayer, Database, eventLog, 'ACTION')
           ])
