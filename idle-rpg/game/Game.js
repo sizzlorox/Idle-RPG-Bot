@@ -115,13 +115,8 @@ class Game {
       });
   }
 
-  moveEvent(selectedPlayer, onlinePlayers) {
+  moveEvent(selectedPlayer) {
     return new Promise((resolve) => {
-      if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-        return this.attackEvent(selectedPlayer, onlinePlayers)
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
-
       return this.Event.moveEvent(selectedPlayer)
         .then(updatedPlayer => resolve(updatedPlayer));
     });
