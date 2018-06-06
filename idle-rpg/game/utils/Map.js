@@ -9,69 +9,70 @@ class Map {
   moveToRandomMap(selectedPlayer) {
     const movement = this.Helper.randomBetween(0, 3);
     const mapSize = maps[maps.length - 1].coords;
+    const newCoords = selectedPlayer.map.coords;
 
     switch (movement) {
       case 0:
         // UP - Move down if at edge
         if (selectedPlayer.map.coords[1] === 0) {
-          selectedPlayer.map.coords[1]++;
+          newCoords[1]++;
           return {
-            map: this.getMapByCoords(selectedPlayer.map.coords),
+            map: this.getMapByCoords(newCoords),
             direction: 'South'
           };
         }
 
-        selectedPlayer.map.coords[1]--;
+        newCoords[1]--;
         return {
-          map: this.getMapByCoords(selectedPlayer.map.coords),
+          map: this.getMapByCoords(newCoords),
           direction: 'North'
         };
 
       case 1:
         // Down - Move up if at edge
         if (selectedPlayer.map.coords[1] === mapSize[1]) {
-          selectedPlayer.map.coords[1]--;
+          newCoords[1]--;
           return {
-            map: this.getMapByCoords(selectedPlayer.map.coords),
+            map: this.getMapByCoords(newCoords),
             direction: 'North'
           };
         }
 
-        selectedPlayer.map.coords[1]++;
+        newCoords[1]++;
         return {
-          map: this.getMapByCoords(selectedPlayer.map.coords),
+          map: this.getMapByCoords(newCoords),
           direction: 'South'
         };
 
       case 2:
         // Right - Move left if at edge
         if (selectedPlayer.map.coords[0] === mapSize[0]) {
-          selectedPlayer.map.coords[0]--;
+          newCoords[0]--;
           return {
-            map: this.getMapByCoords(selectedPlayer.map.coords),
+            map: this.getMapByCoords(newCoords),
             direction: 'West'
           };
         }
 
-        selectedPlayer.map.coords[0]++;
+        newCoords[0]++;
         return {
-          map: this.getMapByCoords(selectedPlayer.map.coords),
+          map: this.getMapByCoords(newCoords),
           direction: 'East'
         };
 
       case 3:
         // Left - Move right if at edge
         if (selectedPlayer.map.coords[0] === 0) {
-          selectedPlayer.map.coords[0]++;
+          newCoords[0]++;
           return {
-            map: this.getMapByCoords(selectedPlayer.map.coords),
+            map: this.getMapByCoords(newCoords),
             direction: 'East'
           };
         }
 
-        selectedPlayer.map.coords[0]--;
+        newCoords[0]--;
         return {
-          map: this.getMapByCoords(selectedPlayer.map.coords),
+          map: this.getMapByCoords(newCoords),
           direction: 'West'
         };
     }

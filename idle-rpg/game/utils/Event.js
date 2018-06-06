@@ -28,13 +28,13 @@ class Event {
   }
 
   // Move Events
-  async moveEvent(selectedPlayer) {
-    const mapObj = await this.MapManager.moveToRandomMap(selectedPlayer);
+  moveEvent(selectedPlayer) {
+    const mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
     if (mapObj.map.name === selectedPlayer.map.previousLocation) {
       return Promise.resolve(selectedPlayer);
     }
 
-    return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj)
+    return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj);
   }
 
   attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, multiplier) {
