@@ -135,13 +135,12 @@ class Game {
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)
-        && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, (this.config.multiplier + selectedPlayer.personalMultiplier))
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
-
       if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+        if (luckDice >= (95 - (selectedPlayer.stats.luk / 4)) && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
+          return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, (this.config.multiplier + selectedPlayer.personalMultiplier))
+            .then(updatedPlayer => resolve(updatedPlayer));
+        }
+
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
           return this.Event.attackEventMob(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
             .then(updatedPlayer => resolve(updatedPlayer));
