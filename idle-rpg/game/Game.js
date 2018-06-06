@@ -79,7 +79,6 @@ class Game {
       })
       .then((selectedPlayer) => {
         selectedPlayer.events++;
-        console.log(`${selectedPlayer.name} - ${selectedPlayer.level} - ${selectedPlayer.class}`);
         if (selectedPlayer.updated_at) {
           const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
           console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
