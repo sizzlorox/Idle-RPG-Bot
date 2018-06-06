@@ -81,7 +81,7 @@ class Game {
         selectedPlayer.events++;
         if (selectedPlayer.updated_at) {
           const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
-          console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
+          console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago. Lv.${selectedPlayer.level} HP Regen amount: ${((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.end / 8)}`);
         }
 
         return selectedPlayer;

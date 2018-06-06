@@ -130,7 +130,7 @@ const events = {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
       selectedPlayer.map.previousLocation = previousMap.name;
-      const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
+      const eventMsg = `${Helper.generatePlayerName(selectedPlayer, false)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
       const eventLog = `Moved ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
 
       return Promise.all([
