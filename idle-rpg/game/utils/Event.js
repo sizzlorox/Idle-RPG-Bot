@@ -34,7 +34,7 @@ class Event {
       return Promise.resolve(selectedPlayer);
     }
 
-    return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj)
+    return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj);
   }
 
   attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, multiplier) {

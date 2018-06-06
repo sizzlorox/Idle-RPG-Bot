@@ -551,7 +551,7 @@ class Helper {
   generatePlayerName(player, isAction) {
     if (
       player.isMentionInDiscord === 'off'
-      || player.isMentionInDiscord === enumHelper.logTypes.action && !isAction
+      || player.isMentionInDiscord === 'action' && !isAction
       || player.isMentionInDiscord === 'move' && isAction
     ) {
       return `\`${player.name}\``;
