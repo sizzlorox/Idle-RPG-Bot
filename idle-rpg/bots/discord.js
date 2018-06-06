@@ -138,13 +138,16 @@ const heartBeat = () => {
     maxTimer = ((Number(maximumTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
   }
 
-  onlinePlayerList.forEach((player) => {
+  onlinePlayerList.forEach((player, index) => {
     if (!player.timer) {
       const playerTimer = helper.randomBetween(minTimer, maxTimer);
       player.timer = setTimeout(() => {
         game.selectEvent(discordBot, player, onlinePlayerList);
         delete player.timer;
       }, playerTimer);
+    }
+    if (discordOnlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) === -1) {
+      onlinePlayerList.splice(index, 1);
     }
   });
 
