@@ -89,7 +89,7 @@ class Game {
       .then((selectedPlayer) => {
         selectedPlayer.name = player.name;
 
-        this.Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
+        this.Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.end / 8), ((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.int / 8));
         switch (randomEvent) {
           case 0:
             return this.moveEvent(selectedPlayer, onlinePlayers)
