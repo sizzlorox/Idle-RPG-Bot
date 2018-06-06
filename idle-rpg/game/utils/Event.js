@@ -28,8 +28,8 @@ class Event {
   }
 
   // Move Events
-  moveEvent(selectedPlayer) {
-    const mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
+  async moveEvent(selectedPlayer) {
+    const mapObj = await this.MapManager.moveToRandomMap(selectedPlayer);
     if (mapObj.map.name === selectedPlayer.map.previousLocation) {
       return Promise.resolve(selectedPlayer);
     }
