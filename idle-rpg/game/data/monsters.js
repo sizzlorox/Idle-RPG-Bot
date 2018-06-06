@@ -1634,7 +1634,302 @@ const monsters = {
       experience: 40,
       gold: 7,
       rarity: 25
-    }
+    },
+
+    vampire = {
+      name: 'Vampire',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.haunted,
+        map.biomes.swamp
+      ],
+      power: 1.75,
+      health: 175,
+      stats: {
+        str: 2,
+        dex: 2.15,
+        end: 1.75,
+        int: 2,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'bite',
+          power: 2.4
+        },
+        armor: {
+          name: '',
+          power: 1.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 35,
+      gold: 15,
+      rarity: 40
+    },
+
+    imp = {
+      name: 'Imp',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.haunted,
+        map.biomes.forest,
+        map.biomes.swamp,
+        map.biomes.grassland,
+        map.biomes.moors,
+      ],
+      power: 1.25,
+      health: 95,
+      stats: {
+        str: 1.5,
+        dex: 3,
+        end: 1.15,
+        int: 1.15,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'claws',
+          power: 1.2
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 15,
+      gold: 5,
+      rarity: 35
+    },
+
+    ogre = {
+      name: 'Ogre',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.forest,
+        map.biomes.grassland,
+        map.biomes.moors,
+        map.biomes.plateau,
+      ],
+      power: 2.35,
+      health: 150,
+      stats: {
+        str: 2,
+        dex: 1,
+        end: 3,
+        int: 1,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'club',
+          power: 2.7
+        },
+        armor: {
+          name: '',
+          power: 2
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 30,
+      gold: 5,
+      rarity: 20
+    },
+
+    witch = {
+      name: 'Witch',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.haunted
+      ],
+      power: 1.5,
+      health: 90,
+      stats: {
+        str: 1,
+        dex: 2,
+        end: 1.4,
+        int: 3,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'staff',
+          power: 2.4
+        },
+        armor: {
+          name: '',
+          power: 0.5
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 40,
+      gold: 9,
+      rarity: 40
+    },
+
+    salamander = {
+      name: 'Salamander',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.swamp,
+        map.biomes.deser,
+      ],
+      power: 1.2,
+      health: 115,
+      stats: {
+        str: 1.2,
+        dex: 3,
+        end: 1,
+        int: 0.5,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'claws',
+          power: 1.2
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 25,
+      gold: 2,
+      rarity: 65
+    },
+
+    banshee = {
+      name: 'Banshee',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.haunted,
+        map.biomes.swamp,
+      ],
+      power: 1.7,
+      health: 145,
+      stats: {
+        str: 0.5,
+        dex: 3.2,
+        end: 0.7,
+        int: 2,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'magic',
+          name: 'shriek',
+          power: 1.2
+        },
+        armor: {
+          name: '',
+          power: 1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 40,
+      gold: 7,
+      rarity: 40
+    },
+
+    boar = {
+      name: 'Boar',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.forest,
+        map.biomes.plains,
+        map.biomes.grassland,
+        map.biomes.moors,
+      ],
+      power: 1,
+      health: 45,
+      stats: {
+        str: 0.5,
+        dex: 2,
+        end: 1,
+        int: 0.15,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'bite',
+          power: 0.7
+        },
+        armor: {
+          name: '',
+          power: 2
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 7,
+      gold: 1,
+      rarity: 90
+    },
+    // coast, town, haunted, forest, plains, mountains, swamp, grassland, caves, plateau, moors, desert
+    pirate = {
+      name: 'Pirate',
+      isSpawnable: true,
+      spawnableBiomes: [
+        map.biomes.coast
+      ],
+      power: 1.2,
+      health: 85,
+      stats: {
+        str: 1.4,
+        dex: 3,
+        end: 1,
+        int: 0.15,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'cutlass',
+          power: 1.2
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 9,
+      gold: 11,
+      rarity: 65
+    },
   ]
 };
 module.exports = monsters;

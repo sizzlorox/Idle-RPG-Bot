@@ -153,9 +153,7 @@ const resetPlayerObj = {
     mob: 0,
     player: 0,
     firstDeath: 'never'
-  },
-  pastEvents: [],
-  pastPvpEvents: []
+  }
 };
 
 const playerSchema = mongoose.Schema({

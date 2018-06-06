@@ -27,21 +27,13 @@ class Event {
     this.isBlizzardActive = false;
   }
 
-  regenItem(selectedPlayer) {
-    const regeneratedHelmet = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.helmet, 'helmet');
-    selectedPlayer.equipment.helmet = regeneratedHelmet;
-
-    const regeneratedArmor = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.armor, 'armor');
-    selectedPlayer.equipment.armor = regeneratedArmor;
-
-    const regeneratedWeapon = this.ItemManager.regenerateItemByName(selectedPlayer.equipment.weapon, 'weapon');
-    selectedPlayer.equipment.weapon = regeneratedWeapon;
-    return selectedPlayer;
-  }
-
   // Move Events
   moveEvent(selectedPlayer) {
     const mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
+    if (mapObj.map.name === selectedPlayer.map.previousLocation) {
+      return Promise.resolve(selectedPlayer);
+    }
+
     return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj)
   }
 
