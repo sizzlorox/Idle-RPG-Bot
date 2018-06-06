@@ -96,32 +96,32 @@ const processDetails = () => {
 
 const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
 const heartBeat = () => {
-  if (process.env.NODE_ENV.includes('production')) {
-    const discordUsers = discordBot.guilds.size > 0
-      ? discordBot.guilds.find('id', guildID).members
-      : undefined;
+  const discordUsers = discordBot.guilds.size > 0
+    ? discordBot.guilds.find('id', guildID).members
+    : undefined;
 
-    if (discordUsers) {
-      const discordOfflinePlayers = discordUsers
-        .filter(player => player.presence.status === 'offline' && !player.user.bot)
-        .map((player) => {
-          return {
-            name: player.nickname ? player.nickname : player.displayName,
-            discordId: player.id
-          };
-        });
+  if (discordUsers) {
+    const discordOfflinePlayers = discordUsers
+      .filter(player => player.presence.status === 'offline' && !player.user.bot)
+      .map((player) => {
+        return {
+          name: player.nickname ? player.nickname : player.displayName,
+          discordId: player.id
+        };
+      });
 
-      const discordOnlinePlayers = discordUsers
-        .filter(player => player.presence.status === 'online' && !player.user.bot
-          || player.presence.status === 'idle' && !player.user.bot
-          || player.presence.status === 'dnd' && !player.user.bot)
-        .map((player) => {
-          return {
-            name: player.nickname ? player.nickname : player.displayName,
-            discordId: player.id
-          };
-        });
+    const discordOnlinePlayers = discordUsers
+      .filter(player => player.presence.status === 'online' && !player.user.bot
+        || player.presence.status === 'idle' && !player.user.bot
+        || player.presence.status === 'dnd' && !player.user.bot)
+      .map((player) => {
+        return {
+          name: player.nickname ? player.nickname : player.displayName,
+          discordId: player.id
+        };
+      });
 
+    if (process.env.NODE_ENV.includes('production')) {
       onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
         .filter((player, index, array) =>
           index === array.findIndex(p => (
@@ -130,28 +130,28 @@ const heartBeat = () => {
 
       onlinePlayerList.forEach(player => discordOfflinePlayers.filter(offPlayer => offPlayer.discordId === player.discordId));
     }
-  }
 
-  if (onlinePlayerList.length >= 50) {
-    console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
-    minTimer = ((Number(minimalTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
-    maxTimer = ((Number(maximumTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
-  }
-
-  onlinePlayerList.forEach((player, index) => {
-    if (!player.timer) {
-      const playerTimer = helper.randomBetween(minTimer, maxTimer);
-      player.timer = setTimeout(() => {
-        game.selectEvent(discordBot, player, onlinePlayerList);
-        delete player.timer;
-      }, playerTimer);
+    if (onlinePlayerList.length >= 50) {
+      console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
+      minTimer = ((Number(minimalTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
+      maxTimer = ((Number(maximumTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
     }
-    if (discordOnlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) === -1) {
-      onlinePlayerList.splice(index, 1);
-    }
-  });
 
-  processDetails();
+    onlinePlayerList.forEach((player, index) => {
+      if (!player.timer) {
+        const playerTimer = helper.randomBetween(minTimer, maxTimer);
+        player.timer = setTimeout(() => {
+          game.selectEvent(discordBot, player, onlinePlayerList);
+          delete player.timer;
+        }, playerTimer);
+      }
+      if (discordOnlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) === -1) {
+        onlinePlayerList.splice(index, 1);
+      }
+    });
+
+    processDetails();
+  }
 };
 
 discordBot.on('ready', () => {
