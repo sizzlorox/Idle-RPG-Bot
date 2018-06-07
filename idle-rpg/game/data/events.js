@@ -311,9 +311,9 @@ const events = {
 
       if (defender.health > 0 && attacker.health > 0) {
         const eventMsg = attackerDamage > defenderDamage
-          ? `[\`${attacker.map.name}\`] ${Helper.generatePlayerName(attacker, true)} attacked ${Helper.generatePlayerName(defender, true)} with ${Helper.generateGenderString(attacker, 'his')} ${attacker.equipment.weapon.name} but ${Helper.generateGenderString(defender, 'he')} managed to get away!
+          ? `[\`${attacker.map.name}\`] ${Helper.generatePlayerName(attacker, true)} attacked ${Helper.generatePlayerName(defender, true)} with ${Helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${Helper.generateGenderString(defender, 'he')} managed to get away!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`
-          : `[\`${attacker.map.name}\`] ${Helper.generatePlayerName(attacker, true)} attacked ${Helper.generatePlayerName(defender, true)} with ${Helper.generateGenderString(attacker, 'his')} ${attacker.equipment.weapon.name} but ${Helper.generatePlayerName(defender, true)} was too strong!
+          : `[\`${attacker.map.name}\`] ${Helper.generatePlayerName(attacker, true)} attacked ${Helper.generatePlayerName(defender, true)} with ${Helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${Helper.generatePlayerName(defender, true)} was too strong!
   ${Helper.capitalizeFirstLetter(Helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
 
         const expGainAttacker = Math.floor(defenderDamage / 8);

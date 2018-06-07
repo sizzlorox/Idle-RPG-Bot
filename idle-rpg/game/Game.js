@@ -3,6 +3,7 @@ const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
 const { errorLog } = require('../utils/logger');
 const globalSpells = require('./data/globalSpells');
+const { guildID, leaderboardChannelId } = require('../../settings');
 
 /**
  * GANE CLASS
@@ -135,13 +136,12 @@ class Game {
           .then(updatedPlayer => resolve(updatedPlayer));
       }
 
-      if (luckDice >= 95 - (selectedPlayer.stats.luk / 4) && !this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)
-        && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-        return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, (this.config.multiplier + selectedPlayer.personalMultiplier))
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
-
       if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
+        if (luckDice >= (95 - (selectedPlayer.stats.luk / 4)) && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
+          return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, (this.config.multiplier + selectedPlayer.personalMultiplier))
+            .then(updatedPlayer => resolve(updatedPlayer));
+        }
+
         if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
           return this.Event.attackEventMob(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
             .then(updatedPlayer => resolve(updatedPlayer));
@@ -728,6 +728,7 @@ ${rankString}
    * Activates christmas mobs to be spawnable and items droppable
    * @param {*} isStarting
    */
+  // TODO clean up this mess
   updateChristmasEvent(isStarting) {
     if (isStarting) {
       this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
@@ -760,6 +761,42 @@ ${rankString}
       });
     });
     return '';
+  }
+
+  updateLeaderboards(discordBot) {
+    const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
+    const types = [{ level: -1 }, { 'gold.current': -1 }, { spellCast: -1 }, { currentBounty: -1 }, { events: -1 }];
+
+    types.forEach((type, index) => this.Database.loadTop10(type)
+      .then(top10 => `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+        .sort((player1, player2) => {
+          if (Object.keys(type)[0] === 'level') {
+            return player2.experience.current - player1.experience.current && player2.level - player1.level;
+          }
+
+          if (Object.keys(type)[0].includes('.')) {
+            const keys = Object.keys(type)[0].split('.');
+            return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
+          }
+
+          return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+        })
+        .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
+        .join('\n')}`)
+      .then(async (rankString) => {
+        const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
+        const msg = `\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty').replace('spellCast', 'Spells Cast')}`}:
+${rankString}\`\`\``;
+
+        if (msgCount.size < types.length) {
+          // Create message
+          return leaderboardChannel.send(msg);
+        }
+
+        return !msg.includes(msgCount.array()[index].toString())
+          ? msgCount.array()[index].edit(msg)
+          : '';
+      }));
   }
 
 }

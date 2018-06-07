@@ -3,7 +3,9 @@ const settings = {
   battleDebug: false,
   eventDebug: false,
   pvpLevelRestriction: 5,
-  guildID: process.env.GUILD_ID,
+  guildID: process.env.NODE_ENV.includes('production')
+    ? process.env.GUILD_ID
+    : process.env.TEST_GUILD_ID,
 
   actionWebHookId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_ACTION_WEBHOOK_ID
@@ -24,6 +26,9 @@ const settings = {
   faqChannelId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_RPG_FAQ_CHANNEL
     : process.env.TEST_DISCORD_RPG_FAQ_CHANNEL,
+  leaderboardChannelId: process.env.NODE_ENV.includes('production')
+    ? process.env.DISCORD_RPG_LEADERBOARDS_CHANNEL_ID
+    : process.env.TEST_DISCORD_RPG_LEADERBOARDS_CHANNEL_ID,
   streamChannelId: process.env.DISCORD_STREAM_PLUGIN_CHANNEL,
 
   botLoginToken: process.env.NODE_ENV.includes('production')
@@ -35,6 +40,7 @@ const settings = {
 
   botOperator: process.env.DISCORD_BOT_OPERATOR_ID,
   rpgChannel: process.env.DISCORD_RPG_CHANNEL_ID,
+  leaderboardChannel: process.env.DISCORD_RPG_LEADERBOARDS_CHANNEL_ID,
   commandChannel: process.env.NODE_ENV.includes('production') ? process.env.DISCORD_RPG_COMMAND_CHANNEL_ID : process.env.TEST_DISCORD_RPG_COMMAND_CHANNEL_ID,
   mongoDBUri: process.env.MONGODB_URI,
   starterTown: [3, 5],
