@@ -162,8 +162,6 @@ discordBot.on('ready', () => {
   discordBot.user.setStatus('idle');
   console.log('Idle RPG has been loaded!');
 
-  game.updateLeaderboards(discordBot);
-
   console.log(`Interval delay: ${interval} minute(s)`);
   setInterval(heartBeat, 60000 * interval);
 });
