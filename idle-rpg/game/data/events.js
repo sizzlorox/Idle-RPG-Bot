@@ -794,7 +794,9 @@ const events = {
       hermes: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         let eventMsgHermes = '';
         let eventLogHermes = '';
-        if (selectedPlayer.gold.current < (selectedPlayer.gold.current / 6)) {
+        const goldTaken = Math.ceil(selectedPlayer.gold.current / 6);
+
+        if (selectedPlayer.gold.current < goldTaken) {
           eventMsgHermes = `Hermes demanded some gold from ${Helper.generatePlayerName(selectedPlayer, true)} but as ${Helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
           eventLogHermes = 'Hermes demanded gold from you but you had nothing to give';
 
@@ -805,8 +807,6 @@ const events = {
           ])
             .then(resolve(selectedPlayer));
         }
-
-        const goldTaken = Math.round(selectedPlayer.gold.current / 6);
         eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`;
         eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
 

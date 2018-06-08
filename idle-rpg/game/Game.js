@@ -4,6 +4,7 @@ const Event = require('./utils/Event');
 const { errorLog } = require('../utils/logger');
 const globalSpells = require('./data/globalSpells');
 const { guildID, leaderboardChannelId, announcementChannelId } = require('../../settings');
+const { newQuest } = require('../database/schemas/quest');
 
 /**
  * GANE CLASS
@@ -81,6 +82,11 @@ class Game {
       })
       .then((selectedPlayer) => {
         selectedPlayer.events++;
+
+        // TODO remove this later
+        if (!selectedPlayer.quest) {
+          selectedPlayer.quest = newQuest;
+        }
         if (selectedPlayer.updated_at) {
           const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
           console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
