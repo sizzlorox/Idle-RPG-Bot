@@ -696,7 +696,7 @@ ${rankString}
         const announcementChannel = discordBot.guilds.find('id', guildID).channels.find('id', announcementChannelId);
         const leaderboardMessages = leaderboardChannel.fetchMessages({ limit: 10 });
         let resetMsg = '';
-        if (leaderboardChannel.size > 0) {
+        if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
           leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
         }
         resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
