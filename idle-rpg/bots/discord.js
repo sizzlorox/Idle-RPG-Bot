@@ -188,6 +188,10 @@ discordBot.on('message', async (message) => {
     return message.reply('┬─┬ノ(ಠ_ಠノ)');
   }
 
+  if (message.content.includes('¯\_(ツ)_/¯')) {
+    return message.reply('¯\_(ツ)_/¯');
+  }
+
   if (message.attachments && message.attachments.size > 0) {
     const { url } = message.attachments.array()[0];
 
