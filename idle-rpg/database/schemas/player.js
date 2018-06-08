@@ -73,7 +73,7 @@ const newPlayerObj = (discordId, name) => {
       player: 0,
       firstDeath: 'never'
     },
-    quest: questSchema.newQuest
+    quest: newQuest
   };
 };
 
@@ -155,7 +155,7 @@ const resetPlayerObj = {
     player: 0,
     firstDeath: 'never'
   },
-  quest: questSchema.newQuest,
+  quest: newQuest,
 };
 
 const playerSchema = mongoose.Schema({

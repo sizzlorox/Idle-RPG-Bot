@@ -711,6 +711,7 @@ ${rankString}
             prizePool: 1500
           }
         };
+        this.Database.resetAllLogs();
         this.Database.updateGame(this.confg);
       });
   }

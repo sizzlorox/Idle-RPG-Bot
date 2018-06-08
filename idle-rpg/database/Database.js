@@ -464,6 +464,20 @@ class Database {
       }));
   }
 
+  resetAllLogs() {
+    connect();
+    return new Promise((resolve, reject) => MoveLog.update({}, {}, { mulit: true }, (err, result) => {
+      if (err) {
+
+        disconnect();
+        return reject(err);
+      }
+
+      disconnect();
+      return resolve(ActionLog.update({}, {}, { multi: true }));
+    }));
+  }
+
   deleteAllPlayers() {
     connect();
     return new Promise((resolve, reject) => Player.remove({}, (err, result) => {
