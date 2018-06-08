@@ -73,6 +73,7 @@ class Game {
             });
         } else if (selectedPlayer.events === 0) {
           selectedPlayer.map = this.Event.MapClass.getRandomTown();
+          selectedPlayer.createdAt = new Date().getTime();
           this.Helper.sendMessage(this.discordHook, selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
         }
 
