@@ -3,7 +3,7 @@ const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
 const { errorLog } = require('../utils/logger');
 const globalSpells = require('./data/globalSpells');
-const { guildID, leaderboardChannelId } = require('../../settings');
+const { guildID, leaderboardChannelId, announcementChannelId } = require('../../settings');
 
 /**
  * GANE CLASS
@@ -688,8 +688,18 @@ ${rankString}
   /**
    * Deletes all players in database
    */
-  deleteAllPlayers() {
-    return this.Database.resetAllPlayers();
+  deleteAllPlayers(discordBot) {
+    return this.Database.resetAllPlayers()
+      .then(this.updateLeaderboards(discordBot))
+      .then(() => {
+        const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
+        const announcementChannel = discordBot.guilds.find('id', guildID).channels.find('id', announcementChannelId);
+        const leaderboardMessages = leaderboardChannel.fetchMessages().array();
+        let resetMsg = '';
+        leaderboardMessages.forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
+        resetMsg = resetMsg.concat('Server has been Reset! Good luck to all idlers!');
+        announcementChannel.send(resetMsg);
+      });
   }
 
   /**

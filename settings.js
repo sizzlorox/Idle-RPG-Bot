@@ -26,6 +26,9 @@ const settings = {
   faqChannelId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_RPG_FAQ_CHANNEL
     : process.env.TEST_DISCORD_RPG_FAQ_CHANNEL,
+  announcementChannelId: process.env.NODE_ENV.includes('production')
+    ? process.env.DISCORD_RPG_ANNOUNCEMENT_CHANNEL
+    : process.env.TEST_DISCORD_RPG_ANNOUNCEMENT_CHANNEL,
   leaderboardChannelId: process.env.NODE_ENV.includes('production')
     ? process.env.DISCORD_RPG_LEADERBOARDS_CHANNEL_ID
     : process.env.TEST_DISCORD_RPG_LEADERBOARDS_CHANNEL_ID,

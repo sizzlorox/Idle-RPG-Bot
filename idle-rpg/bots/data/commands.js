@@ -659,8 +659,8 @@ const commands = [
     command: '!resetall',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      game.deleteAllPlayers()
+    function: (game, message, discordBot) => {
+      game.deleteAllPlayers(discordBot)
         .then(() => {
           message.author.send('Done.');
         });
