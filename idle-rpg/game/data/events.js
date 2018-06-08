@@ -78,7 +78,7 @@ ${mobListResult.join('\n')}`;
   const eventMsgResults = `↳ ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
 
   mobListInfo.mobs.forEach((mobInfo, i) => {
-    mobCountString = i > 0 ? mobCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
+    mobCountString = i > 0 ? mobCountString.concat(`, ${mobInfo.event.killed + mobInfo.event.fled}x \`${mobInfo.mob}\``) : mobCountString.concat(`${mobInfo.event.killed + mobInfo.event.fled}x \`${mobInfo.mob}\``);
     if (mobInfo.event.killed > 0) {
       mobKillCountString = mobKillCountString !== '' ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
     }
