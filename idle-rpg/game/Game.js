@@ -384,9 +384,9 @@ ${rankString}
           case 'home':
             if (castingPlayer.gold.current >= globalSpells.home.spellCost) {
               castingPlayer.gold.current -= globalSpells.home.spellCost;
-              const Kindale = this.Event.MapClass.getMapByIndex(4);
-              castingPlayer.map = Kindale;
-              this.discordHook.actionHook.send(`${castingPlayer.name} just cast ${spell}!\nTeleported back to ${Kindale.name}.`);
+              const randomHome = this.Event.MapClass.getRandomTown();
+              castingPlayer.map = randomHome;
+              this.discordHook.actionHook.send(`${castingPlayer.name} just cast ${spell}!\nTeleported back to ${randomHome.name}.`);
 
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
@@ -697,7 +697,7 @@ ${rankString}
         const leaderboardMessages = leaderboardChannel.fetchMessages().array();
         let resetMsg = '';
         leaderboardMessages.forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
-        resetMsg = resetMsg.concat('Server has been Reset! Good luck to all idlers!');
+        resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
         announcementChannel.send(resetMsg);
       });
   }

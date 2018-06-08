@@ -56,11 +56,11 @@ function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, mult
 
     if (Math.floor(results.defenderDamage / (results.defender.length)) > 0) {
       mobListResult.push(`  ${mob.name}'s ${mob.equipment.weapon.name} did ${mob.dmgDealt} damage.
-${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`);
+  ${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`);
     }
   });
   let battleResult = `Battle Results:
-You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
+  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
 ${mobListResult.join('\n')}`;
 
   if (selectedPlayer.health <= 0) {
