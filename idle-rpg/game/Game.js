@@ -694,11 +694,24 @@ ${rankString}
       .then(() => {
         const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
         const announcementChannel = discordBot.guilds.find('id', guildID).channels.find('id', announcementChannelId);
-        const leaderboardMessages = leaderboardChannel.fetchMessages().array();
+        const leaderboardMessages = leaderboardChannel.fetchMessages({ limit: 10 });
         let resetMsg = '';
-        leaderboardMessages.forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
+        if (leaderboardChannel.size > 0) {
+          leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
+        }
         resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
         announcementChannel.send(resetMsg);
+
+        this.config = {
+          multiplier: 1,
+          spells: {
+            activeBless: 0
+          },
+          dailyLottery: {
+            prizePool: 1500
+          }
+        };
+        this.Database.updateGame(this.confg);
       });
   }
 

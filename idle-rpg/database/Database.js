@@ -4,7 +4,7 @@ const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
 
 const gameSchema = require('./schemas/game');
-const { playerSchema, newPlayerObj } = require('./schemas/player');
+const { playerSchema, newPlayerObj, resetPlayerObj } = require('./schemas/player');
 const actionLogSchema = require('./schemas/actionLog');
 const moveLogSchema = require('./schemas/moveLog');
 const pvpLogSchema = require('./schemas/pvpLog');
@@ -442,7 +442,7 @@ class Database {
   }
 
   resetAllPlayers() {
-    const resetObj = Player.resetPlayerObj;
+    const resetObj = resetPlayerObj;
     resetObj.map = this.MapClass.getRandomTown();
 
     connect();
