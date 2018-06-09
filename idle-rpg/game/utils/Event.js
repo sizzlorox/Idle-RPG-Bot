@@ -31,14 +31,10 @@ class Event {
   moveEvent(selectedPlayer) {
     let mapObj;
 
-    if (!selectedPlayer.map.previousLocation) {
-      selectedPlayer.map.previousLocation = selectedPlayer.map.name;
-    }
-
     do {
       mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
-    } while (mapObj.map.name === selectedPlayer.map.previousLocation);
-    
+    } while (mapObj.map.name === mapObj.previousLocation);
+
     return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj);
   }
 

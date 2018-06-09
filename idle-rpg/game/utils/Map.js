@@ -1,5 +1,7 @@
 const maps = require('../data/maps');
 
+const mapSize = maps[maps.length - 1].coords;
+
 class Map {
 
   constructor(Helper) {
@@ -8,7 +10,6 @@ class Map {
 
   moveToRandomMap(selectedPlayer) {
     const movement = this.Helper.randomBetween(0, 3);
-    const mapSize = maps[maps.length - 1].coords;
     const newCoords = selectedPlayer.map.coords;
 
     switch (movement) {
@@ -18,14 +19,16 @@ class Map {
           newCoords[1]++;
           return {
             map: this.getMapByCoords(newCoords),
-            direction: 'South'
+            direction: 'South',
+            previousLocation: selectedPlayer.map.name
           };
         }
 
         newCoords[1]--;
         return {
           map: this.getMapByCoords(newCoords),
-          direction: 'North'
+          direction: 'North',
+          previousLocation: selectedPlayer.map.name
         };
 
       case 1:
@@ -34,14 +37,16 @@ class Map {
           newCoords[1]--;
           return {
             map: this.getMapByCoords(newCoords),
-            direction: 'North'
+            direction: 'North',
+            previousLocation: selectedPlayer.map.name
           };
         }
 
         newCoords[1]++;
         return {
           map: this.getMapByCoords(newCoords),
-          direction: 'South'
+          direction: 'South',
+          previousLocation: selectedPlayer.map.name
         };
 
       case 2:
@@ -50,14 +55,16 @@ class Map {
           newCoords[0]--;
           return {
             map: this.getMapByCoords(newCoords),
-            direction: 'West'
+            direction: 'West',
+            previousLocation: selectedPlayer.map.name
           };
         }
 
         newCoords[0]++;
         return {
           map: this.getMapByCoords(newCoords),
-          direction: 'East'
+          direction: 'East',
+          previousLocation: selectedPlayer.map.name
         };
 
       case 3:
@@ -66,14 +73,16 @@ class Map {
           newCoords[0]++;
           return {
             map: this.getMapByCoords(newCoords),
-            direction: 'East'
+            direction: 'East',
+            previousLocation: selectedPlayer.map.name
           };
         }
 
         newCoords[0]--;
         return {
           map: this.getMapByCoords(newCoords),
-          direction: 'West'
+          direction: 'West',
+          previousLocation: selectedPlayer.map.name
         };
     }
   }

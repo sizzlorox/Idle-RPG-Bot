@@ -14,11 +14,7 @@ const mapSchema = mongoose.Schema({
     name: String
   },
   levelReq: Number,
-  lore: String,
-  previousLocation: {
-    type: String,
-    default: ''
-  }
+  lore: String
 });
 
 mapSchema.set('autoIndex', false);
