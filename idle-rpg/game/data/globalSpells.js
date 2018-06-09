@@ -7,7 +7,7 @@ const globalSpells = {
 
   home: {
     spellCost: 500,
-    description: 'Teleports you to Kindale.'
+    description: 'Teleports you to a random town.'
   }
 };
 module.exports = globalSpells;

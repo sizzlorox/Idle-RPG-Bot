@@ -3,7 +3,8 @@ const enumHelper = require('../utils/enumHelper');
 const Event = require('./utils/Event');
 const { errorLog } = require('../utils/logger');
 const globalSpells = require('./data/globalSpells');
-const { guildID, leaderboardChannelId } = require('../../settings');
+const { guildID, leaderboardChannelId, announcementChannelId } = require('../../settings');
+const { newQuest } = require('../database/schemas/quest');
 
 /**
  * GANE CLASS
@@ -73,6 +74,7 @@ class Game {
             });
         } else if (selectedPlayer.events === 0) {
           selectedPlayer.map = this.Event.MapClass.getRandomTown();
+          selectedPlayer.createdAt = new Date().getTime();
           this.Helper.sendMessage(this.discordHook, selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
         }
 
@@ -80,6 +82,11 @@ class Game {
       })
       .then((selectedPlayer) => {
         selectedPlayer.events++;
+
+        // TODO remove this later
+        if (!selectedPlayer.quest) {
+          selectedPlayer.quest = newQuest;
+        }
         if (selectedPlayer.updated_at) {
           const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
           console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
@@ -384,9 +391,9 @@ ${rankString}
           case 'home':
             if (castingPlayer.gold.current >= globalSpells.home.spellCost) {
               castingPlayer.gold.current -= globalSpells.home.spellCost;
-              const Kindale = this.Event.MapClass.getMapByIndex(4);
-              castingPlayer.map = Kindale;
-              this.discordHook.actionHook.send(`${castingPlayer.name} just cast ${spell}!\nTeleported back to ${Kindale.name}.`);
+              const randomHome = this.Event.MapClass.getRandomTown();
+              castingPlayer.map = randomHome;
+              this.discordHook.actionHook.send(`${castingPlayer.name} just cast ${spell}!\nTeleported back to ${randomHome.name}.`);
 
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
@@ -688,8 +695,32 @@ ${rankString}
   /**
    * Deletes all players in database
    */
-  deleteAllPlayers() {
-    return this.Database.resetAllPlayers();
+  deleteAllPlayers(discordBot) {
+    return this.Database.resetAllPlayers()
+      .then(this.updateLeaderboards(discordBot))
+      .then(() => {
+        const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
+        const announcementChannel = discordBot.guilds.find('id', guildID).channels.find('id', announcementChannelId);
+        const leaderboardMessages = leaderboardChannel.fetchMessages({ limit: 10 });
+        let resetMsg = '';
+        if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
+          leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
+        }
+        resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
+        announcementChannel.send(resetMsg);
+
+        this.config = {
+          multiplier: 1,
+          spells: {
+            activeBless: 0
+          },
+          dailyLottery: {
+            prizePool: 1500
+          }
+        };
+        this.Database.resetAllLogs();
+        this.Database.updateGame(this.confg);
+      });
   }
 
   /**

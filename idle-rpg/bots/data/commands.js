@@ -271,7 +271,7 @@ const commands = [
     command: '!lore',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, Helper) => {
+    function: (game, message) => {
       if (message.content.includes(' ')) {
         const splitMessage = message.content.split(/ (.+)/)[1].toLowerCase();
         const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage)
@@ -281,7 +281,7 @@ const commands = [
           return message.author.send(`${splitMessage} was not found. Did you type the map correctly?`);
         }
 
-        return message.author.send(`\`\`\`${Helper.capitalizeFirstLetter(splitMessage)}: ${requestedMap[0]}\`\`\``);
+        return message.author.send(`\`\`\`${splitMessage}: ${requestedMap[0]}\`\`\``);
       }
 
       return message.author.send('You must enter a map to retrieve its lore. Check `!help` for more info.');
@@ -659,8 +659,8 @@ const commands = [
     command: '!resetall',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      game.deleteAllPlayers()
+    function: (game, message, discordBot) => {
+      game.deleteAllPlayers(discordBot)
         .then(() => {
           message.author.send('Done.');
         });

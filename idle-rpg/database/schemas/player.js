@@ -26,7 +26,8 @@ const newPlayerObj = (discordId, name) => {
       current: 0,
       stolen: 0,
       stole: 0,
-      total: 0
+      total: 0,
+      dailyLottery: 0
     },
     isMentionInDiscord: 'on',
     isPrivateMessage: false,
@@ -71,11 +72,11 @@ const newPlayerObj = (discordId, name) => {
       mob: 0,
       player: 0,
       firstDeath: 'never'
-    }
+    },
+    quest: newQuest
   };
 };
 
-// TODO: update resetplayerobj with new database
 const resetPlayerObj = {
   class: 'Wanderer',
   health: 105,
@@ -153,7 +154,8 @@ const resetPlayerObj = {
     mob: 0,
     player: 0,
     firstDeath: 'never'
-  }
+  },
+  quest: newQuest,
 };
 
 const playerSchema = mongoose.Schema({

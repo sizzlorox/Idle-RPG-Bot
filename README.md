@@ -22,6 +22,7 @@ DISCORD_RPG_WELCOME_CHANNEL_ID=<Discord welcome channel ID here>
 DISCORD_RPG_CHANNEL_ID=<Discord action channel ID here>
 DISCORD_RPG_COMMAND_CHANNEL_ID=<Discord command channel ID here>
 DISCORD_RPG_FAQ_CHANNEL=<Discord FAQ channel ID here>
+DISCORD_RPG_ANNOUNCEMENT_CHANNEL=<Discord Announcement channel ID here>
 DISCORD_RPG_LEADERBOARDS_CHANNEL_ID=<Discord Leaderboard channel ID here>
 DISCORD_BOT_LOGIN_TOKEN=<Discord bot login token here>
 DISCORD_STREAM_PLUGIN_CHANNEL=<Discord Stream Plugin channel (NOT NEEDED)>

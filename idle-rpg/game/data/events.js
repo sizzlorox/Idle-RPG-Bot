@@ -56,11 +56,11 @@ function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, mult
 
     if (Math.floor(results.defenderDamage / (results.defender.length)) > 0) {
       mobListResult.push(`  ${mob.name}'s ${mob.equipment.weapon.name} did ${mob.dmgDealt} damage.
-${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`);
+  ${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`);
     }
   });
   let battleResult = `Battle Results:
-You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
+  You have ${selectedPlayer.health} / ${playerMaxHealth} HP left.
 ${mobListResult.join('\n')}`;
 
   if (selectedPlayer.health <= 0) {
@@ -78,7 +78,7 @@ ${mobListResult.join('\n')}`;
   const eventMsgResults = `↳ ${Helper.capitalizeFirstLetter(Helper.generateGenderString(selectedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${selectedPlayer.health}/${playerMaxHealth}]`;
 
   mobListInfo.mobs.forEach((mobInfo, i) => {
-    mobCountString = i > 0 ? mobCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
+    mobCountString = i > 0 ? mobCountString.concat(`, ${mobInfo.event.killed + mobInfo.event.fled}x \`${mobInfo.mob}\``) : mobCountString.concat(`${mobInfo.event.killed + mobInfo.event.fled}x \`${mobInfo.mob}\``);
     if (mobInfo.event.killed > 0) {
       mobKillCountString = mobKillCountString !== '' ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
     }
@@ -92,8 +92,8 @@ ${mobListResult.join('\n')}`;
       ? `${mobFleeCountString} just fled from ${Helper.generatePlayerName(results.attacker, true)}!\n`
       : `${Helper.generatePlayerName(results.attacker, true)} just fled from ${mobFleeCountString}!\n`);
     eventLog = eventLog.concat(results.attackerDamage > results.defenderDamage
-      ? `${mobFleeCountString} fled from you!\n`
-      : `You fled from ${mobFleeCountString}!\n`);
+      ? `${mobFleeCountString} fled from you! [${expGain}exp]\n`
+      : `You fled from ${mobFleeCountString}! [${expGain}exp]\n`);
   }
 
   if (mobKillCountString) {
@@ -129,7 +129,6 @@ const events = {
     movePlayer: (discordHook, Database, Helper, selectedPlayer, mapObj) => new Promise((resolve) => {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
-      selectedPlayer.map.previousLocation = previousMap.name;
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
       const eventLog = `Moved ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
 
@@ -794,7 +793,9 @@ const events = {
       hermes: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         let eventMsgHermes = '';
         let eventLogHermes = '';
-        if (selectedPlayer.gold.current < (selectedPlayer.gold.current / 6)) {
+        const goldTaken = Math.ceil(selectedPlayer.gold.current / 6);
+
+        if (selectedPlayer.gold.current < goldTaken) {
           eventMsgHermes = `Hermes demanded some gold from ${Helper.generatePlayerName(selectedPlayer, true)} but as ${Helper.generateGenderString(selectedPlayer, 'he')} had no money, Hermes left him alone.`;
           eventLogHermes = 'Hermes demanded gold from you but you had nothing to give';
 
@@ -805,8 +806,6 @@ const events = {
           ])
             .then(resolve(selectedPlayer));
         }
-
-        const goldTaken = Math.round(selectedPlayer.gold.current / 6);
         eventMsgHermes = `Hermes took ${goldTaken} gold from ${Helper.generatePlayerName(selectedPlayer, true)} by force. Probably he is just out of humor.`;
         eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
 

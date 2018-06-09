@@ -161,6 +161,8 @@ discordBot.on('ready', () => {
   discordBot.user.setActivity('Idle-RPG Game Master');
   discordBot.user.setStatus('idle');
   console.log('Idle RPG has been loaded!');
+  
+  game.updateLeaderboards(discordBot);
 
   console.log(`Interval delay: ${interval} minute(s)`);
   setInterval(heartBeat, 60000 * interval);
@@ -184,6 +186,10 @@ discordBot.on('message', async (message) => {
 
   if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
     return message.reply('┬─┬ノ(ಠ_ಠノ)');
+  }
+
+  if (message.content.includes('¯\_(ツ)_/¯')) {
+    return message.reply('¯\_(ツ)_/¯');
   }
 
   if (message.attachments && message.attachments.size > 0) {
