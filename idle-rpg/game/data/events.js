@@ -810,6 +810,7 @@ const events = {
         eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
 
         selectedPlayer.gold.current -= goldTaken;
+        selectedPlayer.gold.lost += goldTaken;
         if (selectedPlayer.gold.current < 0) {
           selectedPlayer.gold.current = 0;
         }
