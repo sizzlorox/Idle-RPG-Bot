@@ -816,7 +816,8 @@ ${rankString}
         .join('\n')}`)
       .then(async (rankString) => {
         const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
-        const msg = `\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0].includes('death') ? Object.keys(type)[0].replace('.', ' by ') : Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty').replace('spellCast', 'Spells Cast')}`}:
+        const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
+        const msg = `\`\`\`Top 10 ${subjectTitle}:
 ${rankString}\`\`\``;
 
         if (msgCount.size < types.length) {
