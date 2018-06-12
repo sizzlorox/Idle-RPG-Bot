@@ -63,6 +63,11 @@ const newPlayerObj = (discordId, name) => {
       mob: 0,
       player: 0
     },
+    fled: {
+      mob: 0,
+      player: 0,
+      you: 0
+    },
     battles: {
       won: 0,
       lost: 0,
@@ -144,6 +149,11 @@ const resetPlayerObj = {
   kills: {
     mob: 0,
     player: 0
+  },
+  fled: {
+    mob: 0,
+    player: 0,
+    you: 0
   },
   battles: {
     won: 0,
@@ -352,6 +362,20 @@ const playerSchema = mongoose.Schema({
       default: 0
     },
     lost: {
+      type: Number,
+      default: 0
+    }
+  },
+  fled: {
+    mob: {
+      type: Number,
+      default: 0
+    },
+    player: {
+      type: Number,
+      default: 0,
+    },
+    you: {
       type: Number,
       default: 0
     }

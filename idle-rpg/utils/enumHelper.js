@@ -226,6 +226,7 @@ const enumHelper = {
     stolen: 1,
     spells: 1,
     kills: 1,
+    fled: 1,
     battles: 1,
     deaths: 1,
     quest: 1,

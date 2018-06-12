@@ -524,6 +524,10 @@ class Helper {
     Kills:
       Monsters: ${player.kills.mob}
       Players: ${player.kills.player}
+    Fled:
+      Monsters: ${player.fled.mob}
+      Players: ${player.fled.player}
+      You: ${player.fled.you}
     Battles:
       Won: ${player.battles.won}
       Lost: ${player.battles.lost}
