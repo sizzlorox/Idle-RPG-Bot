@@ -237,6 +237,16 @@ const enumHelper = {
     name: 1,
     stats: 1,
     equipment: 1
-  }
+  },
+
+  leaderboardStats: [
+    { level: -1 },
+    { 'gold.current': -1 },
+    { spellCast: -1 },
+    { currentBounty: -1 },
+    { events: -1 },
+    { 'deaths.mob': -1 },
+    { 'deaths.player': -1 }
+  ]
 };
 module.exports = enumHelper;

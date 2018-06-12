@@ -796,7 +796,7 @@ ${rankString}
 
   updateLeaderboards(discordBot) {
     const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
-    const types = [{ level: -1 }, { 'gold.current': -1 }, { spellCast: -1 }, { currentBounty: -1 }, { events: -1 }];
+    const types = enumHelper.leaderboardStats;
 
     types.forEach((type, index) => this.Database.loadTop10(type)
       .then(top10 => `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
@@ -816,7 +816,7 @@ ${rankString}
         .join('\n')}`)
       .then(async (rankString) => {
         const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
-        const msg = `\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty').replace('spellCast', 'Spells Cast')}`}:
+        const msg = `\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0].includes('death') ? Object.keys(type)[0].replace('.', ' by ') : Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty').replace('spellCast', 'Spells Cast')}`}:
 ${rankString}\`\`\``;
 
         if (msgCount.size < types.length) {
