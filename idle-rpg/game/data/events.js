@@ -39,6 +39,7 @@ function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, mult
       mobListInfo.mobs[infoList].event.killed++;
     } else if (mob.health > 0 && selectedPlayer.health > 0) {
       mobListInfo.mobs[infoList].event.fled++;
+      mob.health > selectedPlayer.health ? selectedPlayer.fled.you++ : selectedPlayer.fled.mob++;
     }
 
     if (!selectedPlayer.quest.questMob.name.includes('None') && mob.name.includes(selectedPlayer.quest.questMob.name) && mob.health <= 0) {
@@ -324,6 +325,8 @@ const events = {
         attacker.experience.total += expGainAttacker;
         defender.experience.current += expGainDefender;
         defender.experience.total += expGainDefender;
+
+        defender.health > attacker.health ? attacker.fled.you++ && defender.fled.player++ : attacker.fled.player++ && defender.fled.you++;
 
         return Promise.all([
           Helper.sendMessage(discordHook, attacker, false, eventMsg),
@@ -810,6 +813,7 @@ const events = {
         eventLogHermes = `Hermes took ${goldTaken} gold from you. It will be spent in favor of Greek pantheon. He promises!`;
 
         selectedPlayer.gold.current -= goldTaken;
+        selectedPlayer.gold.lost += goldTaken;
         if (selectedPlayer.gold.current < 0) {
           selectedPlayer.gold.current = 0;
         }

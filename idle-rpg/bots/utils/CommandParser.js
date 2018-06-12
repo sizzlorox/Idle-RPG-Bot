@@ -1,5 +1,5 @@
 const commands = require('../data/commands');
-const { botOperator } = require('../../../settings');
+const { botOperator, commandChannel } = require('../../../settings');
 const { commandLog } = require('../../utils/logger');
 const moment = require('moment');
 
@@ -38,7 +38,7 @@ class CommandParser {
       return commandObj.function(game, messageObj, discordBot, this.Helper, hook);
     }
 
-    if (messageContent.startsWith('!')) {
+    if (messageContent.startsWith('!') && channelId === commandChannel) {
       return messageObj.author.send(`Please check !help for more info. ${messageContent} was an invalid command.`);
     }
   }
