@@ -246,7 +246,8 @@ const enumHelper = {
     { currentBounty: -1 },
     { events: -1 },
     { 'deaths.mob': -1 },
-    { 'deaths.player': -1 }
+    { 'deaths.player': -1 },
+    { 'kills.player': -1 }
   ]
 };
 module.exports = enumHelper;

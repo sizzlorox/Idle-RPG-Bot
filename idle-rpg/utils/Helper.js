@@ -742,5 +742,20 @@ class Helper {
 
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
   }
+
+  formatLeaderboards(subjectKey) {
+    if (subjectKey.includes('.')) {
+      if (subjectKey.split('.')[0].includes('death')) {
+        return subjectKey.replace('.', ' by ');
+      }
+      if (subjectKey.split('.')[0].includes('kills')) {
+        return subjectKey.replace('s.', 'ed ');
+      }
+
+      return subjectKey.split('.')[0];
+    }
+
+    return subjectKey.replace('currentBounty', 'Bounty').replace('spellCast', 'Spells Cast');
+  }
 }
 module.exports = Helper;
