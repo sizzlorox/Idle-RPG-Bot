@@ -2,6 +2,7 @@ const moment = require('moment');
 const Space = require('../modules/Space');
 const Crypto = require('../modules/Crypto');
 const Urban = require('../modules/Urban');
+const GitHub = require('../modules/Github');
 const maps = require('../../game/data/maps');
 const spells = require('../../game/data/globalSpells');
 const { commandChannel } = require('../../../settings');
@@ -698,6 +699,18 @@ const commands = [
               });
           });
       }
+    }
+  },
+
+  randomRepo = {
+    command: '!ranrepo',
+    function: (game, message) => {
+      GitHub.randomRepo()
+        .then((repoList) => {
+          const ranIndex = game.helperGetter().randomBetween(0, repoList.length);
+          const randomRepo = repoList[ranIndex];
+          message.reply(`\nRepo: ${randomRepo.name}\nOwner: ${randomRepo.owner.login}\n${randomRepo.url.replace('api.', '').replace('/repos', '')}`);
+        });
     }
   },
 

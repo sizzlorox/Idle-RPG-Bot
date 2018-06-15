@@ -30,10 +30,9 @@ class Event {
   // Move Events
   moveEvent(selectedPlayer) {
     let mapObj;
-
     do {
       mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
-    } while (mapObj.map.name === mapObj.previousLocation);
+    } while (mapObj.map.name === selectedPlayer.map.name || mapObj.map.name === selectedPlayer.previousMap);
 
     return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj);
   }
@@ -232,7 +231,7 @@ class Event {
   }
 
   chanceToCatchSnowflake(selectedPlayer) {
-    events.special.snowFlake(this.discordHook, this.Database, this.Helper, selectedPlayer);
+    return events.special.snowFlake(this.discordHook, this.Database, this.Helper, selectedPlayer);
   }
 
   /**
