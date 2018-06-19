@@ -199,6 +199,10 @@ const playerSchema = mongoose.Schema({
     }
   },
   map: mapSchema,
+  previousMap: {
+    type: String,
+    default: 'None'
+  },
   level: Number,
   gold: {
     current: {

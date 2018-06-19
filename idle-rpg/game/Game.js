@@ -44,7 +44,7 @@ class Game {
         });
     } else {
       this.config = {
-        multiplier: 1,
+        multiplier: 7,
         spells: {
           activeBless: 0
         },

@@ -14,7 +14,6 @@ class Map {
 
     switch (movement) {
       case 0:
-        // UP - Move down if at edge
         if (selectedPlayer.map.coords[1] === 0) {
           newCoords[1]++;
           return {
@@ -32,7 +31,6 @@ class Map {
         };
 
       case 1:
-        // Down - Move up if at edge
         if (selectedPlayer.map.coords[1] === mapSize[1]) {
           newCoords[1]--;
           return {
@@ -50,7 +48,6 @@ class Map {
         };
 
       case 2:
-        // Right - Move left if at edge
         if (selectedPlayer.map.coords[0] === mapSize[0]) {
           newCoords[0]--;
           return {
@@ -68,7 +65,6 @@ class Map {
         };
 
       case 3:
-        // Left - Move right if at edge
         if (selectedPlayer.map.coords[0] === 0) {
           newCoords[0]++;
           return {

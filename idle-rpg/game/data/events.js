@@ -32,7 +32,7 @@ function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, mult
       });
     }
     infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
-    expGain += Math.ceil(((mob.experience * multiplier) + (mob.dmgDealt / 4)) / 6);
+    expGain += Math.ceil(((mob.experience) + (mob.dmgDealt / 4)) / 6) * multiplier;
 
     if (mob.health <= 0) {
       goldGain += Math.floor((mob.gold * multiplier));
@@ -130,8 +130,9 @@ const events = {
     movePlayer: (discordHook, Database, Helper, selectedPlayer, mapObj) => new Promise((resolve) => {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
+      selectedPlayer.previousMap = previousMap.name;
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
-      const eventLog = `Moved ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
+      const eventLog = `Travelled ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
 
       return Promise.all([
         Helper.sendMessage(discordHook, selectedPlayer, true, eventMsg),
