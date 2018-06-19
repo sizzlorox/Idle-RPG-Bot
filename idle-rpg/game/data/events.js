@@ -32,7 +32,7 @@ function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, mult
       });
     }
     infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
-    expGain += Math.ceil(((mob.experience * multiplier) + (mob.dmgDealt / 4)) / 6);
+    expGain += Math.ceil(((mob.experience) + (mob.dmgDealt / 4)) / 6) * multiplier;
 
     if (mob.health <= 0) {
       goldGain += Math.floor((mob.gold * multiplier));
