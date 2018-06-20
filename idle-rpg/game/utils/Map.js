@@ -9,78 +9,80 @@ class Map {
   }
 
   moveToRandomMap(selectedPlayer) {
-    const movement = this.Helper.randomBetween(0, 3);
-    const newCoords = selectedPlayer.map.coords;
+    return new Promise((resolve) => {
+      const movement = this.Helper.randomBetween(0, 3);
+      const newCoords = selectedPlayer.map.coords;
 
-    switch (movement) {
-      case 0:
-        if (selectedPlayer.map.coords[1] === 0) {
-          newCoords[1]++;
-          return {
-            map: this.getMapByCoords(newCoords),
-            direction: 'South',
-            previousLocation: selectedPlayer.map.name
-          };
-        }
+      switch (movement) {
+        case 0:
+          if (selectedPlayer.map.coords[1] === 0) {
+            newCoords[1]++;
+            return resolve({
+              map: this.getMapByCoords(newCoords),
+              direction: 'South',
+              previousLocation: selectedPlayer.map.name
+            });
+          }
 
-        newCoords[1]--;
-        return {
-          map: this.getMapByCoords(newCoords),
-          direction: 'North',
-          previousLocation: selectedPlayer.map.name
-        };
-
-      case 1:
-        if (selectedPlayer.map.coords[1] === mapSize[1]) {
           newCoords[1]--;
-          return {
+          return resolve({
             map: this.getMapByCoords(newCoords),
             direction: 'North',
             previousLocation: selectedPlayer.map.name
-          };
-        }
+          });
 
-        newCoords[1]++;
-        return {
-          map: this.getMapByCoords(newCoords),
-          direction: 'South',
-          previousLocation: selectedPlayer.map.name
-        };
+        case 1:
+          if (selectedPlayer.map.coords[1] === mapSize[1]) {
+            newCoords[1]--;
+            return resolve({
+              map: this.getMapByCoords(newCoords),
+              direction: 'North',
+              previousLocation: selectedPlayer.map.name
+            });
+          }
 
-      case 2:
-        if (selectedPlayer.map.coords[0] === mapSize[0]) {
-          newCoords[0]--;
-          return {
+          newCoords[1]++;
+          return resolve({
             map: this.getMapByCoords(newCoords),
-            direction: 'West',
+            direction: 'South',
             previousLocation: selectedPlayer.map.name
-          };
-        }
+          });
 
-        newCoords[0]++;
-        return {
-          map: this.getMapByCoords(newCoords),
-          direction: 'East',
-          previousLocation: selectedPlayer.map.name
-        };
+        case 2:
+          if (selectedPlayer.map.coords[0] === mapSize[0]) {
+            newCoords[0]--;
+            return resolve({
+              map: this.getMapByCoords(newCoords),
+              direction: 'West',
+              previousLocation: selectedPlayer.map.name
+            });
+          }
 
-      case 3:
-        if (selectedPlayer.map.coords[0] === 0) {
           newCoords[0]++;
-          return {
+          return resolve({
             map: this.getMapByCoords(newCoords),
             direction: 'East',
             previousLocation: selectedPlayer.map.name
-          };
-        }
+          });
 
-        newCoords[0]--;
-        return {
-          map: this.getMapByCoords(newCoords),
-          direction: 'West',
-          previousLocation: selectedPlayer.map.name
-        };
-    }
+        case 3:
+          if (selectedPlayer.map.coords[0] === 0) {
+            newCoords[0]++;
+            return resolve({
+              map: this.getMapByCoords(newCoords),
+              direction: 'East',
+              previousLocation: selectedPlayer.map.name
+            });
+          }
+
+          newCoords[0]--;
+          return resolve({
+            map: this.getMapByCoords(newCoords),
+            direction: 'West',
+            previousLocation: selectedPlayer.map.name
+          });
+      }
+    });
   }
 
   getMapByCoords(coords) {

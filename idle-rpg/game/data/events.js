@@ -194,6 +194,25 @@ const events = {
       return resolve(selectedPlayer);
     }),
 
+    quest: (discordHook, Database, Helper, selectedPlayer, mob) => new Promise((resolve) => {
+      if (!selectedPlayer.quest.questMob.name.includes('None')) {
+        return resolve(selectedPlayer);
+      }
+
+      selectedPlayer.quest.questMob.name = mob;
+      selectedPlayer.quest.questMob.count = Helper.randomBetween(1, 15);
+      selectedPlayer.quest.questMob.killCount = 0;
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] Quest Master has asked ${Helper.generatePlayerName(selectedPlayer, true)} to kill ${selectedPlayer.quest.questMob.count === 1 ? 'a' : selectedPlayer.quest.questMob.count} ${mob}!`;
+      const eventLog = `Quest Master in ${selectedPlayer.map.name} asked you to kill ${selectedPlayer.quest.questMob.count === 1 ? 'a' : selectedPlayer.quest.questMob.count} ${mob}.`;
+
+      return Promise.all([
+        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
+        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
+        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
+      ])
+        .then(resolve(selectedPlayer));
+    }),
+
     /**
      * Purchases item from town
      * @param {Hooks} discordHook
@@ -544,25 +563,6 @@ const events = {
       }
 
       return resolve({ stealingPlayer, victimPlayer });
-    }),
-
-    quest: (discordHook, Database, Helper, selectedPlayer, mob) => new Promise((resolve) => {
-      if (!selectedPlayer.quest.questMob.includes('None')) {
-        return resolve(selectedPlayer);
-      }
-
-      selectedPlayer.quest.questMob = mob;
-      selectedPlayer.quest.count = Helper.randomBetween(1, 15);
-      selectedPlayer.quest.killCount = 0;
-      const eventMsg = `[\`${selectedPlayer.map.name}\`] Quest Master has asked ${Helper.generatePlayerName(selectedPlayer, true)} to kill ${selectedPlayer.quest.count === 1 ? 'a' : selectedPlayer.quest.count} ${mob}!`;
-      const eventLog = `Quest Master in ${selectedPlayer.map.name} asked you to kill ${selectedPlayer.quest.count === 1 ? 'a' : selectedPlayer.quest.count} ${mob}.`;
-
-      return Promise.all([
-        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-      ])
-        .then(resolve(selectedPlayer));
     }),
 
     dropItem: (discordHook, Database, Helper, selectedPlayer, mob, ItemManager, InventoryManager) => new Promise((resolve) => {

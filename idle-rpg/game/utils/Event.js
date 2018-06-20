@@ -28,13 +28,17 @@ class Event {
   }
 
   // Move Events
-  moveEvent(selectedPlayer) {
-    let mapObj;
-    do {
-      mapObj = this.MapManager.moveToRandomMap(selectedPlayer);
-    } while (mapObj.map.name === selectedPlayer.map.name || mapObj.map.name === selectedPlayer.previousMap);
+  moveEvent(selectedPlayer, multiplier) {
+    return this.MapManager.moveToRandomMap(selectedPlayer)
+      .then((mapObj) => {
+        if (mapObj.map.name === selectedPlayer.map.name || mapObj.map.name === selectedPlayer.previousMap) {
+          return this.MapManager.getTowns().includes(selectedPlayer.map.name)
+            ? this.generateQuestEvent(selectedPlayer)
+            : this.attackEventMob(selectedPlayer, multiplier);
+        }
 
-    return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj);
+        return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj);
+      });
   }
 
   attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, multiplier) {
@@ -119,7 +123,7 @@ class Event {
 
   generateQuestEvent(selectedPlayer) {
     return this.MonsterManager.generateQuestMonster(selectedPlayer)
-      .then(mob => events.quest(this.discordHook, this.Database, this.Helper, selectedPlayer, mob));
+      .then(mob => events.town.quest(this.discordHook, this.Database, this.Helper, selectedPlayer, mob));
   }
 
   // Luck Events
