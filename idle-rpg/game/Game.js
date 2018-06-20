@@ -124,7 +124,7 @@ class Game {
 
   moveEvent(selectedPlayer) {
     return new Promise((resolve) => {
-      return this.Event.moveEvent(selectedPlayer)
+      return this.Event.moveEvent(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
         .then(updatedPlayer => resolve(updatedPlayer));
     });
   }
