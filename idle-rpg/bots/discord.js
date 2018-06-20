@@ -161,7 +161,7 @@ discordBot.on('ready', () => {
   discordBot.user.setActivity('Idle-RPG Game Master');
   discordBot.user.setStatus('idle');
   console.log('Idle RPG has been loaded!');
-  
+
   game.updateLeaderboards(discordBot);
 
   console.log(`Interval delay: ${interval} minute(s)`);
@@ -192,7 +192,7 @@ discordBot.on('message', async (message) => {
     return message.reply('¯\_(ツ)_/¯');
   }
 
-  if (message.attachments && message.attachments.size > 0) {
+  if (process.env.VIRUS_TOTAL_APIKEY && message.attachments && message.attachments.size > 0) {
     const { url } = message.attachments.array()[0];
 
     return VirusTotal.scanUrl(url)
