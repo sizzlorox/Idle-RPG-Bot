@@ -136,6 +136,7 @@ const events = {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
       selectedPlayer.previousMap = previousMap.name;
+      selectedPlayer.travelled++;
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
       const eventLog = `Travelled ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
 
