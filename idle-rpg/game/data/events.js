@@ -56,6 +56,7 @@ function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, mult
         selectedPlayer.quest.questMob.killCount = 0;
         selectedPlayer.quest.completed++;
       }
+      selectedPlayer.quest.updated_at = new Date();
     }
 
     if (Math.floor(results.defenderDamage / (results.defender.length)) > 0) {
@@ -135,7 +136,6 @@ const events = {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
       selectedPlayer.previousMap = previousMap.name;
-      console.log(`PreviousMap: ${previousMap.coords} | newMap: ${mapObj.map.coords}`);
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
       const eventLog = `Travelled ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
 
@@ -207,6 +207,7 @@ const events = {
       selectedPlayer.quest.questMob.name = mob;
       selectedPlayer.quest.questMob.count = Helper.randomBetween(1, 15);
       selectedPlayer.quest.questMob.killCount = 0;
+      selectedPlayer.quest.updated_at = new Date();
       const eventMsg = `[\`${selectedPlayer.map.name}\`] Quest Master has asked ${Helper.generatePlayerName(selectedPlayer, true)} to kill ${selectedPlayer.quest.questMob.count === 1 ? 'a' : selectedPlayer.quest.questMob.count} ${mob}!`;
       const eventLog = `Quest Master in ${selectedPlayer.map.name} asked you to kill ${selectedPlayer.quest.questMob.count === 1 ? 'a' : selectedPlayer.quest.questMob.count} ${mob}.`;
 

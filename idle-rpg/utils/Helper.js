@@ -516,9 +516,10 @@ class Helper {
       Count: ${player.quest.questMob.count}
       Kills Left: ${player.quest.questMob.count - player.quest.questMob.killCount}
       Completed: ${player.quest.completed}
-      Last Update: ${this.secondsToTimeFormat(Math.floor((new Date().getTime() - player.quest.updated_at.getTime()) / 1000))}
+      Last Update: ${this.getTimePassed(player.quest.updated_at.getTime())}
 
     Born: ${this.getTimePassed(player.createdAt)}
+    Travelled: ${player.travelled}
     Events: ${player.events}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
