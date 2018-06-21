@@ -437,7 +437,7 @@ class Helper {
           selectedPlayer.deaths.mob++;
         } else {
           if (selectedPlayer.currentBounty > 0) {
-            const bountyGain = selectedPlayer.currentBounty / 4;
+            const bountyGain = selectedPlayer.currentBounty / 1.25;
             const bountyEventLog = `Claimed ${bountyGain} gold for ${selectedPlayer.name}'s head`;
             attackerObj.gold.current += Number(bountyGain);
             attackerObj.gold.total += Number(bountyGain);
