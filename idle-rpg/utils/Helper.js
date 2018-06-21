@@ -437,19 +437,20 @@ class Helper {
           selectedPlayer.deaths.mob++;
         } else {
           if (selectedPlayer.currentBounty > 0) {
-            const bountyGain = selectedPlayer.currentBounty / 4;
+            const bountyGain = Math.ceil(selectedPlayer.currentBounty / 1.25);
             const bountyEventLog = `Claimed ${bountyGain} gold for ${selectedPlayer.name}'s head`;
             attackerObj.gold.current += Number(bountyGain);
             attackerObj.gold.total += Number(bountyGain);
+            selectedPlayer.currentBounty = 0;
             this.sendMessage(hook, selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
               .then(this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
               .then(this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true))
               .then(this.logEvent(attackerObj, Database, bountyEventLog, enumHelper.logTypes.action));
-            selectedPlayer.currentBounty = 0;
           }
 
           selectedPlayer.deaths.player++;
           attackerObj.kills.player++;
+          Database.savePlayer(attackerObj);
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`);
@@ -515,9 +516,10 @@ class Helper {
       Count: ${player.quest.questMob.count}
       Kills Left: ${player.quest.questMob.count - player.quest.questMob.killCount}
       Completed: ${player.quest.completed}
-      Last Update: ${this.secondsToTimeFormat(Math.floor((new Date().getTime() - player.quest.updated_at.getTime()) / 1000))}
+      Last Update: ${this.getTimePassed(player.quest.updated_at.getTime())}
 
     Born: ${this.getTimePassed(player.createdAt)}
+    Travelled: ${player.travelled}
     Events: ${player.events}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
@@ -746,11 +748,17 @@ class Helper {
 
   formatLeaderboards(subjectKey) {
     if (subjectKey.includes('.')) {
-      if (subjectKey.split('.')[0].includes('death')) {
-        return subjectKey.replace('.', ' by ');
+      if (subjectKey.includes('deaths.mob')) {
+        return subjectKey.replace('deaths.mob', 'Killed by mob');
       }
-      if (subjectKey.split('.')[0].includes('kills')) {
-        return subjectKey.replace('s.', 'ed ');
+      if (subjectKey.includes('deaths.player')) {
+        return subjectKey.replace('deaths.player', 'Killed by player');
+      }
+      if (subjectKey.includes('kills.player')) {
+        return subjectKey.replace('kills.player', 'Player kills');
+      }
+      if (subjectKey.includes('quest.complete')) {
+        return subjectKey.replace('quest.complete', 'Completed Quests')
       }
 
       return subjectKey.split('.')[0];

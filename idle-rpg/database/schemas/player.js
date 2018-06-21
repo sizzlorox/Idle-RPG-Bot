@@ -384,10 +384,17 @@ const playerSchema = mongoose.Schema({
       default: 0
     }
   },
+  travelled: {
+    type: Number,
+    default: 0
+  },
   deaths: {
     mob: Number,
     player: Number,
-    firstDeath: String
+    firstDeath: {
+      type: String,
+      default: 'never'
+    }
   },
   quest: {
     type: questSchema,
