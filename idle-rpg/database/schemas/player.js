@@ -387,7 +387,10 @@ const playerSchema = mongoose.Schema({
   deaths: {
     mob: Number,
     player: Number,
-    firstDeath: String
+    firstDeath: {
+      type: String,
+      default: 'never'
+    }
   },
   quest: {
     type: questSchema,
