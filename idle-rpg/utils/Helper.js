@@ -748,11 +748,17 @@ class Helper {
 
   formatLeaderboards(subjectKey) {
     if (subjectKey.includes('.')) {
-      if (subjectKey.split('.')[0].includes('death')) {
-        return subjectKey.replace('.', ' by ');
+      if (subjectKey.includes('deaths.mob')) {
+        return subjectKey.replace('deaths.mob', 'Killed by mob');
       }
-      if (subjectKey.split('.')[0].includes('kills')) {
-        return subjectKey.replace('s.', 'ed ');
+      if (subjectKey.includes('deaths.player')) {
+        return subjectKey.replace('deaths.player', 'Killed by player');
+      }
+      if (subjectKey.includes('kills.player')) {
+        return subjectKey.replace('kills.player', 'Player kills');
+      }
+      if (subjectKey.includes('quest.complete')) {
+        return subjectKey.replace('quest.complete', 'Completed Quests')
       }
 
       return subjectKey.split('.')[0];

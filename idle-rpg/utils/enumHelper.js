@@ -254,7 +254,8 @@ const enumHelper = {
     { events: -1 },
     { 'deaths.mob': -1 },
     { 'deaths.player': -1 },
-    { 'kills.player': -1 }
+    { 'kills.player': -1 },
+    { 'quest.completed': -1 }
   ]
 };
 module.exports = enumHelper;
