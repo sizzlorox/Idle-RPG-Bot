@@ -441,15 +441,16 @@ class Helper {
             const bountyEventLog = `Claimed ${bountyGain} gold for ${selectedPlayer.name}'s head`;
             attackerObj.gold.current += Number(bountyGain);
             attackerObj.gold.total += Number(bountyGain);
+            selectedPlayer.currentBounty = 0;
             this.sendMessage(hook, selectedPlayer, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${selectedPlayer.name}!`))
               .then(this.sendPrivateMessage(hook, selectedPlayer, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true))
               .then(this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true))
               .then(this.logEvent(attackerObj, Database, bountyEventLog, enumHelper.logTypes.action));
-            selectedPlayer.currentBounty = 0;
           }
 
           selectedPlayer.deaths.player++;
           attackerObj.kills.player++;
+          Database.savePlayer(attackerObj);
         }
 
         const eventMsg = this.setImportantMessage(`${selectedPlayer.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`);

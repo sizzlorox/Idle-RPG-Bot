@@ -231,7 +231,11 @@ const enumHelper = {
     fled: 1,
     battles: 1,
     deaths: 1,
-    quest: 1,
+    'quest.questMob.name': 1,
+    'quest.questMob.count': 1,
+    'quest.questMob.killCount': 1,
+    'quest.completed': 1,
+    'quest.updated_at': 1,
     spellCast: 1
   },
 

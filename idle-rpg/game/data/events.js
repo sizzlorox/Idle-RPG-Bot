@@ -131,6 +131,7 @@ const events = {
       const previousMap = selectedPlayer.map;
       selectedPlayer.map = mapObj.map;
       selectedPlayer.previousMap = previousMap.name;
+      console.log (`PreviousMap: ${previousMap.coords} | newMap: ${mapObj.map.coords}`);
       const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
       const eventLog = `Travelled ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
 
