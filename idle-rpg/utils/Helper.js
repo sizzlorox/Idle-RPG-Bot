@@ -757,8 +757,8 @@ class Helper {
       if (subjectKey.includes('kills.player')) {
         return subjectKey.replace('kills.player', 'Player kills');
       }
-      if (subjectKey.includes('quest.complete')) {
-        return subjectKey.replace('quest.complete', 'Completed Quests')
+      if (subjectKey.includes('quest.completed')) {
+        return subjectKey.replace('quest.completed', 'Completed Quests')
       }
 
       return subjectKey.split('.')[0];
