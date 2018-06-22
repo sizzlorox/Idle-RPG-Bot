@@ -91,6 +91,7 @@ const resetPlayerObj = {
     lost: 0,
     total: 0
   },
+  personalMultiplier: 0,
   level: 1,
   gold: {
     current: 0,

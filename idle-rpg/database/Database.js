@@ -376,6 +376,24 @@ class Database {
       }));
   }
 
+  resetPersonalMultipliers() {
+    return new Promise((resolve, reject) => Player.update({},
+      {
+        $set: {
+          personalMultiplier: 0
+        }
+      },
+      {
+        multi: true
+      }, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(result);
+      }));
+  }
+
   resetAllLogs() {
     return new Promise((resolve, reject) => MoveLog.update({}, {}, { mulit: true }, (err, result) => {
       if (err) {

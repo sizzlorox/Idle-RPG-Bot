@@ -41,7 +41,8 @@ class Game {
               this.Database.updateGame(this.config);
             }, 1800000 + (5000 * i));
           }
-        });
+        })
+        .then(() => this.Database.resetPersonalMultipliers());
     } else {
       this.config = {
         multiplier: 7,
@@ -82,6 +83,7 @@ class Game {
       })
       .then((selectedPlayer) => {
         selectedPlayer.events++;
+        console.log(`${selectedPlayer.name} - ${selectedPlayer.personalMultiplier}x`);
 
         // TODO remove this later
         if (!selectedPlayer.quest) {
