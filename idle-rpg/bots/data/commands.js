@@ -807,6 +807,10 @@ const commands = [
             })[0];
             definition = definition.replace('****', `\`${game.helperGetter().capitalizeFirstLetter(wordDefinition.word).replace('+', ' ')}\``);
 
+            if (definition.length >= 2000) {
+              return message.reply('The result of this search was more than 2000 characters (Discords message limit) and I`m too lazy to split it for you. Have a nice day.');
+            }
+
             return message.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`));
           });
       }
