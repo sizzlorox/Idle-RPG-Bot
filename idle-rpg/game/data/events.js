@@ -98,8 +98,8 @@ ${mobListResult.join('\n')}`;
       ? `${mobFleeCountString} just fled from ${Helper.generatePlayerName(results.attacker, true)}!\n`
       : `${Helper.generatePlayerName(results.attacker, true)} just fled from ${mobFleeCountString}!\n`);
     eventLog = eventLog.concat(results.attackerDamage > results.defenderDamage
-      ? `${mobFleeCountString} fled from you! [${expGain}exp]\n`
-      : `You fled from ${mobFleeCountString}! [${expGain}exp]\n`);
+      ? `${mobFleeCountString} fled from you! [${expGain} exp]\n`
+      : `You fled from ${mobFleeCountString}! [${expGain} exp]\n`);
   }
 
   if (mobKillCountString) {
