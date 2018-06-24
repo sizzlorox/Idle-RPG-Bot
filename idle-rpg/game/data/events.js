@@ -283,7 +283,10 @@ const events = {
           const randomPlayerIndex = Helper.randomBetween(0, sameMapPlayers.length - 1);
           let randomPlayer;
           if (playersWithBounty.length > 0) {
-            playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
+            if (playersWithBounty.length > 1) {
+              playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
+            }
+
             const diceMax = playersWithBounty[0].chance;
             const randomDice = Helper.randomBetween(0, diceMax);
             const filteredBountyPlayers = playersWithBounty.filter(player => player.chance >= randomDice);
