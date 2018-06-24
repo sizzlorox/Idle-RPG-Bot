@@ -1,5 +1,5 @@
 const enumHelper = require('../../utils/enumHelper');
-const { pvpLevelRestriction } = require('../../../settings');
+const { pvpLevelRestriction, maximumTimer } = require('../../../settings');
 const { errorLog } = require('../../utils/logger');
 
 function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, multiplier) {
@@ -912,7 +912,7 @@ const events = {
       dionysus: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         // Might overwrite his event if currently saving if he fired and event at the same time.
         const increaseMult = Helper.randomBetween(1, 3);
-        const timeLimit = Helper.randomBetween(10000, 1800000);
+        const timeLimit = Helper.randomBetween(maximumTimer * 60000, (maximumTimer * 15) * 60000);
 
         const eventMsgDionysus = `Dionysus has partied with ${Helper.generatePlayerName(selectedPlayer, true)} increasing ${Helper.generateGenderString(selectedPlayer, 'his')} multiplier by ${increaseMult} for ${Math.floor(timeLimit / 60000)} minutes!`;
         const eventLogDionysus = `Dionysus partied with you increasing your multiplier by ${increaseMult} for ${Math.ceil(timeLimit / 60000)} minutes!`;
