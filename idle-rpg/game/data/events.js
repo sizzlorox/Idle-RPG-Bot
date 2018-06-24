@@ -50,7 +50,7 @@ function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, mult
       if (selectedPlayer.quest.questMob.killCount >= selectedPlayer.quest.questMob.count) {
         isQuestCompleted = true;
         questExpGain = Math.ceil((expGain * selectedPlayer.quest.questMob.count) / 2);
-        questGoldGain = Math.ceil(goldGain * selectedPlayer.quest.questMob.count) / 2);
+        questGoldGain = Math.ceil((goldGain * selectedPlayer.quest.questMob.count) / 2);
         selectedPlayer.quest.questMob.name = 'None';
         selectedPlayer.quest.questMob.count = 0;
         selectedPlayer.quest.questMob.killCount = 0;
