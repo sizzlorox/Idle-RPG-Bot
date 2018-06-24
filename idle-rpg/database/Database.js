@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { mongoDBUri } = require('../../settings');
+const { mongoDBUri, botID } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
 
@@ -251,7 +251,7 @@ class Database {
     const select = {
       name: 1
     };
-    const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.name);
+    const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.discordId).concat(botID);
     enumHelper.mockPlayers.map(npc => npc.name).forEach(npc => removeNpcs.push(npc));
 
     select[Object.keys(type)[0]] = 1;
@@ -261,7 +261,7 @@ class Database {
       type['experience.current'] = -1;
     }
     const query = {
-      name: { $nin: removeNpcs, $exists: true }
+      discordId: { $nin: removeNpcs, $exists: true }
     };
 
     return new Promise((resolve, reject) => Player.find(query, (err, result) => {

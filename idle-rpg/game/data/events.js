@@ -1,5 +1,5 @@
 const enumHelper = require('../../utils/enumHelper');
-const { pvpLevelRestriction } = require('../../../settings');
+const { pvpLevelRestriction, maximumTimer } = require('../../../settings');
 const { errorLog } = require('../../utils/logger');
 
 function pveMessageFormat(Helper, results, selectedPlayer, playerMaxHealth, multiplier) {
@@ -276,10 +276,29 @@ const events = {
         const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
           && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
           && player.level <= selectedPlayer.level + pvpLevelRestriction && player.level >= selectedPlayer.level - pvpLevelRestriction);
+        const playersWithBounty = sameMapPlayers.filter(player => player.currentBounty !== 0)
+          .map(player => player.chance = Math.floor((player.currentBounty * Math.log(1.2)) / 100));
 
         if (sameMapPlayers.length > 0 && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
           const randomPlayerIndex = Helper.randomBetween(0, sameMapPlayers.length - 1);
-          const randomPlayer = sameMapPlayers[randomPlayerIndex];
+          let randomPlayer;
+          if (playersWithBounty.length > 0 && Helper.randomBetween(0, 100) >= 50) {
+            if (playersWithBounty.length > 1) {
+              playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
+            }
+
+            const diceMax = playersWithBounty[0].chance;
+            const randomDice = Helper.randomBetween(0, diceMax);
+            const filteredBountyPlayers = playersWithBounty.filter(player => player.chance >= randomDice);
+            if (filteredBountyPlayers.length > 0) {
+              const filteredBountyPlayersIndex = Helper.randomBetween(0, filteredBountyPlayers.length - 1);
+              randomPlayer = filteredBountyPlayers[filteredBountyPlayersIndex];
+            } else {
+              randomPlayer = sameMapPlayers[randomPlayerIndex];
+            }
+          } else {
+            randomPlayer = sameMapPlayers[randomPlayerIndex];
+          }
 
           if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name && randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
             return resolve({ randomPlayer });
@@ -699,14 +718,13 @@ const events = {
     }),
 
     gambling: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
-      if (selectedPlayer.gold.current < 10) {
+      const luckGambleChance = Helper.randomBetween(0, 100);
+      const luckGambleGold = Math.floor(2 * ((Math.log(selectedPlayer.gold.current) * selectedPlayer.gold.current) / 100));
+      if (selectedPlayer.gold.current < luckGambleGold) {
         return resolve(selectedPlayer);
       }
 
-      const luckGambleChance = Helper.randomBetween(0, 100);
-      const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold.current / 10, selectedPlayer.gold.current / 3));
       selectedPlayer.gambles++;
-
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
         const { eventMsg, eventLog } = Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
         selectedPlayer.gold.current -= luckGambleGold;
@@ -894,7 +912,7 @@ const events = {
       dionysus: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
         // Might overwrite his event if currently saving if he fired and event at the same time.
         const increaseMult = Helper.randomBetween(1, 3);
-        const timeLimit = Helper.randomBetween(10000, 1800000);
+        const timeLimit = Helper.randomBetween(maximumTimer * 60000, (maximumTimer * 15) * 60000);
 
         const eventMsgDionysus = `Dionysus has partied with ${Helper.generatePlayerName(selectedPlayer, true)} increasing ${Helper.generateGenderString(selectedPlayer, 'his')} multiplier by ${increaseMult} for ${Math.floor(timeLimit / 60000)} minutes!`;
         const eventLogDionysus = `Dionysus partied with you increasing your multiplier by ${increaseMult} for ${Math.ceil(timeLimit / 60000)} minutes!`;

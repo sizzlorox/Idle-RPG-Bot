@@ -3,6 +3,9 @@ const settings = {
   battleDebug: false,
   eventDebug: false,
   pvpLevelRestriction: 5,
+  botID: process.env.NODE_ENV.includes('production')
+    ? process.env.DISCORD_BOT_ID
+    : process.env.TEST_DISCORD_BOT_ID,
   guildID: process.env.NODE_ENV.includes('production')
     ? process.env.GUILD_ID
     : process.env.TEST_GUILD_ID,
