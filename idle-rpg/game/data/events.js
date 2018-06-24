@@ -276,10 +276,26 @@ const events = {
         const sameMapPlayers = mappedPlayers.filter(player => player.name !== selectedPlayer.name
           && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
           && player.level <= selectedPlayer.level + pvpLevelRestriction && player.level >= selectedPlayer.level - pvpLevelRestriction);
+        const playersWithBounty = sameMapPlayers.filter(player => player.currentBounty !== 0)
+          .map(player => player.chance = Math.floor((player1.currentBounty * Math.log(1.2)) / 100))
+          .sort(player1, player2 => player2.chance - player1.chance);
 
         if (sameMapPlayers.length > 0 && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
           const randomPlayerIndex = Helper.randomBetween(0, sameMapPlayers.length - 1);
-          const randomPlayer = sameMapPlayers[randomPlayerIndex];
+          let randomPlayer;
+          if (playersWithBounty.length > 0) {
+            const diceMax = playersWithBounty[0].chance;
+            const randomDice = Helper.randomBetween(0, diceMax);
+            const filteredBountyPlayers = playersWithBounty.filter(player => player.chance >= randomDice);
+            if (filteredBountyPlayers.length > 0) {
+              const filteredBountyPlayersIndex = Helper.randomBetween(0, filteredBountyPlayers.length - 1);
+              randomPlayer = filteredBountyPlayers[filteredBountyPlayersIndex];
+            } else {
+              randomPlayer = sameMapPlayers[randomPlayerIndex];
+            }
+          } else {
+            randomPlayer = sameMapPlayers[randomPlayerIndex];
+          }
 
           if (selectedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name && randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
             return resolve({ randomPlayer });

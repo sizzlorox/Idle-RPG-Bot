@@ -131,24 +131,8 @@ const enumHelper = {
     }
   ],
 
-  mockPlayers: [
-    {
-      name: 'Statcheck01',
-      discordId: 'Statcheck01'
-    },
-    // {
-    //   name: 'Statcheck02',
-    //   discordId: 'Statcheck02'
-    // },
-    // {
-    //   name: 'Statcheck03',
-    //   discordId: 'Statcheck03'
-    // },
-    // {
-    //   name: 'Statcheck04',
-    //   discordId: 'Statcheck04'
-    // }
-  ],
+  // if .fill(undefined) is not used to fill the array with any data, the undefined pointers make the array return as [] with a length of 30 even while mapping.
+  mockPlayers: new Array(30).fill(undefined).map((obj, index) => Object.create({ name: `MockedTester${index}`, discordId: `MockedTester${index}` })),
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
   genders: {

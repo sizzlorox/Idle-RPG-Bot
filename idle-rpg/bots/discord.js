@@ -74,9 +74,9 @@ let guildName;
 
 console.log(`Current ENV: ${process.env.NODE_ENV}`);
 if (!process.env.NODE_ENV.includes('production')) {
-  console.log('Mock Players loaded');
   onlinePlayerList = mockPlayers;
   guildName = 'Idle-RPG-TEST';
+  console.log(`${mockPlayers.length} Mock Players loaded`);
 } else {
   onlinePlayerList.push({
     name: 'Pyddur, God of Beer',
