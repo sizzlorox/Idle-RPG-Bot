@@ -264,6 +264,10 @@ ${rankString}
       });
   }
 
+  checkMultiplier() {
+    return `Current Multiplier: ${this.config.multiplier}x\nActive Bless: ${this.config.spells.activeBless}x`;
+  }
+
   getRank(commandAuthor, type = { level: -1 }) {
     return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then(player => this.Database.loadCurrentRank(player, type))
