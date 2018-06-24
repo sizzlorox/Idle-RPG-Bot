@@ -24,6 +24,7 @@ const commands = [
         !c, !char, !character - Sends PM with your stats and equipment
         !c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-sensitive)
         !m, !map - Displays the worlds locations
+        !multi, !multiplier - Displays current multiplier
         !cs, !castspell - Lists spells available to cast
         !cs, !castspell <spell> - Casts a global spell onto Idle-RPG\`\`\``;
       const helpMsg2 = `\`\`\`        !el, !eventlog - Lists up to 15 past events
@@ -251,6 +252,16 @@ const commands = [
     function: (game, message) => {
       game.prizePool()
         .then(msg => message.author.send(msg));
+    }
+  },
+
+  command = {
+    command: ['!multiplier', '!multi'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (game, message) => {
+      const result = game.checkMultiplier();
+      message.author.send(result);
     }
   },
 
