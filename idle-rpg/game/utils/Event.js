@@ -78,8 +78,7 @@ class Event {
         }
 
         return battleResults;
-      })
-      .catch(err => console.log);
+      });
   }
 
   attackEventMob(selectedPlayer, multiplier) {
@@ -100,25 +99,21 @@ class Event {
           case enumHelper.battle.outcomes.lost:
             return this.Helper.checkHealth(this.MapManager, battleResults.updatedPlayer, battleResults.updatedMob, this.Database, this.discordHook);
         }
-      })
-      .catch(err => console.log);
+      });
   }
 
   // Item Events
   generateTownItemEvent(selectedPlayer) {
     return this.ItemManager.generateItem(selectedPlayer)
-      .then(item => events.town.item(this.discordHook, this.Database, this.Helper, selectedPlayer, item, this.InventoryManager))
-      .catch(err => console.log);
+      .then(item => events.town.item(this.discordHook, this.Database, this.Helper, selectedPlayer, item, this.InventoryManager));
   }
 
   sellInTown(selectedPlayer) {
-    return events.town.sell(this.discordHook, this.Database, this.Helper, selectedPlayer)
-      .catch(err => console.log);
+    return events.town.sell(this.discordHook, this.Database, this.Helper, selectedPlayer);
   }
 
   campEvent(selectedPlayer) {
-    return events.camp(this.discordHook, this.Database, this.Helper, selectedPlayer)
-      .catch(err => console.log);
+    return events.camp(this.discordHook, this.Database, this.Helper, selectedPlayer);
   }
 
   generateQuestEvent(selectedPlayer) {
@@ -197,8 +192,7 @@ class Event {
   }
 
   generateGamblingEvent(selectedPlayer) {
-    return events.luck.gambling(this.discordHook, this.Database, this.Helper, selectedPlayer)
-      .catch(err => console.log);
+    return events.luck.gambling(this.discordHook, this.Database, this.Helper, selectedPlayer);
   }
 
   /**

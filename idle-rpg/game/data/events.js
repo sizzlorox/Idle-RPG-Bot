@@ -277,13 +277,13 @@ const events = {
           && onlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) !== -1
           && player.level <= selectedPlayer.level + pvpLevelRestriction && player.level >= selectedPlayer.level - pvpLevelRestriction);
         const playersWithBounty = sameMapPlayers.filter(player => player.currentBounty !== 0)
-          .map(player => player.chance = Math.floor((player.currentBounty * Math.log(1.2)) / 100))
-          .sort(player1, player2 => player2.chance - player1.chance);
+          .map(player => player.chance = Math.floor((player.currentBounty * Math.log(1.2)) / 100));
 
         if (sameMapPlayers.length > 0 && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
           const randomPlayerIndex = Helper.randomBetween(0, sameMapPlayers.length - 1);
           let randomPlayer;
           if (playersWithBounty.length > 0) {
+            playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
             const diceMax = playersWithBounty[0].chance;
             const randomDice = Helper.randomBetween(0, diceMax);
             const filteredBountyPlayers = playersWithBounty.filter(player => player.chance >= randomDice);
@@ -715,14 +715,13 @@ const events = {
     }),
 
     gambling: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
-      if (selectedPlayer.gold.current < 10) {
+      const luckGambleChance = Helper.randomBetween(0, 100);
+      const luckGambleGold = Math.floor((Math.log(selectedPlayer.gold.current) * selectedPlayer.gold.current) / 100);
+      if (selectedPlayer.gold.current < luckGambleGold) {
         return resolve(selectedPlayer);
       }
 
-      const luckGambleChance = Helper.randomBetween(0, 100);
-      const luckGambleGold = Math.round(Helper.randomBetween(selectedPlayer.gold.current / 10, selectedPlayer.gold.current / 3));
       selectedPlayer.gambles++;
-
       if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
         const { eventMsg, eventLog } = Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
         selectedPlayer.gold.current -= luckGambleGold;
