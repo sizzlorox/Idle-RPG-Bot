@@ -20,7 +20,8 @@ const {
   botLoginToken,
   minimalTimer,
   maximumTimer,
-  guildID
+  guildID,
+  botID
 } = require('../../settings');
 
 const webHookOptions = {
@@ -174,6 +175,10 @@ discordBot.on('error', (err) => {
 });
 
 discordBot.on('message', async (message) => {
+  if (message.author.id === botID) {
+    return;
+  }
+
   if (message.content.startsWith('!cs') || message.content.startsWith('!castspell')) {
     await Antispam.logAuthor(message.author.id);
     await Antispam.logMessage(message.author.id, message.content);

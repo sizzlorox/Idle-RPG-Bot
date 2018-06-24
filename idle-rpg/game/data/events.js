@@ -716,7 +716,7 @@ const events = {
 
     gambling: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
       const luckGambleChance = Helper.randomBetween(0, 100);
-      const luckGambleGold = Math.floor((Math.log(selectedPlayer.gold.current) * selectedPlayer.gold.current) / 100);
+      const luckGambleGold = Math.floor(2 * ((Math.log(selectedPlayer.gold.current) * selectedPlayer.gold.current) / 100));
       if (selectedPlayer.gold.current < luckGambleGold) {
         return resolve(selectedPlayer);
       }
