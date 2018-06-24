@@ -282,7 +282,7 @@ const events = {
         if (sameMapPlayers.length > 0 && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
           const randomPlayerIndex = Helper.randomBetween(0, sameMapPlayers.length - 1);
           let randomPlayer;
-          if (playersWithBounty.length > 0) {
+          if (playersWithBounty.length > 0 && Helper.randomBetween(0, 100) >= 50) {
             if (playersWithBounty.length > 1) {
               playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
             }
