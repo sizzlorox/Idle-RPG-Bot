@@ -150,7 +150,7 @@ class Helper {
 
   sendPrivateMessage(discordHook, player, msg, isImportantMessage) {
     return new Promise((resolve) => {
-      if (player && player.isPrivateMessage && process.env.includes('production')) {
+      if (player && player.isPrivateMessage && process.env.NODE_ENV.includes('production')) {
         if (player.isPrivateMessageImportant && !isImportantMessage) {
           return resolve();
         }
