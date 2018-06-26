@@ -5,6 +5,7 @@ const Urban = require('../modules/Urban');
 const GitHub = require('../modules/Github');
 const maps = require('../../game/data/maps');
 const spells = require('../../game/data/globalSpells');
+const enumHelper = require('../../utils/enumHelper');
 const { commandChannel } = require('../../../settings');
 
 const commands = [
@@ -54,13 +55,17 @@ const commands = [
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
-        if (playerObj.size === 0) {
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot).array();
+        if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           message.author.send(`${checkPlayer} was not found!`);
           return;
+        } else if (process.env.NODE_ENV.includes('development')) {
+          playerObj.push({
+            id: checkPlayer
+          });
         }
 
-        return game.playerStats(playerObj.array()[0])
+        return game.playerStats(playerObj[0])
           .then((playerStats) => {
             if (!playerStats) {
               return message.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
@@ -95,13 +100,17 @@ const commands = [
       if (message.content.includes(' ')) {
         let checkPlayer = message.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
-        if (playerObj.size === 0) {
+        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot).array();
+        if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           message.author.send(`${checkPlayer} was not found!`);
           return;
+        } else if (process.env.NODE_ENV.includes('development')) {
+          playerObj.push({
+            id: checkPlayer
+          });
         }
 
-        return game.playerInventory(playerObj.array()[0])
+        return game.playerInventory(playerObj[0])
           .then((playerInventory) => {
             if (!playerInventory) {
               return message.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');

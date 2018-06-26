@@ -81,31 +81,36 @@ class Event {
       });
   }
 
-  attackEventMob(selectedPlayer, multiplier) {
-    return this.MonsterManager.generateNewMonster(selectedPlayer)
-      .then(mob => this.Battle.newSimulateBattle(selectedPlayer, mob))
-      .then(results => events.battle.pveResults(this.discordHook, this.Database, this.Helper, this.MapManager, results, multiplier))
-      .then((battleResults) => {
-        switch (battleResults.result) {
-          case enumHelper.battle.outcomes.win:
-            return Promise.all([
-              events.battle.dropItem(this.discordHook, this.Database, this.Helper, battleResults.updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager)
-            ])
-              .then(promiseResults => this.Helper.checkExperience(promiseResults[0], this.Database, this.discordHook, 'ToRemoveLater'));
+  async attackEventMob(selectedPlayer, multiplier) {
+    try {
+      const mob = await this.MonsterManager.generateNewMonster(selectedPlayer);
+      const simulatedBattle = await this.Battle.newSimulateBattle(selectedPlayer, mob);
+      const battleResults = await events.battle.pveResults(this.discordHook, this.Database, this.Helper, this.MapManager, simulatedBattle, multiplier);
+      let { updatedPlayer } = battleResults;
+      switch (battleResults.result) {
+        case enumHelper.battle.outcomes.win:
+          updatedPlayer = await events.battle.dropItem(this.discordHook, this.Database, this.Helper, updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager);
+          updatedPlayer = await this.Helper.checkExperience(updatedPlayer, this.Database, this.discordHook);
+          return Promise.resolve(updatedPlayer);
 
-          case enumHelper.battle.outcomes.fled:
-            return this.Helper.checkExperience(battleResults.updatedPlayer, this.Database, this.discordHook, 'ToRemoveLater');
+        case enumHelper.battle.outcomes.fled:
+          updatedPlayer = await this.Helper.checkExperience(updatedPlayer, this.Database, this.discordHook);
+          return Promise.resolve(updatedPlayer);
 
-          case enumHelper.battle.outcomes.lost:
-            return this.Helper.checkHealth(this.MapManager, battleResults.updatedPlayer, battleResults.updatedMob, this.Database, this.discordHook);
-        }
-      });
+        case enumHelper.battle.outcomes.lost:
+          updatedPlayer = await this.Helper.checkHealth(this.MapManager, updatedPlayer, battleResults.updatedMob, this.Database, this.discordHook);
+          return Promise.resolve(updatedPlayer);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // Item Events
-  generateTownItemEvent(selectedPlayer) {
-    return this.ItemManager.generateItem(selectedPlayer)
-      .then(item => events.town.item(this.discordHook, this.Database, this.Helper, selectedPlayer, item, this.InventoryManager));
+  async generateTownItemEvent(selectedPlayer) {
+    const item = await this.ItemManager.generateItem(selectedPlayer);
+    const updatedPlayer = await events.town.item(this.discordHook, this.Database, this.Helper, selectedPlayer, item, this.InventoryManager);
+    return Promise.resolve(updatedPlayer);
   }
 
   sellInTown(selectedPlayer) {
@@ -229,7 +234,8 @@ class Event {
   }
 
   chanceToCatchSnowflake(selectedPlayer) {
-    return events.special.snowFlake(this.discordHook, this.Database, this.Helper, selectedPlayer);
+    return this.ItemManager.generateSnowflake(selectedPlayer)
+      .then(snowFlake => events.special.snowFlake(this.discordHook, this.Database, this.Helper, selectedPlayer, snowFlake));
   }
 
   /**
