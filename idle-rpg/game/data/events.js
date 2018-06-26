@@ -252,7 +252,7 @@ const events = {
         selectedPlayer = await InventoryManager.addItemIntoInventory(selectedPlayer, item);
       }
 
-      const eventMsg = `**[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!**`;
+      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`;
       const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
       await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
       await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
@@ -610,7 +610,7 @@ const events = {
 
           let eventMsg;
           if (!item.isXmasEvent) {
-            eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`;
+            eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\``;
           } else {
             eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`;
           }
