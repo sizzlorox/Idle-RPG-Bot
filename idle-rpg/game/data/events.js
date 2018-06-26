@@ -228,39 +228,38 @@ const events = {
      * @param {InventoryManager} InventoryManager
      * @returns {Player} updatedPlayer
      */
-    item: (discordHook, Database, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
-      const itemCost = Math.round(item.gold);
+    item: async (discordHook, Database, Helper, selectedPlayer, item, InventoryManager) => {
+      const itemCost = await Math.round(item.gold);
 
       if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
-        return resolve(selectedPlayer);
+        return selectedPlayer;
       }
 
       if (item.position !== enumHelper.inventory.position) {
-        selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
+        // selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
         const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
         const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
         if (oldItemRating > newItemRating) {
-          return resolve(selectedPlayer);
+          return selectedPlayer;
         }
-        selectedPlayer.gold.current -= itemCost;
-        selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
+
+        selectedPlayer.gold.current -= await itemCost;
+        selectedPlayer = await Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
       } else if (selectedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
-        return resolve(selectedPlayer);
+        return selectedPlayer;
       } else {
-        selectedPlayer.gold.current -= itemCost;
-        selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
+        selectedPlayer.gold.current -= await itemCost;
+        selectedPlayer = await InventoryManager.addItemIntoInventory(selectedPlayer, item);
       }
 
       const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`;
       const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
+      await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+      await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+      await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-      ])
-        .then(resolve(selectedPlayer));
-    })
+      return selectedPlayer;
+    }
   },
 
   battle: {
@@ -591,43 +590,45 @@ const events = {
       return resolve({ stealingPlayer, victimPlayer });
     }),
 
-    dropItem: (discordHook, Database, Helper, selectedPlayer, mob, ItemManager, InventoryManager) => new Promise((resolve) => {
-      const dropitemChance = Helper.randomBetween(0, 100);
+    dropItem: async (discordHook, Database, Helper, selectedPlayer, mob, ItemManager, InventoryManager) => {
+      try {
+        const dropitemChance = await Helper.randomBetween(0, 100);
 
-      if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
-        return ItemManager.generateItem(selectedPlayer, mob.find(obj => obj.health <= 0))
-          .then(async (item) => {
-            if (item.position !== enumHelper.inventory.position) {
-              const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-              const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
-              if (oldItemRating > newItemRating) {
-                selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
-              } else {
-                selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
-              }
+        if (dropitemChance <= 15 + (selectedPlayer.stats.luk / 4)) {
+          const item = await ItemManager.generateItem(selectedPlayer, mob.find(obj => obj.health <= 0));
+          if (item.position !== enumHelper.inventory.position) {
+            const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+            const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
+            if (oldItemRating > newItemRating) {
+              selectedPlayer = await InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
             } else {
-              selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
+              selectedPlayer = await Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
             }
+          } else {
+            selectedPlayer = await InventoryManager.addItemIntoInventory(selectedPlayer, item);
+          }
 
-            let eventMsg;
-            if (!item.isXmasEvent) {
-              eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\``;
-            } else {
-              eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`;
-            }
-            const eventLog = `Received ${item.name} from ${mob[0].name}`;
+          let eventMsg;
+          if (!item.isXmasEvent) {
+            eventMsg = `${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\``;
+          } else {
+            eventMsg = `**${Helper.generatePlayerName(selectedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`;
+          }
+          const eventLog = `Received ${item.name} from ${mob[0].name}`;
+          await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+          if (process.env.NODE_ENV.includes('production')) {
+            await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+          }
+          await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
 
-            return Promise.all([
-              Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-              Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-              Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-            ])
-              .then(resolve(selectedPlayer));
-          });
+          return selectedPlayer;
+        }
+
+        return selectedPlayer;
+      } catch (err) {
+        console.log(err);
       }
-
-      return resolve(selectedPlayer);
-    })
+    }
   },
 
   luck: {
@@ -937,27 +938,25 @@ const events = {
   },
 
   special: {
-    snowFlake: (discordHook, Database, Helper, selectedPlayer) => new Promise(async (resolve) => {
-      const snowFlakeDice = Helper.randomBetween(0, 100);
+    snowFlake: async (discordHook, Database, Helper, selectedPlayer, snowFlake) => {
+      const snowFlakeDice = await Helper.randomBetween(0, 100);
       if (snowFlakeDice <= 5) {
-        const snowFlake = this.ItemManager.generateSnowflake(selectedPlayer);
         const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
         const newItemRating = await Helper.calculateItemRating(selectedPlayer, snowFlake);
         if (oldItemRating < newItemRating) {
-          selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
           const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
           const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
-          return Promise.all([
-            Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgSnowflake),
-            Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true),
-            Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-          ])
-            .then(resolve(selectedPlayer));
+          selectedPlayer = await Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
+          await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgSnowflake);
+          await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true);
+          await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
+
+          return selectedPlayer;
         }
       }
 
-      return resolve(selectedPlayer);
-    })
+      return selectedPlayer;
+    }
   }
 };
 module.exports = events;

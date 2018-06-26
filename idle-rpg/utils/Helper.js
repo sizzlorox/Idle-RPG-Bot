@@ -150,7 +150,7 @@ class Helper {
 
   sendPrivateMessage(discordHook, player, msg, isImportantMessage) {
     return new Promise((resolve) => {
-      if (player && player.isPrivateMessage) {
+      if (player && player.isPrivateMessage && process.env.NODE_ENV.includes('production')) {
         if (player.isPrivateMessageImportant && !isImportantMessage) {
           return resolve();
         }
@@ -162,6 +162,8 @@ class Helper {
           })
           .catch(err => errorLog.error(err));
       }
+
+      return resolve();
     });
   }
 
