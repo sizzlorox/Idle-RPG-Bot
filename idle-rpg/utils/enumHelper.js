@@ -132,7 +132,7 @@ const enumHelper = {
   ],
 
   // if .fill(undefined) is not used to fill the array with any data, the undefined pointers make the array return as [] with a length of 30 even while mapping.
-  mockPlayers: new Array(30).fill(undefined).map((obj, index) => Object.create({ name: `MockedTester${index}`, discordId: `MockedTester${index}` })),
+  mockPlayers: new Array(30).fill(undefined).map((obj, index) => Object.assign({}, { name: `Mocktester${index}`, discordId: `Mocktester${index}` })),
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
   genders: {
@@ -189,6 +189,7 @@ const enumHelper = {
     class: 1,
     mana: 1,
     level: 1,
+    personalMultiplier: 1,
     'experience.current': 1,
     'experience.lost': 1,
     'experience.total': 1,

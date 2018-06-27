@@ -88,6 +88,9 @@ const logger = {
         threshold: '10m',      // Rotate log files larger than 10 megabytes
         totalSize: '20m',      // Don't keep more than 20mb of archived log files
       })
+    },
+    {
+      stream: process.stdout
     }]
   }),
 

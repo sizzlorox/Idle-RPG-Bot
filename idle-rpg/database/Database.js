@@ -312,7 +312,7 @@ class Database {
         return reject(err);
       }
 
-      return resolve(result);
+      return result ? resolve(result._doc) : resolve(null);
     })
       .select(selectFields));
   }
