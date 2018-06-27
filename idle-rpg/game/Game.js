@@ -71,7 +71,7 @@ class Game {
             .then((newPlayer) => {
               this.Helper.sendMessage(this.discordHook, selectedPlayer, false, `${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
 
-              return newPlayer;
+              return newPlayer._doc;
             });
         } else if (selectedPlayer.events === 0) {
           selectedPlayer.map = this.Event.MapClass.getRandomTown();
@@ -79,7 +79,7 @@ class Game {
           this.Helper.sendMessage(this.discordHook, selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
         }
 
-        return selectedPlayer;
+        return selectedPlayer._doc;
       })
       .then((selectedPlayer) => {
         selectedPlayer.events++;

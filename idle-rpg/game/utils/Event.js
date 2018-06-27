@@ -28,17 +28,21 @@ class Event {
   }
 
   // Move Events
-  moveEvent(selectedPlayer, multiplier) {
-    return this.MapManager.moveToRandomMap(selectedPlayer)
-      .then((mapObj) => {
-        if (mapObj.map.name === selectedPlayer.map.name || mapObj.map.name === selectedPlayer.previousMap) {
-          return this.MapManager.getTowns().includes(selectedPlayer.map.name)
-            ? this.generateQuestEvent(selectedPlayer)
-            : this.attackEventMob(selectedPlayer, multiplier);
-        }
+  async moveEvent(selectedPlayer, multiplier) {
+    let updatedPlayer = Object.assign({}, selectedPlayer);
+    try {
+      const mapObj = await this.MapManager.moveToRandomMap(updatedPlayer);
+      if (mapObj.map.name === updatedPlayer.map.name || mapObj.map.name === updatedPlayer.previousMap) {
+        return await this.MapManager.getTowns().includes(updatedPlayer.map.name)
+          ? this.generateQuestEvent(updatedPlayer)
+          : this.attackEventMob(updatedPlayer, multiplier);
+      }
+      updatedPlayer = await events.movement.movePlayer(this.discordHook, this.Database, this.Helper, updatedPlayer, mapObj);
 
-        return events.movement.movePlayer(this.discordHook, this.Database, this.Helper, selectedPlayer, mapObj);
-      });
+      return updatedPlayer;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, multiplier) {
@@ -82,48 +86,69 @@ class Event {
   }
 
   async attackEventMob(selectedPlayer, multiplier) {
+    let updatedPlayer = Object.assign({}, selectedPlayer);
     try {
-      const mob = await this.MonsterManager.generateNewMonster(selectedPlayer);
-      const simulatedBattle = await this.Battle.newSimulateBattle(selectedPlayer, mob);
+      const mob = await this.MonsterManager.generateNewMonster(updatedPlayer);
+      const simulatedBattle = await this.Battle.newSimulateBattle(updatedPlayer, mob);
       const battleResults = await events.battle.pveResults(this.discordHook, this.Database, this.Helper, this.MapManager, simulatedBattle, multiplier);
-      let { updatedPlayer } = battleResults;
+      updatedPlayer = battleResults.updatedPlayer;
       switch (battleResults.result) {
         case enumHelper.battle.outcomes.win:
           updatedPlayer = await events.battle.dropItem(this.discordHook, this.Database, this.Helper, updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager);
           updatedPlayer = await this.Helper.checkExperience(updatedPlayer, this.Database, this.discordHook);
-          return Promise.resolve(updatedPlayer);
+          return updatedPlayer;
 
         case enumHelper.battle.outcomes.fled:
           updatedPlayer = await this.Helper.checkExperience(updatedPlayer, this.Database, this.discordHook);
-          return Promise.resolve(updatedPlayer);
+          return updatedPlayer;
 
         case enumHelper.battle.outcomes.lost:
           updatedPlayer = await this.Helper.checkHealth(this.MapManager, updatedPlayer, battleResults.updatedMob, this.Database, this.discordHook);
-          return Promise.resolve(updatedPlayer);
+          return updatedPlayer;
       }
     } catch (err) {
-      console.log(err);
+      errorLog.error(err);
     }
   }
 
   // Item Events
   async generateTownItemEvent(selectedPlayer) {
-    const item = await this.ItemManager.generateItem(selectedPlayer);
-    const updatedPlayer = await events.town.item(this.discordHook, this.Database, this.Helper, selectedPlayer, item, this.InventoryManager);
-    return Promise.resolve(updatedPlayer);
+    let updatedPlayer = Object.assign({}, selectedPlayer);
+    try {
+      const item = await this.ItemManager.generateItem(updatedPlayer);
+      updatedPlayer = await events.town.item(this.discordHook, this.Database, this.Helper, updatedPlayer, item, this.InventoryManager);
+
+      return updatedPlayer;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   sellInTown(selectedPlayer) {
     return events.town.sell(this.discordHook, this.Database, this.Helper, selectedPlayer);
   }
 
-  campEvent(selectedPlayer) {
-    return events.camp(this.discordHook, this.Database, this.Helper, selectedPlayer);
+  async campEvent(selectedPlayer) {
+    let updatedPlayer = Object.assign({}, selectedPlayer);
+    try {
+      updatedPlayer = await events.camp(this.discordHook, this.Database, this.Helper, updatedPlayer);
+
+      return updatedPlayer;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  generateQuestEvent(selectedPlayer) {
-    return this.MonsterManager.generateQuestMonster(selectedPlayer)
-      .then(mob => events.town.quest(this.discordHook, this.Database, this.Helper, selectedPlayer, mob));
+  async generateQuestEvent(selectedPlayer) {
+    let updatedPlayer = Object.assign({}, selectedPlayer);
+    try {
+      const mob = await this.MonsterManager.generateQuestMonster(updatedPlayer);
+      updatedPlayer = await events.town.quest(this.discordHook, this.Database, this.Helper, updatedPlayer, mob);
+
+      return updatedPlayer;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   // Luck Events
@@ -172,32 +197,49 @@ class Event {
     });
   }
 
-  generateGoldEvent(selectedPlayer, multiplier) {
-    return events.luck.gold(this.discordHook, this.Database, this.Helper, selectedPlayer, multiplier);
+  async generateGoldEvent(selectedPlayer, multiplier) {
+    let updatedPlayer = Object.assign({}, selectedPlayer);
+    try {
+      updatedPlayer = await events.luck.gold(this.discordHook, this.Database, this.Helper, updatedPlayer, multiplier);
+
+      return updatedPlayer;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  generateLuckItemEvent(selectedPlayer) {
-    return new Promise((resolve) => {
-      const luckItemDice = this.Helper.randomBetween(0, 100);
+  async generateLuckItemEvent(selectedPlayer) {
+    let updatedPlayer = Object.assign({}, selectedPlayer);
+    try {
+      const luckItemDice = await this.Helper.randomBetween(0, 100);
 
-      if (luckItemDice <= 15 + (selectedPlayer.stats.luk / 4)) {
-        return this.SpellManager.generateSpell(selectedPlayer)
-          .then(spell => events.luck.item.spell(this.discordHook, this.Database, this.Helper, selectedPlayer, spell))
-          .then(updatedPlayer => resolve(updatedPlayer))
-          .catch(err => console.log);
-      } else if (luckItemDice <= 30 + (selectedPlayer.stats.luk / 4)) {
-        return this.ItemManager.generateItem(selectedPlayer)
-          .then(item => events.luck.item.item(this.discordHook, this.Database, this.Helper, selectedPlayer, item, this.InventoryManager))
-          .then(updatedPlayer => resolve(updatedPlayer))
-          .catch(err => console.log);
+      if (luckItemDice <= 15 + (updatedPlayer.stats.luk / 4)) {
+        const spell = await this.SpellManager.generateSpell(updatedPlayer);
+        updatedPlayer = await events.luck.item.spell(this.discordHook, this.Database, this.Helper, updatedPlayer, spell);
+
+        return updatedPlayer;
+      } else if (luckItemDice <= 30 + (updatedPlayer.stats.luk / 4)) {
+        const item = await this.ItemManager.generateItem(updatedPlayer);
+        updatedPlayer = await events.luck.item.item(this.discordHook, this.Database, this.Helper, updatedPlayer, item, this.InventoryManager);
+
+        return updatedPlayer;
       }
 
-      return resolve(selectedPlayer);
-    });
+      return updatedPlayer;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  generateGamblingEvent(selectedPlayer) {
-    return events.luck.gambling(this.discordHook, this.Database, this.Helper, selectedPlayer);
+  async generateGamblingEvent(selectedPlayer) {
+    let updatedPlayer = Object.assign({}, selectedPlayer);
+    try {
+      updatedPlayer = await events.luck.gambling(this.discordHook, this.Database, this.Helper, updatedPlayer);
+
+      return updatedPlayer;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   /**
@@ -233,9 +275,16 @@ class Event {
     }
   }
 
-  chanceToCatchSnowflake(selectedPlayer) {
-    return this.ItemManager.generateSnowflake(selectedPlayer)
-      .then(snowFlake => events.special.snowFlake(this.discordHook, this.Database, this.Helper, selectedPlayer, snowFlake));
+  async chanceToCatchSnowflake(selectedPlayer) {
+    let updatedPlayer = Object.assign({}, selectedPlayer);
+    try {
+      const snowFlake = await this.ItemManager.generateSnowflake(updatedPlayer);
+      updatedPlayer = await events.special.snowFlake(this.discordHook, this.Database, this.Helper, selectedPlayer, snowFlake);
+
+      return updatedPlayer;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   /**

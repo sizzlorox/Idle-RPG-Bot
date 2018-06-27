@@ -132,21 +132,22 @@ const events = {
      * @param { map, direction } mapObj
      * @returns {Player} updatedPlayer
      */
-    movePlayer: (discordHook, Database, Helper, selectedPlayer, mapObj) => new Promise((resolve) => {
-      const previousMap = selectedPlayer.map;
-      selectedPlayer.map = mapObj.map;
-      selectedPlayer.previousMap = previousMap.name;
-      selectedPlayer.travelled++;
-      const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${previousMap.name}\` and arrived in \`${mapObj.map.name}\`.`;
-      const eventLog = `Travelled ${mapObj.direction} from ${previousMap.name} and arrived in ${mapObj.map.name}`;
+    movePlayer: async (discordHook, Database, Helper, selectedPlayer, mapObj) => {
+      try {
+        selectedPlayer.previousMap = selectedPlayer.map.name;
+        selectedPlayer.map = mapObj.map;
+        selectedPlayer.travelled++;
+        const eventMsg = `${Helper.generatePlayerName(selectedPlayer)} decided to head \`${mapObj.direction}\` from \`${selectedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`;
+        const eventLog = `Travelled ${mapObj.direction} from ${selectedPlayer.previousMap} and arrived in ${mapObj.map.name}`;
+        await Helper.sendMessage(discordHook, selectedPlayer, true, eventMsg);
+        await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false);
+        await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.move);
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, selectedPlayer, true, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, false),
-        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.move)
-      ])
-        .then(resolve(selectedPlayer));
-    })
+        return Promise.resolve(selectedPlayer);
+      } catch (err) {
+        errorLog.error(err);
+      }
+    }
   },
 
   /**
@@ -155,18 +156,20 @@ const events = {
    * @param {Player} selectedPlayer
    * @returns {Player} updatedPlayer
    */
-  camp: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
-    selectedPlayer = Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
-    // TODO: Make more camp event messages to be selected randomly
-    const { eventMsg, eventLog } = Helper.randomCampEventMessage(selectedPlayer);
+  camp: async (discordHook, Database, Helper, selectedPlayer) => {
+    try {
+      selectedPlayer = await Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.end / 2), ((5 * selectedPlayer.level) / 2) + (selectedPlayer.stats.int / 2));
+      // TODO: Make more camp event messages to be selected randomly
+      const { eventMsg, eventLog } = await Helper.randomCampEventMessage(selectedPlayer);
+      await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+      await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+      await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
 
-    return Promise.all([
-      Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-      Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-      Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-    ])
-      .then(resolve(selectedPlayer));
-  }),
+      return Promise.resolve(selectedPlayer);
+    } catch (err) {
+      errorLog.error(err);
+    }
+  },
 
   town: {
     /**
@@ -200,25 +203,23 @@ const events = {
       return resolve(selectedPlayer);
     }),
 
-    quest: (discordHook, Database, Helper, selectedPlayer, mob) => new Promise((resolve) => {
+    quest: async (discordHook, Database, Helper, selectedPlayer, mob) => {
       if (!selectedPlayer.quest.questMob.name.includes('None')) {
-        return resolve(selectedPlayer);
+        return Promise.resolve(selectedPlayer);
       }
 
       selectedPlayer.quest.questMob.name = mob;
-      selectedPlayer.quest.questMob.count = Helper.randomBetween(1, 15);
+      selectedPlayer.quest.questMob.count = await Helper.randomBetween(1, 15);
       selectedPlayer.quest.questMob.killCount = 0;
       selectedPlayer.quest.updated_at = new Date();
       const eventMsg = `[\`${selectedPlayer.map.name}\`] Quest Master has asked ${Helper.generatePlayerName(selectedPlayer, true)} to kill ${selectedPlayer.quest.questMob.count === 1 ? 'a' : selectedPlayer.quest.questMob.count} ${mob}!`;
       const eventLog = `Quest Master in ${selectedPlayer.map.name} asked you to kill ${selectedPlayer.quest.questMob.count === 1 ? 'a' : selectedPlayer.quest.questMob.count} ${mob}.`;
+      await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+      await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+      await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-      ])
-        .then(resolve(selectedPlayer));
-    }),
+      return Promise.resolve(selectedPlayer);
+    },
 
     /**
      * Purchases item from town
@@ -229,36 +230,40 @@ const events = {
      * @returns {Player} updatedPlayer
      */
     item: async (discordHook, Database, Helper, selectedPlayer, item, InventoryManager) => {
-      const itemCost = await Math.round(item.gold);
+      try {
+        const itemCost = Math.round(item.gold);
 
-      if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
-        return selectedPlayer;
-      }
-
-      if (item.position !== enumHelper.inventory.position) {
-        // selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
-        const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-        const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
-        if (oldItemRating > newItemRating) {
-          return selectedPlayer;
+        if (selectedPlayer.gold.current <= itemCost || item.name.startsWith('Cracked')) {
+          return Promise.resolve(selectedPlayer);
         }
 
-        selectedPlayer.gold.current -= await itemCost;
-        selectedPlayer = await Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
-      } else if (selectedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
-        return selectedPlayer;
-      } else {
-        selectedPlayer.gold.current -= await itemCost;
-        selectedPlayer = await InventoryManager.addItemIntoInventory(selectedPlayer, item);
+        if (item.position !== enumHelper.inventory.position) {
+          // selectedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
+          const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+          const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
+          if (oldItemRating > newItemRating) {
+            return Promise.resolve(selectedPlayer);
+          }
+
+          selectedPlayer.gold.current -= itemCost;
+          selectedPlayer = await Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types[item.position].position, item);
+        } else if (selectedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
+          return Promise.resolve(selectedPlayer);
+        } else {
+          selectedPlayer.gold.current -= itemCost;
+          selectedPlayer = await InventoryManager.addItemIntoInventory(selectedPlayer, item);
+        }
+
+        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`;
+        const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
+        await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+        await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+        await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
+
+        return Promise.resolve(selectedPlayer);
+      } catch (err) {
+        errorLog.error(err);
       }
-
-      const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`;
-      const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
-      await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
-      await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
-      await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
-
-      return selectedPlayer;
     }
   },
 
@@ -621,12 +626,12 @@ const events = {
           }
           await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
 
-          return selectedPlayer;
+          return Promise.resolve(selectedPlayer);
         }
 
-        return selectedPlayer;
+        return Promise.resolve(selectedPlayer);
       } catch (err) {
-        console.log(err);
+        errorLog.error(err);
       }
     }
   },
@@ -673,86 +678,94 @@ const events = {
         return resolve(selectedPlayer);
       }),
 
-      item: (discordHook, Database, Helper, selectedPlayer, item, InventoryManager) => new Promise(async (resolve) => {
-        const { eventMsg, eventLog } = Helper.randomItemEventMessage(selectedPlayer, item);
-        if (item.position !== enumHelper.inventory.position) {
-          const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
-          const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
-          if (oldItemRating > newItemRating) {
-            selectedPlayer = InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
+      item: async (discordHook, Database, Helper, selectedPlayer, item, InventoryManager) => {
+        try {
+          const { eventMsg, eventLog } = await Helper.randomItemEventMessage(selectedPlayer, item);
+          if (item.position !== enumHelper.inventory.position) {
+            const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment[item.position]);
+            const newItemRating = await Helper.calculateItemRating(selectedPlayer, item);
+            if (oldItemRating > newItemRating) {
+              selectedPlayer = await InventoryManager.addEquipmentIntoInventory(selectedPlayer, item);
+            } else {
+              selectedPlayer = await Helper.setPlayerEquipment(selectedPlayer, item.position, item);
+            }
           } else {
-            selectedPlayer = Helper.setPlayerEquipment(selectedPlayer, item.position, item);
+            selectedPlayer = await InventoryManager.addItemIntoInventory(selectedPlayer, item);
           }
-        } else {
-          selectedPlayer = InventoryManager.addItemIntoInventory(selectedPlayer, item);
-        }
 
-        return Promise.all([
-          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-        ])
-          .then(resolve(selectedPlayer));
-      })
+          await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+          await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+          await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
+
+          return Promise.resolve(selectedPlayer);
+        } catch (err) {
+          errorLog.error(err);
+        }
+      }
     },
 
-    gold: (discordHook, Database, Helper, selectedPlayer, multiplier) => new Promise((resolve) => {
-      const luckGoldChance = Helper.randomBetween(0, 100);
-      if (luckGoldChance >= 75) {
-        const luckGoldDice = Helper.randomBetween(5, 100);
-        const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
-        selectedPlayer.gold.current += goldAmount;
-        selectedPlayer.gold.total += goldAmount;
+    gold: async (discordHook, Database, Helper, selectedPlayer, multiplier) => {
+      try {
+        const luckGoldChance = await Helper.randomBetween(0, 100);
+        if (luckGoldChance >= 75) {
+          const luckGoldDice = await Helper.randomBetween(5, 100);
+          const goldAmount = Math.round((luckGoldDice * selectedPlayer.stats.luk) / 2) * multiplier;
+          selectedPlayer.gold.current += goldAmount;
+          selectedPlayer.gold.total += goldAmount;
 
-        const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} found ${goldAmount} gold!`;
-        const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
+          const eventMsg = `[\`${selectedPlayer.map.name}\`] ${Helper.generatePlayerName(selectedPlayer, true)} found ${goldAmount} gold!`;
+          const eventLog = `Found ${goldAmount} gold in ${selectedPlayer.map.name}`;
 
-        return Promise.all([
-          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-        ])
-          .then(resolve(selectedPlayer));
-      }
+          await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+          await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+          await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
 
-      return resolve(selectedPlayer);
-    }),
-
-    gambling: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
-      const luckGambleChance = Helper.randomBetween(0, 100);
-      const luckGambleGold = Math.floor(2 * ((Math.log(selectedPlayer.gold.current) * selectedPlayer.gold.current) / 100));
-      if (selectedPlayer.gold.current < luckGambleGold) {
-        return resolve(selectedPlayer);
-      }
-
-      selectedPlayer.gambles++;
-      if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
-        const { eventMsg, eventLog } = Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
-        selectedPlayer.gold.current -= luckGambleGold;
-        selectedPlayer.gold.gambles.lost += luckGambleGold;
-        if (selectedPlayer.gold.current <= 0) {
-          selectedPlayer.gold.current = 0;
+          return Promise.resolve(selectedPlayer);
         }
 
-        return Promise.all([
-          Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-          Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-          Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-        ])
-          .then(resolve(selectedPlayer));
+        return Promise.resolve(selectedPlayer);
+      } catch (err) {
+        errorLog.error(err);
       }
-      const { eventMsg, eventLog } = Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
-      selectedPlayer.gold.current += luckGambleGold;
-      selectedPlayer.gold.total += luckGambleGold;
-      selectedPlayer.gold.gambles.won += luckGambleGold;
+    },
 
-      return Promise.all([
-        Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg),
-        Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true),
-        Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action)
-      ])
-        .then(resolve(selectedPlayer));
-    }),
+    gambling: async (discordHook, Database, Helper, selectedPlayer) => {
+      try {
+        const luckGambleChance = await Helper.randomBetween(0, 100);
+        const luckGambleGold = Math.floor(2 * ((Math.log(selectedPlayer.gold.current) * selectedPlayer.gold.current) / 100));
+        if (selectedPlayer.gold.current < luckGambleGold) {
+          return Promise.resolve(selectedPlayer);
+        }
+
+        selectedPlayer.gambles++;
+        if (luckGambleChance <= 50 - (selectedPlayer.stats.luk / 4)) {
+          const { eventMsg, eventLog } = await Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, false);
+          selectedPlayer.gold.current -= luckGambleGold;
+          selectedPlayer.gold.gambles.lost += luckGambleGold;
+          if (selectedPlayer.gold.current <= 0) {
+            selectedPlayer.gold.current = 0;
+          }
+
+          await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+          await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+          await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
+
+          return Promise.resolve(selectedPlayer);
+        }
+        const { eventMsg, eventLog } = await Helper.randomGambleEventMessage(selectedPlayer, luckGambleGold, true);
+        selectedPlayer.gold.current += luckGambleGold;
+        selectedPlayer.gold.total += luckGambleGold;
+        selectedPlayer.gold.gambles.won += luckGambleGold;
+
+        await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsg);
+        await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLog, true);
+        await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
+
+        return Promise.resolve(selectedPlayer);
+      } catch (err) {
+        errorLog.error(err);
+      }
+    },
 
     gods: {
       hades: (discordHook, Database, Helper, selectedPlayer) => new Promise((resolve) => {
@@ -939,23 +952,27 @@ const events = {
 
   special: {
     snowFlake: async (discordHook, Database, Helper, selectedPlayer, snowFlake) => {
-      const snowFlakeDice = await Helper.randomBetween(0, 100);
-      if (snowFlakeDice <= 5) {
-        const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
-        const newItemRating = await Helper.calculateItemRating(selectedPlayer, snowFlake);
-        if (oldItemRating < newItemRating) {
-          const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
-          const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
-          selectedPlayer = await Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
-          await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgSnowflake);
-          await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true);
-          await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
+      try {
+        const snowFlakeDice = await Helper.randomBetween(0, 100);
+        if (snowFlakeDice <= 5) {
+          const oldItemRating = await Helper.calculateItemRating(selectedPlayer, selectedPlayer.equipment.relic);
+          const newItemRating = await Helper.calculateItemRating(selectedPlayer, snowFlake);
+          if (oldItemRating < newItemRating) {
+            const eventMsgSnowflake = `<@!${selectedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`;
+            const eventLogSnowflake = 'You caught a strange looking snowflake while travelling inside the blizzard.';
+            selectedPlayer = await Helper.setPlayerEquipment(selectedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
+            await Helper.sendMessage(discordHook, selectedPlayer, false, eventMsgSnowflake);
+            await Helper.sendPrivateMessage(discordHook, selectedPlayer, eventLogSnowflake, true);
+            await Helper.logEvent(selectedPlayer, Database, eventLog, enumHelper.logTypes.action);
 
-          return selectedPlayer;
+            return Promise.resolve(selectedPlayer);
+          }
         }
-      }
 
-      return selectedPlayer;
+        return Promise.resolve(selectedPlayer);
+      } catch (err) {
+        errorLog.error(err);
+      }
     }
   }
 };
