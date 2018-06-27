@@ -79,10 +79,10 @@ class Item {
     return item;
   }
 
-  generateItem(selectedPlayer, mob) {
+  generateItem(updatedPlayer, mob) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomMaterialChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (updatedPlayer.level / 6));
+      const randomMaterialChance = Math.round(this.Helper.randomBetween(0, 100) - (updatedPlayer.level / 6));
       const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
       const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
 
@@ -177,25 +177,20 @@ class Item {
   }
 
   // EVENT ITEM
-  generateSnowflake(selectedPlayer) {
+  generateSnowflake(updatedPlayer) {
     const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
-    const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (updatedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = this.Helper.randomBetween(0, itemRarityList.length - 1);
-
+    
     const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
       + snowFlake.stats.str) / 4);
-
     const itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
       + snowFlake.stats.dex) / 4);
-
     const itemEnd = Math.round((itemRarityList[randomRarityIndex].stats.end
       + snowFlake.stats.end) / 4);
-
     const itemInt = Math.round((itemRarityList[randomRarityIndex].stats.int
       + snowFlake.stats.int) / 4);
-
-    const itemLuk = snowFlake.stats.luk;
 
     const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 

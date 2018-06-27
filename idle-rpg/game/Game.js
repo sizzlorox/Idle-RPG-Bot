@@ -45,7 +45,7 @@ class Game {
         .then(() => this.Database.resetPersonalMultipliers());
     } else {
       this.config = {
-        multiplier: 7,
+        multiplier: 1,
         spells: {
           activeBless: 0
         },
@@ -56,152 +56,128 @@ class Game {
     }
   }
 
-  /**
-   * Loads player by discordID and rolls a dice to select which type of event to activate
-   * @param {Number} player
-   * @param {Array} onlinePlayers
-   */
-  selectEvent(discordBot, player, onlinePlayers) {
-    const randomEvent = this.Helper.randomBetween(0, 2);
+  async selectEvent(discordBot, player, onlinePlayers) {
+    try {
+      const loadedPlayer = await this.Database.loadPlayer(player.discordId);
+      let updatedPlayer = Object.assign({}, loadedPlayer);
+      if (!loadedPlayer) {
+        updatedPlayer = await this.Database.createNewPlayer(player.discordId, player.name);
+        await this.Helper.sendMessage(this.discordHook, updatedPlayer, false, `${this.Helper.generatePlayerName(updatedPlayer, true)} was born in \`${updatedPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
+      } else if (updatedPlayer.events === 0) {
+        updatedPlayer.map = this.Event.MapClass.getRandomTown();
+        updatedPlayer.createdAt = new Date().getTime();
+        this.Helper.sendMessage(this.discordHook, updatedPlayer, false, `${this.Helper.generatePlayerName(updatedPlayer, true)} was reborn in \`${updatedPlayer.map.name}\`!`);
+      }
+      updatedPlayer.name = player.name;
+      updatedPlayer.events++;
 
-    this.Database.loadPlayer(player.discordId)
-      .then((selectedPlayer) => {
-        if (!selectedPlayer) {
-          return this.Database.createNewPlayer(player.discordId, player.name)
-            .then((newPlayer) => {
-              this.Helper.sendMessage(this.discordHook, selectedPlayer, false, `${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
-
-              return newPlayer._doc;
-            });
-        } else if (selectedPlayer.events === 0) {
-          selectedPlayer.map = this.Event.MapClass.getRandomTown();
-          selectedPlayer.createdAt = new Date().getTime();
-          this.Helper.sendMessage(this.discordHook, selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
-        }
-
-        return selectedPlayer._doc;
-      })
-      .then((selectedPlayer) => {
-        selectedPlayer.events++;
-        console.log(`${selectedPlayer.name} - ${selectedPlayer.personalMultiplier}x`);
-
-        // TODO remove this later
-        if (!selectedPlayer.quest) {
-          selectedPlayer.quest = newQuest;
-        }
-        if (selectedPlayer.updated_at) {
-          const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
-          console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
-        }
-
-        return selectedPlayer;
-      })
-      .then((selectedPlayer) => {
-        selectedPlayer.name = player.name;
-
-        this.Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.end / 8), ((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.int / 8));
-        switch (randomEvent) {
-          case 0:
-            return this.moveEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
-          case 1:
-            return this.attackEvent(selectedPlayer, onlinePlayers)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
-          case 2:
-            return this.luckEvent(selectedPlayer)
-              .then(updatedPlayer => this.Database.savePlayer(updatedPlayer));
-        }
-      })
-      .then((updatedPlayer) => {
-        if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
-          this.Helper.sendMessage(this.discordHook, updatedPlayer, false, this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
-            .then(this.Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true));
-        }
-        return updatedPlayer;
-      })
-      .then((updatedPlayer) => {
-        this.setPlayerTitles(discordBot, updatedPlayer);
-      });
+      if (updatedPlayer.updated_at) {
+        const lastUpdated = (new Date().getTime() - updatedPlayer.updated_at.getTime()) / 1000;
+        console.log(`${updatedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
+      }
+      await this.Helper.passiveRegen(updatedPlayer, ((5 * updatedPlayer.level) / 4) + (updatedPlayer.stats.end / 8), ((5 * updatedPlayer.level) / 4) + (updatedPlayer.stats.int / 8));
+      updatedPlayer = await this.eventResults(updatedPlayer, onlinePlayers);
+      if (isNaN(updatedPlayer.equipment.armor.power)) {
+        console.log(updatedPlayer.equipment.armor);
+      }
+      
+      if (isNaN(updatedPlayer.equipment.weapon.power)) {
+        console.log(updatedPlayer.equipment.weapon);
+      }
+      
+      if (isNaN(updatedPlayer.equipment.helmet.power)) {
+        console.log(updatedPlayer.equipment.helmet);
+      }
+      await this.Database.savePlayer(updatedPlayer);
+      if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
+        await this.Helper.sendMessage(this.discordHook, updatedPlayer, false, this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
+        await this.Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true);
+      }
+      await this.setPlayerTitles(discordBot, updatedPlayer);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  moveEvent(selectedPlayer) {
-    return new Promise((resolve) => {
-      return this.Event.moveEvent(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
-        .then(updatedPlayer => resolve(updatedPlayer));
-    });
+  async eventResults(updatedPlayer, onlinePlayers) {
+    try {
+      const randomEvent = await this.Helper.randomBetween(0, 2);
+      switch (randomEvent) {
+        case 0:
+          return await this.moveEvent(updatedPlayer);
+        case 1:
+          return await this.attackEvent(updatedPlayer, onlinePlayers);
+        case 2:
+          return await this.luckEvent(updatedPlayer);
+      }
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  /**
-   * Rolls dice to select which type of attack event is activated for the player
-   * @param {Player} selectedPlayer
-   * @param {Array} onlinePlayers
-   */
-  attackEvent(selectedPlayer, onlinePlayers) {
-    return new Promise((resolve) => {
-      const luckDice = this.Helper.randomBetween(0, 100);
-      if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name) && luckDice <= 30 + (selectedPlayer.stats.luk / 4)) {
-        return this.Event.sellInTown(selectedPlayer)
-          .then(updatedPlayer => this.Event.generateTownItemEvent(updatedPlayer))
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
-
-      if (!this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-        if (luckDice >= (95 - (selectedPlayer.stats.luk / 4)) && selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return this.Event.attackEventPlayerVsPlayer(selectedPlayer, onlinePlayers, (this.config.multiplier + selectedPlayer.personalMultiplier))
-            .then(updatedPlayer => resolve(updatedPlayer));
-        }
-
-        if (selectedPlayer.health > (100 + (selectedPlayer.level * 5)) / 4) {
-          return this.Event.attackEventMob(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
-            .then(updatedPlayer => resolve(updatedPlayer));
-        }
-
-        return this.Event.campEvent(selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
-      }
-
-      return this.Event.generateLuckItemEvent(selectedPlayer)
-        .then(updatedPlayer => resolve(updatedPlayer));
-    });
+  async moveEvent(updatedPlayer) {
+    try {
+      return await this.Event.moveEvent(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  /**
-   * Rolls dice to select which type of luck event is activated for the player
-   * @param {Player} selectedPlayer
-   */
-  luckEvent(selectedPlayer) {
-    return new Promise((resolve) => {
-      const luckDice = this.Helper.randomBetween(0, 100);
-      if (luckDice <= 5 + (selectedPlayer.stats.luk / 4)) {
-        return this.Event.generateGodsEvent(selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
+  async attackEvent(updatedPlayer, onlinePlayers) {
+    try {
+      const luckDice = await this.Helper.randomBetween(0, 100);
+      if (this.Event.MapClass.getTowns().includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
+        updatedPlayer = await this.Event.sellInTown(updatedPlayer);
+        return await this.Event.generateTownItemEvent(updatedPlayer);
       }
 
-      if (this.Event.MapClass.getTowns().includes(selectedPlayer.map.name)) {
-        if (luckDice <= 20 + (selectedPlayer.stats.luk / 4)) {
-          return this.Event.generateGamblingEvent(selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
+      if (!this.Event.MapClass.getTowns().includes(updatedPlayer.map.name)) {
+        if (luckDice >= (95 - (updatedPlayer.stats.luk / 4)) && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
+          return await this.Event.attackEventPlayerVsPlayer(updatedPlayer, onlinePlayers, (this.config.multiplier + updatedPlayer.personalMultiplier));
         }
 
-        if (luckDice <= 45 + (selectedPlayer.stats.luk / 4) && selectedPlayer.quest.questMob === 'None') {
-          return this.Event.generateQuestEvent(selectedPlayer)
-            .then(updatedPlayer => resolve(updatedPlayer));
+        if (updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
+          return await this.Event.attackEventMob(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
+        }
+
+        return this.Event.campEvent(updatedPlayer);
+      }
+
+      return this.Event.generateLuckItemEvent(updatedPlayer);
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
+  async luckEvent(updatedPlayer) {
+    try {
+      const luckDice = await this.Helper.randomBetween(0, 100);
+      if (luckDice <= 5 + (updatedPlayer.stats.luk / 4)) {
+        return this.Event.generateGodsEvent(updatedPlayer);
+      }
+
+      if (this.Event.MapClass.getTowns().includes(updatedPlayer.map.name)) {
+        if (luckDice <= 20 + (updatedPlayer.stats.luk / 4)) {
+          return this.Event.generateGamblingEvent(updatedPlayer);
+        }
+
+        if (luckDice <= 45 + (updatedPlayer.stats.luk / 4) && updatedPlayer.quest.questMob === 'None') {
+          return this.Event.generateQuestEvent(updatedPlayer);
         }
       }
 
-      if (this.Event.isBlizzardActive && luckDice <= 10 + (selectedPlayer.stats.luk / 4)) {
-        return this.Event.chanceToCatchSnowflake(selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
+      if (this.Event.isBlizzardActive && luckDice <= 10 + (updatedPlayer.stats.luk / 4)) {
+        return this.Event.chanceToCatchSnowflake(updatedPlayer);
       }
 
-      if (luckDice >= 65 - (selectedPlayer.stats.luk / 4)) {
-        return this.Event.generateLuckItemEvent(selectedPlayer)
-          .then(updatedPlayer => resolve(updatedPlayer));
+      if (luckDice >= 65 - (updatedPlayer.stats.luk / 4)) {
+        return this.Event.generateLuckItemEvent(updatedPlayer);
       }
 
-      return this.Event.generateGoldEvent(selectedPlayer, (this.config.multiplier + selectedPlayer.personalMultiplier))
-        .then(updatedPlayer => resolve(updatedPlayer));
-    });
+      return this.Event.generateGoldEvent(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   // Event
