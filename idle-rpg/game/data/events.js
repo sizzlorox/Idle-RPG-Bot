@@ -490,13 +490,13 @@ const events = {
               stolenEquip = victimPlayer.equipment[itemKeys[luckItem]];
               stolenEquip.name = removePreviousOwnerName;
 
-              eventMsg = await helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenEquip.name}!`);
+              eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenEquip.name}!`);
               eventLog = `Stole ${victimPlayer.equipment[itemKeys[luckItem]].name}`;
               otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`;
             } else {
               stolenEquip = victimPlayer.equipment[itemKeys[luckItem]];
               stolenEquip.name = `${victimPlayer.name}'s ${victimPlayer.equipment[itemKeys[luckItem]].name}`;
-              eventMsg = await helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenEquip.name}!`);
+              eventMsg = helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenEquip.name}!`);
               eventLog = `Stole ${stolenEquip.name}`;
               otherPlayerLog = `${stealingPlayer.name} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`;
             }

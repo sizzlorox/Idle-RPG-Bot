@@ -125,12 +125,7 @@ const items = {
     },
     gold = {
       name: 'Gold',
-      stats: {
-        str: 1.5,
-        dex: 0,
-        end: 0,
-        int: 4
-      },
+      power: 1.45,
       gold: 15,
       rarity: 20
     },

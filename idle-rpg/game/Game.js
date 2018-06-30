@@ -78,15 +78,15 @@ class Game {
       await this.Helper.passiveRegen(updatedPlayer, ((5 * updatedPlayer.level) / 4) + (updatedPlayer.stats.end / 8), ((5 * updatedPlayer.level) / 4) + (updatedPlayer.stats.int / 8));
       updatedPlayer = await this.eventResults(updatedPlayer, onlinePlayers);
       if (isNaN(updatedPlayer.equipment.armor.power)) {
-        console.log(updatedPlayer.equipment.armor);
+        errorLog.error(updatedPlayer.equipment.armor);
       }
       
       if (isNaN(updatedPlayer.equipment.weapon.power)) {
-        console.log(updatedPlayer.equipment.weapon);
+        errorLog.error(updatedPlayer.equipment.weapon);
       }
       
       if (isNaN(updatedPlayer.equipment.helmet.power)) {
-        console.log(updatedPlayer.equipment.helmet);
+        errorLog.error(updatedPlayer.equipment.helmet);
       }
       await this.Database.savePlayer(updatedPlayer);
       if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
