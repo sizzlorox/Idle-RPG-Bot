@@ -44,7 +44,7 @@ class Monster {
       const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100));
       const randomTypeChance = Math.round(this.Helper.randomBetween(0, 100));
       const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
-      const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType);
+      const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType && mobType.isSpawnable);
       const randomTypeIndex = this.Helper.randomBetween(0, monsterTypeList.length - 1);
 
       return resolve(monsterTypeList[randomTypeIndex].name);
