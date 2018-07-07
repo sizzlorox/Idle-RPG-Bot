@@ -71,6 +71,10 @@ class Game {
       updatedPlayer.name = player.name;
       updatedPlayer.events++;
 
+      if (!updatedPlayer.quest || updatedPlayer.quest && !updatedPlayer.quest.questMob) {
+        updatedPlayer.quest = newQuest;
+      }
+
       if (updatedPlayer.updated_at) {
         const lastUpdated = (new Date().getTime() - updatedPlayer.updated_at.getTime()) / 1000;
         console.log(`${updatedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
@@ -79,14 +83,17 @@ class Game {
       updatedPlayer = await this.eventResults(updatedPlayer, onlinePlayers);
       if (isNaN(updatedPlayer.equipment.armor.power)) {
         errorLog.error(updatedPlayer.equipment.armor);
+        updatedPlayer = await this.Event.generateLuckItemEvent(updatedPlayer);
       }
-      
+
       if (isNaN(updatedPlayer.equipment.weapon.power)) {
         errorLog.error(updatedPlayer.equipment.weapon);
+        updatedPlayer = await this.Event.generateLuckItemEvent(updatedPlayer);
       }
-      
+
       if (isNaN(updatedPlayer.equipment.helmet.power)) {
         errorLog.error(updatedPlayer.equipment.helmet);
+        updatedPlayer = await this.Event.generateLuckItemEvent(updatedPlayer);
       }
       await this.Database.savePlayer(updatedPlayer);
       if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
@@ -491,6 +498,25 @@ ${rankString}
           });
       })
       .catch(err => errorLog.error(err));
+  }
+
+  async resetQuest(discordUser) {
+    try {
+      const loadedPlayer = await this.Database.loadPlayer(discordUser);
+      if (!loadedPlayer || !loadedPlayer.quest) {
+        return 'I\'m sorry but you have no quest.';
+      }
+      if (((new Date() - loadedPlayer.quest.updated_at) / (1000 * 60 * 60 * 24)) >= 2) {
+        return 'I\'m sorry but you must have a quest at least 2 days old';
+      }
+      const oldQuestMob = loadedPlayer.quest.questMob.name;
+
+      const updatedPlayer = await this.Event.generateQuestEvent(loadedPlayer);
+      await this.Database.savePlayer(updatedPlayer);
+      return `Quest ${oldQuestMob} has been changed to ${updatedPlayer.quest.questMob.name} Count: ${updatedPlayer.quest.questMob.count}`;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   setPlayerTitles(discordBot, selectedPlayer) {

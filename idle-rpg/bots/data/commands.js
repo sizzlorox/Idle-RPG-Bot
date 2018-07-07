@@ -32,6 +32,7 @@ const commands = [
         !el, !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
         !pl, !pvplog - Lists up to 15 past PvP events
         !pl, !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
+        !nq, !newquest - Changes the quest mob if quest is older than 2 days
         !mention <on|off|action|move> - Change if events relating to you will @Mention you
         !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
         !gender <male|female|neutral|neuter> - Change your character's gender
@@ -130,6 +131,16 @@ const commands = [
           Helper.generateInventoryString(playerInventory)
             .then(inv => message.author.send(inv));
         });
+    }
+  },
+
+  resetQuest = {
+    command: ['!newquest', '!nq'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: async (game, message) => {
+      const result = await game.resetQuest(message.author.id);
+      return message.author.send(result);
     }
   },
 
