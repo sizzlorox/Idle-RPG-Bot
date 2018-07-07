@@ -65,10 +65,10 @@ class Event {
       }
       switch (results.result) {
         case enumHelper.battle.outcomes.win:
-          const winStealResult = await events.battle.steal(this.params, results.updatedAttacker, results.updatedDefender, this.InventoryManager);
-          const updatedVictim = await this.Helper.checkHealth(this.params, this.MapManager, winStealResult.victimPlayer, winStealResult.stealingPlayer);
+          const winResults = await events.battle.steal(this.params, results.updatedAttacker, results.updatedDefender, this.InventoryManager);
+          const updatedVictim = await this.Helper.checkHealth(this.params, this.MapManager, winResults.victimPlayer, winResults.stealingPlayer);
           await this.Database.savePlayer(updatedVictim);
-          return await this.Helper.checkExperience(this.params, winStealResult.stealingPlayer);
+          return await this.Helper.checkExperience(this.params, winResults.stealingPlayer);
 
         case enumHelper.battle.outcomes.fled:
           const fledUpdatedDefender = await this.Helper.checkExperience(this.params, results.updatedDefender);
@@ -76,10 +76,10 @@ class Event {
           return await this.Helper.checkExperience(this.params, results.updatedAttacker);
 
         case enumHelper.battle.outcomes.lost:
-          const lostStealResult = await events.battle.steal(this.params, results.updatedDefender, results.updatedAttacker, this.InventoryManager);
-          const lostUpdatedDefender = await this.Helper.checkExperience(this.params, lostStealResult.stealingPlayer);
+          const loseResults = await events.battle.steal(this.params, results.updatedDefender, results.updatedAttacker, this.InventoryManager);
+          const lostUpdatedDefender = await this.Helper.checkExperience(this.params, loseResults.stealingPlayer);
           await this.Database.savePlayer(lostUpdatedDefender);
-          return await this.Helper.checkHealth(this.params, this.MapManager, lostStealResult.victimPlayer, lostStealResult.stealingPlayer);
+          return await this.Helper.checkHealth(this.params, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer);
       }
     } catch (err) {
       errorLog.error(err);
