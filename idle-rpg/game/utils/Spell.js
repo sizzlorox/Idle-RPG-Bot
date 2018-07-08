@@ -7,30 +7,27 @@ class Spell {
   }
 
   generateSpell(selectedPlayer) {
-    return new Promise((resolve) => {
-      const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomSpellChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const spellRarityList = spells.strength.filter(spellRarity => spellRarity.rarity >= randomRarityChance);
-      const spellSpellList = spells.spell.filter(spell => spell.rarity >= randomSpellChance);
-      const randomRarityIndex = this.Helper.randomBetween(0, spellRarityList.length - 1);
+    const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const randomSpellChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const spellRarityList = spells.strength.filter(spellRarity => spellRarity.rarity >= randomRarityChance);
+    const spellSpellList = spells.spell.filter(spell => spell.rarity >= randomSpellChance);
+    const randomRarityIndex = this.Helper.randomBetween(0, spellRarityList.length - 1);
 
-      let spellType;
-      let randomSpellIndex;
-      do {
-        randomSpellIndex = this.Helper.randomBetween(0, spellSpellList.length - 1);
-        spellType = spellSpellList[randomSpellIndex];
-      } while (spellType === undefined);
+    let spellType;
+    let randomSpellIndex;
+    do {
+      randomSpellIndex = this.Helper.randomBetween(0, spellSpellList.length - 1);
+      spellType = spellSpellList[randomSpellIndex];
+    } while (spellType === undefined);
 
-      const spellObj = {
-        name: `${spellRarityList[randomRarityIndex].name} ${spellType.name}`,
-        description: spellType.description,
-        power: spellRarityList[randomRarityIndex].power + spellType.power,
-        chance: spellType.chance,
-        function: spellType.function,
-        type: spellType.type
-      };
-      return resolve(spellObj);
-    });
+    return {
+      name: `${spellRarityList[randomRarityIndex].name} ${spellType.name}`,
+      description: spellType.description,
+      power: spellRarityList[randomRarityIndex].power + spellType.power,
+      chance: spellType.chance,
+      function: spellType.function,
+      type: spellType.type
+    };
   }
 
   // GETTER SETTERS

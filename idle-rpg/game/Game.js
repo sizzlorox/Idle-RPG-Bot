@@ -528,6 +528,10 @@ ${rankString}
     const currentGuild = discordBot.guilds.array()[0];
     const playerDiscordObj = currentGuild.members
       .filterArray(member => member.id === selectedPlayer.discordId)[0];
+    if (!playerDiscordObj) {
+      return selectedPlayer;
+    }
+
     const goldTitleRole = currentGuild.roles.filterArray(role => role.name === 'Gold Hoarder')[0];
     const thiefTitleRole = currentGuild.roles.filterArray(role => role.name === 'Thief')[0];
     const veteranTitleRole = currentGuild.roles.filterArray(role => role.name === 'Veteran Idler')[0];

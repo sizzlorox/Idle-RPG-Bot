@@ -7,78 +7,6 @@ class Item {
     this.Helper = Helper;
   }
 
-  regenerateItemByName(item, position) {
-    const itemName = item.name;
-    console.log(itemName);
-    const splitItemName = itemName.split(' ');
-    let rarity;
-    let material;
-    let type;
-    if (itemName === 'Fists' || itemName === 'Fist') {
-      item.str = 1;
-      item.dex = 1;
-      item.end = 1;
-      item.int = 0;
-      item.position = position;
-      return item;
-    } else if (itemName === 'Nothing') {
-      item.str = 0;
-      item.dex = 0;
-      item.end = 0;
-      item.int = 0;
-      item.position = position;
-      return item;
-    }
-    splitItemName.forEach((thing) => {
-      if (!rarity) {
-        rarity = items.rarity.find(obj => obj.name.includes(thing));
-      }
-
-      if (!material) {
-        material = items.material.find(obj => obj.name.includes(thing));
-      }
-
-      if (!type) {
-        switch (position) {
-          case 'helmet':
-            type = items.type[0].find(obj => obj.name.includes(thing));
-            break;
-          case 'armor':
-            type = items.type[2].find(obj => obj.name.includes(thing));
-            break;
-          case 'weapon':
-            type = items.type[1].find(obj => obj.name.includes(thing));
-            break;
-        }
-      }
-    });
-
-    const itemStr = (rarity.stats.str
-      * (material.stats.str
-        + type.stats.str)) / 4;
-
-    const itemDex = (rarity.stats.dex
-      * (material.stats.dex
-        + type.stats.dex)) / 4;
-
-    const itemEnd = (rarity.stats.end
-      * (material.stats.end
-        + type.stats.end)) / 4;
-
-    const itemInt = (rarity.stats.int
-      * (material.stats.int
-        + type.stats.int)) / 4;
-
-    const itemPosition = position;
-
-    item.str = itemStr;
-    item.dex = itemDex;
-    item.end = itemEnd;
-    item.int = itemInt;
-    item.position = itemPosition;
-    return item;
-  }
-
   generateItem(updatedPlayer, mob) {
     return new Promise((resolve) => {
       const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (updatedPlayer.level / 6));
@@ -182,7 +110,7 @@ class Item {
     const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (updatedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = this.Helper.randomBetween(0, itemRarityList.length - 1);
-    
+
     const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
       + snowFlake.stats.str) / 4);
     const itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
@@ -194,7 +122,7 @@ class Item {
 
     const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
-    const itemObj = {
+    return {
       name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,
       position: snowFlake.position,
       stats: {
@@ -209,8 +137,6 @@ class Item {
       gold: Number((itemRarityList[randomRarityIndex].gold
         * snowFlake.gold).toFixed()) * itemRating
     };
-
-    return itemObj;
   }
 
   // GETTER SETTERS

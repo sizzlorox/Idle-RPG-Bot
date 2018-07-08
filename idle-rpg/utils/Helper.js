@@ -350,15 +350,6 @@ class Helper {
   }
 
   async setPlayerEquipment(playerObj, equipment, item) {
-    const oldItemRating = await this.calculateItemRating(playerObj, playerObj.equipment[item.position]);
-    const newItemRating = await this.calculateItemRating(playerObj, item);
-    if (item.name !== enumHelper.equipment.empty.weapon.name && item.name !== enumHelper.equipment.empty.armor.name) {
-      if (oldItemRating > newItemRating) {
-        infoLog.info({ player: playerObj.name, old: { itemName: playerObj.equipment[item.position], power: oldItemRating }, new: { itemName: item.name, power: newItemRating } });
-        return playerObj;
-      }
-      playerObj.equipment[equipment].gold = item.gold;
-    }
     playerObj.equipment[equipment].name = item.name;
     if (equipment !== enumHelper.equipment.types.relic.position) {
       playerObj.equipment[equipment].power = item.power;
