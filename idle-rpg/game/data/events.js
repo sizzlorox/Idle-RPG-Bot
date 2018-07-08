@@ -77,7 +77,7 @@ ${mobListResult.join('\n')}`;
 
       return '';
     }).join(', ').replace(/,$/g, '');
-    eventMsg = eventMsg.concat(`${killerMob} just killed ${Helper.generatePlayerName(updatedPlayer, true)}!\n`);
+    eventMsg = eventMsg.concat(`| ${killerMob} just killed ${Helper.generatePlayerName(updatedPlayer, true)}!\n`);
     eventLog = eventLog.concat(`${killerMob} just killed you!\n`);
   }
   const eventMsgResults = `↳ ${Helper.capitalizeFirstLetter(Helper.generateGenderString(updatedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${updatedPlayer.health}/${playerMaxHealth}]`;
@@ -88,15 +88,17 @@ ${mobListResult.join('\n')}`;
     if (mobInfo.event.killed > 0) {
       mobKillCountString = mobKillCountString !== '' ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
     }
-    if (mobInfo.event.fled > 0) {
+    if (mobInfo.event.fled > 0 && mobInfo.event.killed === 0) {
       mobFleeCountString = mobKillCountString !== '' ? mobFleeCountString.concat(`, ${mobInfo.event.fled}x \`${mobInfo.mob}\``) : mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
+    } else if (mobInfo.event.fled > 0) {
+      mobFleeCountString = mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
     }
   });
 
   if (mobFleeCountString) {
     eventMsg = eventMsg.concat(results.attackerDamage > results.defenderDamage
-      ? `${mobFleeCountString} just fled from ${Helper.generatePlayerName(results.attacker, true)}!\n`
-      : `${Helper.generatePlayerName(results.attacker, true)} just fled from ${mobFleeCountString}!\n`);
+      ? `| ${mobFleeCountString} just fled from ${Helper.generatePlayerName(results.attacker, true)}!\n`
+      : `| ${Helper.generatePlayerName(results.attacker, true)} just fled from ${mobFleeCountString}!\n`);
     eventLog = eventLog.concat(results.attackerDamage > results.defenderDamage
       ? `${mobFleeCountString} fled from you! [${expGain} exp]\n`
       : `You fled from ${mobFleeCountString}! [${expGain} exp]\n`);
@@ -310,7 +312,7 @@ const events = {
         if (attacker.health <= 0) {
           battleResult = battleResult.replace(`  ${attacker.name} has ${attacker.health}/${playerMaxHealth} HP left.`, '');
           const eventMsg = `[\`${attacker.map.name}\`] ${helper.generatePlayerName(defender, true)} just killed ${helper.generatePlayerName(attacker, true)} with ${helper.generateGenderString(defender, 'his')} \`${defender.equipment.weapon.name}\`!
-    ${helper.generatePlayerName(attacker, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
+↳ ${helper.generatePlayerName(attacker, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
 
           const expGain = Math.floor(attackerDamage / 8);
           const eventLog = `Died to ${defender.name} in ${attacker.map.name}.`;
@@ -338,9 +340,9 @@ const events = {
         if (defender.health > 0 && attacker.health > 0) {
           const eventMsg = attackerDamage > defenderDamage
             ? `[\`${attacker.map.name}\`] ${helper.generatePlayerName(attacker, true)} attacked ${helper.generatePlayerName(defender, true)} with ${helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${helper.generateGenderString(defender, 'he')} managed to get away!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`
+↳ ${helper.capitalizeFirstLetter(helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`
             : `[\`${attacker.map.name}\`] ${helper.generatePlayerName(attacker, true)} attacked ${helper.generatePlayerName(defender, true)} with ${helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${helper.generatePlayerName(defender, true)} was too strong!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
+↳ ${helper.capitalizeFirstLetter(helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
 
           const expGainAttacker = Math.floor(defenderDamage / 8);
           const expGainDefender = Math.floor(attackerDamage / 8);
@@ -371,7 +373,7 @@ const events = {
         battleResult = battleResult.replace(`  ${defender.name} has ${defender.health}/${defenderMaxHealth} HP left.`, '');
         const expGain = Math.floor(defenderDamage / 8);
         const eventMsg = `[\`${attacker.map.name}\`] ${helper.generatePlayerName(attacker, true)} just killed \`${defender.name}\` with ${helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\`!
-    ${helper.capitalizeFirstLetter(helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
+↳ ${helper.capitalizeFirstLetter(helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`;
         const eventLog = `Killed ${defender.name} in ${attacker.map.name}. [${expGain} exp]`;
         const otherPlayerLog = `Died to ${attacker.name} in ${attacker.map.name}.`;
 

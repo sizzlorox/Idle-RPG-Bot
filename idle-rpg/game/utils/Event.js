@@ -88,7 +88,7 @@ class Event {
 
   async attackEventMob(updatedPlayer, multiplier) {
     try {
-      const mob = await this.MonsterManager.generateNewMonster(updatedPlayer);
+      const mob = await this.MonsterManager.generateMonster(updatedPlayer);
       const simulatedBattle = await this.Battle.newSimulateBattle(updatedPlayer, mob);
       const battleResults = await events.battle.pveResults(this.params, simulatedBattle, multiplier);
       updatedPlayer = battleResults.updatedPlayer;
