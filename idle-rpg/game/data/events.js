@@ -139,7 +139,12 @@ const events = {
         await helper.sendPrivateMessage(hook, updatedPlayer, eventLog, false);
         await helper.logEvent(updatedPlayer, db, eventLog, enumHelper.logTypes.move);
 
-        return updatedPlayer;
+        return {
+          type: 'movement',
+          updatedPlayer,
+          msg: eventMsg,
+          pm: eventLog
+        };
       } catch (err) {
         errorLog.error(err);
       }
