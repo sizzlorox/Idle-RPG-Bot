@@ -17,6 +17,9 @@ class DiscordBot {
       this.bot.user.setStatus('idle');
       this.loadGuilds();
     });
+    this.bot.on('guildCreate', (guild) => {
+      this.manageGuildChannels(guild);
+    });
   }
 
   loadGuilds() {
@@ -44,7 +47,16 @@ class DiscordBot {
     if (!hasLeaderboardsChannel) {
       console.log(`Creating Idle-RPG Leaderboards Channel for Guild: ${guild.name}`);
       try {
-        const leaderboardsChannel = await guild.createChannel('leaderboards', 'text', {}, 'Creating channels for Idle-RPG-Bot');
+        const leaderboardsChannel = await guild.createChannel('leaderboards', 'text', [{
+          id: guild.id,
+          deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
+          allow: []
+        },
+        {
+          id: this.bot.user.id,
+          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
+          allow: ['SEND_MESSAGES', 'MANAGE_MESSAGES']
+        }], 'Creating channels for Idle-RPG-Bot');
         await leaderboardsChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
       } catch (err) {
         console.log(err);
@@ -53,7 +65,11 @@ class DiscordBot {
     if (!hasCommandsChannel) {
       console.log(`Creating Idle-RPG Commands Channel for Guild: ${guild.name}`);
       try {
-        const commandsChannel = await guild.createChannel('commands', 'text', {}, 'Creating channels for Idle-RPG-Bot');
+        const commandsChannel = await guild.createChannel('commands', 'text', [{
+          id: guild.id,
+          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
+          allow: ['SEND_MESSAGES', 'ADD_REACTIONS']
+        }], 'Creating channels for Idle-RPG-Bot');
         await commandsChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
         await commandsChannel.setTopic('In order to easier check other players stats/equip, a command channel was created. You can check others with @mentions.', 'Setting up Idle-RPG Channels');
       } catch (err) {
@@ -63,7 +79,16 @@ class DiscordBot {
     if (!hasFAQChannel) {
       console.log(`Creating Idle-RPG FAQ Channel for Guild: ${guild.name}`);
       try {
-        const faqChannel = await guild.createChannel('faq', 'text', {}, 'Creating channels for Idle-RPG-Bot');
+        const faqChannel = await guild.createChannel('faq', 'text', [{
+          id: guild.id,
+          deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
+          allow: []
+        },
+        {
+          id: this.bot.user.id,
+          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
+          allow: ['SEND_MESSAGES']
+        }], 'Creating channels for Idle-RPG-Bot');
         await faqChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
         await faqChannel.setTopic('Frequently asked questions', 'Setting up Idle-RPG Channels');
         await faqChannel.send(`
@@ -79,14 +104,11 @@ The game is in super early development right now so resets are expected. Once th
 • **How can I help with the development?**
 Suggestions are always welcome, if you have experience with NodeJS you're welcome to become a contributor and develop along side with us!
 
-• **The bot is offline. Now what?**
-The bot has been a bad boy and decided to sleep. Mention the @Admin role and we will get to it as fast as we can.
-
 • **My event counter goes up but I did not see anything in the event channels**
 There are some events such as luck events which fail. When they do it does not print anything but your event counter goes up.
 
 • **Is there a way to turn off all the spam from events?**
-Yes, you can either right click the channel to mute and select the mute checkbox, click the bell on top right of discord or mute the whole server by clicking on the servers icon to the left side of discord and selecting the mute checkbox.
+Yes, you can right click the channel to mute and select the mute checkbox.
 
 • **Is this open source?**
 Yes, <https://github.com/sizzlorox/Idle-RPG-Bot>
@@ -103,7 +125,11 @@ No.`);
     if (!hasActionsChannel) {
       console.log(`Creating Idle-RPG Action Channel for Guild: ${guild.name}`);
       try {
-        const actionChannel = await guild.createChannel('actions', 'text', {}, 'Creating channels for Idle-RPG-Bot');
+        const actionChannel = await guild.createChannel('actions', 'text', [{
+          id: guild.id,
+          deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
+          allow: ['ADD_REACTIONS']
+        }], 'Creating channels for Idle-RPG-Bot');
         await actionChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
         await actionChannel.setTopic('Muting this channel is recommended in order to not get spammed.', 'Setting up Idle-RPG Channels');
       } catch (err) {
@@ -113,7 +139,11 @@ No.`);
     if (!hasMovementChannel) {
       console.log(`Creating Idle-RPG Movement Channel for Guild: ${guild.name}`);
       try {
-        const movementChannel = await guild.createChannel('movement', 'text', {}, 'Creating channels for Idle-RPG-Bot');
+        const movementChannel = await guild.createChannel('movement', 'text', [{
+          id: guild.id,
+          deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
+          allow: ['ADD_REACTIONS']
+        }], 'Creating channels for Idle-RPG-Bot');
         await movementChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
         await movementChannel.setTopic('Muting this channel is recommended in order to not get spammed.', 'Setting up Idle-RPG Channels');
       } catch (err) {
