@@ -111,13 +111,13 @@ class Item {
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = this.Helper.randomBetween(0, itemRarityList.length - 1);
 
-    const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
+    const itemStr = Math.round((itemRarityList[randomRarityIndex].power
       + snowFlake.stats.str) / 4);
-    const itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
+    const itemDex = Math.round((itemRarityList[randomRarityIndex].power
       + snowFlake.stats.dex) / 4);
-    const itemEnd = Math.round((itemRarityList[randomRarityIndex].stats.end
+    const itemEnd = Math.round((itemRarityList[randomRarityIndex].power
       + snowFlake.stats.end) / 4);
-    const itemInt = Math.round((itemRarityList[randomRarityIndex].stats.int
+    const itemInt = Math.round((itemRarityList[randomRarityIndex].power
       + snowFlake.stats.int) / 4);
 
     const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
