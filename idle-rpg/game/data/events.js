@@ -128,15 +128,13 @@ ${mobListResult.join('\n')}`;
 const events = {
   movement: {
     movePlayer: async (params, updatedPlayer, mapObj) => {
-      const { hook, db, helper } = params;
+      const { db, helper } = params;
       try {
         updatedPlayer.previousMap = updatedPlayer.map.name;
         updatedPlayer.map = mapObj.map;
         updatedPlayer.travelled++;
         const eventMsg = `${helper.generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`;
         const eventLog = `Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`;
-        await helper.sendMessage(hook, updatedPlayer, true, eventMsg);
-        await helper.sendPrivateMessage(hook, updatedPlayer, eventLog, false);
         await helper.logEvent(updatedPlayer, db, eventLog, enumHelper.logTypes.move);
 
         return {

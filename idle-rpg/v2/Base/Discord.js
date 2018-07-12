@@ -111,6 +111,11 @@ No.`);
           id: guild.id,
           deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
           allow: ['ADD_REACTIONS']
+        },
+        {
+          id: this.bot.user.id,
+          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
+          allow: ['SEND_MESSAGES']
         }], 'Creating channels for Idle-RPG-Bot');
         await actionChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
         await actionChannel.setTopic('Muting this channel is recommended in order to not get spammed.', 'Setting up Idle-RPG Channels');
@@ -125,6 +130,11 @@ No.`);
           id: guild.id,
           deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
           allow: ['ADD_REACTIONS']
+        },
+        {
+          id: this.bot.user.id,
+          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
+          allow: ['SEND_MESSAGES']
         }], 'Creating channels for Idle-RPG-Bot');
         await movementChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
         await movementChannel.setTopic('Muting this channel is recommended in order to not get spammed.', 'Setting up Idle-RPG Channels');
@@ -135,14 +145,21 @@ No.`);
   }
 
   getOnlinePlayers(guild) {
-    return guild.members.filter(member => member.presence !== 'offline').map(member => member.id);
+    return guild.members
+      .filter(member => member.presence.status !== 'offline' && !member.bot && member.displayName !== 'Idle-RPG' && member.displayName !== 'Idle-RPG-Test')
+      .map(member => Object.assign({}, {
+        discordId: member.id,
+        name: member.nickname ? member.nickname : member.displayName
+      }));
   }
 
   sendMessage(guild, result) {
     if (result.updatedPlayer.isPrivateMessage && process.env.NODE_ENV.includes('production')) {
       guild.members.find(member => member.id === results.updatedPlayer.discordId).send(result.pm);
     }
-    return guild.channels.find(channel => channel.name === result.msg.type && channel.type === 'text' && channel.parent.name === 'Idle-RPG').send(result.msg);
+
+    // TODO add check to parent once you find out why its still null
+    return guild.channels.find(channel => channel.name === result.type && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/).send(result.msg);
   }
 
 }

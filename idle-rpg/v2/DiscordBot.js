@@ -32,37 +32,35 @@ class DiscordBot {
       this.bot.user.setActivity('Idle-RPG Game Master');
       this.bot.user.setStatus('idle');
       this.discord.loadGuilds();
-      const interval = process.env.NODE_ENV.includes('production') ? this.tickInMinutes : 1;
-      setInterval(this.heartBeat, 60000 * interval);
+      this.loadHeartBeat();
     });
     this.bot.on('guildCreate', (guild) => {
       this.discord.manageGuildChannels(guild);
     });
   }
 
-  heartBeat() {
-    this.bot.guilds.forEach((guild) => {
-      const guildOnlineMembers = this.discord.getOnlinePlayers(guild);
-      if (guildOnlineMembers.size >= 50) {
+  loadHeartBeat() {
+    const interval = process.env.NODE_ENV.includes('production') ? this.tickInMinutes : 1;
+    setInterval(() => {
+      this.bot.guilds.forEach((guild) => {
+        const guildOnlineMembers = this.discord.getOnlinePlayers(guild);
         console.log(`MinTimer: ${(this.minTimer / 1000) / 60} - MaxTimer: ${(this.maxTimer / 1000) / 60}`);
-        this.minTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
-        this.maxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
-      }
-      console.log(guildOnlineMembers);
-      guildOnlineMembers.forEach((player, index) => {
-        if (!player.timer) {
-          const playerTimer = this.helper.randomBetween(this.minTimer, this.maxTimer);
-          player.timer = setTimeout(async () => {
-            const eventResult = await this.game.selectEvent(player, guildOnlineMembers);
-            delete player.timer;
-            return this.discord.sendMessage(guild, eventResult);
-          }, playerTimer);
+        if (guildOnlineMembers.size >= 50) {
+          this.minTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
+          this.maxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
         }
-        if (process.env.NODE_ENV.includes('production') && discordOnlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) === -1) {
-          onlinePlayerList.splice(index, 1);
-        }
+        guildOnlineMembers.forEach((player) => {
+          if (!player.timer) {
+            const playerTimer = this.helper.randomBetween(this.minTimer, this.maxTimer);
+            player.timer = setTimeout(async () => {
+              const eventResult = await this.game.selectEvent(player, guildOnlineMembers);
+              delete player.timer;
+              return this.discord.sendMessage(guild, eventResult);
+            }, playerTimer);
+          }
+        });
       });
-    });
+    }, 60000 * interval);
   }
 
 }

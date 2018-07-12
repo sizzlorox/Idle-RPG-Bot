@@ -38,11 +38,11 @@ class Event {
   async moveEvent(updatedPlayer, multiplier) {
     try {
       const mapObj = await this.MapManager.moveToRandomMap(updatedPlayer);
-      if (mapObj.map.name === updatedPlayer.map.name || mapObj.map.name === updatedPlayer.previousMap) {
-        return await this.MapManager.getTowns().includes(updatedPlayer.map.name)
-          ? this.generateQuestEvent(updatedPlayer)
-          : this.attackEventMob(updatedPlayer, multiplier);
-      }
+      // if (mapObj.map.name === updatedPlayer.map.name || mapObj.map.name === updatedPlayer.previousMap) {
+      //   return await this.MapManager.getTowns().includes(updatedPlayer.map.name)
+      //     ? this.generateQuestEvent(updatedPlayer)
+      //     : this.attackEventMob(updatedPlayer, multiplier);
+      // }
       return await events.movement.movePlayer(this.params, updatedPlayer, mapObj);
     } catch (err) {
       errorLog.error(err);

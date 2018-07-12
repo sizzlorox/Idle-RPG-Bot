@@ -55,17 +55,27 @@ class Game {
     }
   }
 
-  async selectEvent(discordBot, player, onlinePlayers) {
+  async selectEvent(player, onlinePlayers) {
     try {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
-      const selectedPlayer = Object.assign({}, loadedPlayer);
+      let selectedPlayer = Object.assign({}, loadedPlayer);
       if (!loadedPlayer) {
         selectedPlayer = await this.Database.createNewPlayer(player.discordId, player.name);
-        await this.Helper.sendMessage(selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was born in \`${selectedPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
+
+        return {
+          updatedPlayer: selectedPlayer,
+          msg: `${this.Helper.generatePlayerName(selectedPlayer, true)} was born in \`${selectedPlayer.map.name}\`! Welcome to the world of Idle-RPG!`,
+          pm: 'You were born.'
+        };
       } else if (selectedPlayer.events === 0) {
         selectedPlayer.map = this.Event.MapClass.getRandomTown();
         selectedPlayer.createdAt = new Date().getTime();
-        this.Helper.sendMessage(selectedPlayer, false, `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`);
+
+        return {
+          updatedPlayer: selectedPlayer,
+          msg: `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`,
+          pm: 'You were reborn.'
+        };
       }
       selectedPlayer.name = player.name;
       selectedPlayer.events++;
@@ -79,7 +89,7 @@ class Game {
         console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
       }
       await this.Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.end / 8), ((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.int / 8));
-      let { updatedPlayer, msg, pm } = await this.eventResults(selectedPlayer, onlinePlayers);
+      let { type, updatedPlayer, msg, pm } = await this.eventResults(selectedPlayer, onlinePlayers);
       if (isNaN(updatedPlayer.equipment.armor.power)) {
         errorLog.error(updatedPlayer.equipment.armor);
         updatedPlayer = await this.Event.generateLuckItemEvent(updatedPlayer);
@@ -99,9 +109,9 @@ class Game {
         msg = msg.concat(this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`));
         pm = pm.concat(`You have encountered ${updatedPlayer.events} events!`);
       }
-      await this.setPlayerTitles(discordBot, updatedPlayer);
+      // await this.setPlayerTitles(discordBot, updatedPlayer);
 
-      return { updatedPlayer, msg, pm };
+      return { type, updatedPlayer, msg, pm };
     } catch (err) {
       errorLog.error(err);
     }
