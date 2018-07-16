@@ -207,11 +207,14 @@ const events = {
         updatedPlayer.quest.updated_at = new Date();
         const eventMsg = `[\`${updatedPlayer.map.name}\`] Quest Master has asked ${helper.generatePlayerName(updatedPlayer, true)} to kill ${updatedPlayer.quest.questMob.count === 1 ? 'a' : updatedPlayer.quest.questMob.count} ${mob}!`;
         const eventLog = `Quest Master in ${updatedPlayer.map.name} asked you to kill ${updatedPlayer.quest.questMob.count === 1 ? 'a' : updatedPlayer.quest.questMob.count} ${mob}.`;
-        await helper.sendMessage(hook, updatedPlayer, false, eventMsg);
-        await helper.sendPrivateMessage(hook, updatedPlayer, eventLog, true);
         await helper.logEvent(updatedPlayer, db, eventLog, enumHelper.logTypes.action);
 
-        return updatedPlayer;
+        return {
+          type: 'actions',
+          updatedPlayer,
+          msg: eventMsg,
+          pmMsg: eventLog
+        };
       } catch (err) {
         errorLog.error(err);
       }
@@ -406,7 +409,7 @@ const events = {
       const { hook, db, helper } = params;
       try {
         const playerMaxHealth = 100 + (results.attacker.level * 5);
-        const {
+        let {
           updatedPlayer,
           expGain,
           goldGain,
@@ -420,8 +423,6 @@ const events = {
 
         if (updatedPlayer.health <= 0) {
           updatedPlayer.battles.lost++;
-          await helper.sendMessage(hook, updatedPlayer, false, eventMsg);
-          await helper.sendPrivateMessage(hook, updatedPlayer, pmMsg, true);
           await helper.logEvent(updatedPlayer, db, eventLog, enumHelper.logTypes.action);
 
           return {
@@ -436,9 +437,6 @@ const events = {
           updatedPlayer.experience.total += expGain;
           updatedPlayer.gold.current += goldGain + questGoldGain;
           updatedPlayer.gold.total += goldGain + questGoldGain;
-
-          await helper.sendMessage(hook, updatedPlayer, false, eventMsg);
-          await helper.sendPrivateMessage(hook, updatedPlayer, pmMsg, true);
           await helper.logEvent(updatedPlayer, db, eventLog, enumHelper.logTypes.action);
 
           return {
@@ -454,19 +452,19 @@ const events = {
         updatedPlayer.gold.total += goldGain + questGoldGain;
         updatedPlayer.kills.mob++;
         updatedPlayer.battles.won++;
-        await helper.sendMessage(hook, updatedPlayer, false, eventMsg);
-        await helper.sendPrivateMessage(hook, updatedPlayer, pmMsg, true);
         await helper.logEvent(updatedPlayer, db, eventLog, enumHelper.logTypes.action);
         if (isQuestCompleted) {
-          await helper.sendMessage(hook, updatedPlayer, false, `${helper.generatePlayerName(updatedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
-          await helper.sendPrivateMessage(hook, updatedPlayer, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, true);
+          eventMsg = eventMsg.concat(`${helper.generatePlayerName(updatedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
+          pmMsg = pmMsg.concat(`Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
           await helper.logEvent(hook, db, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, enumHelper.logTypes.action);
         }
 
         return {
           result: enumHelper.battle.outcomes.win,
           updatedPlayer,
-          updatedMob: results.defender
+          updatedMob: results.defender,
+          msg: eventMsg,
+          pmMsg
         };
       } catch (err) {
         errorLog.error(err);
@@ -571,7 +569,7 @@ const events = {
     },
 
     dropItem: async (params, updatedPlayer, mob, ItemManager, InventoryManager) => {
-      const { hook, db, helper } = params;
+      const { db, helper } = params;
       try {
         const dropitemChance = await helper.randomBetween(0, 100);
 
@@ -596,14 +594,17 @@ const events = {
             eventMsg = `**${helper.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`;
           }
           const eventLog = `Received ${item.name} from ${mob[0].name}`;
-          await helper.sendMessage(hook, updatedPlayer, false, eventMsg);
-          await helper.sendPrivateMessage(hook, updatedPlayer, eventLog, true);
           await helper.logEvent(updatedPlayer, db, eventLog, enumHelper.logTypes.action);
 
-          return updatedPlayer;
+          return {
+            type: 'actions',
+            updatedPlayer,
+            msg: eventMsg,
+            pm: eventLog
+          };
         }
 
-        return updatedPlayer;
+        return { updatedPlayer };
       } catch (err) {
         errorLog.error(err);
       }

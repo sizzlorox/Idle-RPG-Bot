@@ -6,43 +6,7 @@ class Battle {
     this.Helper = Helper;
   }
 
-  simulateBattleWithMob(selectedPlayer, mobObj) {
-    return new Promise((resolve) => {
-      const playerDamage = this.Helper.sumPlayerTotalStrength(selectedPlayer);
-      const playerEvasive = this.Helper.sumPlayerTotalDexterity(selectedPlayer)
-        + (this.Helper.sumPlayerTotalIntelligence(selectedPlayer) / 2);
-      const playerDefense = this.Helper.sumPlayerTotalEndurance(selectedPlayer);
-
-      const mobDamage = mobObj.stats.str;
-      const mobEvasive = mobObj.stats.dex;
-      const mobDefense = mobObj.stats.end;
-
-      const playerChance = Math.ceil((playerDamage + playerEvasive) - (mobDefense + mobEvasive));
-      const mobChance = Math.ceil((mobDamage + mobEvasive) - (playerDefense + playerEvasive));
-
-      return resolve({ playerChance, mobChance });
-    });
-  }
-
-  simulateBattleWithPlayer(selectedPlayer, otherPlayer) {
-    const playerDamage = this.Helper.sumPlayerTotalStrength(selectedPlayer);
-    const playerEvasive = this.Helper.sumPlayerTotalDexterity(selectedPlayer)
-      + (this.Helper.sumPlayerTotalIntelligence(selectedPlayer) / 2);
-    const playerDefense = this.Helper.sumPlayerTotalEndurance(selectedPlayer);
-
-    const otherPlayerDamage = this.Helper.sumPlayerTotalStrength(otherPlayer);
-    const otherPlayerEvasive = this.Helper.sumPlayerTotalDexterity(otherPlayer)
-      + (this.Helper.sumPlayerTotalIntelligence(otherPlayer) / 2);
-    const otherPlayerDefense = this.Helper.sumPlayerTotalEndurance(otherPlayer);
-
-    const playerChance = Math.round((playerDamage + playerEvasive) - (otherPlayerDefense + otherPlayerEvasive)) + this.Helper.randomBetween(1, 5 + this.Helper.sumPlayerTotalLuck(selectedPlayer));
-    const otherPlayerChance = Math.round((otherPlayerDamage + otherPlayerEvasive) - (playerDefense + playerEvasive)) + this.Helper.randomBetween(1, 5 + this.Helper.sumPlayerTotalLuck(otherPlayer));
-    this.Helper.printBattleDebug(`PlayerChance: ${playerChance} - OtherPlayerChance: ${otherPlayerChance}`);
-
-    return { playerChance, otherPlayerChance };
-  }
-
-  newSimulateBattle(attacker, defender) {
+  simulateBattle(attacker, defender) {
     return new Promise((resolve) => {
       const maxRounds = 5;
       const battleResults = [];

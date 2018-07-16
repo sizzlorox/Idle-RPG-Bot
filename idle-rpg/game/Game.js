@@ -106,7 +106,7 @@ class Game {
       }
       await this.Database.savePlayer(updatedPlayer);
       if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
-        msg = msg.concat(this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`));
+        msg = msg.concat(`\n${this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`)}`);
         pm = pm.concat(`You have encountered ${updatedPlayer.events} events!`);
       }
       // await this.setPlayerTitles(discordBot, updatedPlayer);

@@ -38,11 +38,11 @@ class Event {
   async moveEvent(updatedPlayer, multiplier) {
     try {
       const mapObj = await this.MapManager.moveToRandomMap(updatedPlayer);
-      // if (mapObj.map.name === updatedPlayer.map.name || mapObj.map.name === updatedPlayer.previousMap) {
-      //   return await this.MapManager.getTowns().includes(updatedPlayer.map.name)
-      //     ? this.generateQuestEvent(updatedPlayer)
-      //     : this.attackEventMob(updatedPlayer, multiplier);
-      // }
+      if (mapObj.map.name === updatedPlayer.map.name || mapObj.map.name === updatedPlayer.previousMap) {
+        return await this.MapManager.getTowns().includes(updatedPlayer.map.name)
+          ? this.generateQuestEvent(updatedPlayer)
+          : this.attackEventMob(updatedPlayer, multiplier);
+      }
       return await events.movement.movePlayer(this.params, updatedPlayer, mapObj);
     } catch (err) {
       errorLog.error(err);
@@ -94,14 +94,32 @@ class Event {
       updatedPlayer = battleResults.updatedPlayer;
       switch (battleResults.result) {
         case enumHelper.battle.outcomes.win:
-          updatedPlayer = await events.battle.dropItem(this.params, updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager);
-          return await this.Helper.checkExperience(this.params, updatedPlayer);
+          const dropItemResults = await events.battle.dropItem(this.params, updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager);
+          const checkedWinResults = await this.Helper.checkExperience(this.params, dropItemResults.updatedPlayer);
+          return {
+            type: 'actions',
+            updatedPlayer: checkedWinResults.updatedPlayer,
+            msg: battleResults.msg.concat(dropItemResults.msg ? `\n${dropItemResults.msg}` : '').concat(checkedWinResults.msg ? `\n${checkedWinResults.msg}` : ''),
+            pmMsg: battleResults.pmMsg.concat(dropItemResults.pmMsg ? `\n${dropItemResults.pmMsg}` : '').concat(checkedWinResults.pmMsg ? `\n${checkedWinResults.pmMsg}` : '')
+          };
 
         case enumHelper.battle.outcomes.fled:
-          return await this.Helper.checkExperience(this.params, updatedPlayer);
+          const checkedFledResults = await this.Helper.checkExperience(this.params, updatedPlayer);
+          return {
+            type: 'actions',
+            updatedPlayer: checkedFledResults.updatedPlayer,
+            msg: battleResults.msg.concat(checkedFledResults.msg ? `${checkedFledResults.msg}` : ''),
+            pmMsg: battleResults.pmMsg.concat(checkedFledResults.pmMsg ? `\n${checkedFledResults.pmMsg}` : '')
+          };
 
         case enumHelper.battle.outcomes.lost:
-          return await this.Helper.checkHealth(this.params, this.MapManager, updatedPlayer, battleResults.updatedMob);
+          const checkLostResults = await this.Helper.checkHealth(this.params, this.MapManager, updatedPlayer, battleResults.updatedMob);
+          return {
+            type: 'actions',
+            updatedPlayer: checkLostResults.updatedPlayer,
+            msg: battleResults.msg.concat(checkLostResults.msg ? `\n${checkLostResults.msg}` : ''),
+            pmMsg: battleResults.pmMsg.concat(checkLostResults.pmMsg ? `\n${checkLostResults.pmMsg}` : '')
+          };
       }
     } catch (err) {
       errorLog.error(err);

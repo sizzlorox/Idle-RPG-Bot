@@ -8,6 +8,7 @@ const messages = require('../game/data/messages');
 const RNG = seedrandom();
 
 class Helper {
+
   printBattleDebug(debugMsg) {
     if (battleDebug) {
       console.log(debugMsg);
@@ -279,10 +280,12 @@ class Helper {
       + player.equipment.relic.luk;
   }
 
-  async checkExperience(params, playerObj) {
-    const { hook, db } = params;
+  async checkExperience(Database, playerObj, eventMsg, pmMsg) {
     try {
       if (playerObj.experience.current >= playerObj.level * 15) {
+        eventMsg.push(this.setImportantMessage(`${playerObj.name} is now level ${playerObj.level}!`));
+        eventLog.push(`Leveled up to level ${playerObj.level}`);
+
         playerObj.level++;
         playerObj.experience.current = 0;
         playerObj.health = 100 + (playerObj.level * 5);
@@ -329,21 +332,20 @@ class Helper {
         }
 
         if (playerObj.class !== oldClass) {
-          await this.sendMessage(hook, playerObj, false, this.setImportantMessage(`${playerObj.name} has decided to become a ${playerObj.class}!`));
-          await this.sendPrivateMessage(hook, playerObj, `You have become a ${playerObj.class}`, true);
-          await this.logEvent(playerObj, db, `You have become a ${playerObj.class}`, enumHelper.logTypes.action);
+          eventMsg.push(this.setImportantMessage(`${playerObj.name} has decided to become a ${playerObj.class}!`));
+          pmMsg.push(`You have become a ${playerObj.class}`);
+          await this.logEvent(playerObj, Database, `You have become a ${playerObj.class}`, enumHelper.logTypes.action);
         }
+        await this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
 
-        const eventMsg = this.setImportantMessage(`${playerObj.name} is now level ${playerObj.level}!`);
-        const eventLog = `Leveled up to level ${playerObj.level}`;
-        await this.sendMessage(hook, playerObj, false, eventMsg);
-        await this.sendPrivateMessage(hook, playerObj, eventLog, true);
-        await this.logEvent(playerObj, db, eventLog, enumHelper.logTypes.action);
-
-        return playerObj;
+        return {
+          updatedPlayer: playerObj,
+          msg: eventMsg,
+          pmMsg
+        };
       }
 
-      return playerObj;
+      return { updatedPlayer: playerObj };
     } catch (err) {
       errorLog.error(err);
     }
@@ -368,12 +370,14 @@ class Helper {
     return playerObj;
   }
 
-  async checkHealth(params, MapClass, playerObj, attackerObj) {
-    const { hook, db } = params;
+  async checkHealth(Database, MapClass, playerObj, attackerObj, eventMsg, pmMsg, otherPlayerPmMsg) {
     try {
       if (playerObj.health <= 0) {
         const expLoss = Math.ceil(playerObj.experience.current / 8);
         const goldLoss = Math.ceil(playerObj.gold.current / 12);
+        eventMsg.push(this.setImportantMessage(`${playerObj.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`));
+        pmMsg.push(`You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`);
+        let bountyEventLog;
         playerObj.health = 100 + (playerObj.level * 5);
         playerObj.mana = 50 + (playerObj.level * 5);
         playerObj.map = await MapClass.getRandomTown();
@@ -392,8 +396,8 @@ class Helper {
           switch (randomEquip) {
             case 0:
               if (playerObj.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
-                await this.sendMessage(hook, playerObj, false, this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.helmet.name} just broke!`));
-                await this.sendPrivateMessage(hook, playerObj, `Your ${playerObj.equipment.helmet.name} just broke!`, true);
+                eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.helmet.name} just broke!`));
+                pmMsg.push(`Your ${playerObj.equipment.helmet.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.helmet.position,
@@ -403,8 +407,8 @@ class Helper {
               break;
             case 1:
               if (playerObj.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
-                await this.sendMessage(hook, playerObj, false, this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.armor.name} just broke!`));
-                await this.sendPrivateMessage(hook, playerObj, `Your ${playerObj.equipment.armor.name} just broke!`, true);
+                eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.armor.name} just broke!`));
+                pmMsg.push(`Your ${playerObj.equipment.armor.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.armor.position,
@@ -414,8 +418,8 @@ class Helper {
               break;
             case 2:
               if (playerObj.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-                await this.sendMessage(hook, playerObj, false, this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.weapon.name} just broke!`))
-                await this.sendPrivateMessage(hook, playerObj, `Your ${playerObj.equipment.weapon.name} just broke!`, true);
+                eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.weapon.name} just broke!`));
+                pmMsg.push(`Your ${playerObj.equipment.weapon.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.weapon.position,
@@ -435,31 +439,31 @@ class Helper {
         } else {
           if (playerObj.currentBounty > 0) {
             const bountyGain = Math.ceil(playerObj.currentBounty / 1.25);
-            const bountyEventLog = `Claimed ${bountyGain} gold for ${playerObj.name}'s head`;
+            bountyEventLog = `Claimed ${bountyGain} gold for ${playerObj.name}'s head`;
             attackerObj.gold.current += Number(bountyGain);
             attackerObj.gold.total += Number(bountyGain);
             playerObj.currentBounty = 0;
-            await this.sendMessage(hook, playerObj, false, this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`))
-            await this.sendPrivateMessage(hook, playerObj, `${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`, true);
-            await this.sendPrivateMessage(hook, attackerObj, bountyEventLog, true);
-            await this.logEvent(attackerObj, db, bountyEventLog, enumHelper.logTypes.action);
+            eventMsg.push(this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`));
+            pmMsg.push(`You just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`)
+            otherPlayerPmMsg.push(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`);
+            await this.logEvent(attackerObj, Database, bountyEventLog, enumHelper.logTypes.action);
           }
 
           playerObj.deaths.player++;
           attackerObj.kills.player++;
-          await db.savePlayer(attackerObj);
+          await Database.savePlayer(attackerObj);
         }
+        await this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
 
-        const eventMsg = this.setImportantMessage(`${playerObj.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`);
-        const eventLog = `You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`;
-        await this.sendMessage(hook, playerObj, false, eventMsg);
-        await this.sendPrivateMessage(hook, playerObj, eventLog, true);
-        await this.logEvent(playerObj, db, eventLog, enumHelper.logTypes.action);
-
-        return playerObj;
+        return {
+          updatedPlayer: playerObj,
+          msg: eventMsg,
+          pmMsg,
+          otherPlayerPmMsg
+        };
       }
 
-      return playerObj;
+      return { updatedPlayer: playerObj };
     } catch (err) {
       errorLog.error(err);
     }

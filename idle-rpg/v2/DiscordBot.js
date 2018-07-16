@@ -1,6 +1,6 @@
 const DiscordJS = require('discord.js');
 const fs = require('fs');
-const Game = require('../game/Game');
+const Game = require('../v2/idle-rpg/Game');
 const Helper = require('../utils/Helper');
 const Discord = require('./Base/Discord');
 const { minimalTimer, maximumTimer, botLoginToken } = require('../../settings');
@@ -53,7 +53,7 @@ class DiscordBot {
           if (!player.timer) {
             const playerTimer = this.helper.randomBetween(this.minTimer, this.maxTimer);
             player.timer = setTimeout(async () => {
-              const eventResult = await this.game.selectEvent(player, guildOnlineMembers);
+              const eventResult = await this.game.activateEvent(player, guildOnlineMembers);
               delete player.timer;
               return this.discord.sendMessage(guild, eventResult);
             }, playerTimer);
