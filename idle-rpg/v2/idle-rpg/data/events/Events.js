@@ -45,7 +45,7 @@ class Events {
   async moveEvent(playerObj) {
     const updatedPlayer = Object.assign({}, playerObj);
     const eventMsg = [];
-    const pmMsg = [];
+    const eventLog = [];
     try {
       const mapObj = await this.MapManager.moveToRandomMap(updatedPlayer);
       if (mapObj.map.name === updatedPlayer.previousMap) {
@@ -56,16 +56,16 @@ class Events {
       updatedPlayer.previousMap = updatedPlayer.map.name;
       updatedPlayer.map = mapObj.map;
       updatedPlayer.travelled++;
-      eventMsg.push(`${this.Helper.generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`);
-      const eventLog = `Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`;
-      pmMsg.push(eventLog);
+      console.log('move event');
+      await eventMsg.push(`${this.Helper.generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`);
+      eventLog.push(`Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`);
       await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.move);
 
       return {
         type: 'movement',
         updatedPlayer,
         msg: eventMsg,
-        pm: pmMsg
+        pm: eventLog
       };
     } catch (err) {
       errorLog.error(err);
@@ -79,6 +79,7 @@ class Events {
       if (this.MapManager.getTowns().includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
         const townSellResults = await this.TownEvents.sell(updatedPlayer);
         const townItemResults = await this.TownEvents.generateItemEvent(townSellResults.updatedPlayer);
+        console.log('town item event');
 
         return {
           type: 'actions',
@@ -93,20 +94,25 @@ class Events {
           const playerToBattle = await this.Battle.findPlayerToBattle(updatedPlayer, onlinePlayers);
           if (!playerToBattle) {
             const mobToBattle = await this.MonsterManager.generateMonster(updatedPlayer);
+            console.log('pve event');
             return await this.Battle.playerVsMob(updatedPlayer, mobToBattle, (this.config.multiplier + updatedPlayer.personalMultiplier));
           }
 
+          console.log('pvp event');
           return await this.Battle.playerVsPlayer(updatedPlayer, playerToBattle);
         }
 
         if (updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
           const mobToBattle = await this.MonsterManager.generateMonster(updatedPlayer);
+          console.log('pve event');
           return await this.Battle.playerVsMob(updatedPlayer, mobToBattle, (this.config.multiplier + updatedPlayer.personalMultiplier));
         }
 
+        console.log('camp event');
         return await this.Battle.camp(updatedPlayer);
       }
 
+      console.log('attack item event');
       return await this.LuckEvents.itemEvent(updatedPlayer);
     } catch (err) {
       errorLog.error(err);
@@ -118,16 +124,20 @@ class Events {
     try {
       const luckDice = await this.Helper.randomBetween(0, 100);
       if (luckDice <= 5 + (updatedPlayer.stats.luk / 4)) {
+        console.log('gods event');
         return this.LuckEvents.godsEvent(updatedPlayer);
       }
 
       if (this.MapManager.getTowns().includes(updatedPlayer.map.name)) {
         if (luckDice <= 20 + (updatedPlayer.stats.luk / 4)) {
+          console.log('gamble event');
           return this.LuckEvents.gamblingEvent(updatedPlayer);
         }
 
         if (luckDice <= 45 + (updatedPlayer.stats.luk / 4)) {
-          return this.LuckEvents.questEvent(updatedPlayer);
+          console.log('quest event');
+          const mobForQuest = await this.MonsterManager.generateMonster(updatedPlayer);
+          return this.LuckEvents.questEvent(updatedPlayer, mobForQuest);
         }
       }
 
@@ -137,6 +147,7 @@ class Events {
       // }
 
       if (luckDice >= 65 - (updatedPlayer.stats.luk / 4)) {
+        console.log('luck item event');
         return await this.LuckEvents.itemEvent(updatedPlayer);
       }
 

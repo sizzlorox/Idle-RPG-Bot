@@ -1,3 +1,5 @@
+const { infoLog, actionLog, moveLog } = require('../../utils/logger');
+
 class Discord {
 
   constructor(bot) {
@@ -154,24 +156,34 @@ No.`);
   }
 
   sendMessage(guild, result) {
-    if (result.updatedPlayer.isPrivateMessage && result.pm) {
-      if (result.type !== 'actions' && result.updatedPlayer.isPrivateMessageImportant) {
+    try {
+      if (result.pm && result.updatedPlayer.isPrivateMessage && result.updatedPlayer.isPrivateMessageImportant && result.type === 'actions'
+        || result.pm && result.updatedPlayer.isPrivateMessage && !result.updatedPlayer.isPrivateMessageImportant) {
+        const guildMember = guild.members.find(member => member.id === result.updatedPlayer.discordId);
+        guildMember.send(result.pm.join('\n'));
+      }
+      if (result.attackerObj && result.attackerObj.isPrivateMessage && result.otherPlayerPmMsg) {
+        const guildMember = guild.members.find(member => member.id === result.attackerObj.discordId);
+        guildMember.send(result.otherPlayerPmMsg.join('\n'));
+      }
+      if (!result.msg) {
         return;
       }
-      const guildMember = guild.members.find(member => member.id === result.updatedPlayer.discordId);
-      result.pm.forEach(msg => guildMember.send(msg));
-    }
-    if (result.attackerObj && result.attackerObj.isPrivateMessage && result.otherPlayerPmMsg) {
-      const guildMember = guild.members.find(member => member.id === result.attackerObj.discordId);
-      result.otherPlayerPmMsg.forEach(msg => guildMember.send(msg));
-    }
-    if (!result.msg) {
-      return;
-    }
 
-    // TODO add check to parent once you find out why its still null
-    const channelToSend = guild.channels.find(channel => channel.name === result.type && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
-    return result.msg.forEach(msg => channelToSend.send(msg));
+      switch (result.type) {
+        case 'actions':
+          actionLog.info(result.msg);
+          break;
+        case 'movement':
+          moveLog.info(result.msg);
+          break;
+      }
+      // TODO add check to parent once you find out why its still null
+      const channelToSend = guild.channels.find(channel => channel.name === result.type && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
+      return channelToSend.send(result.msg.join('\n'));
+    } catch (err) {
+      infoLog.info(err);
+    }
   }
 
 }

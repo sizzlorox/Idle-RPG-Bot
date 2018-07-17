@@ -100,6 +100,18 @@ class Game {
     return eventResults;
   }
 
+  get dbClass() {
+    return this.Database;
+  }
+
+  get getMultiplier() {
+    return this.config.multiplier;
+  }
+
+  set setMultiplier(value) {
+    this.config.multiplier = value;
+  }
+
   fetchCommand(params) {
     return this.Commands[params.command](params);
   }

@@ -283,8 +283,8 @@ class Helper {
   async checkExperience(Database, playerObj, eventMsg, eventLog) {
     try {
       if (playerObj.experience.current >= playerObj.level * 15) {
-        eventMsg.push(this.setImportantMessage(`${playerObj.name} is now level ${playerObj.level}!`));
-        eventLog.push(`Leveled up to level ${playerObj.level}`);
+        await eventMsg.push(this.setImportantMessage(`${playerObj.name} is now level ${playerObj.level}!`));
+        await await eventLog.push(`Leveled up to level ${playerObj.level}`);
 
         playerObj.level++;
         playerObj.experience.current = 0;
@@ -332,8 +332,8 @@ class Helper {
         }
 
         if (playerObj.class !== oldClass) {
-          eventMsg.push(this.setImportantMessage(`${playerObj.name} has decided to become a ${playerObj.class}!`));
-          eventLog.push(`You have become a ${playerObj.class}`);
+          await eventMsg.push(this.setImportantMessage(`${playerObj.name} has decided to become a ${playerObj.class}!`));
+          await eventLog.push(`You have become a ${playerObj.class}`);
         }
         await this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
 
@@ -369,13 +369,13 @@ class Helper {
     return playerObj;
   }
 
-  async checkHealth(Database, MapClass, playerObj, attackerObj, eventMsg, pmMsg, otherPlayerPmMsg) {
+  async checkHealth(Database, MapClass, playerObj, attackerObj, eventMsg, eventLog, otherPlayerPmMsg) {
     try {
       if (playerObj.health <= 0) {
         const expLoss = Math.ceil(playerObj.experience.current / 8);
         const goldLoss = Math.ceil(playerObj.gold.current / 12);
-        eventMsg.push(this.setImportantMessage(`${playerObj.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`));
-        pmMsg.push(`You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`);
+        await eventMsg.push(this.setImportantMessage(`${playerObj.name} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`));
+        eventLog.push(`You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`);
         let bountyEventLog;
         playerObj.health = 100 + (playerObj.level * 5);
         playerObj.mana = 50 + (playerObj.level * 5);
@@ -395,8 +395,8 @@ class Helper {
           switch (randomEquip) {
             case 0:
               if (playerObj.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
-                eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.helmet.name} just broke!`));
-                pmMsg.push(`Your ${playerObj.equipment.helmet.name} just broke!`);
+                await eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.helmet.name} just broke!`));
+                eventLog.push(`Your ${playerObj.equipment.helmet.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.helmet.position,
@@ -406,8 +406,8 @@ class Helper {
               break;
             case 1:
               if (playerObj.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
-                eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.armor.name} just broke!`));
-                pmMsg.push(`Your ${playerObj.equipment.armor.name} just broke!`);
+                await eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.armor.name} just broke!`));
+                eventLog.push(`Your ${playerObj.equipment.armor.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.armor.position,
@@ -417,8 +417,8 @@ class Helper {
               break;
             case 2:
               if (playerObj.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
-                eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.weapon.name} just broke!`));
-                pmMsg.push(`Your ${playerObj.equipment.weapon.name} just broke!`);
+                await eventMsg.push(this.setImportantMessage(`${playerObj.name}'s ${playerObj.equipment.weapon.name} just broke!`));
+                eventLog.push(`Your ${playerObj.equipment.weapon.name} just broke!`);
                 await this.setPlayerEquipment(
                   playerObj,
                   enumHelper.equipment.types.weapon.position,
@@ -442,8 +442,8 @@ class Helper {
             attackerObj.gold.current += Number(bountyGain);
             attackerObj.gold.total += Number(bountyGain);
             playerObj.currentBounty = 0;
-            eventMsg.push(this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`));
-            pmMsg.push(`You just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`)
+            await eventMsg.push(this.setImportantMessage(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`));
+            eventLog.push(`You just claimed ${bountyGain} gold as a reward for killing ${playerObj.name}!`)
             otherPlayerPmMsg.push(`${attackerObj.name} just claimed ${bountyGain} gold as a reward for killing you!`);
             await this.logEvent(attackerObj, Database, bountyEventLog, enumHelper.logTypes.action);
           }
@@ -457,7 +457,7 @@ class Helper {
         return {
           updatedPlayer: playerObj,
           msg: eventMsg,
-          pmMsg,
+          pm: eventLog,
           attackerObj,
           otherPlayerPmMsg
         };

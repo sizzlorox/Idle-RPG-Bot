@@ -19,7 +19,7 @@ class Town {
   async sell(playerObj) {
     const updatedPlayer = Object.assign({}, playerObj);
     const eventMsg = [];
-    const pmMsg = [];
+    const eventLog = [];
     try {
       if (updatedPlayer.inventory.equipment.length > 0) {
         let profit = 0;
@@ -31,16 +31,15 @@ class Town {
         updatedPlayer.gold.current += profit;
         updatedPlayer.gold.total += profit;
 
-        eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just sold what they found adventuring for ${profit} gold!`);
-        const eventLog = `Made ${profit} gold selling what you found adventuring`;
-        pmMsg.push(eventLog);
+        await eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just sold what they found adventuring for ${profit} gold!`);
+        eventLog.push(`Made ${profit} gold selling what you found adventuring`);
         await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
         return {
           type: 'actions',
           updatedPlayer,
           msg: eventMsg,
-          pm: pmMsg
+          pm: eventLog
         };
       }
 
@@ -53,7 +52,7 @@ class Town {
   async generateItemEvent(playerObj) {
     let updatedPlayer = Object.assign({}, playerObj);
     const eventMsg = [];
-    const pmMsg = [];
+    const eventLog = [];
     try {
       const item = await this.ItemManager.generateItem(updatedPlayer);
       const itemCost = Math.round(item.gold);
@@ -77,26 +76,22 @@ class Town {
         updatedPlayer = await this.Helper.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types[item.position].position, item);
       } else if (updatedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
         return {
-          type: 'actions',
           updatedPlayer,
-          msg: eventMsg,
-          pm: pmMsg
         };
       } else {
         updatedPlayer.gold.current -= itemCost;
         updatedPlayer = await this.InventoryManager.addItemIntoInventory(updatedPlayer, item);
       }
 
-      eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`);
-      const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
-      pmMsg.push(eventLog);
+      await eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`);
+      eventLog.push(`Purchased ${item.name} from Town for ${itemCost} Gold`);
       await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
       return {
         type: 'actions',
         updatedPlayer,
         msg: eventMsg,
-        pm: pmMsg
+        pm: eventLog
       };
     } catch (err) {
       errorLog.error(err);
