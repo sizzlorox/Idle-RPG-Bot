@@ -18,7 +18,7 @@ class DiscordBot {
     this.CommandParser = new CommandParser({
       Game: this.Game,
       Helper: this.Helper,
-      Bot: this.discord
+      Bot: this.bot
     });
     this.loadEventListeners();
     this.bot.login(botLoginToken);

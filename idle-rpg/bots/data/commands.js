@@ -506,9 +506,14 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, messageObj } = params;
+      const { Game, actionsChannel, messageObj } = params;
       if (messageObj.content.includes(' ')) {
-        return Game.fetchCommand('castSpell', messageObj.author, messageObj.content.split(/ (.+)/)[1].toLowerCase());
+        return Game.fetchCommand({
+          command: 'castSpell',
+          author: messageObj.author,
+          actionsChannel,
+          spell: messageObj.content.split(/ (.+)/)[1].toLowerCase()
+        });
       }
       let spellsString = '```List of Spells:\n  ';
       spellsString = spellsString.concat(Object.keys(spells).map(spell => `${spell} - ${spells[spell].spellCost} gold - ${spells[spell].description}`).join('\n  '));

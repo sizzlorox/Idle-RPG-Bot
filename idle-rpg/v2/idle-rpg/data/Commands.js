@@ -12,16 +12,19 @@ class Commands {
     this.MapManager = MapManager;
   }
 
-  playerStats(commandAuthor) {
-    return this.Database.loadPlayer(commandAuthor.id, enumHelper.statsSelectFields);
+  playerStats(params) {
+    const { author } = params;
+    return this.Database.loadPlayer(author.id, enumHelper.statsSelectFields);
   }
 
-  playerInventory(commandAuthor) {
-    return this.Database.loadPlayer(commandAuthor.id, enumHelper.inventorySelectFields);
+  playerInventory(params) {
+    const { author } = params;
+    return this.Database.loadPlayer(author.id, enumHelper.inventorySelectFields);
   }
 
-  async resetQuest(commandAuthor) {
-    const loadedPlayer = await this.Database.loadPlayer(commandAuthor);
+  async resetQuest(params) {
+    const { author } = params;
+    const loadedPlayer = await this.Database.loadPlayer(author);
     try {
       if (!loadedPlayer || !loadedPlayer.quest) {
         return 'I\'m sorry but you have no quest.';
@@ -38,8 +41,9 @@ class Commands {
     }
   }
 
-  joinLottery(commandAuthor) {
-    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
+  joinLottery(params) {
+    const { author } = params;
+    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         if (player.lottery.joined) {
           return 'You\'ve already joined todays daily lottery!';
@@ -72,7 +76,8 @@ class Commands {
     return `Current Multiplier: ${this.config.multiplier}x\nActive Bless: ${this.config.spells.activeBless}x`;
   }
 
-  top10(commandAuthor, type) {
+  top10(params) {
+    const { author, type } = params;
     return this.Database.loadTop10(type)
       .then((top10) => {
         const rankString = `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
@@ -91,14 +96,15 @@ class Commands {
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`;
 
-        commandAuthor.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
+        author.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
 ${rankString}
         \`\`\``);
       });
   }
 
-  getRank(commandAuthor, type) {
-    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
+  getRank(params) {
+    const { author, type } = params;
+    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then(player => this.Database.loadCurrentRank(player, type))
       .then(currentRank => currentRank.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
         .sort((player1, player2) => {
@@ -112,16 +118,16 @@ ${rankString}
           }
 
           return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
-        }).findIndex(player => player.discordId === commandAuthor.id))
+        }).findIndex(player => player.discordId === author.id))
       .then((rank) => {
-        commandAuthor.send(`You're currently ranked ${rank + 1} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
+        author.send(`You're currently ranked ${rank + 1} in ${Object.keys(type)[0].includes('.') ? Object.keys(type)[0].split('.')[0] : Object.keys(type)[0]}!`);
       });
   }
 
-  castSpell(commandAuthor, spell) {
-    return this.Database.loadPlayer(commandAuthor.id, { pastEvents: 0, pastPvpEvents: 0 })
+  castSpell(params) {
+    const { author, actionsChannel, spell } = params;
+    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
-        const guildActionsChannel = commandAuthor.guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
         switch (spell) {
           case 'bless':
             if (castingPlayer.gold.current >= globalSpells.bless.spellCost) {
@@ -129,22 +135,22 @@ ${rankString}
               castingPlayer.gold.current -= globalSpells.bless.spellCost;
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
-                  commandAuthor.send('Spell has been cast!');
+                  author.send('Spell has been cast!');
                 })
                 .then(() => this.Database.updateGame(this.config));
               this.config.multiplier += 1;
               this.config.spells.activeBless++;
-              guildActionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name} just cast ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+              actionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name} just cast ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               setTimeout(() => {
                 this.config.multiplier -= 1;
                 this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
                 this.config.spells.activeBless--;
                 this.Database.updateGame(this.config);
 
-                guildActionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+                actionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
               }, 1800000); // 30 minutes
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
+              author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
             }
             break;
 
@@ -153,13 +159,14 @@ ${rankString}
               castingPlayer.gold.current -= globalSpells.home.spellCost;
               const randomHome = this.MapManager.getRandomTown();
               castingPlayer.map = randomHome;
-              guildActionsChannel.send(`${castingPlayer.name} just cast ${spell}!\nTeleported back to ${randomHome.name}.`);
+              actionsChannel.send(`${castingPlayer.name} just cast ${spell} and teleported back to ${randomHome.name}.`);
+              author.send(`Teleported back to ${randomHome.name}.`);
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
-                  commandAuthor.send('Spell has been cast!');
+                  author.send('Spell has been cast!');
                 });
             } else {
-              commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold.current} gold.`);
+              author.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold.current} gold.`);
             }
             break;
         }

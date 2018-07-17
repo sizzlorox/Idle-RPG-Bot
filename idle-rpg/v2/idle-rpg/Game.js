@@ -100,8 +100,7 @@ class Game {
   }
 
   fetchCommand(params) {
-    const { command, author, type } = params;
-    return this.Commands[command](author, type);
+    return this.Commands[params.command](params);
   }
 
 }
