@@ -5,11 +5,10 @@ const { errorLog } = require('../../../utils/logger');
 class Commands {
 
   constructor(params) {
-    const { Helper, Database, Events, Config, MapManager } = params;
+    const { Helper, Database, Events, MapManager } = params;
     this.Helper = Helper;
     this.Database = Database;
     this.Events = Events;
-    this.config = Config;
     this.MapManager = MapManager;
   }
 
@@ -66,15 +65,19 @@ class Commands {
       });
   }
 
-  prizePool() {
+  prizePool(params) {
+    const { author } = params;
     return this.Database.loadLotteryPlayers()
-      .then((lotteryPlayers) => {
-        return `There are ${lotteryPlayers.length} contestants for a prize pool of ${this.config.dailyLottery.prizePool} gold!`;
+      .then(async (lotteryPlayers) => {
+        const config = await this.Database.loadGame();
+        return author.send(`There are ${lotteryPlayers.length} contestants for a prize pool of ${config.dailyLottery.prizePool} gold!`);
       });
   }
 
-  checkMultiplier() {
-    return `Current Multiplier: ${this.config.multiplier}x\nActive Bless: ${this.config.spells.activeBless}x`;
+  async checkMultiplier(params) {
+    const { author } = params;
+    const config = await this.Database.loadGame();
+    return author.send(`Current Multiplier: ${config.multiplier}x\nActive Bless: ${config.spells.activeBless}x`);
   }
 
   top10(params) {

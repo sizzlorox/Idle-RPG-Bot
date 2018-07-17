@@ -11,8 +11,7 @@ const Inventory = require('../../../../game/utils/Inventory');
 class Events {
 
   constructor(params) {
-    const { Helper, Map, Database, config } = params;
-    this.config = config;
+    const { Helper, Map, Database } = params;
     this.Helper = Helper;
     this.MapManager = Map;
     this.Database = Database;
@@ -57,7 +56,7 @@ class Events {
       updatedPlayer.map = mapObj.map;
       updatedPlayer.travelled++;
       console.log('move event');
-      await eventMsg.push(`${this.Helper.generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`);
+      eventMsg.push(`${this.Helper.generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`);
       eventLog.push(`Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`);
       await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.move);
 
@@ -72,7 +71,7 @@ class Events {
     }
   }
 
-  async attackEvent(loadedPlayer, onlinePlayers) {
+  async attackEvent(loadedPlayer, onlinePlayers, globalMultiplier) {
     const updatedPlayer = Object.assign({}, loadedPlayer);
     try {
       const luckDice = await this.Helper.randomBetween(0, 100);
@@ -84,8 +83,8 @@ class Events {
         return {
           type: 'actions',
           updatedPlayer: townItemResults.updatedPlayer,
-          msg: townSellResults.msg.push(townItemResults.msg),
-          pm: townSellResults.pm.push(townItemResults.pm)
+          msg: townSellResults.msg ? townSellResults.msg.push(townItemResults.msg) : townItemResults.msg,
+          pm: townSellResults.pm ? townSellResults.pm.push(townItemResults.pm) : townItemResults.pm
         };
       }
 
@@ -94,37 +93,37 @@ class Events {
           if (onlinePlayers.length <= 1) {
             const mobToBattle = await this.MonsterManager.generateMonster(updatedPlayer);
             console.log('pve event');
-            return await this.Battle.playerVsMob(updatedPlayer, mobToBattle, (this.config.multiplier + updatedPlayer.personalMultiplier));
+            return this.Battle.playerVsMob(updatedPlayer, mobToBattle, (globalMultiplier + updatedPlayer.personalMultiplier));
           }
-          const playerToBattle = await this.Battle.findPlayerToBattle(updatedPlayer, onlinePlayers);
-          if (Object.keys(playerToBattle).length === 0) {
+          const { randomPlayer } = await this.Battle.findPlayerToBattle(updatedPlayer, onlinePlayers);
+          if (!randomPlayer) {
             const mobToBattle = await this.MonsterManager.generateMonster(updatedPlayer);
             console.log('pve event from empty pvp');
-            return await this.Battle.playerVsMob(updatedPlayer, mobToBattle, (this.config.multiplier + updatedPlayer.personalMultiplier));
+            return this.Battle.playerVsMob(updatedPlayer, mobToBattle, (globalMultiplier + updatedPlayer.personalMultiplier));
           }
 
           console.log('pvp event');
-          return await this.Battle.playerVsPlayer(updatedPlayer, playerToBattle);
+          return this.Battle.playerVsPlayer(updatedPlayer, randomPlayer);
         }
 
         if (updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
           const mobToBattle = await this.MonsterManager.generateMonster(updatedPlayer);
           console.log('pve event');
-          return await this.Battle.playerVsMob(updatedPlayer, mobToBattle, (this.config.multiplier + updatedPlayer.personalMultiplier));
+          return this.Battle.playerVsMob(updatedPlayer, mobToBattle, (globalMultiplier + updatedPlayer.personalMultiplier));
         }
 
         console.log('camp event');
-        return await this.Battle.camp(updatedPlayer);
+        return this.Battle.camp(updatedPlayer);
       }
 
       console.log('attack item event');
-      return await this.LuckEvents.itemEvent(updatedPlayer);
+      return this.LuckEvents.itemEvent(updatedPlayer);
     } catch (err) {
       errorLog.error(err);
     }
   }
 
-  async luckEvent(loadedPlayer) {
+  async luckEvent(loadedPlayer, globalMultiplier) {
     const updatedPlayer = Object.assign({}, loadedPlayer);
     try {
       const luckDice = await this.Helper.randomBetween(0, 100);
@@ -141,7 +140,7 @@ class Events {
 
         if (luckDice <= 45 + (updatedPlayer.stats.luk / 4)) {
           console.log('quest event');
-          const mobForQuest = await this.MonsterManager.generateMonster(updatedPlayer);
+          const mobForQuest = await this.MonsterManager.generateQuestMonster(updatedPlayer);
           return this.LuckEvents.questEvent(updatedPlayer, mobForQuest);
         }
       }
@@ -153,18 +152,19 @@ class Events {
 
       if (luckDice >= 65 - (updatedPlayer.stats.luk / 4)) {
         console.log('luck item event');
-        return await this.LuckEvents.itemEvent(updatedPlayer);
+        return this.LuckEvents.itemEvent(updatedPlayer);
       }
 
-      return this.LuckEvents.goldEvent(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
+      return this.LuckEvents.goldEvent(updatedPlayer, (globalMultiplier + updatedPlayer.personalMultiplier));
     } catch (err) {
       errorLog.error(err);
     }
   }
 
   // Used in command
-  retrieveNewQuest(loadedPlayer) {
-    return this.LuckEvents.questEvent(loadedPlayer);
+  async retrieveNewQuest(loadedPlayer) {
+    const mobForQuest = await this.MonsterManager.generateQuestMonster(updatedPlayer);
+    return this.LuckEvents.questEvent(loadedPlayer, mobForQuest);
   }
 
 }

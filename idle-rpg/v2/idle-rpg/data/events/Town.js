@@ -31,7 +31,7 @@ class Town {
         updatedPlayer.gold.current += profit;
         updatedPlayer.gold.total += profit;
 
-        await eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just sold what they found adventuring for ${profit} gold!`);
+        eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just sold what they found adventuring for ${profit} gold!`);
         eventLog.push(`Made ${profit} gold selling what you found adventuring`);
         await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
@@ -83,7 +83,7 @@ class Town {
         updatedPlayer = await this.InventoryManager.addItemIntoInventory(updatedPlayer, item);
       }
 
-      await eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`);
+      eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`);
       eventLog.push(`Purchased ${item.name} from Town for ${itemCost} Gold`);
       await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 

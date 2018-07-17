@@ -122,11 +122,11 @@ class Game {
       const randomEvent = await this.Helper.randomBetween(0, 2);
       switch (0) {
         case 0:
-          return await this.moveEvent(updatedPlayer);
+           this.moveEvent(updatedPlayer);
         case 1:
-          return await this.attackEvent(updatedPlayer, onlinePlayers);
+           this.attackEvent(updatedPlayer, onlinePlayers);
         case 2:
-          return await this.luckEvent(updatedPlayer);
+           this.luckEvent(updatedPlayer);
       }
     } catch (err) {
       errorLog.error(err);
@@ -135,7 +135,7 @@ class Game {
 
   async moveEvent(updatedPlayer) {
     try {
-      return await this.Event.moveEvent(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
+       this.Event.moveEvent(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
     } catch (err) {
       errorLog.error(err);
     }
@@ -146,16 +146,16 @@ class Game {
       const luckDice = await this.Helper.randomBetween(0, 100);
       if (this.Event.MapClass.getTowns().includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
         updatedPlayer = await this.Event.sellInTown(updatedPlayer);
-        return await this.Event.generateTownItemEvent(updatedPlayer);
+         this.Event.generateTownItemEvent(updatedPlayer);
       }
 
       if (!this.Event.MapClass.getTowns().includes(updatedPlayer.map.name)) {
         if (luckDice >= (95 - (updatedPlayer.stats.luk / 4)) && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
-          return await this.Event.attackEventPlayerVsPlayer(updatedPlayer, onlinePlayers, (this.config.multiplier + updatedPlayer.personalMultiplier));
+           this.Event.attackEventPlayerVsPlayer(updatedPlayer, onlinePlayers, (this.config.multiplier + updatedPlayer.personalMultiplier));
         }
 
         if (updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
-          return await this.Event.attackEventMob(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
+           this.Event.attackEventMob(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
         }
 
         return this.Event.campEvent(updatedPlayer);

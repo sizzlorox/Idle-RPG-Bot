@@ -314,8 +314,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj } = params;
-      Game.fetchCommand({ command: 'prizePool' })
-        .then(msg => messageObj.author.send(msg));
+      return Game.fetchCommand({ command: 'prizePool', author: messageObj.author });
     }
   },
 
@@ -325,8 +324,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj } = params;
-      const result = Game.fetchCommand({ command: 'checkMultiplier' });
-      messageObj.author.send(result);
+      return Game.fetchCommand({ command: 'checkMultiplier', author: messageObj.author });
     }
   },
 

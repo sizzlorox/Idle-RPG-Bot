@@ -48,7 +48,7 @@ class Game {
         }
       };
     }
-    this.Events = new Events({ Helper: this.Helper, Map: this.Map, Database: this.Database, config: this.config });
+    this.Events = new Events({ Helper: this.Helper, Map: this.Map, Database: this.Database });
     this.Commands = new Commands({ Helper: this.Helper, Database: this.Database, Events: this.Events, Config: this.config, MapManager: this.Map });
   }
 
@@ -59,9 +59,13 @@ class Game {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.name);
         return {
           updatedPlayer: newPlayer,
-          msg: `${this.Helper.generatePlayerName(loadedPlayer, true)} was born in \`${loadedPlayer.map.name}\`! Welcome to the world of Idle-RPG!`,
+          msg: `${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`,
           pm: 'You were born.'
         };
+      }
+      if (isNaN(loadedPlayer.gold.current)) {
+        loadedPlayer.gold.current = 10000;
+        loadedPlayer.gold.total = loadedPlayer.gold.lost + loadedPlayer.gold.current + loadPlayer.stole + loadPlayer.dailyLottery + loadedPlayer.gambles.won;
       }
 
       if (loadedPlayer.updated_at) {
@@ -83,11 +87,11 @@ class Game {
       const randomEvent = await this.Helper.randomBetween(0, 2);
       switch (randomEvent) {
         case 0:
-          return await this.Events.moveEvent(loadedPlayer);
+          return this.Events.moveEvent(loadedPlayer);
         case 1:
-          return await this.Events.attackEvent(loadedPlayer, onlinePlayers);
+          return this.Events.attackEvent(loadedPlayer, onlinePlayers, this.config.multiplier);
         case 2:
-          return await this.Events.luckEvent(loadedPlayer);
+          return this.Events.luckEvent(loadedPlayer, this.config.multiplier);
       }
     } catch (err) {
       errorLog.error(err);
