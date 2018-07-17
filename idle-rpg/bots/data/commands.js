@@ -67,7 +67,10 @@ const commands = [
           });
         }
 
-        return Game.fetchCommand('playerStats', playerObj[0])
+        return Game.fetchCommand({
+          command: 'playerStats',
+          author: playerObj[0]
+        })
           .then((playerStats) => {
             if (!playerStats) {
               return messageObj.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
@@ -80,7 +83,10 @@ const commands = [
           });
       }
 
-      return Game.fetchCommand('playerStats', messageObj.author)
+      return Game.fetchCommand({
+        command: 'playerStats',
+        author: messageObj.author
+      })
         .then((playerStats) => {
           if (!playerStats) {
             return messageObj.author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -113,7 +119,10 @@ const commands = [
           });
         }
 
-        return Game.fetchCommand('playerInventory', playerObj[0])
+        return Game.fetchCommand({
+          command: 'playerInventory',
+          author: playerObj[0]
+        })
           .then((playerInventory) => {
             if (!playerInventory) {
               return messageObj.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
@@ -124,7 +133,10 @@ const commands = [
           });
       }
 
-      Game.fetchCommand('playerInventory', messageObj.author)
+      Game.fetchCommand({
+        command: 'playerInventory',
+        author: messageObj.author
+      })
         .then((playerInventory) => {
           if (!playerInventory) {
             return messageObj.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -142,7 +154,10 @@ const commands = [
     channelOnlyId: commandChannel,
     function: async (params) => {
       const { Game, messageObj } = params;
-      const result = await Game.fetchCommand('resetQuest', messageObj.author.id);
+      const result = await Game.fetchCommand({
+        command: 'resetQuest',
+        author: messageObj.author.id
+      });
       return messageObj.author.send(result);
     }
   },
@@ -162,7 +177,10 @@ const commands = [
           return;
         }
 
-        return Game.fetchCommand('playerStats', playerObj.array()[0])
+        return Game.fetchCommand({
+          command: 'playerStats',
+          author: playerObj.array()[0]
+        })
           .then((playerStats) => {
             if (!playerStats) {
               return messageObj.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
@@ -173,7 +191,10 @@ const commands = [
           });
       }
 
-      Game.fetchCommand('playerStats', messageObj.author)
+      Game.fetchCommand({
+        command: 'playerStats',
+        author: messageObj.author
+      })
         .then((playerStats) => {
           if (!playerStats) {
             return messageObj.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -200,7 +221,10 @@ const commands = [
           return;
         }
 
-        return Game.fetchCommand('playerEquipment', playerObj.array()[0])
+        return Game.fetchCommand({
+          command: 'playerEquipment',
+          author: playerObj.array()[0]
+        })
           .then((playerEquipment) => {
             if (!playerEquipment) {
               return messageObj.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
@@ -211,7 +235,10 @@ const commands = [
           });
       }
 
-      Game.fetchCommand('playerEquipment', messageObj.author)
+      Game.fetchCommand({
+        command: 'playerEquipment',
+        author: messageObj.author
+      })
         .then((playerEquipment) => {
           if (!playerEquipment) {
             return messageObj.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -238,7 +265,10 @@ const commands = [
           return;
         }
 
-        return Game.fetchCommand('playerStats', playerObj.array()[0])
+        return Game.fetchCommand({
+          command: 'playerStats',
+          author: playerObj.array()[0]
+        })
           .then((playerSpells) => {
             if (!playerSpells) {
               return messageObj.author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
@@ -249,7 +279,10 @@ const commands = [
           });
       }
 
-      Game.fetchCommand('playerStats', messageObj.author)
+      Game.fetchCommand({
+        command: 'playerStats',
+        author: messageObj.author
+      })
         .then((playerSpells) => {
           if (!playerSpells) {
             return messageObj.author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
@@ -267,7 +300,10 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj } = params;
-      Game.fetchCommand('joinLottery', messageObj.author)
+      Game.fetchCommand({
+        command: 'joinLottery',
+        author: messageObj.author
+      })
         .then(msg => messageObj.author.send(msg));
     }
   },
@@ -278,7 +314,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj } = params;
-      Game.fetchCommand('prizePool')
+      Game.fetchCommand({ command: 'prizePool' })
         .then(msg => messageObj.author.send(msg));
     }
   },
@@ -289,7 +325,7 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj } = params;
-      const result = Game.fetchCommand('checkMultiplier');
+      const result = Game.fetchCommand({ command: 'checkMultiplier' });
       messageObj.author.send(result);
     }
   },
@@ -298,13 +334,14 @@ const commands = [
     command: ['!map', '!m'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
+    function: (params) => {
+      const { messageObj } = params;
       let mapInfo = '';
       maps.forEach((map) => {
         mapInfo = mapInfo.concat(`\n${map.name} (${map.biome.name}) Coordinates: ${map.coords}`);
       });
 
-      message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
+      messageObj.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
     }
   },
 
@@ -312,20 +349,21 @@ const commands = [
     command: '!lore',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitMessage = message.content.split(/ (.+)/)[1].toLowerCase();
+    function: (params) => {
+      const { messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitMessage = messageObj.content.split(/ (.+)/)[1].toLowerCase();
         const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage)
           .map(map => map.lore);
 
         if (requestedMap.length === 0) {
-          return message.author.send(`${splitMessage} was not found. Did you type the map correctly?`);
+          return messageObj.author.send(`${splitMessage} was not found. Did you type the map correctly?`);
         }
 
-        return message.author.send(`\`\`\`${splitMessage}: ${requestedMap[0]}\`\`\``);
+        return messageObj.author.send(`\`\`\`${splitMessage}: ${requestedMap[0]}\`\`\``);
       }
 
-      return message.author.send('You must enter a map to retrieve its lore. Check `!help` for more info.');
+      return messageObj.author.send('You must enter a map to retrieve its lore. Check `!help` for more info.');
     }
   },
 
@@ -333,31 +371,64 @@ const commands = [
     command: '!top10',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      switch ((message.content.split(/ (.+)/)[1] === undefined) ? 'level' : message.content.split(/ (.+)/)[1].toLowerCase()) {
+    function: (params) => {
+      const { Game, messageObj } = params;
+      switch ((messageObj.content.split(/ (.+)/)[1] === undefined) ? 'level' : messageObj.content.split(/ (.+)/)[1].toLowerCase()) {
         case 'gambles':
-          game.top10(message.author, { gambles: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { gambles: -1 }
+          });
           break;
         case 'stolen':
-          game.top10(message.author, { stolen: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { stolen: -1 }
+          });
           break;
         case 'stole':
-          game.top10(message.author, { stole: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { stole: -1 }
+          });
           break;
         case 'gold':
-          game.top10(message.author, { 'gold.current': -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { 'gold.current': -1 }
+          });
           break;
         case 'spells':
-          game.top10(message.author, { spellCast: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { spellCast: -1 }
+          });
           break;
         case 'events':
-          game.top10(message.author, { events: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { events: -1 }
+          });
           break;
         case 'bounty':
-          game.top10(message.author, { currentBounty: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { currentBounty: -1 }
+          });
           break;
         default:
-          game.top10(message.author, { level: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { level: -1 }
+          });
           break;
       }
     }
@@ -367,31 +438,64 @@ const commands = [
     command: '!rank',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      switch ((message.content.split(/ (.+)/)[1] === undefined) ? 'level' : message.content.split(/ (.+)/)[1].toLowerCase()) {
+    function: (params) => {
+      const { Game, messageObj } = params;
+      switch ((messageObj.content.split(/ (.+)/)[1] === undefined) ? 'level' : messageObj.content.split(/ (.+)/)[1].toLowerCase()) {
         case 'gambles':
-          game.getRank(message.author, { gambles: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { gambles: -1 }
+          });
           break;
         case 'stolen':
-          game.getRank(message.author, { stolen: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { stolen: -1 }
+          });
           break;
         case 'stole':
-          game.getRank(message.author, { stole: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { stole: -1 }
+          });
           break;
         case 'gold':
-          game.getRank(message.author, { 'gold.current': -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { 'gold.current': -1 }
+          });
           break;
         case 'spells':
-          game.getRank(message.author, { spellCast: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { spellCast: -1 }
+          });
           break;
         case 'events':
-          game.getRank(message.author, { events: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { events: -1 }
+          });
           break;
         case 'bounty':
-          game.getRank(message.author, { currentBounty: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { currentBounty: -1 }
+          });
           break;
         default:
-          game.getRank(message.author, { level: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { level: -1 }
+          });
           break;
       }
     }
@@ -401,14 +505,15 @@ const commands = [
     command: ['!castspell', '!cs'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        return game.castSpell(message.author, message.content.split(/ (.+)/)[1].toLowerCase());
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        return Game.fetchCommand('castSpell', messageObj.author, messageObj.content.split(/ (.+)/)[1].toLowerCase());
       }
       let spellsString = '```List of Spells:\n  ';
       spellsString = spellsString.concat(Object.keys(spells).map(spell => `${spell} - ${spells[spell].spellCost} gold - ${spells[spell].description}`).join('\n  '));
 
-      return message.author.send(spellsString.concat('```'));
+      return messageObj.author.send(spellsString.concat('```'));
     }
   },
 

@@ -49,7 +49,7 @@ class Game {
       };
     }
     this.Events = new Events({ Helper: this.Helper, Map: this.Map, Database: this.Database, config: this.config });
-    this.Commands = new Commands({ Database: this.Database, Events: this.Events, Config: this.config });
+    this.Commands = new Commands({ Database: this.Database, Events: this.Events, Config: this.config, MapManager: this.Map });
   }
 
   async activateEvent(player, onlinePlayers) {
@@ -99,8 +99,9 @@ class Game {
     return eventResults;
   }
 
-  fetchCommand(command, commandObj) {
-    return this.Commands[command](commandObj);
+  fetchCommand(params) {
+    const { command, author, type } = params;
+    return this.Commands[command](author, type);
   }
 
 }
