@@ -44,7 +44,7 @@ class Town {
         };
       }
 
-      return updatedPlayer;
+      return { updatedPlayer };
     } catch (err) {
       errorLog.error(err);
     }
@@ -84,13 +84,13 @@ class Town {
         };
       } else {
         updatedPlayer.gold.current -= itemCost;
-        updatedPlayer = await InventoryManager.addItemIntoInventory(updatedPlayer, item);
+        updatedPlayer = await this.InventoryManager.addItemIntoInventory(updatedPlayer, item);
       }
 
       eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.Helper.generatePlayerName(updatedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`);
       const eventLog = `Purchased ${item.name} from Town for ${itemCost} Gold`;
       pmMsg.push(eventLog);
-      await this.Helper.logEvent(updatedPlayer, db, eventLog, enumHelper.logTypes.action);
+      await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
       return {
         type: 'actions',

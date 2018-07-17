@@ -280,7 +280,7 @@ class Helper {
       + player.equipment.relic.luk;
   }
 
-  async checkExperience(Database, playerObj, eventMsg, pmMsg) {
+  async checkExperience(Database, playerObj, eventMsg, eventLog) {
     try {
       if (playerObj.experience.current >= playerObj.level * 15) {
         eventMsg.push(this.setImportantMessage(`${playerObj.name} is now level ${playerObj.level}!`));
@@ -333,15 +333,14 @@ class Helper {
 
         if (playerObj.class !== oldClass) {
           eventMsg.push(this.setImportantMessage(`${playerObj.name} has decided to become a ${playerObj.class}!`));
-          pmMsg.push(`You have become a ${playerObj.class}`);
-          await this.logEvent(playerObj, Database, `You have become a ${playerObj.class}`, enumHelper.logTypes.action);
+          eventLog.push(`You have become a ${playerObj.class}`);
         }
         await this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
 
         return {
           updatedPlayer: playerObj,
           msg: eventMsg,
-          pmMsg
+          pm: eventLog
         };
       }
 
@@ -459,6 +458,7 @@ class Helper {
           updatedPlayer: playerObj,
           msg: eventMsg,
           pmMsg,
+          attackerObj,
           otherPlayerPmMsg
         };
       }

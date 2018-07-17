@@ -1,6 +1,7 @@
 const Database = require('../../database/Database');
 const Events = require('./data/events/Events');
 const Map = require('../../game/utils/Map');
+const Commands = require('../idle-rpg/data/Commands');
 const { errorLog } = require('../../utils/logger');
 
 class Game {
@@ -48,6 +49,7 @@ class Game {
       };
     }
     this.Events = new Events({ Helper: this.Helper, Map: this.Map, Database: this.Database, config: this.config });
+    this.Commands = new Commands({ Database: this.Database, Events: this.Events, Config: this.config });
   }
 
   async activateEvent(player, onlinePlayers) {
@@ -77,12 +79,14 @@ class Game {
 
   async selectEvent(loadedPlayer, onlinePlayers) {
     try {
-      const randomEvent = await this.Helper.randomBetween(0, 1);
+      const randomEvent = await this.Helper.randomBetween(0, 2);
       switch (randomEvent) {
         case 0:
           return await this.Events.moveEvent(loadedPlayer);
         case 1:
           return await this.Events.attackEvent(loadedPlayer, onlinePlayers);
+        case 2:
+          return await this.Events.luckEvent(loadedPlayer);
       }
     } catch (err) {
       errorLog.error(err);
@@ -90,8 +94,13 @@ class Game {
   }
 
   async updatePlayer(eventResults) {
+    eventResults.updatedPlayer.events++;
     await this.Database.savePlayer(eventResults.updatedPlayer);
     return eventResults;
+  }
+
+  fetchCommand(command, commandObj) {
+    return this.Commands[command](commandObj);
   }
 
 }

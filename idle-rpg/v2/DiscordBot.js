@@ -3,6 +3,8 @@ const fs = require('fs');
 const Game = require('../v2/idle-rpg/Game');
 const Helper = require('../utils/Helper');
 const Discord = require('./Base/Discord');
+const Antispam = require('../bots/modules/Antispam');
+const CommandParser = require('../bots/utils/CommandParser');
 const { minimalTimer, maximumTimer, botLoginToken } = require('../../settings');
 
 class DiscordBot {
@@ -11,8 +13,13 @@ class DiscordBot {
   constructor() {
     this.bot = new DiscordJS.Client();
     this.discord = new Discord(this.bot);
-    this.helper = new Helper();
-    this.game = new Game(this.helper);
+    this.Helper = new Helper();
+    this.Game = new Game(this.Helper);
+    this.CommandParser = new CommandParser({
+      Game: this.Game,
+      Helper: this.Helper,
+      Bot: this.discord
+    });
     this.loadEventListeners();
     this.bot.login(botLoginToken);
     this.minTimer = (minimalTimer * 1000) * 60;
@@ -34,6 +41,44 @@ class DiscordBot {
       this.discord.loadGuilds();
       this.loadHeartBeat();
     });
+    this.bot.on('message', async (message) => {
+      if (message.author.id === this.bot.user.id) {
+        return;
+      }
+
+      if (message.content.startsWith('!cs') || message.content.startsWith('!castspell')) {
+        await Antispam.logAuthor(message.author.id);
+        await Antispam.logMessage(message.author.id, message.content);
+        const skip = await Antispam.checkMessageInterval(message);
+        if (skip) {
+          infoLog.info(`Spam detected by ${message.author.username}.`);
+          return;
+        }
+      }
+
+      if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
+        return message.reply('┬─┬ノ(ಠ_ಠノ)');
+      }
+
+      if (message.content.includes('¯\_(ツ)_/¯')) {
+        return message.reply('¯\_(ツ)_/¯');
+      }
+
+      // if (process.env.VIRUS_TOTAL_APIKEY && message.attachments && message.attachments.size > 0) {
+      //   const { url } = message.attachments.array()[0];
+
+      //   return VirusTotal.scanUrl(url)
+      //     .then(VirusTotal.retrieveReport)
+      //     .then((reportResults) => {
+      //       if (reportResults.positives > 0) {
+      //         message.delete();
+      //         message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');
+      //       }
+      //     });
+      // }
+
+      return this.CommandParser.parseUserCommand(message);
+    });
     this.bot.on('guildCreate', (guild) => {
       this.discord.manageGuildChannels(guild);
     });
@@ -51,9 +96,9 @@ class DiscordBot {
         }
         guildOnlineMembers.forEach((player) => {
           if (!player.timer) {
-            const playerTimer = this.helper.randomBetween(this.minTimer, this.maxTimer);
+            const playerTimer = this.Helper.randomBetween(this.minTimer, this.maxTimer);
             player.timer = setTimeout(async () => {
-              const eventResult = await this.game.activateEvent(player, guildOnlineMembers);
+              const eventResult = await this.Game.activateEvent(player, guildOnlineMembers);
               delete player.timer;
               return this.discord.sendMessage(guild, eventResult);
             }, playerTimer);

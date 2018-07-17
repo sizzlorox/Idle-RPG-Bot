@@ -154,14 +154,17 @@ No.`);
   }
 
   sendMessage(guild, result) {
-    if (result.updatedPlayer.isPrivateMessage && process.env.NODE_ENV.includes('production')) {
-      const guildMember = guild.members.find(member => member.id === results.updatedPlayer.discordId);
+    if (result.updatedPlayer.isPrivateMessage && result.pm) {
+      const guildMember = guild.members.find(member => member.id === result.updatedPlayer.discordId);
       result.pm.forEach(msg => guildMember.send(msg));
     }
-    // TODO: add attacker Obj to pm bounty claims etc
-    // if (result.attackerLog && result.attackerLog.isPrivateMessage && process.env.NODE_ENV.includes('production')) {
-    //   guild.members.find(member => member.id === results.updatedPlayer.discordId).send(result.pm);
-    // }
+    if (result.attackerObj && result.attackerObj.isPrivateMessage && result.otherPlayerPmMsg) {
+      const guildMember = guild.members.find(member => member.id === result.attackerObj.discordId);
+      result.otherPlayerPmMsg.forEach(msg => guildMember.send(msg));
+    }
+    if (!result.msg) {
+      return;
+    }
 
     // TODO add check to parent once you find out why its still null
     const channelToSend = guild.channels.find(channel => channel.name === result.type && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
