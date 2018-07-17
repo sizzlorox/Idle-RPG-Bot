@@ -90,11 +90,16 @@ class Events {
       }
 
       if (!this.MapManager.getTowns().includes(updatedPlayer.map.name)) {
-        if (luckDice >= (95 - (updatedPlayer.stats.luk / 4)) && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4 && onlinePlayers.length > 1) {
-          const playerToBattle = await this.Battle.findPlayerToBattle(updatedPlayer, onlinePlayers);
-          if (!playerToBattle) {
+        if (luckDice >= (95 - (updatedPlayer.stats.luk / 4)) && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
+          if (onlinePlayers.length <= 1) {
             const mobToBattle = await this.MonsterManager.generateMonster(updatedPlayer);
             console.log('pve event');
+            return await this.Battle.playerVsMob(updatedPlayer, mobToBattle, (this.config.multiplier + updatedPlayer.personalMultiplier));
+          }
+          const playerToBattle = await this.Battle.findPlayerToBattle(updatedPlayer, onlinePlayers);
+          if (Object.keys(playerToBattle).length === 0) {
+            const mobToBattle = await this.MonsterManager.generateMonster(updatedPlayer);
+            console.log('pve event from empty pvp');
             return await this.Battle.playerVsMob(updatedPlayer, mobToBattle, (this.config.multiplier + updatedPlayer.personalMultiplier));
           }
 
