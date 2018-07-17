@@ -5,7 +5,8 @@ const { errorLog } = require('../../../utils/logger');
 class Commands {
 
   constructor(params) {
-    const { Database, Events, Config, MapManager } = params;
+    const { Helper, Database, Events, Config, MapManager } = params;
+    this.Helper = Helper;
     this.Database = Database;
     this.Events = Events;
     this.config = Config;
@@ -171,6 +172,138 @@ ${rankString}
             break;
         }
       });
+  }
+
+  placeBounty(params) {
+    const { author, actionsChannel, recipient, amount } = params;
+    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
+      .then((placer) => {
+        if (placer.gold.current >= amount) {
+          placer.gold.current -= amount;
+
+          return this.Database.savePlayer(placer)
+            .then(() => {
+              return this.Database.loadPlayer(recipient)
+                .then((bountyRecipient) => {
+                  if (!bountyRecipient) {
+                    return author.send('This player does not exist.');
+                  }
+                  bountyRecipient.currentBounty += amount;
+                  actionsChannel.send(this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
+
+                  return this.Database.savePlayer(bountyRecipient)
+                    .then(() => author.send(`Bounty of ${amount} gold has been placed`));
+                });
+            });
+        }
+
+        return author.send('You need more gold to place this bounty');
+      });
+  }
+
+  playerEventLog(params) {
+    const { author, amount } = params;
+    return this.Database.loadActionLog(author.id)
+      .then((playerLog) => {
+        if (!playerLog.log.length) {
+          return;
+        }
+
+        return this.Helper.generateLog(playerLog, amount);
+      });
+  }
+
+  playerPvpLog(params) {
+    const { author, amount } = params;
+    return this.Database.loadPvpLog(author.id)
+      .then((player) => {
+        if (!player) {
+          return;
+        }
+
+        return this.Helper.generatePvpLog(player, amount);
+      });
+  }
+
+  modifyPM(params) {
+    const { author, value, filtered } = params;
+    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
+      .then((castingPlayer) => {
+        if (!castingPlayer) {
+          return author.send('Please set this after you have been born');
+        }
+
+        if (castingPlayer.isPrivateMessage !== value || castingPlayer.isPrivateMessageImportant !== filtered) {
+          castingPlayer.isPrivateMessage = value;
+          castingPlayer.isPrivateMessageImportant = filtered;
+
+          return this.Database.savePlayer(castingPlayer)
+            .then(() => author.send('Preference for being PMed has been updated.'));
+        }
+
+        return author.send('Your PM preference is already set to this value.');
+      });
+  }
+
+  modifyMention(params) {
+    const { author, value } = params;
+    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
+      .then((castingPlayer) => {
+        if (!castingPlayer) {
+          return author.send('Please set this after you have been born');
+        }
+
+        if (castingPlayer.isMentionInDiscord !== value) {
+          castingPlayer.isMentionInDiscord = value;
+
+          return this.Database.savePlayer(castingPlayer)
+            .then(() => author.send('Preference for being @mention has been updated.'));
+        }
+
+        return author.send('Your @mention preference is already set to this value.');
+      });
+  }
+
+  modifyGender(params) {
+    const { author, value } = params;
+    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
+      .then((castingPlayer) => {
+        if (!castingPlayer) {
+          return author.send('Please set this after you have been born');
+        }
+
+        if (castingPlayer.gender !== value) {
+          castingPlayer.gender = value;
+          return this.Database.savePlayer(castingPlayer)
+            .then(() => author.send('Gender has been updated.'));
+        }
+
+        return author.send('Your gender is already set to this value.');
+      });
+  }
+
+  setPlayerBounty(params) {
+    const { recipient, amount } = params;
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
+      .then((player) => {
+        player.currentBounty = amount;
+        return this.Database.savePlayer(player);
+      });
+  }
+
+  setPlayergold(params) {
+    const { recipient, amount } = params;
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
+      .then((player) => {
+        player.gold.current = Number(amount);
+        player.gold.total += Number(amount);
+        return this.Database.savePlayer(player);
+      });
+  }
+
+  deletePlayer(params) {
+    const { recipient } = params;
+    return this.Database.deletePlayer(recipient);
   }
 
 }

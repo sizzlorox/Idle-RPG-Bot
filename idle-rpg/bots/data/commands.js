@@ -529,25 +529,32 @@ const commands = [
     command: ['!bounty', '!b'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
-      const splitArray = message.content.split(' ');
-      if (message.content.includes(' ') && splitArray.length === 3) {
+    function: (params) => {
+      const { Game, actionsChannel, messageObj } = params;
+      const splitArray = messageObj.content.split(' ');
+      if (messageObj.content.includes(' ') && splitArray.length === 3) {
         const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
         const amount = splitArray[2];
 
         if (Number(amount) <= 0 || Number(amount) % 1 !== 0 || !amount.match(/^\d+$/)) {
-          return message.author.send('Please use a regular amount of gold.');
+          return messageObj.author.send('Please use a regular amount of gold.');
         }
         if (Number(amount) < 100) {
-          return message.author.send('You must place a bounty higher or equal to 100');
+          return messageObj.author.send('You must place a bounty higher or equal to 100');
         }
         if (!recipient.match(/^\d+$/)) {
-          return message.author.send('Please add a bounty to a player.');
+          return messageObj.author.send('Please add a bounty to a player.');
         }
-        return game.placeBounty(message.author, recipient, Number(amount));
+        return Game.fetchCommand({
+          command: 'placeBounty',
+          author: messageObj.author,
+          actionsChannel,
+          recipient,
+          amount: Number(amount)
+        });
       }
 
-      return message.author.send('Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head');
+      return messageObj.author.send('Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head');
     }
   },
 
@@ -555,26 +562,35 @@ const commands = [
     command: ['!eventlog', '!el'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
-        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
+        return Game.fetchCommand({
+          command: 'playerEventLog',
+          author: splitCommand[1].replace(/([\<\@\!\>])/g, ''),
+          amount: 15
+        })
           .then((result) => {
             if (!result || result.length === 0) {
-              return message.author.send('This player has not activated any Events yet.');
+              return messageObj.author.send('This player has not activated any Events yet.');
             }
 
-            return message.author.send(`\`\`\`${result}\`\`\``);
+            return messageObj.author.send(`\`\`\`${result}\`\`\``);
           });
       }
 
-      return game.playerEventLog(message.author.id, 15)
+      return Game.fetchCommand({
+        command: 'playerEventLog',
+        author: messageObj.author.id,
+        amount: 15
+      })
         .then((result) => {
           if (!result || result.length === 0) {
-            return message.author.send('You have not activated any Events yet.');
+            return messageObj.author.send('You have not activated any Events yet.');
           }
 
-          return message.author.send(`\`\`\`${result}\`\`\``);
+          return messageObj.author.send(`\`\`\`${result}\`\`\``);
         });
     }
   },
@@ -583,26 +599,35 @@ const commands = [
     command: ['!pvplog', '!pl'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
-        return game.playerPvpLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
+        return Game.fetchCommand({
+          command: 'playerPvpLog',
+          author: splitCommand[1].replace(/([\<\@\!\>])/g, ''),
+          amount: 15
+        })
           .then((result) => {
             if (!result || result.length === 0) {
-              return message.author.send('This player has not had any PvP Events yet.');
+              return messageObj.author.send('This player has not had any PvP Events yet.');
             }
 
-            return message.author.send(`\`\`\`${result}\`\`\``);
+            return messageObj.author.send(`\`\`\`${result}\`\`\``);
           });
       }
 
-      return game.playerPvpLog(message.author.id, 15)
+      return Game.fetchCommand({
+        command: 'playerPvpLog',
+        author: messageObj.author.id,
+        amount: 15
+      })
         .then((result) => {
           if (!result || result.length === 0) {
-            return message.author.send('You have not had any PvP Events yet.');
+            return messageObj.author.send('You have not had any PvP Events yet.');
           }
 
-          return message.author.send(`\`\`\`${result}\`\`\``);
+          return messageObj.author.send(`\`\`\`${result}\`\`\``);
         });
     }
   },
@@ -614,19 +639,30 @@ const commands = [
     command: '!pm',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
         switch (splitCommand[1].toLowerCase()) {
           case 'on':
           case 'off':
-            return game.modifyPM(message.author, splitCommand[1] === 'on', false);
+            return Game.fetchCommand({
+              command: 'modifyPM',
+              author: messageObj.author,
+              value: splitCommand[1] === 'on',
+              filtered: false
+            });
           case 'filtered':
-            return game.modifyPM(message.author, true, true);
+            return Game.fetchCommand({
+              command: 'modifyPM',
+              author: messageObj.author,
+              value: true,
+              filtered: true
+            });
         }
       }
 
-      return message.author.send(`\`\`\`Possible options:
+      return messageObj.author.send(`\`\`\`Possible options:
       on - You will be pmed in events that include you
       off - You won't be pmed in events that include you
       filtered - You will be pmed certain important events that include you
@@ -641,9 +677,10 @@ const commands = [
     command: '!mention',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
 
         // Use switch to validate the value
         switch (splitCommand[1].toLowerCase()) {
@@ -651,11 +688,15 @@ const commands = [
           case 'off':
           case 'action':
           case 'move':
-            return game.modifyMention(message.author, splitCommand[1].toLowerCase());
+            return Game.fetchCommand({
+              command: 'modifyMention',
+              author: messageObj.author,
+              value: splitCommand[1].toLowerCase()
+            });
         }
       }
 
-      return message.author.send(`\`\`\`Possible options:
+      return messageObj.author.send(`\`\`\`Possible options:
         on - You will be tagged in events that include you
         off - You won't be tagged in events that include you
         action - You will be tagged in action events that include you
@@ -671,9 +712,10 @@ const commands = [
     command: '!gender',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
 
         // Use switch to validate the value
         switch (splitCommand[1].toLowerCase()) {
@@ -681,11 +723,15 @@ const commands = [
           case 'female':
           case 'neutral':
           case 'neuter':
-            return game.modifyGender(message.author, splitCommand[1]);
+            return Game.fetchCommand({
+              command: 'modifyGender',
+              author: messageObj.author,
+              value: splitCommand[1]
+            });
         }
       }
 
-      return message.author.send(`\`\`\`Possible options:
+      return messageObj.author.send(`\`\`\`Possible options:
         male
         female
         neutral
@@ -699,13 +745,18 @@ const commands = [
     command: '!setbounty',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      const splitArray = message.content.split(' ');
-      if (message.content.includes(' ') && splitArray.length === 3) {
+    function: (params) => {
+      const { Game, messageObj } = params;
+      const splitArray = messageObj.content.split(' ');
+      if (messageObj.content.includes(' ') && splitArray.length === 3) {
         const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
         const amount = splitArray[2];
-        game.setPlayerBounty(recipient, Number(amount));
-        return message.author.send('Done');
+        Game.fetchCommand({
+          command: 'setPlayerBounty',
+          recipient,
+          amount: Number(amount)
+        });
+        return messageObj.author.send('Done');
       }
     }
   },
@@ -714,13 +765,18 @@ const commands = [
     command: '!setgold',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      const splitArray = message.content.split(' ');
-      if (message.content.includes(' ') && splitArray.length === 3) {
+    function: (params) => {
+      const { Game, messageObj } = params;
+      const splitArray = messageObj.content.split(' ');
+      if (messageObj.content.includes(' ') && splitArray.length === 3) {
         const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
         const amount = splitArray[2];
-        game.setPlayerGold(recipient, Number(amount));
-        return message.author.send('Done');
+        Game.fetchCommand({
+          command: 'setPlayerGold',
+          recipient,
+          amount: Number(amount)
+        });
+        return messageObj.author.send('Done');
       }
     }
   },
@@ -796,11 +852,15 @@ const commands = [
     command: '!resetplayer',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        game.deletePlayer(message.content.split(/ (.+)/)[1])
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        Game.fetchCommand({
+          command: 'deletePlayer',
+          recipient: messageObj.content.split(/ (.+)/)[1]
+        })
           .then(() => {
-            message.author.send('Done.');
+            messageObj.author.send('Done.');
           });
       }
     }

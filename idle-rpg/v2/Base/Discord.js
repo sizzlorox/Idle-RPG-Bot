@@ -155,6 +155,9 @@ No.`);
 
   sendMessage(guild, result) {
     if (result.updatedPlayer.isPrivateMessage && result.pm) {
+      if (result.type !== 'actions' && result.updatedPlayer.isPrivateMessageImportant) {
+        return;
+      }
       const guildMember = guild.members.find(member => member.id === result.updatedPlayer.discordId);
       result.pm.forEach(msg => guildMember.send(msg));
     }

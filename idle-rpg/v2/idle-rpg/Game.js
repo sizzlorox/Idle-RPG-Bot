@@ -49,15 +49,16 @@ class Game {
       };
     }
     this.Events = new Events({ Helper: this.Helper, Map: this.Map, Database: this.Database, config: this.config });
-    this.Commands = new Commands({ Database: this.Database, Events: this.Events, Config: this.config, MapManager: this.Map });
+    this.Commands = new Commands({ Helper: this.Helper, Database: this.Database, Events: this.Events, Config: this.config, MapManager: this.Map });
   }
 
   async activateEvent(player, onlinePlayers) {
     try {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
+        const newPlayer = await this.Database.createNewPlayer(player.discordId, player.name);
         return {
-          updatedPlayer: await this.Database.createNewPlayer(player.discordId, player.name),
+          updatedPlayer: newPlayer,
           msg: `${this.Helper.generatePlayerName(loadedPlayer, true)} was born in \`${loadedPlayer.map.name}\`! Welcome to the world of Idle-RPG!`,
           pm: 'You were born.'
         };
