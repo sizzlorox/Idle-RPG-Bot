@@ -13,7 +13,8 @@ const commands = [
   help = {
     command: ['!help', '!h'],
     operatorOnly: false,
-    function: (game, message) => {
+    function: (params) => {
+      const { Game, Helper, Bot, messageObj } = params;
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
         !top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
@@ -43,8 +44,8 @@ const commands = [
         !sb, !spellbook - Returns list of spells your character has learned
         !i, !inv, !inventory - Displays what your character has in his/her inventory
         \`\`\``;
-      message.author.send(helpMsg)
-        .then(() => message.author.send(helpMsg2));
+      messageObj.author.send(helpMsg)
+        .then(() => messageObj.author.send(helpMsg2));
     }
   },
 
@@ -301,6 +302,7 @@ const commands = [
     function: (params) => {
       const { Game, messageObj } = params;
       Game.fetchCommand({
+        Game,
         command: 'joinLottery',
         author: messageObj.author
       })
@@ -507,6 +509,7 @@ const commands = [
       const { Game, actionsChannel, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         return Game.fetchCommand({
+          Game,
           command: 'castSpell',
           author: messageObj.author,
           actionsChannel,
@@ -835,12 +838,17 @@ const commands = [
     command: '!givegold',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ') && message.content.split(' ').length > 2) {
-        const splitCommand = message.content.split(' ');
-        game.giveGold(splitCommand[1], splitCommand[2])
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ') && messageObj.content.split(' ').length > 2) {
+        const splitCommand = messageObj.content.split(' ');
+        Game.fetchCommand({
+          command: 'giveGold',
+          recipient: splitCommand[1],
+          amount: splitCommand[2]
+        })
           .then(() => {
-            message.author.send('Done.');
+            messageObj.author.send('Done.');
           });
       }
     }

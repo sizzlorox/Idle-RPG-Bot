@@ -1,4 +1,5 @@
 const DiscordJS = require('discord.js');
+const util = require('util');
 const fs = require('fs');
 const Crons = require('../v2/idle-rpg/Crons');
 const Game = require('../v2/idle-rpg/Game');
@@ -34,14 +35,17 @@ class DiscordBot {
     this.bot.on('error', err => console.log(err));
     this.bot.once('ready', () => {
       this.bot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
-      this.bot.user.setActivity('Idle-RPG Game Master');
       this.bot.user.setStatus('idle');
       this.discord.loadGuilds();
       this.loadHeartBeat();
       this.Crons.loadCrons();
     });
     this.bot.on('message', async (message) => {
-      if (message.author.id === this.bot.user.id) {
+      if (message.content.includes('(╯°□°）╯︵ ┻━┻') && message.guild && message.guild.name === 'Idle-RPG') {
+        return message.reply('┬─┬ノ(ಠ_ಠノ)');
+      }
+
+      if (message.author.id === this.bot.user.id || message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
         return;
       }
 
@@ -50,17 +54,9 @@ class DiscordBot {
         await Antispam.logMessage(message.author.id, message.content);
         const skip = await Antispam.checkMessageInterval(message);
         if (skip) {
-          infoLog.info(`Spam detected by ${message.author.username}.`);
+          // infoLog.info(`Spam detected by ${message.author.username}.`);
           return;
         }
-      }
-
-      if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
-        return message.reply('┬─┬ノ(ಠ_ಠノ)');
-      }
-
-      if (message.content.includes('¯\_(ツ)_/¯')) {
-        return message.reply('¯\_(ツ)_/¯');
       }
 
       // if (process.env.VIRUS_TOTAL_APIKEY && message.attachments && message.attachments.size > 0) {
@@ -87,17 +83,24 @@ class DiscordBot {
 
   loadHeartBeat() {
     const interval = process.env.NODE_ENV.includes('production') ? this.tickInMinutes : 1;
+    let onlinePlayers = [];
     setInterval(() => {
+      this.processDetails();
       this.bot.guilds.forEach((guild) => {
+        let guildMinTimer = this.minTimer;
+        let guildMaxTimer = this.maxTimer;
         const guildOnlineMembers = this.discord.getOnlinePlayers(guild);
-        console.log(`MinTimer: ${(this.minTimer / 1000) / 60} - MaxTimer: ${(this.maxTimer / 1000) / 60}`);
-        if (guildOnlineMembers.size >= 50) {
-          this.minTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
-          this.maxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
+        const guildOfflineMembers = this.discord.getOfflinePlayers(guild);
+        const membersToAdd = guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId) < 0);
+        onlinePlayers.push(...membersToAdd);
+        onlinePlayers = onlinePlayers.filter(member => guildOfflineMembers.findIndex(offlineMember => member.discordId === offlineMember.discordId) < 0);
+        if (guildOnlineMembers.length >= 50) {
+          guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
+          guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
         }
-        guildOnlineMembers.forEach((player) => {
+        onlinePlayers.filter(member => member.guildId === guild.id).forEach((player) => {
           if (!player.timer) {
-            const playerTimer = this.Helper.randomBetween(this.minTimer, this.maxTimer);
+            const playerTimer = this.Helper.randomBetween(guildMinTimer, guildMaxTimer);
             player.timer = setTimeout(async () => {
               const eventResult = await this.Game.activateEvent(player, guildOnlineMembers);
               delete player.timer;
@@ -106,7 +109,18 @@ class DiscordBot {
           }
         });
       });
+      this.bot.user.setActivity(`${onlinePlayers.length} idlers in ${this.bot.guilds.size} guilds`);
     }, 60000 * interval);
+  }
+
+  processDetails() {
+    let memoryUsage = util.inspect(process.memoryUsage());
+    memoryUsage = JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
+
+    console.log('------------');
+    console.log(`\n\nHeap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
+    console.log(`Current Up Time: ${this.Helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
+    console.log('------------');
   }
 
   // CRONS
@@ -120,7 +134,7 @@ class DiscordBot {
         guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG')
           .send(this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
       });
-      this.Game.setMultiplier(this.Game.getMultiplier + 1);
+      this.Game.setMultiplier(this.Game.getMultiplier() + 1);
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
@@ -128,8 +142,7 @@ class DiscordBot {
         guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG')
           .send(this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
       });
-      const newMultiplier = this.Game.getMultiplier - 1 <= 0 ? 1 : this.Game.getMultiplier - 1;
-      this.Game.setMultiplier(newMultiplier);
+      this.Game.setMultiplier(this.Game.getMultiplier() - 1 <= 0 ? 1 : this.Game.getMultiplier() - 1);
     }, 5400000); // 1hr 30 minutes
   }
 
@@ -139,7 +152,7 @@ class DiscordBot {
       return;
     }
 
-    return this.Game.dbClass.loadLotteryPlayers()
+    return this.Game.dbClass().loadLotteryPlayers()
       .then((lotteryPlayers) => {
         if (!lotteryPlayers.length) {
           return;
@@ -147,7 +160,7 @@ class DiscordBot {
         const randomWinner = this.Helper.randomBetween(0, lotteryPlayers.length - 1);
         const winner = lotteryPlayers[randomWinner];
 
-        return this.Game.dbClass.loadGame()
+        return this.Game.dbClass().loadGame()
           .then((updatedConfig) => {
             const eventMsg = this.Helper.setImportantMessage(`Out of ${lotteryPlayers.length} contestants, ${winner.name} has won the daily lottery of ${updatedConfig.dailyLottery.prizePool} gold!`);
             const eventLog = `Congratulations! Out of ${lotteryPlayers.length} contestants, you just won ${updatedConfig.dailyLottery.prizePool} gold from the daily lottery!`;
@@ -171,10 +184,10 @@ class DiscordBot {
             });
 
             return Promise.all([
-              this.Game.dbClass.updateGame(updatedConfig),
-              this.Helper.logEvent(winner, this.Game.dbClass, eventLog, enumHelper.logTypes.action),
-              this.Game.dbClass.savePlayer(winner),
-              this.Game.dbClass.removeLotteryPlayers()
+              this.Game.dbClass().updateGame(updatedConfig),
+              this.Helper.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action),
+              this.Game.dbClass().savePlayer(winner),
+              this.Game.dbClass().removeLotteryPlayers()
             ])
               .catch(err => errorLog.error(err));
           });
@@ -184,7 +197,7 @@ class DiscordBot {
 
   updateLeaderboards() {
     const types = enumHelper.leaderboardStats;
-    types.forEach((type, index) => this.Game.dbClass.loadTop10(type)
+    types.forEach((type, index) => this.Game.dbClass().loadTop10(type)
       .then(top10 => `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
         .sort((player1, player2) => {
           if (Object.keys(type)[0] === 'level') {

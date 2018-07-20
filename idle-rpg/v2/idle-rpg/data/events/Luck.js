@@ -73,13 +73,19 @@ class Luck {
           updatedPlayer.experience.total += luckExpAthena;
           eventMsg.push(`Athena shared her wisdom with ${this.Helper.generatePlayerName(updatedPlayer, true)} making ${this.Helper.generateGenderString(updatedPlayer, 'him')} gain ${luckExpAthena} experience!`);
           eventLog.push(`Athena shared her wisdom with you making you gain ${luckExpAthena} experience`);
-          return this.Helper.checkExperience(this.Database, updatedPlayer, eventMsg, eventLog);
+          const checkedExp = await this.Helper.checkExperience(this.Database, updatedPlayer, eventMsg, eventLog);
+          return {
+            type: 'actions',
+            updatedPlayer: checkedExp.updatedPlayer,
+            msg: checkedExp.msg,
+            pm: checkedExp.pm
+          };
 
         case 6:
           const spell = await this.SpellManager.generateSpell(updatedPlayer);
           if (updatedPlayer.spells.length > 0) {
             let shouldAddToList = false;
-            updatedPlayer.spells.forEach((ownedSpell, index) => {
+            await updatedPlayer.spells.forEach((ownedSpell, index) => {
               const spellName = ownedSpell.name.split(/ (.+)/)[1];
               if (spell.power > ownedSpell.power) {
                 if (spell.name.includes(spellName)) {
@@ -103,7 +109,7 @@ class Luck {
             eventLog.push(`Eris gave you a scroll of ${spell.name}`);
             break;
           }
-          break;
+          return { updatedPlayer };
 
         case 7:
           // Might overwrite his event if currently saving if he fired and event at the same time.

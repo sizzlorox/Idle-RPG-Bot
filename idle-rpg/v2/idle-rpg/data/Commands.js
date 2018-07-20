@@ -42,7 +42,7 @@ class Commands {
   }
 
   joinLottery(params) {
-    const { author } = params;
+    const { Game, author } = params;
     return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         if (player.lottery.joined) {
@@ -54,7 +54,7 @@ class Commands {
         return this.Database.loadGame()
           .then((updatedConfig) => {
             updatedConfig.dailyLottery.prizePool += 100;
-            this.config = updatedConfig;
+            Game.setConfig(updatedConfig);
 
             return this.Database.updateGame(updatedConfig)
               .then(() => this.Database.savePlayer(player))
@@ -129,7 +129,7 @@ ${rankString}
   }
 
   castSpell(params) {
-    const { author, actionsChannel, spell } = params;
+    const { Game, author, actionsChannel, spell } = params;
     return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((castingPlayer) => {
         switch (spell) {
@@ -140,18 +140,16 @@ ${rankString}
               this.Database.savePlayer(castingPlayer)
                 .then(() => {
                   author.send('Spell has been cast!');
-                })
-                .then(() => this.Database.updateGame(this.config));
-              this.config.multiplier += 1;
-              this.config.spells.activeBless++;
-              actionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name} just cast ${spell}!!\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+                });
+              Game.setMultiplier(Game.getMultiplier() + 1);
+              Game.setActiveBless(Game.getActiveBless() + 1);
+              Game.updateConfig();
+              actionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name} just cast ${spell}!!\nCurrent Active Bless: ${Game.getConfig().spells.activeBless}\nCurrent Multiplier is: ${Game.getConfig().multiplier}x`));
               setTimeout(() => {
-                this.config.multiplier -= 1;
-                this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-                this.config.spells.activeBless--;
-                this.Database.updateGame(this.config);
-
-                actionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
+                Game.setMultiplier(Game.getMultiplier() - 1 <= 0 ? 1 : Game.getMultiplier() - 1);
+                Game.setActiveBless(Game.getActiveBless() - 1 <= 0 ? 0 : Game.getActiveBless() - 1);
+                Game.updateConfig();
+                actionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${Game.getConfig().spells.activeBless}\nCurrent Multiplier is: ${Game.getConfig().multiplier}x`));
               }, 1800000); // 30 minutes
             } else {
               author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
@@ -307,6 +305,16 @@ ${rankString}
   deletePlayer(params) {
     const { recipient } = params;
     return this.Database.deletePlayer(recipient);
+  }
+
+  giveGold(params) {
+    const { recipient, amount } = params;
+    return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
+      .then((updatingPlayer) => {
+        updatingPlayer.gold.current += Number(amount);
+        updatingPlayer.gold.total += Number(amount);
+        this.Database.savePlayer(updatingPlayer);
+      });
   }
 
 }

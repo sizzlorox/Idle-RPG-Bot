@@ -2,6 +2,7 @@ const Database = require('../../database/Database');
 const Events = require('./data/events/Events');
 const Map = require('../../game/utils/Map');
 const Commands = require('../idle-rpg/data/Commands');
+const { newQuest } = require('../../../idle-rpg/database/schemas/quest');
 const { errorLog } = require('../../utils/logger');
 
 class Game {
@@ -59,19 +60,14 @@ class Game {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.name);
         return {
           updatedPlayer: newPlayer,
-          msg: `${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`,
-          pm: 'You were born.'
+          msg: [`${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`],
+          pm: ['You were born.']
         };
       }
-      if (isNaN(loadedPlayer.gold.current)) {
-        loadedPlayer.gold.current = 10000;
-        loadedPlayer.gold.total = loadedPlayer.gold.lost + loadedPlayer.gold.current + loadPlayer.stole + loadPlayer.dailyLottery + loadedPlayer.gambles.won;
+      if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
+        loadedPlayer.quest = newQuest;
       }
 
-      if (loadedPlayer.updated_at) {
-        const lastUpdated = (new Date().getTime() - loadedPlayer.updated_at.getTime()) / 1000;
-        console.log(`${loadedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
-      }
       await this.Helper.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       const eventResults = await this.selectEvent(loadedPlayer, onlinePlayers);
       const msgResults = await this.updatePlayer(eventResults);
@@ -104,16 +100,36 @@ class Game {
     return eventResults;
   }
 
-  get dbClass() {
+  dbClass() {
     return this.Database;
   }
 
-  get getMultiplier() {
+  getMultiplier() {
     return this.config.multiplier;
   }
 
-  set setMultiplier(value) {
+  setMultiplier(value) {
     this.config.multiplier = value;
+  }
+
+  getActiveBless() {
+    return this.config.spells.activeBless;
+  }
+
+  setActiveBless(value) {
+    this.config.spells.activeBless = value;
+  }
+
+  updateConfig() {
+    this.Database.updateGame(this.config);
+  }
+
+  getConfig() {
+    return this.config;
+  }
+
+  setConfig(value) {
+    this.config = value;
   }
 
   fetchCommand(params) {
