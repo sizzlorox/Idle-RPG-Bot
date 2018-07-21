@@ -42,7 +42,9 @@ class DiscordBot {
     });
     this.bot.on('message', async (message) => {
       if (message.content.includes('(╯°□°）╯︵ ┻━┻') && message.guild && message.guild.name === 'Idle-RPG') {
-        return message.reply('┬─┬ノ(ಠ_ಠノ)');
+        let tableMsg = '';
+        message.content.split('(╯°□°）╯︵ ┻━┻').forEach((table, index) => index === 0 ? '' : tableMsg = tableMsg.concat('┬─┬ノ(ಠ\\_ಠノ) '));
+        return message.reply(tableMsg);
       }
 
       if (message.author.id === this.bot.user.id || message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
