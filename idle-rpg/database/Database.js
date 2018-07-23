@@ -98,8 +98,8 @@ class Database {
   }
 
   // PLAYER
-  createNewPlayer(discordId, name) {
-    return new Promise((resolve, reject) => Player.create(newPlayerObj(discordId, name), (err, result) => {
+  createNewPlayer(discordId, guildId, name) {
+    return new Promise((resolve, reject) => Player.create(newPlayerObj(discordId, guildId, name), (err, result) => {
       if (err) {
         return reject(err);
       }
@@ -247,7 +247,7 @@ class Database {
       .select(selectFields));
   }
 
-  loadTop10(type) {
+  loadTop10(type, guildId, botID) {
     const select = {
       name: 1
     };
@@ -261,7 +261,8 @@ class Database {
       type['experience.current'] = -1;
     }
     const query = {
-      discordId: { $nin: removeNpcs, $exists: true }
+      discordId: { $nin: removeNpcs, $exists: true },
+      guildId
     };
 
     return new Promise((resolve, reject) => Player.find(query, (err, result) => {

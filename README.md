@@ -11,27 +11,12 @@ To see this bot in action it is currently running at this discord server:
 # Setup
 Created a .env file in the project root directory with these env variables: (Without < >)
 ```
-GUILD_ID=<Your discord server/guild's ID>
-DISCORD_ACTION_WEBHOOK_ID=<Your discord action channel webhook ID here>
-DISCORD_ACTION_WEBHOOK_TOKEN=<Your discord action channel webhook token here>
-DISCORD_MOVEMENT_WEBHOOK_ID=<Your discord movement channel webhook ID here>
-DISCORD_MOVEMENT_WEBHOOK_TOKEN=<Your discord movement channel webhook token here>
+DISCORD_BOT_LOGIN_TOKEN=<Bot login token>
 
-DISCORD_BOT_OPERATOR_ID=<Discord bot operator ID here>
-DISCORD_RPG_WELCOME_CHANNEL_ID=<Discord welcome channel ID here>
-DISCORD_RPG_CHANNEL_ID=<Discord action channel ID here>
-DISCORD_RPG_COMMAND_CHANNEL_ID=<Discord command channel ID here>
-DISCORD_RPG_FAQ_CHANNEL=<Discord FAQ channel ID here>
-DISCORD_RPG_ANNOUNCEMENT_CHANNEL=<Discord Announcement channel ID here>
-DISCORD_RPG_LEADERBOARDS_CHANNEL_ID=<Discord Leaderboard channel ID here>
-DISCORD_BOT_LOGIN_TOKEN=<Discord bot login token here>
-DISCORD_STREAM_PLUGIN_CHANNEL=<Discord Stream Plugin channel (NOT NEEDED)>
+MIN_TIMER=<Minimal Timer in minutes>
+MAX_TIMER=<Maximum Timer in minutes>
 
-MIN_TIMER=<Minimal timer in minutes here>
-MAX_TIMER=<Maximum timer in minutes here>
-
-VIRUS_TOTAL_APIKEY=<api key for your virus total account (not required)>
-MONGODB_URI=<mongodb connection URI>
+MONGODB_URI=<MongoDB Connection URI>
 ```
 
 # Requirements

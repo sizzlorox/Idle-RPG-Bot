@@ -199,24 +199,24 @@ class DiscordBot {
 
   updateLeaderboards() {
     const types = enumHelper.leaderboardStats;
-    types.forEach((type, index) => this.Game.dbClass().loadTop10(type)
-      .then(top10 => `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
-        .sort((player1, player2) => {
-          if (Object.keys(type)[0] === 'level') {
-            return player2.experience.current - player1.experience.current && player2.level - player1.level;
-          }
+    this.bot.guilds.forEach((guild) => {
+      types.forEach((type, index) => this.Game.dbClass().loadTop10(type, guild.id, this.bot.user.id)
+        .then(top10 => `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+          .sort((player1, player2) => {
+            if (Object.keys(type)[0] === 'level') {
+              return player2.experience.current - player1.experience.current && player2.level - player1.level;
+            }
 
-          if (Object.keys(type)[0].includes('.')) {
-            const keys = Object.keys(type)[0].split('.');
-            return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
-          }
+            if (Object.keys(type)[0].includes('.')) {
+              const keys = Object.keys(type)[0].split('.');
+              return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
+            }
 
-          return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
-        })
-        .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
-        .join('\n')}`)
-      .then(async (rankString) => {
-        return this.bot.guilds.forEach(async (guild) => {
+            return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+          })
+          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
+          .join('\n')}`)
+        .then(async (rankString) => {
           const leaderboardChannel = guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
           const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
           const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
@@ -231,8 +231,8 @@ ${rankString}\`\`\``;
           return !msg.includes(msgCount.array()[index].toString())
             ? msgCount.array()[index].edit(msg)
             : '';
-        });
-      }));
+        }));
+    });
   }
 
 }

@@ -60,7 +60,7 @@ class Game {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       let selectedPlayer = Object.assign({}, loadedPlayer);
       if (!loadedPlayer) {
-        selectedPlayer = await this.Database.createNewPlayer(player.discordId, player.name);
+        selectedPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
 
         return {
           updatedPlayer: selectedPlayer,

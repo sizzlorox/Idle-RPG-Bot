@@ -8,7 +8,7 @@ class Crons {
     this.powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
     this.dailyLotteryTime = '00 00 10 * * 0-6';
     this.blizzardRandomTime = '00 00 9 * * 0-6';
-    this.leadboardUpdateTime = '00 */10 * * * 0-6';
+    this.leadboardUpdateTime = '00 */5 * * * 0-6';
     this.timeZone = 'America/Los_Angeles';
   }
 

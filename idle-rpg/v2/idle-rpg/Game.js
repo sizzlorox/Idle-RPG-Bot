@@ -57,7 +57,7 @@ class Game {
     try {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
-        const newPlayer = await this.Database.createNewPlayer(player.discordId, player.name);
+        const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
         return {
           updatedPlayer: newPlayer,
           msg: [`${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`],
@@ -67,7 +67,11 @@ class Game {
       if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
       }
+      if (loadedPlayer.guildId === 'None') {
+        loadedPlayer.guildId = player.guildId;
+      }
 
+      console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId}`);
       await this.Helper.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       const eventResults = await this.selectEvent(loadedPlayer, onlinePlayers);
       const msgResults = await this.updatePlayer(eventResults);
