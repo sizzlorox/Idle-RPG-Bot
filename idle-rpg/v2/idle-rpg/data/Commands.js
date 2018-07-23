@@ -41,37 +41,28 @@ class Commands {
     }
   }
 
-  joinLottery(params) {
-    const { Game, author } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((player) => {
-        if (player.lottery.joined) {
-          return 'You\'ve already joined todays daily lottery!';
-        }
-        player.lottery.joined = true;
-        player.lottery.amount += 100;
+  async joinLottery(params) {
+    const { author } = params;
+    const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (player.lottery.joined) {
+      return author.send('You\'ve already joined todays daily lottery!');
+    }
 
-        return this.Database.loadGame()
-          .then((updatedConfig) => {
-            updatedConfig.dailyLottery.prizePool += 100;
-            Game.setConfig(updatedConfig);
+    const guildConfig = await this.Database.loadGame(player.guildId);
+    guildConfig.dailyLottery.prizePool += 100;
+    await this.Database.updateGame(player.guildId, guildConfig);
+    await this.Database.savePlayer(player);
 
-            return this.Database.updateGame(updatedConfig)
-              .then(() => this.Database.savePlayer(player))
-              .then(() => 'You have joined todays daily lottery! Good luck!')
-              .catch(err => errorLog.error(err));
-          })
-          .catch(err => errorLog.error(err));
-      });
+    return author.send('You have joined todays daily lottery! Good luck!');
   }
 
-  prizePool(params) {
+  async prizePool(params) {
     const { author } = params;
-    return this.Database.loadLotteryPlayers()
-      .then(async (lotteryPlayers) => {
-        const config = await this.Database.loadGame();
-        return author.send(`There are ${lotteryPlayers.length} contestants for a prize pool of ${config.dailyLottery.prizePool} gold!`);
-      });
+    const player = await this.Database.loadPlayer(author.id, { guildId: -1 });
+    const lotteryPlayers = await this.Database.loadLotteryPlayers(player.guildId);
+    const guildConfig = await this.Database.loadGame(player.guildId);
+
+    return author.send(`There are ${lotteryPlayers.length} contestants for a prize pool of ${guildConfig.dailyLottery.prizePool} gold!`);
   }
 
   async checkMultiplier(params) {
@@ -81,8 +72,8 @@ class Commands {
   }
 
   top10(params) {
-    const { author, type } = params;
-    return this.Database.loadTop10(type)
+    const { author, type, guildId, Bot } = params;
+    return this.Database.loadTop10(type, guildId, Bot.user.id)
       .then((top10) => {
         const rankString = `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
           .sort((player1, player2) => {
@@ -128,51 +119,53 @@ ${rankString}
       });
   }
 
-  castSpell(params) {
+  async castSpell(params) {
     const { Game, author, actionsChannel, spell } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((castingPlayer) => {
-        switch (spell) {
-          case 'bless':
-            if (castingPlayer.gold.current >= globalSpells.bless.spellCost) {
-              castingPlayer.spellCast++;
-              castingPlayer.gold.current -= globalSpells.bless.spellCost;
-              this.Database.savePlayer(castingPlayer)
-                .then(() => {
-                  author.send('Spell has been cast!');
-                });
-              Game.setMultiplier(Game.getMultiplier() + 1);
-              Game.setActiveBless(Game.getActiveBless() + 1);
-              Game.updateConfig();
-              actionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name} just cast ${spell}!!\nCurrent Active Bless: ${Game.getConfig().spells.activeBless}\nCurrent Multiplier is: ${Game.getConfig().multiplier}x`));
-              setTimeout(() => {
-                Game.setMultiplier(Game.getMultiplier() - 1 <= 0 ? 1 : Game.getMultiplier() - 1);
-                Game.setActiveBless(Game.getActiveBless() - 1 <= 0 ? 0 : Game.getActiveBless() - 1);
-                Game.updateConfig();
-                actionsChannel.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${Game.getConfig().spells.activeBless}\nCurrent Multiplier is: ${Game.getConfig().multiplier}x`));
-              }, 1800000); // 30 minutes
-            } else {
-              author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
-            }
-            break;
-
-          case 'home':
-            if (castingPlayer.gold.current >= globalSpells.home.spellCost) {
-              castingPlayer.gold.current -= globalSpells.home.spellCost;
-              const randomHome = this.MapManager.getRandomTown();
-              castingPlayer.map = randomHome;
-              actionsChannel.send(`${castingPlayer.name} just cast ${spell} and teleported back to ${randomHome.name}.`);
-              author.send(`Teleported back to ${randomHome.name}.`);
-              this.Database.savePlayer(castingPlayer)
-                .then(() => {
-                  author.send('Spell has been cast!');
-                });
-            } else {
-              author.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - castingPlayer.gold.current} gold.`);
-            }
-            break;
+    const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const guildConfig = await this.Database.loadGame(player.guildId);
+    switch (spell) {
+      case 'bless':
+        if (player.gold.current >= globalSpells.bless.spellCost) {
+          player.spellCast++;
+          player.gold.current -= globalSpells.bless.spellCost;
+          await this.Database.savePlayer(player.guildId, player)
+            .then(() => {
+              author.send('Spell has been cast!');
+            });
+          guildConfig.multiplier++;
+          guildConfig.spells.activeBless++;
+          await this.Database.updateGame(player.guildId, guildConfig);
+          actionsChannel.send(this.Helper.setImportantMessage(`${player.name} just cast ${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          setTimeout(() => {
+            Game.setMultiplier(Game.getMultiplier() - 1 <= 0 ? 1 : Game.getMultiplier() - 1);
+            Game.setActiveBless(Game.getActiveBless() - 1 <= 0 ? 0 : Game.getActiveBless() - 1);
+            guildConfig.multiplier--;
+            guildConfig.spells.activeBless--;
+            guildConfig.spells.activeBless = guildConfig.spells.activeBless <= 0 ? 1 : guildConfig.spells.activeBless;
+            this.Database.updateGame(player.guildId, guildConfig);
+            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}s ${spell} just wore off.\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          }, 1800000); // 30 minutes
+        } else {
+          author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
         }
-      });
+        break;
+
+      case 'home':
+        if (player.gold.current >= globalSpells.home.spellCost) {
+          player.gold.current -= globalSpells.home.spellCost;
+          const randomHome = this.MapManager.getRandomTown();
+          player.map = randomHome;
+          actionsChannel.send(`${player.name} just cast ${spell} and teleported back to ${randomHome.name}.`);
+          author.send(`Teleported back to ${randomHome.name}.`);
+          await this.Database.savePlayer(player.guildId, player)
+            .then(() => {
+              author.send('Spell has been cast!');
+            });
+        } else {
+          author.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - player.gold.current} gold.`);
+        }
+        break;
+    }
   }
 
   placeBounty(params) {

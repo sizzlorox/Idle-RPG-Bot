@@ -9,52 +9,18 @@ class Game {
 
   constructor(Helper) {
     this.activeSpells = [];
-    this.config = '';
 
     this.Helper = Helper;
     this.Database = new Database(Helper);
     this.Map = new Map(Helper);
-    if (process.env.NODE_ENV.includes('production')) {
-      this.Database.loadGame()
-        .then((loadedConfig) => {
-          this.config = loadedConfig;
-          if (this.config.spells.activeBless === 0) {
-            this.config.multiplier = 1;
-            this.Database.updateGame(this.config);
-          }
-        })
-        .then(() => console.log(`Config loaded\nMultiplier:${this.config.multiplier}\nActive Bless:${this.config.spells.activeBless}\nPrize Pool:${this.config.dailyLottery.prizePool}`))
-        .then(() => {
-          for (let i = 0; i < this.config.spells.activeBless; i++) {
-            setTimeout(() => {
-              this.config.spells.activeBless--;
-              this.config.multiplier -= 1;
-              this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
-              if (this.config.spells.activeBless === 0) {
-                this.config.multiplier = 1;
-              }
-              this.Database.updateGame(this.config);
-            }, 1800000 + (5000 * i));
-          }
-        })
-        .then(() => this.Database.resetPersonalMultipliers());
-    } else {
-      this.config = {
-        multiplier: 1,
-        spells: {
-          activeBless: 0
-        },
-        dailyLottery: {
-          prizePool: 1500
-        }
-      };
-    }
     this.Events = new Events({ Helper: this.Helper, Map: this.Map, Database: this.Database });
-    this.Commands = new Commands({ Helper: this.Helper, Database: this.Database, Events: this.Events, Config: this.config, MapManager: this.Map });
+    this.Commands = new Commands({ Helper: this.Helper, Database: this.Database, Events: this.Events, MapManager: this.Map });
+    this.Database.resetPersonalMultipliers();
   }
 
   async activateEvent(player, onlinePlayers) {
     try {
+      const loadedGuildConfig = await this.Database.loadGame(player.guildId);
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
@@ -73,7 +39,7 @@ class Game {
 
       console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId}`);
       await this.Helper.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
-      const eventResults = await this.selectEvent(loadedPlayer, onlinePlayers);
+      const eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
       const msgResults = await this.updatePlayer(eventResults);
 
       return msgResults;
@@ -82,16 +48,16 @@ class Game {
     }
   }
 
-  async selectEvent(loadedPlayer, onlinePlayers) {
+  async selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers) {
     try {
       const randomEvent = await this.Helper.randomBetween(0, 2);
       switch (randomEvent) {
         case 0:
           return this.Events.moveEvent(loadedPlayer);
         case 1:
-          return this.Events.attackEvent(loadedPlayer, onlinePlayers, this.config.multiplier);
+          return this.Events.attackEvent(loadedPlayer, onlinePlayers, loadedGuildConfig.multiplier);
         case 2:
-          return this.Events.luckEvent(loadedPlayer, this.config.multiplier);
+          return this.Events.luckEvent(loadedPlayer, loadedGuildConfig.multiplier);
       }
     } catch (err) {
       errorLog.error(err);
@@ -100,7 +66,7 @@ class Game {
 
   async updatePlayer(eventResults) {
     eventResults.updatedPlayer.events++;
-    await this.Database.savePlayer(eventResults.updatedPlayer);
+    await this.Database.savePlayer(eventResults.updatedPlayer.guildId, eventResults.updatedPlayer);
     return eventResults;
   }
 
@@ -108,32 +74,28 @@ class Game {
     return this.Database;
   }
 
-  getMultiplier() {
-    return this.config.multiplier;
-  }
-
-  setMultiplier(value) {
-    this.config.multiplier = value;
-  }
-
-  getActiveBless() {
-    return this.config.spells.activeBless;
-  }
-
-  setActiveBless(value) {
-    this.config.spells.activeBless = value;
-  }
-
-  updateConfig() {
-    this.Database.updateGame(this.config);
-  }
-
-  getConfig() {
-    return this.config;
-  }
-
-  setConfig(value) {
-    this.config = value;
+  async loadGuildConfig(guildId) {
+    const loadedConfig = await this.Database.loadGame(guildId);
+    if (loadedConfig.spells.activeBless === 0) {
+      loadedConfig.multiplier = 1;
+      await this.Database.updateGame(guildId, loadedConfig);
+    }
+    console.log(`
+    Config loaded for guild ${guildId}
+    Multiplier:${loadedConfig.multiplier}
+    Active Bless:${loadedConfig.spells.activeBless}
+    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n`);
+    for (let i = 0; i < loadedConfig.spells.activeBless; i++) {
+      setTimeout(() => {
+        loadedConfig.spells.activeBless--;
+        loadedConfig.multiplier -= 1;
+        loadedConfig.multiplier = loadedConfig.multiplier <= 0 ? 1 : loadedConfig.multiplier;
+        if (loadedConfig.spells.activeBless === 0) {
+          loadedConfig.multiplier = 1;
+        }
+        this.Database.updateGame(guildId, loadedConfig);
+      }, 1800000 + (5000 * i));
+    }
   }
 
   fetchCommand(params) {

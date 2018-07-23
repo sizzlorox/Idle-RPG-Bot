@@ -10,9 +10,14 @@ const CommandParser = require('../bots/utils/CommandParser');
 const enumHelper = require('../utils/enumHelper');
 const { minimalTimer, maximumTimer, botLoginToken } = require('../../settings');
 
+/*
+
+  TODO: Change to shards once guild count is approaching 100
+
+*/
+
 class DiscordBot {
 
-  // TODO remove discord.js from constructor and change to utilize shards
   constructor() {
     this.bot = new DiscordJS.Client();
     this.discord = new Discord(this.bot);
@@ -39,6 +44,10 @@ class DiscordBot {
       this.discord.loadGuilds();
       this.loadHeartBeat();
       this.Crons.loadCrons();
+
+      this.bot.guilds.forEach((guild) => {
+        this.Game.loadGuildConfig(guild.id);
+      }, console.log('Reset all personal multipliers'));
     });
     this.bot.on('message', async (message) => {
       if (message.content.includes('(╯°□°）╯︵ ┻━┻') && message.guild && message.guild.name === 'Idle-RPG') {
@@ -61,24 +70,11 @@ class DiscordBot {
         }
       }
 
-      // if (process.env.VIRUS_TOTAL_APIKEY && message.attachments && message.attachments.size > 0) {
-      //   const { url } = message.attachments.array()[0];
-
-      //   return VirusTotal.scanUrl(url)
-      //     .then(VirusTotal.retrieveReport)
-      //     .then((reportResults) => {
-      //       if (reportResults.positives > 0) {
-      //         message.delete();
-      //         message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');
-      //       }
-      //     });
-      // }
-
       if (message.content.startsWith('!')) {
         return this.CommandParser.parseUserCommand(message);
       }
     });
-    this.bot.on('guildCreate', (guild) => {
+    this.bot.on('guildCreate', async (guild) => {
       this.discord.manageGuildChannels(guild);
     });
   }
@@ -136,7 +132,9 @@ class DiscordBot {
         guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG')
           .send(this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
       });
-      this.Game.setMultiplier(this.Game.getMultiplier() + 1);
+      const guildConfig = this.Game.dbClass().loadGame(guild.id);
+      guildConfig.multiplier++;
+      this.Game.dbClass().updateGame(guild.id, guildConfig);
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
@@ -144,57 +142,49 @@ class DiscordBot {
         guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG')
           .send(this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
       });
-      this.Game.setMultiplier(this.Game.getMultiplier() - 1 <= 0 ? 1 : this.Game.getMultiplier() - 1);
+      const guildConfig = this.Game.dbClass().loadGame(guild.id);
+      guildConfig.multiplier--;
+      guildConfig.multiplier = guildConfig.multiplier - 1 <= 0 ? guildConfig.multiplier = 1 : guildConfig.multiplier--;
+      this.Game.dbClass().updateGame(guild.id, guildConfig);
     }, 5400000); // 1hr 30 minutes
   }
 
-  // TODO convert to async/await
   dailyLottery() {
     if (!process.env.NODE_ENV.includes('production')) {
       return;
     }
 
-    return this.Game.dbClass().loadLotteryPlayers()
-      .then((lotteryPlayers) => {
-        if (!lotteryPlayers.length) {
-          return;
+    this.bot.guilds.forEach(async (guild) => {
+      const guildLotteryPlayers = await this.Game.dbClass().loadLotteryPlayers();
+      if (!guildLotteryPlayers) {
+        return;
+      }
+
+      const guildConfig = await this.Game.dbClass().loadGame(guild.id);
+      const randomWinner = this.Helper.randomBetween(0, guildLotteryPlayers.length - 1);
+      const winner = guildLotteryPlayers[randomWinner];
+      const eventMsg = this.Helper.setImportantMessage(`Out of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
+      const eventLog = `Congratulations! Out of ${guildLotteryPlayers.length} contestants, you just won ${guildConfig.dailyLottery.prizePool} gold from the daily lottery!`;
+      winner.gold.current += guildConfig.dailyLottery.prizePool;
+      winner.gold.total += guildConfig.dailyLottery.prizePool;
+      winner.gold.dailyLottery += guildConfig.dailyLottery.prizePool;
+
+      guildLotteryPlayers.forEach((player) => {
+        const discordUser = guild.members.find(member => member.id === player.discordId);
+        if (player.discordId !== winner.discordId && discordUser) {
+          discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${guildConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
+        } else if (discordUser) {
+          discordUser.send(`Thank you for participating in the lottery! You have won the prize of ${guildConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
         }
-        const randomWinner = this.Helper.randomBetween(0, lotteryPlayers.length - 1);
-        const winner = lotteryPlayers[randomWinner];
+      });
 
-        return this.Game.dbClass().loadGame()
-          .then((updatedConfig) => {
-            const eventMsg = this.Helper.setImportantMessage(`Out of ${lotteryPlayers.length} contestants, ${winner.name} has won the daily lottery of ${updatedConfig.dailyLottery.prizePool} gold!`);
-            const eventLog = `Congratulations! Out of ${lotteryPlayers.length} contestants, you just won ${updatedConfig.dailyLottery.prizePool} gold from the daily lottery!`;
-            winner.gold.current += updatedConfig.dailyLottery.prizePool;
-            winner.gold.total += updatedConfig.dailyLottery.prizePool;
-            winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
-
-            lotteryPlayers.forEach((player) => {
-              const discordUser = this.bot.guilds.forEach(guild => guild.members.find(member => member.id === player.discordId));
-              if (player.discordId !== winner.discordId && discordUser) {
-                discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
-              } else if (discordUser) {
-                discordUser.send(`Thank you for participating in the lottery! You have won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
-              }
-            });
-
-            updatedConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
-            this.config = updatedConfig;
-            this.bot.guilds.forEach((guild) => {
-              guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG').send(eventMsg);
-            });
-
-            return Promise.all([
-              this.Game.dbClass().updateGame(updatedConfig),
-              this.Helper.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action),
-              this.Game.dbClass().savePlayer(winner),
-              this.Game.dbClass().removeLotteryPlayers()
-            ])
-              .catch(err => errorLog.error(err));
-          });
-      })
-      .catch(err => errorLog.error(err));
+      guildConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
+      guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG').send(eventMsg);
+      await this.Game.dbClass().updateGame(guild.id, updatedConfig);
+      await this.Helper.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
+      await this.Game.dbClass().savePlayer(guild.id, winner);
+      await this.Game.dbClass().removeLotteryPlayers(guild.id);
+    });
   }
 
   updateLeaderboards() {

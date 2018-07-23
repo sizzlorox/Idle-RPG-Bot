@@ -19,7 +19,9 @@ class CommandParser {
     const commandChannelId = messageObj.channel.type === 'dm'
       ? messageObj.channel.type
       : messageObj.guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text').id;
-    const actionChannel = this.Bot.guilds.find(guild => guild.members.find(member => member.id === messageObj.author.id)).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const actionChannel = this.Bot.guilds.find(guild => guild.members.find(member => member.id === messageObj.author.id)).channels
+      .find(channel => channel.name === 'actions' && channel.type === 'text');
+    const guildId = this.Bot.guilds.find(guild => guild.members.find(member => member.id === messageObj.author.id)).id;
     const messageContent = messageObj.content;
     const command = messageContent.includes(' ') ? messageContent.split(' ')[0].toLowerCase() : messageContent.toLowerCase();
     const authorId = messageObj.author.id;
@@ -46,6 +48,7 @@ class CommandParser {
         Bot: this.Bot,
         Helper: this.Helper,
         actionsChannel: actionChannel,
+        guildId,
         messageObj
       };
 

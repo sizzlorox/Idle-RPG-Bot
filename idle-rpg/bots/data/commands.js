@@ -301,12 +301,10 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj } = params;
-      Game.fetchCommand({
-        Game,
+      return Game.fetchCommand({
         command: 'joinLottery',
         author: messageObj.author
-      })
-        .then(msg => messageObj.author.send(msg));
+      });
     }
   },
 
@@ -316,7 +314,10 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, messageObj } = params;
-      return Game.fetchCommand({ command: 'prizePool', author: messageObj.author });
+      return Game.fetchCommand({
+        command: 'prizePool',
+        author: messageObj.author
+      });
     }
   },
 
@@ -372,62 +373,78 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, messageObj } = params;
+      const { Game, messageObj, guildId, Bot } = params;
       switch ((messageObj.content.split(/ (.+)/)[1] === undefined) ? 'level' : messageObj.content.split(/ (.+)/)[1].toLowerCase()) {
         case 'gambles':
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
-            type: { gambles: -1 }
+            type: { gambles: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'stolen':
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
-            type: { stolen: -1 }
+            type: { stolen: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'stole':
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
-            type: { stole: -1 }
+            type: { stole: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'gold':
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
-            type: { 'gold.current': -1 }
+            type: { 'gold.current': -1 },
+            guildId,
+            Bot
           });
           break;
         case 'spells':
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
-            type: { spellCast: -1 }
+            type: { spellCast: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'events':
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
-            type: { events: -1 }
+            type: { events: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'bounty':
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
-            type: { currentBounty: -1 }
+            type: { currentBounty: -1 },
+            guildId,
+            Bot
           });
           break;
         default:
           Game.fetchCommand({
             command: 'top10',
             author: messageObj.author,
-            type: { level: -1 }
+            type: { level: -1 },
+            guildId,
+            Bot
           });
           break;
       }
@@ -445,56 +462,72 @@ const commands = [
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
-            type: { gambles: -1 }
+            type: { gambles: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'stolen':
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
-            type: { stolen: -1 }
+            type: { stolen: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'stole':
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
-            type: { stole: -1 }
+            type: { stole: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'gold':
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
-            type: { 'gold.current': -1 }
+            type: { 'gold.current': -1 },
+            guildId,
+            Bot
           });
           break;
         case 'spells':
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
-            type: { spellCast: -1 }
+            type: { spellCast: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'events':
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
-            type: { events: -1 }
+            type: { events: -1 },
+            guildId,
+            Bot
           });
           break;
         case 'bounty':
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
-            type: { currentBounty: -1 }
+            type: { currentBounty: -1 },
+            guildId,
+            Bot
           });
           break;
         default:
           Game.fetchCommand({
             command: 'getRank',
             author: messageObj.author,
-            type: { level: -1 }
+            type: { level: -1 },
+            guildId,
+            Bot
           });
           break;
       }
