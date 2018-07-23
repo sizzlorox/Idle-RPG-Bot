@@ -137,8 +137,6 @@ ${rankString}
           await this.Database.updateGame(player.guildId, guildConfig);
           actionsChannel.send(this.Helper.setImportantMessage(`${player.name} just cast ${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
           setTimeout(() => {
-            Game.setMultiplier(Game.getMultiplier() - 1 <= 0 ? 1 : Game.getMultiplier() - 1);
-            Game.setActiveBless(Game.getActiveBless() - 1 <= 0 ? 0 : Game.getActiveBless() - 1);
             guildConfig.multiplier--;
             guildConfig.spells.activeBless--;
             guildConfig.spells.activeBless = guildConfig.spells.activeBless <= 0 ? 1 : guildConfig.spells.activeBless;
