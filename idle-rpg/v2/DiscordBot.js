@@ -8,7 +8,7 @@ const Discord = require('./Base/Discord');
 const Antispam = require('../bots/modules/Antispam');
 const CommandParser = require('../bots/utils/CommandParser');
 const enumHelper = require('../utils/enumHelper');
-const { errorLog } = require('../utils/logger');
+const { errorLog, welcomeLog } = require('../utils/logger');
 const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../settings');
 
 /*
