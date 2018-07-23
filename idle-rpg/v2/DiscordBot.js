@@ -79,6 +79,18 @@ class DiscordBot {
       this.discord.manageGuildChannels(guild);
     });
 
+
+    this.bot.on('guildMemberUpdate', (oldMember, newMember) => {
+      if (oldMember.guild.id !== guildID) {
+        return;
+      }
+
+      if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game) {
+        newMember.guild.channels.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text')
+          .send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
+      }
+    });
+
     this.bot.on('guildMemberAdd', (member) => {
       if (member.guild.id !== guildID) {
         return;
