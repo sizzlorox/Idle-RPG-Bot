@@ -8,6 +8,7 @@ const Discord = require('./Base/Discord');
 const Antispam = require('../bots/modules/Antispam');
 const CommandParser = require('../bots/utils/CommandParser');
 const enumHelper = require('../utils/enumHelper');
+const { errorLog } = require('../utils/logger');
 const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../settings');
 
 /*
@@ -37,7 +38,7 @@ class DiscordBot {
   }
 
   loadEventListeners() {
-    this.bot.on('error', err => console.log(err));
+    this.bot.on('error', err => errorLog.error(err));
     this.bot.once('ready', () => {
       this.bot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
       this.bot.user.setStatus('idle');
