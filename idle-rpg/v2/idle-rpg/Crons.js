@@ -43,7 +43,6 @@ class Crons {
     //   runOnInit: false
     // }).start();
 
-    // Leaderboard Channel Updates
     new CronJob({
       cronTime: this.leadboardUpdateTime,
       onTick: () => {

@@ -12,6 +12,7 @@ To see this bot in action it is currently running at this discord server:
 Created a .env file in the project root directory with these env variables: (Without < >)
 ```
 DISCORD_BOT_LOGIN_TOKEN=<Bot login token>
+DISCORD_BOT_OPERATOR_ID=<Bot Operator ID>
 
 MIN_TIMER=<Minimal Timer in minutes>
 MAX_TIMER=<Maximum Timer in minutes>

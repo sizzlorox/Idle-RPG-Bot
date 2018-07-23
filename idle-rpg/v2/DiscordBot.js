@@ -8,7 +8,7 @@ const Discord = require('./Base/Discord');
 const Antispam = require('../bots/modules/Antispam');
 const CommandParser = require('../bots/utils/CommandParser');
 const enumHelper = require('../utils/enumHelper');
-const { minimalTimer, maximumTimer, botLoginToken } = require('../../settings');
+const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../settings');
 
 /*
 
@@ -74,8 +74,23 @@ class DiscordBot {
         return this.CommandParser.parseUserCommand(message);
       }
     });
+
     this.bot.on('guildCreate', async (guild) => {
       this.discord.manageGuildChannels(guild);
+    });
+
+    this.bot.on('guildMemberAdd', (member) => {
+      if (member.guild.id !== guildID) {
+        return;
+      }
+
+      const welcomeChannel = member.guild.channels.find(channel => channel.name === 'newcomers' && channel.type === 'text');
+      if (!welcomeChannel) {
+        return;
+      }
+
+      welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.find(channel => channel.name === 'faq' && channel.type === 'text').id}> or PM me !help.`);
+      welcomeLog.info(member);
     });
   }
 
