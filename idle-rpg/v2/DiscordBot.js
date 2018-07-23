@@ -183,7 +183,7 @@ class DiscordBot {
     }
 
     this.bot.guilds.forEach(async (guild) => {
-      const guildLotteryPlayers = await this.Game.dbClass().loadLotteryPlayers();
+      const guildLotteryPlayers = await this.Game.dbClass().loadLotteryPlayers(guild.id);
       if (!guildLotteryPlayers) {
         return;
       }

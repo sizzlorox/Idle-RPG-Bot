@@ -26,7 +26,7 @@ class Crons {
     new CronJob({
       cronTime: this.dailyLotteryTime,
       onTick: () => {
-        this.Discord.dailyLottery(discordBot, guildName);
+        this.Discord.dailyLottery();
       },
       start: false,
       timeZone: this.timeZone,
