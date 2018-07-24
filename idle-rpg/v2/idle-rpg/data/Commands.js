@@ -120,7 +120,7 @@ ${rankString}
   }
 
   async castSpell(params) {
-    const { Game, author, actionsChannel, spell } = params;
+    const { author, actionsChannel, spell } = params;
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
     const guildConfig = await this.Database.loadGame(player.guildId);
     switch (spell) {
