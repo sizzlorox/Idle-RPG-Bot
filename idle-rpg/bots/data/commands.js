@@ -457,7 +457,7 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, messageObj } = params;
+      const { Game, messageObj, guildId, Bot } = params;
       switch ((messageObj.content.split(/ (.+)/)[1] === undefined) ? 'level' : messageObj.content.split(/ (.+)/)[1].toLowerCase()) {
         case 'gambles':
           Game.fetchCommand({
