@@ -17,6 +17,11 @@ class Commands {
     return this.Database.loadPlayer(author.id, enumHelper.statsSelectFields);
   }
 
+  playerEquipment(params) {
+    const { author } = params;
+    return this.Database.loadPlayer(author.id, enumHelper.equipSelectFields);
+  }
+
   playerInventory(params) {
     const { author } = params;
     return this.Database.loadPlayer(author.id, enumHelper.inventorySelectFields);
