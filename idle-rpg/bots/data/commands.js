@@ -14,7 +14,7 @@ const commands = [
     command: ['!help', '!h'],
     operatorOnly: false,
     function: (params) => {
-      const { Game, Helper, Bot, messageObj } = params;
+      const { messageObj } = params;
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
         !top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
@@ -43,6 +43,7 @@ const commands = [
         !b, !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         !sb, !spellbook - Returns list of spells your character has learned
         !i, !inv, !inventory - Displays what your character has in his/her inventory
+        !invite - Sends you invite channel to official server
         \`\`\``;
       messageObj.author.send(helpMsg)
         .then(() => messageObj.author.send(helpMsg2));
@@ -926,6 +927,15 @@ const commands = [
           || player.presence.status === 'idle' && !player.user.bot
           || player.presence.status === 'dnd' && !player.user.bot);
       aprilfools.forEach(player => player.send('Found a Mythical Alien Relic in Topscros Path'));
+    }
+  },
+
+  invite = {
+    command: '!invite',
+    operatorOnly: false,
+    function: (params) => {
+      const { messageObj } = params;
+      messageObj.author.send('Official Server: <https://discord.gg/nAEBTcj>\nInvite Bot Link: Coming Soon!');
     }
   },
 
