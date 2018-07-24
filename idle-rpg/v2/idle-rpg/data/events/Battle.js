@@ -404,7 +404,7 @@ class Battle {
           eventLog.push(...winResults.pm);
           otherPlayerPmMsg.push(...winResults.otherPlayerPmMsg);
           const victimCheckHealth = await this.Helper.checkHealth(this.Database, this.MapManager, winResults.victimPlayer, winResults.stealingPlayer, eventMsg, otherPlayerPmMsg, eventLog);
-          await this.Database.savePlayer(victimCheckHealth.updatedPlayer);
+          await this.Database.savePlayer(victimCheckHealth.updatedPlayer.guildId, victimCheckHealth.updatedPlayer);
           const winnerCheckExp = await this.Helper.checkExperience(this.Database, winResults.stealingPlayer, eventMsg, eventLog);
 
           return {
@@ -418,7 +418,7 @@ class Battle {
 
         case enumHelper.battle.outcomes.fled:
           const fledUpdatedDefender = await this.Helper.checkExperience(this.Database, defender, eventMsg, otherPlayerPmMsg);
-          await this.Database.savePlayer(fledUpdatedDefender.updatedPlayer);
+          await this.Database.savePlayer(fledUpdatedDefender.updatedPlayer.guildId, fledUpdatedDefender.updatedPlayer);
           const fledResult = await this.Helper.checkExperience(this.Database, attacker, eventMsg, eventLog);
 
           return {
@@ -436,7 +436,7 @@ class Battle {
           eventLog.push(...loseResults.otherPlayerPmMsg);
           otherPlayerPmMsg.push(...loseResults.pm);
           const lostUpdatedDefender = await this.Helper.checkExperience(this.Database, loseResults.stealingPlayer, eventMsg, otherPlayerPmMsg);
-          await this.Database.savePlayer(lostUpdatedDefender.updatedPlayer);
+          await this.Database.savePlayer(lostUpdatedDefender.guildId, lostUpdatedDefender.updatedPlayer);
           const loserCheckHealth = await this.Helper.checkHealth(this.Database, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer, eventMsg, eventLog, otherPlayerPmMsg);
 
           return {

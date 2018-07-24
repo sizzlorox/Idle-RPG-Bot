@@ -124,7 +124,7 @@ class Luck {
                 loadedPlayer.personalMultiplier = 0;
                 return loadedPlayer;
               })
-              .then(loadedPlayer => this.Database.savePlayer(loadedPlayer));
+              .then(loadedPlayer => this.Database.savePlayer(loadedPlayer.guildId, loadedPlayer));
           }, timeLimit);
           break;
       }
