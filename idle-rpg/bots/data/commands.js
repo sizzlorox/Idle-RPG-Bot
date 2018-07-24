@@ -13,7 +13,8 @@ const commands = [
   help = {
     command: ['!help', '!h'],
     operatorOnly: false,
-    function: (game, message) => {
+    function: (params) => {
+      const { messageObj } = params;
       const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
         !top10 - Retrieves top 10 highest level players
         !top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
@@ -42,9 +43,10 @@ const commands = [
         !b, !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         !sb, !spellbook - Returns list of spells your character has learned
         !i, !inv, !inventory - Displays what your character has in his/her inventory
+        !invite - Sends you invite channel to official server
         \`\`\``;
-      message.author.send(helpMsg)
-        .then(() => message.author.send(helpMsg2));
+      messageObj.author.send(helpMsg)
+        .then(() => messageObj.author.send(helpMsg2));
     }
   },
 
@@ -52,13 +54,14 @@ const commands = [
     command: ['!character', '!c', '!char'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, Helper) => {
-      if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(/ (.+)/)[1];
+    function: (params) => {
+      const { Game, Helper, Bot, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot).array();
+        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot).array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
-          message.author.send(`${checkPlayer} was not found!`);
+          messageObj.author.send(`${checkPlayer} was not found!`);
           return;
         } else if (process.env.NODE_ENV.includes('development')) {
           playerObj.push({
@@ -66,29 +69,35 @@ const commands = [
           });
         }
 
-        return game.playerStats(playerObj[0])
+        return Game.fetchCommand({
+          command: 'playerStats',
+          author: playerObj[0]
+        })
           .then((playerStats) => {
             if (!playerStats) {
-              return message.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+              return messageObj.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
             const stats = Helper.generateStatsString(playerStats);
             const equip = Helper.generateEquipmentsString(playerStats);
-            message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`))
-              .then(() => message.author.send(equip.replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`)));
+            messageObj.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`))
+              .then(() => messageObj.author.send(equip.replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`)));
           });
       }
 
-      return game.playerStats(message.author)
+      return Game.fetchCommand({
+        command: 'playerStats',
+        author: messageObj.author
+      })
         .then((playerStats) => {
           if (!playerStats) {
-            return message.author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+            return messageObj.author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
           const stats = Helper.generateStatsString(playerStats);
           const equip = Helper.generateEquipmentsString(playerStats);
-          message.author.send(stats)
-            .then(() => message.author.send(equip));
+          messageObj.author.send(stats)
+            .then(() => messageObj.author.send(equip));
         });
     }
   },
@@ -97,13 +106,14 @@ const commands = [
     command: ['!inventory', '!inv', '!i'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, Helper) => {
-      if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(/ (.+)/)[1];
+    function: (params) => {
+      const { Game, Helper, Bot, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot).array();
+        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot).array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
-          message.author.send(`${checkPlayer} was not found!`);
+          messageObj.author.send(`${checkPlayer} was not found!`);
           return;
         } else if (process.env.NODE_ENV.includes('development')) {
           playerObj.push({
@@ -111,25 +121,31 @@ const commands = [
           });
         }
 
-        return game.playerInventory(playerObj[0])
+        return Game.fetchCommand({
+          command: 'playerInventory',
+          author: playerObj[0]
+        })
           .then((playerInventory) => {
             if (!playerInventory) {
-              return message.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+              return messageObj.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
             return Helper.generateInventoryString(playerInventory)
-              .then(inv => message.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`)));
+              .then(inv => messageObj.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`)));
           });
       }
 
-      game.playerInventory(message.author)
+      Game.fetchCommand({
+        command: 'playerInventory',
+        author: messageObj.author
+      })
         .then((playerInventory) => {
           if (!playerInventory) {
-            return message.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+            return messageObj.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
           Helper.generateInventoryString(playerInventory)
-            .then(inv => message.author.send(inv));
+            .then(inv => messageObj.author.send(inv));
         });
     }
   },
@@ -138,9 +154,13 @@ const commands = [
     command: ['!newquest', '!nq'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: async (game, message) => {
-      const result = await game.resetQuest(message.author.id);
-      return message.author.send(result);
+    function: async (params) => {
+      const { Game, messageObj } = params;
+      const result = await Game.fetchCommand({
+        command: 'resetQuest',
+        author: messageObj.author.id
+      });
+      return messageObj.author.send(result);
     }
   },
 
@@ -148,35 +168,42 @@ const commands = [
     command: ['!stats', '!s'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, Helper) => {
-      if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(/ (.+)/)[1];
+    function: (params) => {
+      const { Game, Helper, Bot, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
+        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
-          message.author.send(`${checkPlayer} was not found!`);
+          messageObj.author.send(`${checkPlayer} was not found!`);
           return;
         }
 
-        return game.playerStats(playerObj.array()[0])
+        return Game.fetchCommand({
+          command: 'playerStats',
+          author: playerObj.array()[0]
+        })
           .then((playerStats) => {
             if (!playerStats) {
-              return message.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+              return messageObj.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
             const stats = Helper.generateStatsString(playerStats);
-            message.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`));
+            messageObj.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`));
           });
       }
 
-      game.playerStats(message.author)
+      Game.fetchCommand({
+        command: 'playerStats',
+        author: messageObj.author
+      })
         .then((playerStats) => {
           if (!playerStats) {
-            return message.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+            return messageObj.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
           const stats = Helper.generateStatsString(playerStats);
-          message.author.send(stats);
+          messageObj.author.send(stats);
         });
     }
   },
@@ -185,35 +212,42 @@ const commands = [
     command: ['!equip', '!e'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, Helper) => {
-      if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(/ (.+)/)[1];
+    function: (params) => {
+      const { Game, Helper, Bot, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
+        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
-          message.author.send(`${checkPlayer} was not found!`);
+          messageObj.author.send(`${checkPlayer} was not found!`);
           return;
         }
 
-        return game.playerEquipment(playerObj.array()[0])
+        return Game.fetchCommand({
+          command: 'playerEquipment',
+          author: playerObj.array()[0]
+        })
           .then((playerEquipment) => {
             if (!playerEquipment) {
-              return message.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+              return messageObj.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
             const equip = Helper.generateEquipmentsString(playerEquipment)
-            message.author.send(equip.replace('Heres your equipment!', `Here is ${playerEquipment.name}s equipment!`));
+            messageObj.author.send(equip.replace('Heres your equipment!', `Here is ${playerEquipment.name}s equipment!`));
           });
       }
 
-      game.playerEquipment(message.author)
+      Game.fetchCommand({
+        command: 'playerEquipment',
+        author: messageObj.author
+      })
         .then((playerEquipment) => {
           if (!playerEquipment) {
-            return message.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+            return messageObj.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
           const equip = Helper.generateEquipmentsString(playerEquipment);
-          message.author.send(equip);
+          messageObj.author.send(equip);
         });
     }
   },
@@ -222,35 +256,42 @@ const commands = [
     command: ['!spellbook', '!sb'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, Helper) => {
-      if (message.content.includes(' ')) {
-        let checkPlayer = message.content.split(/ (.+)/)[1];
+    function: (params) => {
+      const { Game, Helper, Bot, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = discordBot.users.filter(player => player.id === checkPlayer && !player.bot);
+        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot);
         if (playerObj.size === 0) {
-          message.author.send(`${checkPlayer} was not found!`);
+          messageObj.author.send(`${checkPlayer} was not found!`);
           return;
         }
 
-        return game.playerStats(playerObj.array()[0])
+        return Game.fetchCommand({
+          command: 'playerStats',
+          author: playerObj.array()[0]
+        })
           .then((playerSpells) => {
             if (!playerSpells) {
-              return message.author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
+              return messageObj.author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
             const spellBook = Helper.generateSpellBookString(playerSpells);
-            message.author.send(spellBook.replace('Here\'s your spellbook!', `Here is ${playerSpells.name}'s spellbook!`));
+            messageObj.author.send(spellBook.replace('Here\'s your spellbook!', `Here is ${playerSpells.name}'s spellbook!`));
           });
       }
 
-      game.playerStats(message.author)
+      Game.fetchCommand({
+        command: 'playerStats',
+        author: messageObj.author
+      })
         .then((playerSpells) => {
           if (!playerSpells) {
-            return message.author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+            return messageObj.author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
           const spellBook = Helper.generateSpellBookString(playerSpells);
-          message.author.send(spellBook);
+          messageObj.author.send(spellBook);
         });
     }
   },
@@ -259,9 +300,12 @@ const commands = [
     command: ['!lottery'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
-      game.joinLottery(message.author)
-        .then(msg => message.author.send(msg));
+    function: (params) => {
+      const { Game, messageObj } = params;
+      return Game.fetchCommand({
+        command: 'joinLottery',
+        author: messageObj.author
+      });
     }
   },
 
@@ -269,19 +313,22 @@ const commands = [
     command: ['!prizepool'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      game.prizePool()
-        .then(msg => message.author.send(msg));
+    function: (params) => {
+      const { Game, messageObj } = params;
+      return Game.fetchCommand({
+        command: 'prizePool',
+        author: messageObj.author
+      });
     }
   },
 
-  command = {
+  multi = {
     command: ['!multiplier', '!multi'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      const result = game.checkMultiplier();
-      message.author.send(result);
+    function: (params) => {
+      const { Game, messageObj } = params;
+      return Game.fetchCommand({ command: 'checkMultiplier', author: messageObj.author });
     }
   },
 
@@ -289,13 +336,14 @@ const commands = [
     command: ['!map', '!m'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
+    function: (params) => {
+      const { messageObj } = params;
       let mapInfo = '';
       maps.forEach((map) => {
         mapInfo = mapInfo.concat(`\n${map.name} (${map.biome.name}) Coordinates: ${map.coords}`);
       });
 
-      message.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
+      messageObj.author.send(`\`\`\`Map of Idle-RPG:\n${mapInfo}\`\`\``);
     }
   },
 
@@ -303,20 +351,21 @@ const commands = [
     command: '!lore',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitMessage = message.content.split(/ (.+)/)[1].toLowerCase();
+    function: (params) => {
+      const { messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitMessage = messageObj.content.split(/ (.+)/)[1].toLowerCase();
         const requestedMap = maps.filter(map => map.name.toLowerCase() === splitMessage)
           .map(map => map.lore);
 
         if (requestedMap.length === 0) {
-          return message.author.send(`${splitMessage} was not found. Did you type the map correctly?`);
+          return messageObj.author.send(`${splitMessage} was not found. Did you type the map correctly?`);
         }
 
-        return message.author.send(`\`\`\`${splitMessage}: ${requestedMap[0]}\`\`\``);
+        return messageObj.author.send(`\`\`\`${splitMessage}: ${requestedMap[0]}\`\`\``);
       }
 
-      return message.author.send('You must enter a map to retrieve its lore. Check `!help` for more info.');
+      return messageObj.author.send('You must enter a map to retrieve its lore. Check `!help` for more info.');
     }
   },
 
@@ -324,31 +373,80 @@ const commands = [
     command: '!top10',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      switch ((message.content.split(/ (.+)/)[1] === undefined) ? 'level' : message.content.split(/ (.+)/)[1].toLowerCase()) {
+    function: (params) => {
+      const { Game, messageObj, guildId, Bot } = params;
+      switch ((messageObj.content.split(/ (.+)/)[1] === undefined) ? 'level' : messageObj.content.split(/ (.+)/)[1].toLowerCase()) {
         case 'gambles':
-          game.top10(message.author, { gambles: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { gambles: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'stolen':
-          game.top10(message.author, { stolen: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { stolen: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'stole':
-          game.top10(message.author, { stole: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { stole: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'gold':
-          game.top10(message.author, { 'gold.current': -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { 'gold.current': -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'spells':
-          game.top10(message.author, { spellCast: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { spellCast: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'events':
-          game.top10(message.author, { events: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { events: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'bounty':
-          game.top10(message.author, { currentBounty: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { currentBounty: -1 },
+            guildId,
+            Bot
+          });
           break;
         default:
-          game.top10(message.author, { level: -1 });
+          Game.fetchCommand({
+            command: 'top10',
+            author: messageObj.author,
+            type: { level: -1 },
+            guildId,
+            Bot
+          });
           break;
       }
     }
@@ -358,31 +456,80 @@ const commands = [
     command: '!rank',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      switch ((message.content.split(/ (.+)/)[1] === undefined) ? 'level' : message.content.split(/ (.+)/)[1].toLowerCase()) {
+    function: (params) => {
+      const { Game, messageObj } = params;
+      switch ((messageObj.content.split(/ (.+)/)[1] === undefined) ? 'level' : messageObj.content.split(/ (.+)/)[1].toLowerCase()) {
         case 'gambles':
-          game.getRank(message.author, { gambles: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { gambles: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'stolen':
-          game.getRank(message.author, { stolen: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { stolen: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'stole':
-          game.getRank(message.author, { stole: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { stole: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'gold':
-          game.getRank(message.author, { 'gold.current': -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { 'gold.current': -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'spells':
-          game.getRank(message.author, { spellCast: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { spellCast: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'events':
-          game.getRank(message.author, { events: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { events: -1 },
+            guildId,
+            Bot
+          });
           break;
         case 'bounty':
-          game.getRank(message.author, { currentBounty: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { currentBounty: -1 },
+            guildId,
+            Bot
+          });
           break;
         default:
-          game.getRank(message.author, { level: -1 });
+          Game.fetchCommand({
+            command: 'getRank',
+            author: messageObj.author,
+            type: { level: -1 },
+            guildId,
+            Bot
+          });
           break;
       }
     }
@@ -392,14 +539,21 @@ const commands = [
     command: ['!castspell', '!cs'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        return game.castSpell(message.author, message.content.split(/ (.+)/)[1].toLowerCase());
+    function: (params) => {
+      const { Game, actionsChannel, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        return Game.fetchCommand({
+          Game,
+          command: 'castSpell',
+          author: messageObj.author,
+          actionsChannel,
+          spell: messageObj.content.split(/ (.+)/)[1].toLowerCase()
+        });
       }
       let spellsString = '```List of Spells:\n  ';
       spellsString = spellsString.concat(Object.keys(spells).map(spell => `${spell} - ${spells[spell].spellCost} gold - ${spells[spell].description}`).join('\n  '));
 
-      return message.author.send(spellsString.concat('```'));
+      return messageObj.author.send(spellsString.concat('```'));
     }
   },
 
@@ -410,25 +564,32 @@ const commands = [
     command: ['!bounty', '!b'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot, discordHook) => {
-      const splitArray = message.content.split(' ');
-      if (message.content.includes(' ') && splitArray.length === 3) {
+    function: (params) => {
+      const { Game, actionsChannel, messageObj } = params;
+      const splitArray = messageObj.content.split(' ');
+      if (messageObj.content.includes(' ') && splitArray.length === 3) {
         const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
         const amount = splitArray[2];
 
         if (Number(amount) <= 0 || Number(amount) % 1 !== 0 || !amount.match(/^\d+$/)) {
-          return message.author.send('Please use a regular amount of gold.');
+          return messageObj.author.send('Please use a regular amount of gold.');
         }
         if (Number(amount) < 100) {
-          return message.author.send('You must place a bounty higher or equal to 100');
+          return messageObj.author.send('You must place a bounty higher or equal to 100');
         }
         if (!recipient.match(/^\d+$/)) {
-          return message.author.send('Please add a bounty to a player.');
+          return messageObj.author.send('Please add a bounty to a player.');
         }
-        return game.placeBounty(message.author, recipient, Number(amount));
+        return Game.fetchCommand({
+          command: 'placeBounty',
+          author: messageObj.author,
+          actionsChannel,
+          recipient,
+          amount: Number(amount)
+        });
       }
 
-      return message.author.send('Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head');
+      return messageObj.author.send('Please specify a player and amount of gold you wish to place on their head. You need to have enough gold to put on their head');
     }
   },
 
@@ -436,26 +597,35 @@ const commands = [
     command: ['!eventlog', '!el'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
-        return game.playerEventLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
+        return Game.fetchCommand({
+          command: 'playerEventLog',
+          author: splitCommand[1].replace(/([\<\@\!\>])/g, ''),
+          amount: 15
+        })
           .then((result) => {
             if (!result || result.length === 0) {
-              return message.author.send('This player has not activated any Events yet.');
+              return messageObj.author.send('This player has not activated any Events yet.');
             }
 
-            return message.author.send(`\`\`\`${result}\`\`\``);
+            return messageObj.author.send(`\`\`\`${result}\`\`\``);
           });
       }
 
-      return game.playerEventLog(message.author.id, 15)
+      return Game.fetchCommand({
+        command: 'playerEventLog',
+        author: messageObj.author.id,
+        amount: 15
+      })
         .then((result) => {
           if (!result || result.length === 0) {
-            return message.author.send('You have not activated any Events yet.');
+            return messageObj.author.send('You have not activated any Events yet.');
           }
 
-          return message.author.send(`\`\`\`${result}\`\`\``);
+          return messageObj.author.send(`\`\`\`${result}\`\`\``);
         });
     }
   },
@@ -464,26 +634,35 @@ const commands = [
     command: ['!pvplog', '!pl'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
-        return game.playerPvpLog(splitCommand[1].replace(/([\<\@\!\>])/g, ''), 15)
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
+        return Game.fetchCommand({
+          command: 'playerPvpLog',
+          author: splitCommand[1].replace(/([\<\@\!\>])/g, ''),
+          amount: 15
+        })
           .then((result) => {
             if (!result || result.length === 0) {
-              return message.author.send('This player has not had any PvP Events yet.');
+              return messageObj.author.send('This player has not had any PvP Events yet.');
             }
 
-            return message.author.send(`\`\`\`${result}\`\`\``);
+            return messageObj.author.send(`\`\`\`${result}\`\`\``);
           });
       }
 
-      return game.playerPvpLog(message.author.id, 15)
+      return Game.fetchCommand({
+        command: 'playerPvpLog',
+        author: messageObj.author.id,
+        amount: 15
+      })
         .then((result) => {
           if (!result || result.length === 0) {
-            return message.author.send('You have not had any PvP Events yet.');
+            return messageObj.author.send('You have not had any PvP Events yet.');
           }
 
-          return message.author.send(`\`\`\`${result}\`\`\``);
+          return messageObj.author.send(`\`\`\`${result}\`\`\``);
         });
     }
   },
@@ -495,19 +674,30 @@ const commands = [
     command: '!pm',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
         switch (splitCommand[1].toLowerCase()) {
           case 'on':
           case 'off':
-            return game.modifyPM(message.author, splitCommand[1] === 'on', false);
+            return Game.fetchCommand({
+              command: 'modifyPM',
+              author: messageObj.author,
+              value: splitCommand[1] === 'on',
+              filtered: false
+            });
           case 'filtered':
-            return game.modifyPM(message.author, true, true);
+            return Game.fetchCommand({
+              command: 'modifyPM',
+              author: messageObj.author,
+              value: true,
+              filtered: true
+            });
         }
       }
 
-      return message.author.send(`\`\`\`Possible options:
+      return messageObj.author.send(`\`\`\`Possible options:
       on - You will be pmed in events that include you
       off - You won't be pmed in events that include you
       filtered - You will be pmed certain important events that include you
@@ -522,9 +712,10 @@ const commands = [
     command: '!mention',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
 
         // Use switch to validate the value
         switch (splitCommand[1].toLowerCase()) {
@@ -532,11 +723,15 @@ const commands = [
           case 'off':
           case 'action':
           case 'move':
-            return game.modifyMention(message.author, splitCommand[1].toLowerCase());
+            return Game.fetchCommand({
+              command: 'modifyMention',
+              author: messageObj.author,
+              value: splitCommand[1].toLowerCase()
+            });
         }
       }
 
-      return message.author.send(`\`\`\`Possible options:
+      return messageObj.author.send(`\`\`\`Possible options:
         on - You will be tagged in events that include you
         off - You won't be tagged in events that include you
         action - You will be tagged in action events that include you
@@ -552,9 +747,10 @@ const commands = [
     command: '!gender',
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
 
         // Use switch to validate the value
         switch (splitCommand[1].toLowerCase()) {
@@ -562,11 +758,15 @@ const commands = [
           case 'female':
           case 'neutral':
           case 'neuter':
-            return game.modifyGender(message.author, splitCommand[1]);
+            return Game.fetchCommand({
+              command: 'modifyGender',
+              author: messageObj.author,
+              value: splitCommand[1]
+            });
         }
       }
 
-      return message.author.send(`\`\`\`Possible options:
+      return messageObj.author.send(`\`\`\`Possible options:
         male
         female
         neutral
@@ -580,13 +780,18 @@ const commands = [
     command: '!setbounty',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      const splitArray = message.content.split(' ');
-      if (message.content.includes(' ') && splitArray.length === 3) {
+    function: (params) => {
+      const { Game, messageObj } = params;
+      const splitArray = messageObj.content.split(' ');
+      if (messageObj.content.includes(' ') && splitArray.length === 3) {
         const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
         const amount = splitArray[2];
-        game.setPlayerBounty(recipient, Number(amount));
-        return message.author.send('Done');
+        Game.fetchCommand({
+          command: 'setPlayerBounty',
+          recipient,
+          amount: Number(amount)
+        });
+        return messageObj.author.send('Done');
       }
     }
   },
@@ -595,13 +800,18 @@ const commands = [
     command: '!setgold',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      const splitArray = message.content.split(' ');
-      if (message.content.includes(' ') && splitArray.length === 3) {
+    function: (params) => {
+      const { Game, messageObj } = params;
+      const splitArray = messageObj.content.split(' ');
+      if (messageObj.content.includes(' ') && splitArray.length === 3) {
         const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
         const amount = splitArray[2];
-        game.setPlayerGold(recipient, Number(amount));
-        return message.author.send('Done');
+        Game.fetchCommand({
+          command: 'setPlayerGold',
+          recipient,
+          amount: Number(amount)
+        });
+        return messageObj.author.send('Done');
       }
     }
   },
@@ -662,12 +872,17 @@ const commands = [
     command: '!givegold',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ') && message.content.split(' ').length > 2) {
-        const splitCommand = message.content.split(' ');
-        game.giveGold(splitCommand[1], splitCommand[2])
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ') && messageObj.content.split(' ').length > 2) {
+        const splitCommand = messageObj.content.split(' ');
+        Game.fetchCommand({
+          command: 'giveGold',
+          recipient: splitCommand[1],
+          amount: splitCommand[2]
+        })
           .then(() => {
-            message.author.send('Done.');
+            messageObj.author.send('Done.');
           });
       }
     }
@@ -677,11 +892,15 @@ const commands = [
     command: '!resetplayer',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        game.deletePlayer(message.content.split(/ (.+)/)[1])
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        Game.fetchCommand({
+          command: 'deletePlayer',
+          recipient: messageObj.content.split(/ (.+)/)[1]
+        })
           .then(() => {
-            message.author.send('Done.');
+            messageObj.author.send('Done.');
           });
       }
     }
@@ -708,6 +927,15 @@ const commands = [
           || player.presence.status === 'idle' && !player.user.bot
           || player.presence.status === 'dnd' && !player.user.bot);
       aprilfools.forEach(player => player.send('Found a Mythical Alien Relic in Topscros Path'));
+    }
+  },
+
+  invite = {
+    command: '!invite',
+    operatorOnly: false,
+    function: (params) => {
+      const { messageObj } = params;
+      messageObj.author.send('Official Server: <https://discord.gg/nAEBTcj>\nInvite Bot Link: Coming Soon!');
     }
   },
 

@@ -8,10 +8,11 @@ const Helper = require('../../utils/Helper');
 const helper = new Helper();
 const MapClass = new Map(helper);
 
-const newPlayerObj = (discordId, name) => {
+const newPlayerObj = (discordId, guildId, name) => {
   return {
     discordId,
     name,
+    guildId,
     personalMultiplier: 0,
     class: 'Wanderer',
     health: 105,
@@ -174,6 +175,10 @@ const playerSchema = mongoose.Schema({
   personalMultiplier: {
     type: Number,
     default: 0
+  },
+  guildId: {
+    type: String,
+    default: 'None'
   },
   name: String,
   class: {

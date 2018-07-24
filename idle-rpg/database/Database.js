@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { mongoDBUri, botID } = require('../../settings');
+const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
 
@@ -63,14 +63,18 @@ class Database {
   }
 
   // GAME SETTINGS
-  loadGame() {
-    return new Promise((resolve, reject) => Game.find({}, (err, result) => {
+  loadGame(guildId) {
+    return new Promise((resolve, reject) => Game.find({ guildId }, (err, result) => {
       if (err) {
         return reject(err);
       }
       if (!result || !result.length) {
         return Game.create({
+          guildId,
           multiplier: 1,
+          spells: {
+            activeBless: 0
+          },
           dailyLottery: {
             prizePool: 1500
           }
@@ -87,8 +91,8 @@ class Database {
     }));
   }
 
-  updateGame(newConfig) {
-    return new Promise((resolve, reject) => Game.update({}, newConfig, (err, result) => {
+  updateGame(guildId, newConfig) {
+    return new Promise((resolve, reject) => Game.update({ guildId }, newConfig, (err, result) => {
       if (err) {
         return reject(err);
       }
@@ -98,8 +102,8 @@ class Database {
   }
 
   // PLAYER
-  createNewPlayer(discordId, name) {
-    return new Promise((resolve, reject) => Player.create(newPlayerObj(discordId, name), (err, result) => {
+  createNewPlayer(discordId, guildId, name) {
+    return new Promise((resolve, reject) => Player.create(newPlayerObj(discordId, guildId, name), (err, result) => {
       if (err) {
         return reject(err);
       }
@@ -216,9 +220,10 @@ class Database {
       .in(discordIds));
   }
 
-  removeLotteryPlayers() {
+  removeLotteryPlayers(guildId) {
     const query = {
-      'lottery.joined': true
+      'lottery.joined': true,
+      guildId
     };
     return new Promise((resolve, reject) => Player.update(query, { lottery: { joined: false } }, { multi: true }, (err, result) => {
       if (err) {
@@ -229,11 +234,12 @@ class Database {
     }));
   }
 
-  loadLotteryPlayers(selectFields = {
+  loadLotteryPlayers(guildId, selectFields = {
     pastEvents: 0,
     pastPvpEvents: 0
   }) {
     const query = {
+      guildId,
       'lottery.joined': true
     };
 
@@ -247,7 +253,7 @@ class Database {
       .select(selectFields));
   }
 
-  loadTop10(type) {
+  loadTop10(type, guildId, botID) {
     const select = {
       name: 1
     };
@@ -261,7 +267,8 @@ class Database {
       type['experience.current'] = -1;
     }
     const query = {
-      discordId: { $nin: removeNpcs, $exists: true }
+      discordId: { $nin: removeNpcs, $exists: true },
+      guildId
     };
 
     return new Promise((resolve, reject) => Player.find(query, (err, result) => {
@@ -317,13 +324,13 @@ class Database {
       .select(selectFields));
   }
 
-  savePlayer(player) {
+  savePlayer(guildId, player) {
     if (!player) {
       return;
     }
     player.updated_at = Date.now();
 
-    return new Promise((resolve, reject) => Player.findOneAndUpdate({ discordId: player.discordId }, player, (err, result) => {
+    return new Promise((resolve, reject) => Player.findOneAndUpdate({ discordId: player.discordId, guildId }, player, (err, result) => {
       if (err) {
         return reject(err);
       }

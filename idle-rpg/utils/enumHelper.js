@@ -5,6 +5,12 @@ const enumHelper = {
     pvp: 'PVP'
   },
 
+  playableStatus: [
+    'online',
+    'idle',
+    'dnd'
+  ],
+
   map: {
     types: {
       town: 'Town'

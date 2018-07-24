@@ -11,14 +11,13 @@ const { newQuest } = require('../database/schemas/quest');
  */
 class Game {
 
-  constructor(discordHook, Helper) {
-    this.discordHook = discordHook;
+  constructor(Helper) {
     this.activeSpells = [];
     this.config = '';
 
     this.Helper = Helper;
     this.Database = new Database(Helper);
-    this.Event = new Event(this.Database, Helper, discordHook);
+    this.Event = new Event(this.Database, Helper);
     if (process.env.NODE_ENV.includes('production')) {
       this.Database.loadGame()
         .then((loadedConfig) => {
@@ -56,31 +55,41 @@ class Game {
     }
   }
 
-  async selectEvent(discordBot, player, onlinePlayers) {
+  async selectEvent(player, onlinePlayers) {
     try {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
-      let updatedPlayer = Object.assign({}, loadedPlayer);
+      let selectedPlayer = Object.assign({}, loadedPlayer);
       if (!loadedPlayer) {
-        updatedPlayer = await this.Database.createNewPlayer(player.discordId, player.name);
-        await this.Helper.sendMessage(this.discordHook, updatedPlayer, false, `${this.Helper.generatePlayerName(updatedPlayer, true)} was born in \`${updatedPlayer.map.name}\`! Welcome to the world of Idle-RPG!`);
-      } else if (updatedPlayer.events === 0) {
-        updatedPlayer.map = this.Event.MapClass.getRandomTown();
-        updatedPlayer.createdAt = new Date().getTime();
-        this.Helper.sendMessage(this.discordHook, updatedPlayer, false, `${this.Helper.generatePlayerName(updatedPlayer, true)} was reborn in \`${updatedPlayer.map.name}\`!`);
-      }
-      updatedPlayer.name = player.name;
-      updatedPlayer.events++;
+        selectedPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
 
-      if (!updatedPlayer.quest || updatedPlayer.quest && !updatedPlayer.quest.questMob) {
-        updatedPlayer.quest = newQuest;
+        return {
+          updatedPlayer: selectedPlayer,
+          msg: `${this.Helper.generatePlayerName(selectedPlayer, true)} was born in \`${selectedPlayer.map.name}\`! Welcome to the world of Idle-RPG!`,
+          pm: 'You were born.'
+        };
+      } else if (selectedPlayer.events === 0) {
+        selectedPlayer.map = this.Event.MapClass.getRandomTown();
+        selectedPlayer.createdAt = new Date().getTime();
+
+        return {
+          updatedPlayer: selectedPlayer,
+          msg: `${this.Helper.generatePlayerName(selectedPlayer, true)} was reborn in \`${selectedPlayer.map.name}\`!`,
+          pm: 'You were reborn.'
+        };
+      }
+      selectedPlayer.name = player.name;
+      selectedPlayer.events++;
+
+      if (!selectedPlayer.quest || selectedPlayer.quest && !selectedPlayer.quest.questMob) {
+        selectedPlayer.quest = newQuest;
       }
 
-      if (updatedPlayer.updated_at) {
-        const lastUpdated = (new Date().getTime() - updatedPlayer.updated_at.getTime()) / 1000;
-        console.log(`${updatedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
+      if (selectedPlayer.updated_at) {
+        const lastUpdated = (new Date().getTime() - selectedPlayer.updated_at.getTime()) / 1000;
+        console.log(`${selectedPlayer.name} was last updated: ${this.Helper.secondsToTimeFormat(Math.floor(lastUpdated))} ago.`);
       }
-      await this.Helper.passiveRegen(updatedPlayer, ((5 * updatedPlayer.level) / 4) + (updatedPlayer.stats.end / 8), ((5 * updatedPlayer.level) / 4) + (updatedPlayer.stats.int / 8));
-      updatedPlayer = await this.eventResults(updatedPlayer, onlinePlayers);
+      await this.Helper.passiveRegen(selectedPlayer, ((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.end / 8), ((5 * selectedPlayer.level) / 4) + (selectedPlayer.stats.int / 8));
+      let { type, updatedPlayer, msg, pm } = await this.eventResults(selectedPlayer, onlinePlayers);
       if (isNaN(updatedPlayer.equipment.armor.power)) {
         errorLog.error(updatedPlayer.equipment.armor);
         updatedPlayer = await this.Event.generateLuckItemEvent(updatedPlayer);
@@ -97,10 +106,12 @@ class Game {
       }
       await this.Database.savePlayer(updatedPlayer);
       if (updatedPlayer.events % 100 === 0 && updatedPlayer.events !== 0) {
-        await this.Helper.sendMessage(this.discordHook, updatedPlayer, false, this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`))
-        await this.Helper.sendPrivateMessage(this.discordHook, updatedPlayer, `You have encountered ${updatedPlayer.events} events!`, true);
+        msg = msg.concat(`\n${this.Helper.setImportantMessage(`${updatedPlayer.name} has encountered ${updatedPlayer.events} events!`)}`);
+        pm = pm.concat(`You have encountered ${updatedPlayer.events} events!`);
       }
-      await this.setPlayerTitles(discordBot, updatedPlayer);
+      // await this.setPlayerTitles(discordBot, updatedPlayer);
+
+      return { type, updatedPlayer, msg, pm };
     } catch (err) {
       errorLog.error(err);
     }
@@ -109,13 +120,13 @@ class Game {
   async eventResults(updatedPlayer, onlinePlayers) {
     try {
       const randomEvent = await this.Helper.randomBetween(0, 2);
-      switch (randomEvent) {
+      switch (0) {
         case 0:
-          return await this.moveEvent(updatedPlayer);
+           this.moveEvent(updatedPlayer);
         case 1:
-          return await this.attackEvent(updatedPlayer, onlinePlayers);
+           this.attackEvent(updatedPlayer, onlinePlayers);
         case 2:
-          return await this.luckEvent(updatedPlayer);
+           this.luckEvent(updatedPlayer);
       }
     } catch (err) {
       errorLog.error(err);
@@ -124,7 +135,7 @@ class Game {
 
   async moveEvent(updatedPlayer) {
     try {
-      return await this.Event.moveEvent(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
+       this.Event.moveEvent(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
     } catch (err) {
       errorLog.error(err);
     }
@@ -135,16 +146,16 @@ class Game {
       const luckDice = await this.Helper.randomBetween(0, 100);
       if (this.Event.MapClass.getTowns().includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
         updatedPlayer = await this.Event.sellInTown(updatedPlayer);
-        return await this.Event.generateTownItemEvent(updatedPlayer);
+         this.Event.generateTownItemEvent(updatedPlayer);
       }
 
       if (!this.Event.MapClass.getTowns().includes(updatedPlayer.map.name)) {
         if (luckDice >= (95 - (updatedPlayer.stats.luk / 4)) && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
-          return await this.Event.attackEventPlayerVsPlayer(updatedPlayer, onlinePlayers, (this.config.multiplier + updatedPlayer.personalMultiplier));
+           this.Event.attackEventPlayerVsPlayer(updatedPlayer, onlinePlayers, (this.config.multiplier + updatedPlayer.personalMultiplier));
         }
 
         if (updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
-          return await this.Event.attackEventMob(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
+           this.Event.attackEventMob(updatedPlayer, (this.config.multiplier + updatedPlayer.personalMultiplier));
         }
 
         return this.Event.campEvent(updatedPlayer);
@@ -189,15 +200,15 @@ class Game {
 
   // Event
   powerHourBegin() {
-    this.Helper.sendMessage(this.discordHook, undefined, false, this.Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+    this.Helper.sendMessage(undefined, false, this.Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
 
     setTimeout(() => {
-      this.Helper.sendMessage(this.discordHook, undefined, false, this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+      this.Helper.sendMessage(undefined, false, this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
       this.config.multiplier += 1;
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
-      this.Helper.sendMessage(this.discordHook, undefined, false, this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+      this.Helper.sendMessage(undefined, false, this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
       this.config.multiplier -= 1;
       this.config.multiplier = this.config.multiplier <= 0 ? 1 : this.config.multiplier;
     }, 5400000); // 1hr 30 minutes
@@ -489,7 +500,7 @@ ${rankString}
 
             return Promise.all([
               this.Database.updateGame(updatedConfig),
-              this.Helper.sendMessage(this.discordHook, winner, false, eventMsg),
+              this.Helper.sendMessage(winner, false, eventMsg),
               this.Helper.logEvent(winner, this.Database, eventLog, enumHelper.logTypes.action),
               this.Database.savePlayer(winner),
               this.Database.removeLotteryPlayers()
@@ -755,11 +766,11 @@ ${rankString}
    * Sends Christmas Pre Event Message and another pre event message after 21 hours
    */
   sendChristmasFirstPreEventMessage() {
-    return this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
+    return this.Helper.sendMessage(undefined, false, '@everyone\`\`\`python\n\'Terrible news from Kingdom of Olohaseth! Several people are now in hospitals with unknown wounds. They don\`t remember exactly what or who did it to them but they keep warning not to travel to other lands...\'\`\`\`');
   }
 
   sendChristmasSecondPreEventMessage() {
-    return this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
+    return this.Helper.sendMessage(undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
   }
 
   helperGetter() {
@@ -774,7 +785,7 @@ ${rankString}
   // TODO clean up this mess
   updateChristmasEvent(isStarting) {
     if (isStarting) {
-      this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
+      this.Helper.sendMessage(undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
       this.Event.MonsterClass.monsters.forEach((mob) => {
         if (mob.isXmasEvent) {
           mob.isSpawnable = true;
@@ -790,7 +801,7 @@ ${rankString}
       return '';
     }
 
-    this.Helper.sendMessage(this.discordHook, undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
+    this.Helper.sendMessage(undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
     this.Event.MonsterClass.monsters.forEach((mob) => {
       if (mob.isXmasEvent) {
         mob.isSpawnable = false;

@@ -39,11 +39,11 @@ class Event {
     try {
       const mapObj = await this.MapManager.moveToRandomMap(updatedPlayer);
       if (mapObj.map.name === updatedPlayer.map.name || mapObj.map.name === updatedPlayer.previousMap) {
-        return await this.MapManager.getTowns().includes(updatedPlayer.map.name)
+         this.MapManager.getTowns().includes(updatedPlayer.map.name)
           ? this.generateQuestEvent(updatedPlayer)
           : this.attackEventMob(updatedPlayer, multiplier);
       }
-      return await events.movement.movePlayer(this.params, updatedPlayer, mapObj);
+       events.movement.movePlayer(this.params, updatedPlayer, mapObj);
     } catch (err) {
       errorLog.error(err);
     }
@@ -68,18 +68,18 @@ class Event {
           const winResults = await events.battle.steal(this.params, results.updatedAttacker, results.updatedDefender, this.InventoryManager);
           const updatedVictim = await this.Helper.checkHealth(this.params, this.MapManager, winResults.victimPlayer, winResults.stealingPlayer);
           await this.Database.savePlayer(updatedVictim);
-          return await this.Helper.checkExperience(this.params, winResults.stealingPlayer);
+           this.Helper.checkExperience(this.params, winResults.stealingPlayer);
 
         case enumHelper.battle.outcomes.fled:
           const fledUpdatedDefender = await this.Helper.checkExperience(this.params, results.updatedDefender);
           await this.Database.savePlayer(fledUpdatedDefender);
-          return await this.Helper.checkExperience(this.params, results.updatedAttacker);
+           this.Helper.checkExperience(this.params, results.updatedAttacker);
 
         case enumHelper.battle.outcomes.lost:
           const loseResults = await events.battle.steal(this.params, results.updatedDefender, results.updatedAttacker, this.InventoryManager);
           const lostUpdatedDefender = await this.Helper.checkExperience(this.params, loseResults.stealingPlayer);
           await this.Database.savePlayer(lostUpdatedDefender);
-          return await this.Helper.checkHealth(this.params, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer);
+           this.Helper.checkHealth(this.params, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer);
       }
     } catch (err) {
       errorLog.error(err);
@@ -94,14 +94,32 @@ class Event {
       updatedPlayer = battleResults.updatedPlayer;
       switch (battleResults.result) {
         case enumHelper.battle.outcomes.win:
-          updatedPlayer = await events.battle.dropItem(this.params, updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager);
-          return await this.Helper.checkExperience(this.params, updatedPlayer);
+          const dropItemResults = await events.battle.dropItem(this.params, updatedPlayer, battleResults.updatedMob, this.ItemManager, this.InventoryManager);
+          const checkedWinResults = await this.Helper.checkExperience(this.params, dropItemResults.updatedPlayer);
+          return {
+            type: 'actions',
+            updatedPlayer: checkedWinResults.updatedPlayer,
+            msg: battleResults.msg.concat(dropItemResults.msg ? `\n${dropItemResults.msg}` : '').concat(checkedWinResults.msg ? `\n${checkedWinResults.msg}` : ''),
+            pmMsg: battleResults.pmMsg.concat(dropItemResults.pmMsg ? `\n${dropItemResults.pmMsg}` : '').concat(checkedWinResults.pmMsg ? `\n${checkedWinResults.pmMsg}` : '')
+          };
 
         case enumHelper.battle.outcomes.fled:
-          return await this.Helper.checkExperience(this.params, updatedPlayer);
+          const checkedFledResults = await this.Helper.checkExperience(this.params, updatedPlayer);
+          return {
+            type: 'actions',
+            updatedPlayer: checkedFledResults.updatedPlayer,
+            msg: battleResults.msg.concat(checkedFledResults.msg ? `${checkedFledResults.msg}` : ''),
+            pmMsg: battleResults.pmMsg.concat(checkedFledResults.pmMsg ? `\n${checkedFledResults.pmMsg}` : '')
+          };
 
         case enumHelper.battle.outcomes.lost:
-          return await this.Helper.checkHealth(this.params, this.MapManager, updatedPlayer, battleResults.updatedMob);
+          const checkLostResults = await this.Helper.checkHealth(this.params, this.MapManager, updatedPlayer, battleResults.updatedMob);
+          return {
+            type: 'actions',
+            updatedPlayer: checkLostResults.updatedPlayer,
+            msg: battleResults.msg.concat(checkLostResults.msg ? `\n${checkLostResults.msg}` : ''),
+            pmMsg: battleResults.pmMsg.concat(checkLostResults.pmMsg ? `\n${checkLostResults.pmMsg}` : '')
+          };
       }
     } catch (err) {
       errorLog.error(err);
@@ -112,7 +130,7 @@ class Event {
   async generateTownItemEvent(updatedPlayer) {
     try {
       const item = await this.ItemManager.generateItem(updatedPlayer);
-      return await events.town.item(this.params, updatedPlayer, item, this.InventoryManager);
+       events.town.item(this.params, updatedPlayer, item, this.InventoryManager);
     } catch (err) {
       errorLog.error(err);
     }
@@ -120,7 +138,7 @@ class Event {
 
   async sellInTown(updatedPlayer) {
     try {
-      return await events.town.sell(this.params, updatedPlayer);
+       events.town.sell(this.params, updatedPlayer);
     } catch (err) {
       errorLog.error(err);
     }
@@ -128,7 +146,7 @@ class Event {
 
   async campEvent(updatedPlayer) {
     try {
-      return await events.camp(this.params, updatedPlayer);
+       events.camp(this.params, updatedPlayer);
     } catch (err) {
       errorLog.error(err);
     }
@@ -137,7 +155,7 @@ class Event {
   async generateQuestEvent(updatedPlayer) {
     try {
       const mob = await this.MonsterManager.generateQuestMonster(updatedPlayer);
-      return await events.town.quest(this.params, updatedPlayer, mob);
+       events.town.quest(this.params, updatedPlayer, mob);
     } catch (err) {
       errorLog.error(err);
     }
@@ -149,27 +167,27 @@ class Event {
       const luckEvent = await this.Helper.randomBetween(1, 7);
       switch (luckEvent) {
         case 1:
-          return await events.luck.gods.hades(this.params, updatedPlayer);
+           events.luck.gods.hades(this.params, updatedPlayer);
 
         case 2:
-          return await events.luck.gods.zeus(this.params, updatedPlayer);
+           events.luck.gods.zeus(this.params, updatedPlayer);
 
         case 3:
-          return await events.luck.gods.aseco(this.params, updatedPlayer);
+           events.luck.gods.aseco(this.params, updatedPlayer);
 
         case 4:
-          return await events.luck.gods.hermes(this.params, updatedPlayer);
+           events.luck.gods.hermes(this.params, updatedPlayer);
 
         case 5:
           updatedPlayer = await events.luck.gods.athena(this.params, updatedPlayer);
-          return await this.Helper.checkExperience(this.params, updatedPlayer);
+           this.Helper.checkExperience(this.params, updatedPlayer);
 
         case 6:
           const spell = await this.SpellManager.generateSpell(updatedPlayer);
-          return await events.luck.gods.eris(this.params, updatedPlayer, spell);
+           events.luck.gods.eris(this.params, updatedPlayer, spell);
 
         case 7:
-          return await events.luck.gods.dionysus(this.params, updatedPlayer);
+           events.luck.gods.dionysus(this.params, updatedPlayer);
       }
     } catch (err) {
       errorLog.error(err);
@@ -178,7 +196,7 @@ class Event {
 
   async generateGoldEvent(updatedPlayer, multiplier) {
     try {
-      return await events.luck.gold(this.params, updatedPlayer, multiplier);
+       events.luck.gold(this.params, updatedPlayer, multiplier);
     } catch (err) {
       errorLog.error(err);
     }
@@ -189,10 +207,10 @@ class Event {
       const luckItemDice = await this.Helper.randomBetween(0, 100);
       if (luckItemDice <= 15 + (updatedPlayer.stats.luk / 4)) {
         const spell = await this.SpellManager.generateSpell(updatedPlayer);
-        return await events.luck.item.spell(this.params, updatedPlayer, spell);
+         events.luck.item.spell(this.params, updatedPlayer, spell);
       } else if (luckItemDice <= 30 + (updatedPlayer.stats.luk / 4)) {
         const item = await this.ItemManager.generateItem(updatedPlayer);
-        return await events.luck.item.item(this.params, updatedPlayer, item, this.InventoryManager);
+         events.luck.item.item(this.params, updatedPlayer, item, this.InventoryManager);
       }
 
       return updatedPlayer;
@@ -203,7 +221,7 @@ class Event {
 
   async generateGamblingEvent(updatedPlayer) {
     try {
-      return await events.luck.gambling(this.params, updatedPlayer);
+       events.luck.gambling(this.params, updatedPlayer);
     } catch (err) {
       errorLog.error(err);
     }
@@ -245,7 +263,7 @@ class Event {
   async chanceToCatchSnowflake(updatedPlayer) {
     try {
       const snowFlake = await this.ItemManager.generateSnowflake(updatedPlayer);
-      return await events.special.snowFlake(this.params, updatedPlayer, snowFlake);
+       events.special.snowFlake(this.params, updatedPlayer, snowFlake);
     } catch (err) {
       errorLog.error(err);
     }
