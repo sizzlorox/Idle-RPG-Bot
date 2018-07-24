@@ -200,9 +200,9 @@ class DiscordBot {
       guildLotteryPlayers.forEach((player) => {
         const discordUser = guild.members.find(member => member.id === player.discordId);
         if (player.discordId !== winner.discordId && discordUser) {
-          discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${guildConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
+          discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${guildConfig.dailyLottery.prizePool} out of ${guildLotteryPlayers.length} people.`);
         } else if (discordUser) {
-          discordUser.send(`Thank you for participating in the lottery! You have won the prize of ${guildConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
+          discordUser.send(`Thank you for participating in the lottery! You have won the prize of ${guildConfig.dailyLottery.prizePool} out of ${guildLotteryPlayers.length} people.`);
         }
       });
 
