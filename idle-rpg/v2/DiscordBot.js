@@ -20,7 +20,17 @@ const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../se
 class DiscordBot {
 
   constructor() {
-    this.bot = new DiscordJS.Client();
+    this.bot = new DiscordJS.Client({
+      apiRequestMethod: 'sequential',
+      messageCacheMaxSize: 200,
+      messageCacheLifetime: 0,
+      messageSweepInterval: 0,
+      fetchAllMembers: false,
+      disableEveryone: false,
+      sync: false,
+      restWsBridgeTimeout: 5000,
+      restTimeOffset: 500
+    });
     this.discord = new Discord(this.bot);
     this.Helper = new Helper();
     this.Game = new Game(this.Helper);
@@ -58,12 +68,8 @@ class DiscordBot {
       }
 
       if (message.author.id === this.bot.user.id
-        || message.channel.parent && message.channel.parent.name !== 'Idle-RPG'
-        || message.channel.id !== message.guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text').id
-        && message.channel.type !== 'dm') {
-        return message.guild && message.guild.id === guildID
-          ? message.author.send(`Please send this to <#${message.guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text').id}> or PM me.`)
-          : '';
+        || message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
+        return;
       }
 
       if (message.content.startsWith('!cs') || message.content.startsWith('!castspell')) {
@@ -240,7 +246,7 @@ class DiscordBot {
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`)
         .then(async (rankString) => {
-          const leaderboardChannel = guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+          const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
           const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
           const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
           const msg = `\`\`\`Top 10 ${subjectTitle}:
