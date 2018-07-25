@@ -340,13 +340,13 @@ class Database {
     }));
   }
 
-  savePlayer(guildId, player) {
+  savePlayer(player) {
     if (!player) {
       return;
     }
     player.updated_at = Date.now();
 
-    return new Promise((resolve, reject) => Player.findOneAndUpdate({ discordId: player.discordId, guildId }, player, (err, result) => {
+    return new Promise((resolve, reject) => Player.findOneAndUpdate({ discordId: player.discordId }, player, (err, result) => {
       if (err) {
         return reject(err);
       }

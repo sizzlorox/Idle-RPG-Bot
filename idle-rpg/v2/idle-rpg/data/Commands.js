@@ -39,7 +39,7 @@ class Commands {
       }
       const oldQuestMob = loadedPlayer.quest.questMob.name;
       const updatedPlayer = await this.Events.retrieveNewQuest(loadedPlayer);
-      await this.Database.savePlayer(updatedPlayer.guildId, updatedPlayer);
+      await this.Database.savePlayer(updatedPlayer);
       return `Quest ${oldQuestMob} has been changed to ${updatedPlayer.quest.questMob.name} Count: ${updatedPlayer.quest.questMob.count}`;
     } catch (err) {
       errorLog.error(err);
@@ -58,7 +58,7 @@ class Commands {
     const guildConfig = await this.Database.loadGame(player.guildId);
     guildConfig.dailyLottery.prizePool += 100;
     await this.Database.updateGame(player.guildId, guildConfig);
-    await this.Database.savePlayer(player.guildId, player);
+    await this.Database.savePlayer(player);
 
     return author.send('You have joined todays daily lottery! Good luck!');
   }
@@ -136,7 +136,7 @@ ${rankString}
         if (player.gold.current >= globalSpells.bless.spellCost) {
           player.spellCast++;
           player.gold.current -= globalSpells.bless.spellCost;
-          await this.Database.savePlayer(player.guildId, player)
+          await this.Database.savePlayer(player)
             .then(() => {
               author.send('Spell has been cast!');
             });
@@ -163,7 +163,7 @@ ${rankString}
           player.map = randomHome;
           actionsChannel.send(`${player.name} just cast ${spell} and teleported back to ${randomHome.name}.`);
           author.send(`Teleported back to ${randomHome.name}.`);
-          await this.Database.savePlayer(player.guildId, player)
+          await this.Database.savePlayer(player)
             .then(() => {
               author.send('Spell has been cast!');
             });
@@ -182,7 +182,7 @@ ${rankString}
         if (placer.gold.current >= amount) {
           placer.gold.current -= amount;
 
-          return this.Database.savePlayer(placer.guildId, placer)
+          return this.Database.savePlayer(placer)
             .then(() => {
               return this.Database.loadPlayer(recipient)
                 .then((bountyRecipient) => {
@@ -192,7 +192,7 @@ ${rankString}
                   bountyRecipient.currentBounty += amount;
                   actionsChannel.send(this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
 
-                  return this.Database.savePlayer(bountyRecipient.guildId, bountyRecipient)
+                  return this.Database.savePlayer(bountyRecipient)
                     .then(() => author.send(`Bounty of ${amount} gold has been placed`));
                 });
             });
@@ -238,7 +238,7 @@ ${rankString}
           castingPlayer.isPrivateMessage = value;
           castingPlayer.isPrivateMessageImportant = filtered;
 
-          return this.Database.savePlayer(castingPlayer.guildId, castingPlayer)
+          return this.Database.savePlayer(castingPlayer)
             .then(() => author.send('Preference for being PMed has been updated.'));
         }
 
@@ -283,7 +283,7 @@ ${rankString}
         if (castingPlayer.isMentionInDiscord !== value) {
           castingPlayer.isMentionInDiscord = value;
 
-          return this.Database.savePlayer(castingPlayer.guildId, castingPlayer)
+          return this.Database.savePlayer(castingPlayer)
             .then(() => author.send('Preference for being @mention has been updated.'));
         }
 
@@ -301,7 +301,7 @@ ${rankString}
 
         if (castingPlayer.gender !== value) {
           castingPlayer.gender = value;
-          return this.Database.savePlayer(castingPlayer.guildId, castingPlayer)
+          return this.Database.savePlayer(castingPlayer)
             .then(() => author.send('Gender has been updated.'));
         }
 
@@ -320,7 +320,7 @@ ${rankString}
     return this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 })
       .then((player) => {
         player.currentBounty = amount;
-        return this.Database.savePlayer(player.guildId, player);
+        return this.Database.savePlayer(player);
       });
   }
 
@@ -330,7 +330,7 @@ ${rankString}
       .then((player) => {
         player.gold.current = Number(amount);
         player.gold.total += Number(amount);
-        return this.Database.savePlayer(player.guildId, player);
+        return this.Database.savePlayer(player);
       });
   }
 
@@ -345,7 +345,7 @@ ${rankString}
       .then((updatingPlayer) => {
         updatingPlayer.gold.current += Number(amount);
         updatingPlayer.gold.total += Number(amount);
-        this.Database.savePlayer(updatingPlayer.guildId, updatingPlayer);
+        this.Database.savePlayer(updatingPlayer);
       });
   }
 

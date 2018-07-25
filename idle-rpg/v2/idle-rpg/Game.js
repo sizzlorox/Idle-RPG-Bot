@@ -75,7 +75,11 @@ class Game {
 
   async updatePlayer(eventResults) {
     eventResults.updatedPlayer.events++;
-    await this.Database.savePlayer(eventResults.updatedPlayer.guildId, eventResults.updatedPlayer);
+    if (isNaN(loadedPlayer.gold.current)) {
+      loadedPlayer.gold.current = 100;
+      infoLog.log(loadedPlayer);
+    }
+    await this.Database.savePlayer(eventResults.updatedPlayer);
     return eventResults;
   }
 

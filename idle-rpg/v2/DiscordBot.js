@@ -221,7 +221,7 @@ class DiscordBot {
       guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(eventMsg);
       await this.Game.dbClass().updateGame(guild.id, updatedConfig);
       await this.Helper.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
-      await this.Game.dbClass().savePlayer(guild.id, winner);
+      await this.Game.dbClass().savePlayer(winner);
       await this.Game.dbClass().removeLotteryPlayers(guild.id);
     });
   }
