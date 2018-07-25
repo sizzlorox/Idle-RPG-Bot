@@ -51,14 +51,19 @@ class DiscordBot {
       }, console.log('Reset all personal multipliers'));
     });
     this.bot.on('message', async (message) => {
-      if (message.content.includes('(╯°□°）╯︵ ┻━┻') && message.guild && message.guild.name === 'Idle-RPG') {
+      if (message.guild && message.guild.id === guildID && message.content.includes('(╯°□°）╯︵ ┻━┻')) {
         let tableMsg = '';
         message.content.split('(╯°□°）╯︵ ┻━┻').forEach((table, index) => index === 0 ? '' : tableMsg = tableMsg.concat('┬─┬ノ(ಠ\\_ಠノ) '));
         return message.reply(tableMsg);
       }
 
-      if (message.author.id === this.bot.user.id || message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
-        return;
+      if (message.author.id === this.bot.user.id
+        || message.channel.parent && message.channel.parent.name !== 'Idle-RPG'
+        || message.channel.id !== message.guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text').id
+        && message.channel.type !== 'dm') {
+        return message.guild && message.guild.id === guildID
+          ? message.author.send(`Please send this to <#${message.guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text').id}> or PM me.`)
+          : '';
       }
 
       if (message.content.startsWith('!cs') || message.content.startsWith('!castspell')) {
