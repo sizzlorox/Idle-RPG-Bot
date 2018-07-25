@@ -244,6 +244,27 @@ ${rankString}
       });
   }
 
+  async setServer(params) {
+    const { Bot, author, value } = params;
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (value === loadedPlayer.guildId) {
+      return author.send('Your primary server is already set to this.');
+    }
+    let count = 0;
+    await Bot.guilds.forEach(guild => guild.members.find(member => member.id === author.id) ? count++ : count);
+    if (count <= 1) {
+      return author.send('You must be in more than one server with this bot in order to change primary servers.');
+    }
+    const guildToSet = await Bot.guilds.find(guild => guild.id === value);
+    if (!guildToSet) {
+      return author.send('No server found with that ID.');
+    }
+    loadedPlayer.guildId = value;
+    await this.Database.setPlayerGuildId(value, loadedPlayer);
+
+    return author.send(`Primary server set to ${guildToSet.name}`);
+  }
+
   modifyMention(params) {
     const { author, value } = params;
     return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
@@ -280,7 +301,7 @@ ${rankString}
         return author.send('Your gender is already set to this value.');
       });
   }
-  
+
   async resetLotteryPlayers(params) {
     const { author, recipient } = params;
     await this.Database.removeLotteryPlayers(recipient);

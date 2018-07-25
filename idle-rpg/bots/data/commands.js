@@ -43,7 +43,8 @@ const commands = [
         !b, !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
         !sb, !spellbook - Returns list of spells your character has learned
         !i, !inv, !inventory - Displays what your character has in his/her inventory
-        !invite - Sends you invite channel to official server
+        !invite - Sends you invite to the official server
+        !setserver <Server ID> - Sets primary server (If your in more than one server that contains this bot).
         \`\`\``;
       messageObj.author.send(helpMsg)
         .then(() => messageObj.author.send(helpMsg2));
@@ -329,6 +330,26 @@ const commands = [
     function: (params) => {
       const { Game, messageObj } = params;
       return Game.fetchCommand({ command: 'checkMultiplier', author: messageObj.author });
+    }
+  },
+
+  setServer = {
+    command: ['!setserver'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (params) => {
+      const { Bot, Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const value = messageObj.content.split(/ (.+)/)[1].replace(/([\<\@\!\>])/g, '');
+        return Game.fetchCommand({
+          command: 'setServer',
+          author: messageObj.author,
+          Bot,
+          value
+        });
+      }
+
+      return messageObj.author.send('Please input server ID after the command. (ex: !setserver 11111111)');
     }
   },
 

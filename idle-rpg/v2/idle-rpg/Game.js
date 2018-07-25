@@ -18,9 +18,8 @@ class Game {
     this.Database.resetPersonalMultipliers();
   }
 
-  async activateEvent(player, onlinePlayers) {
+  async activateEvent(guildId, player, onlinePlayers) {
     try {
-      const loadedGuildConfig = await this.Database.loadGame(player.guildId);
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
@@ -32,6 +31,12 @@ class Game {
           pm: ['You were born.']
         });
       }
+      if (loadedPlayer.guildId === 'None') {
+        loadedPlayer.guildId = player.guildId;
+      }
+      if (loadedPlayer.guildId !== guildId) {
+        return;
+      }
       if (isNaN(loadedPlayer.gold.current)) {
         loadedPlayer.gold.current = 100;
         infoLog.log(loadedPlayer);
@@ -39,10 +44,8 @@ class Game {
       if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
       }
-      if (loadedPlayer.guildId === 'None') {
-        loadedPlayer.guildId = player.guildId;
-      }
 
+      const loadedGuildConfig = await this.Database.loadGame(player.guildId);
       console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId}`);
       await this.Helper.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       const eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);

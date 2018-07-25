@@ -139,7 +139,7 @@ class DiscordBot {
           if (!player.timer) {
             const playerTimer = this.Helper.randomBetween(guildMinTimer, guildMaxTimer);
             player.timer = setTimeout(async () => {
-              const eventResult = await this.Game.activateEvent(player, guildOnlineMembers);
+              const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
               delete player.timer;
               return this.discord.sendMessage(guild, eventResult);
             }, playerTimer);
@@ -246,7 +246,7 @@ class DiscordBot {
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`)
         .then(async (rankString) => {
-          const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+          const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
           const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
           const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
           const msg = `\`\`\`Top 10 ${subjectTitle}:

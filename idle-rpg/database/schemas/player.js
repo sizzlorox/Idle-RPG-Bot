@@ -171,7 +171,13 @@ const resetPlayerObj = {
 };
 
 const playerSchema = mongoose.Schema({
-  discordId: String,
+  discordId: {
+    type: String,
+    index: {
+      unique: true,
+      dropDups: true
+    }
+  },
   personalMultiplier: {
     type: Number,
     default: 0
@@ -420,7 +426,6 @@ const playerSchema = mongoose.Schema({
     }
   }
 );
-
-playerSchema.set('autoIndex', true);
+// playerSchema.set('autoIndex', true);
 
 module.exports = { playerSchema, newPlayerObj, resetPlayerObj };

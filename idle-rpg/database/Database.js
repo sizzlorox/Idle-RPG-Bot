@@ -325,6 +325,21 @@ class Database {
       .select(selectFields));
   }
 
+  // TODO: Change to use Base DB commands Update(Query, Value);
+  setPlayerGuildId(guildId, player) {
+    if (!player) {
+      return;
+    }
+
+    return new Promise((resolve, reject) => Player.update({ discordId: player.discordId }, { guildId }, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve(result);
+    }));
+  }
+
   savePlayer(guildId, player) {
     if (!player) {
       return;
