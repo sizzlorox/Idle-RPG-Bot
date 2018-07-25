@@ -561,13 +561,13 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, actionsChannel, messageObj } = params;
+      const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         return Game.fetchCommand({
           Game,
           command: 'castSpell',
           author: messageObj.author,
-          actionsChannel,
+          Bot,
           spell: messageObj.content.split(/ (.+)/)[1].toLowerCase()
         });
       }
@@ -586,7 +586,7 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, actionsChannel, messageObj } = params;
+      const { Game, Bot, messageObj } = params;
       const splitArray = messageObj.content.split(' ');
       if (messageObj.content.includes(' ') && splitArray.length === 3) {
         const recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
@@ -604,7 +604,7 @@ const commands = [
         return Game.fetchCommand({
           command: 'placeBounty',
           author: messageObj.author,
-          actionsChannel,
+          Bot,
           recipient,
           amount: Number(amount)
         });

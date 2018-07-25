@@ -127,8 +127,9 @@ ${rankString}
   }
 
   async castSpell(params) {
-    const { author, actionsChannel, spell } = params;
+    const { author, Bot, spell } = params;
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const actionsChannel = Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
     const guildConfig = await this.Database.loadGame(player.guildId);
     switch (spell) {
       case 'bless':
@@ -174,9 +175,10 @@ ${rankString}
   }
 
   placeBounty(params) {
-    const { author, actionsChannel, recipient, amount } = params;
+    const { author, Bot, recipient, amount } = params;
     return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((placer) => {
+        const actionsChannel = Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
         if (placer.gold.current >= amount) {
           placer.gold.current -= amount;
 
@@ -244,6 +246,7 @@ ${rankString}
       });
   }
 
+  // TODO: Block if current or changing server has bless active
   async setServer(params) {
     const { Bot, author, value } = params;
     const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
@@ -258,6 +261,10 @@ ${rankString}
     const guildToSet = await Bot.guilds.find(guild => guild.id === value);
     if (!guildToSet) {
       return author.send('No server found with that ID.');
+    }
+    const memberInGuild = await guildToSet.members.find(member => member.id === author.id);
+    if (!memberInGuild) {
+      return author.send('You\'re not in this server.');
     }
     loadedPlayer.guildId = value;
     await this.Database.setPlayerGuildId(value, loadedPlayer);

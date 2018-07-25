@@ -32,7 +32,7 @@ class Game {
         });
       }
       if (loadedPlayer.guildId === 'None') {
-        loadedPlayer.guildId = player.guildId;
+        loadedPlayer.guildId = guildId;
       }
       if (loadedPlayer.guildId !== guildId) {
         return;
