@@ -52,6 +52,8 @@ class Commands {
     if (player.lottery.joined) {
       return author.send('You\'ve already joined todays daily lottery!');
     }
+    player.lottery.joined = true;
+    player.lottery.amount += 100;
 
     const guildConfig = await this.Database.loadGame(player.guildId);
     guildConfig.dailyLottery.prizePool += 100;
@@ -277,6 +279,12 @@ ${rankString}
 
         return author.send('Your gender is already set to this value.');
       });
+  }
+  
+  async resetLotteryPlayers(params) {
+    const { author, recipient } = params;
+    await this.Database.removeLotteryPlayers(recipient);
+    return author.send('Done');
   }
 
   setPlayerBounty(params) {

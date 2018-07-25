@@ -3,7 +3,7 @@ const Events = require('./data/events/Events');
 const Map = require('../../game/utils/Map');
 const Commands = require('../idle-rpg/data/Commands');
 const { newQuest } = require('../../../idle-rpg/database/schemas/quest');
-const { errorLog } = require('../../utils/logger');
+const { errorLog, infoLog } = require('../../utils/logger');
 
 class Game {
 
@@ -24,11 +24,17 @@ class Game {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
-        return {
+
+        return await this.updatePlayer({
+          type: 'actions',
           updatedPlayer: newPlayer,
           msg: [`${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`],
           pm: ['You were born.']
-        };
+        });
+      }
+      if (isNaN(loadedPlayer.gold.current)) {
+        loadedPlayer.gold.current = 100;
+        infoLog.log(loadedPlayer);
       }
       if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
@@ -57,7 +63,7 @@ class Game {
         case 1:
           return this.Events.attackEvent(loadedPlayer, onlinePlayers, loadedGuildConfig.multiplier);
         case 2:
-          return this.Events.luckEvent(loadedPlayer, loadedGuildConfig.multiplier);
+          return this.Events.luckEvent(loadedPlayer, loadedGuildConfig.events, loadedGuildConfig.multiplier);
       }
     } catch (err) {
       errorLog.error(err);

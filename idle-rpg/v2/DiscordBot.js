@@ -253,5 +253,20 @@ ${rankString}\`\`\``;
     });
   }
 
+  blizzardRandom() {
+    this.bot.guilds.forEach(async (guild) => {
+      const blizzardDice = this.Helper.randomBetween(0, 100);
+      const guildConfig = await this.Game.dbClass().loadGame(guild.id);
+      if (blizzardDice <= 15 && !guildConfig.events.isBlizzardActive) {
+        guildConfig.events.isBlizzardActive = true;
+        await this.Game.dbClass().updateGame(guild.id, guildConfig);
+        setTimeout(() => {
+          guildConfig.events.isBlizzardActive = false;
+          this.Game.dbClass().updateGame(guild.id, guildConfig);
+        }, this.Helper.randomBetween(7200000, 72000000)); // 2-20hrs
+      }
+    });
+  }
+
 }
 module.exports = new DiscordBot();

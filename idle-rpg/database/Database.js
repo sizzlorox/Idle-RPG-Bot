@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
+const { infoLog } = require('../utils/logger');
 
 const gameSchema = require('./schemas/game');
 const { playerSchema, newPlayerObj, resetPlayerObj } = require('./schemas/player');

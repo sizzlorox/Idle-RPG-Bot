@@ -283,13 +283,12 @@ class Helper {
   async checkExperience(Database, playerObj, eventMsg, eventLog) {
     try {
       if (playerObj.experience.current >= playerObj.level * 15) {
-        eventMsg.push(this.setImportantMessage(`${playerObj.name} is now level ${playerObj.level}!`));
-        eventLog.push(`Leveled up to level ${playerObj.level}`);
-
         playerObj.level++;
         playerObj.experience.current = 0;
         playerObj.health = 100 + (playerObj.level * 5);
         playerObj.mana = 50 + (playerObj.level * 5);
+        eventMsg.push(this.setImportantMessage(`${playerObj.name} is now level ${playerObj.level}!`));
+        eventLog.push(`Leveled up to level ${playerObj.level}`);
         for (let i = 0; i < 4; i++) {
           const randomStat = this.randomBetween(0, 3);
           switch (randomStat) {

@@ -906,6 +906,21 @@ const commands = [
     }
   },
 
+  removeLotteryPlayers = {
+    command: '!resetlottery',
+    operatorOnly: true,
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        Game.fetchCommand({
+          command: 'resetLotteryPlayers',
+          author: messageObj.author,
+          recipient: messageObj.content.split(/ (.+)/)[1]
+        });
+      }
+    }
+  },
+
   resetAll = {
     command: '!resetall',
     operatorOnly: true,
