@@ -39,7 +39,7 @@ class Game {
       }
       if (isNaN(loadedPlayer.gold.current)) {
         loadedPlayer.gold.current = 100;
-        infoLog.log(loadedPlayer);
+        infoLog.info(loadedPlayer);
       }
       if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
@@ -75,9 +75,9 @@ class Game {
 
   async updatePlayer(eventResults) {
     eventResults.updatedPlayer.events++;
-    if (isNaN(loadedPlayer.gold.current)) {
-      loadedPlayer.gold.current = 100;
-      infoLog.log(loadedPlayer);
+    if (isNaN(eventResults.updatedPlayer.gold.current)) {
+      eventResults.updatedPlayer.gold.current = 100;
+      infoLog.log(eventResults.updatedPlayer);
     }
     await this.Database.savePlayer(eventResults.updatedPlayer);
     return eventResults;

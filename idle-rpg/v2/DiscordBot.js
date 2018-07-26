@@ -219,7 +219,7 @@ class DiscordBot {
 
       guildConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
       guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(eventMsg);
-      await this.Game.dbClass().updateGame(guild.id, updatedConfig);
+      await this.Game.dbClass().updateGame(guild.id, guildConfig);
       await this.Helper.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
       await this.Game.dbClass().savePlayer(winner);
       await this.Game.dbClass().removeLotteryPlayers(guild.id);

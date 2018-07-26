@@ -449,7 +449,7 @@ class Helper {
 
           playerObj.deaths.player++;
           attackerObj.kills.player++;
-          await Database.savePlayer(attackerObj.guildId, attackerObj);
+          await Database.savePlayer(attackerObj);
         }
         await this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
 
