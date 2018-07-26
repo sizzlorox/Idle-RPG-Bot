@@ -174,7 +174,7 @@ No.`);
 
   async sendMessage(guild, result) {
     try {
-      if (!result.msg && !result.pm) {
+      if (!result || result && !result.msg && !result.pm) {
         return;
       }
       const message = result.msg.join('\n');

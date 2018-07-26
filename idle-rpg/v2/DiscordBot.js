@@ -128,7 +128,7 @@ class DiscordBot {
         let guildMaxTimer = this.maxTimer;
         const guildOnlineMembers = this.discord.getOnlinePlayers(guild);
         const guildOfflineMembers = this.discord.getOfflinePlayers(guild);
-        const membersToAdd = guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId) < 0);
+        const membersToAdd = guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId && member.guildId === onlineMember.guildId || member.discordId === onlineMember.discordId && onlineMember.guildId === 'None') < 0);
         onlinePlayers.push(...membersToAdd);
         onlinePlayers = onlinePlayers.filter(member => guildOfflineMembers.findIndex(offlineMember => member.discordId === offlineMember.discordId) < 0);
         if (guildOnlineMembers.length >= 50) {
