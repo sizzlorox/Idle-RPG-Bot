@@ -154,7 +154,7 @@ No.`);
 
   getOnlinePlayers(guild) {
     return guild.members
-      .filter(member => !member.presence.status.includes('offline') && !member.bot && member.id !== this.bot.user.id)
+      .filter(member => !member.presence.status.includes('offline') && !member.user.bot && member.id !== this.bot.user.id)
       .map(member => Object.assign({}, {
         discordId: member.id,
         name: member.nickname ? member.nickname : member.displayName,
@@ -164,7 +164,7 @@ No.`);
 
   getOfflinePlayers(guild) {
     return guild.members
-      .filter(member => member.presence.status.includes('offline') && !member.bot && member.id !== this.bot.user.id)
+      .filter(member => member.presence.status.includes('offline') && !member.user.bot && member.id !== this.bot.user.id)
       .map(member => Object.assign({}, {
         discordId: member.id,
         name: member.nickname ? member.nickname : member.displayName,
@@ -174,21 +174,11 @@ No.`);
 
   async sendMessage(guild, result) {
     try {
-      if (!result.msg && !result.pm) {
+      if (!result || result && !result.msg && !result.pm) {
         return;
       }
       const message = result.msg.join('\n');
       const privateMessage = result.pm.join('\n');
-      if (result.updatedPlayer.isPrivateMessage && result.updatedPlayer.isPrivateMessageImportant && result.type === 'actions'
-        || result.updatedPlayer.isPrivateMessage && !result.updatedPlayer.isPrivateMessageImportant) {
-        const guildMember = await guild.members.find(member => member.id === result.updatedPlayer.discordId);
-        guildMember.send(privateMessage);
-      }
-      if (result.attackerObj && result.attackerObj.isPrivateMessage && result.otherPlayerPmMsg) {
-        const otherPlayerPrivateMessage = result.otherPlayerPmMsg.join('\n');
-        const guildMember = await guild.members.find(member => member.id === result.attackerObj.discordId);
-        guildMember.send(otherPlayerPrivateMessage);
-      }
 
       switch (result.type) {
         case 'actions':
@@ -200,7 +190,17 @@ No.`);
       }
       // TODO add check to parent once you find out why its still null
       const channelToSend = await guild.channels.find(channel => channel.name === result.type && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
-      return channelToSend.send(message);
+      await channelToSend.send(message, { split: true });
+      if (result.updatedPlayer.isPrivateMessage && result.updatedPlayer.isPrivateMessageImportant && result.type === 'actions'
+        || result.updatedPlayer.isPrivateMessage && !result.updatedPlayer.isPrivateMessageImportant) {
+        const guildMember = await guild.members.find(member => member.id === result.updatedPlayer.discordId);
+        await guildMember.send(privateMessage);
+      }
+      if (result.attackerObj && result.attackerObj.isPrivateMessage && result.otherPlayerPmMsg) {
+        const otherPlayerPrivateMessage = result.otherPlayerPmMsg.join('\n');
+        const guildMember = await guild.members.find(member => member.id === result.attackerObj.discordId);
+        await guildMember.send(otherPlayerPrivateMessage);
+      }
     } catch (err) {
       infoLog.info(err);
     }

@@ -3,7 +3,7 @@ const Events = require('./data/events/Events');
 const Map = require('../../game/utils/Map');
 const Commands = require('../idle-rpg/data/Commands');
 const { newQuest } = require('../../../idle-rpg/database/schemas/quest');
-const { errorLog } = require('../../utils/logger');
+const { errorLog, infoLog } = require('../../utils/logger');
 
 class Game {
 
@@ -18,25 +18,34 @@ class Game {
     this.Database.resetPersonalMultipliers();
   }
 
-  async activateEvent(player, onlinePlayers) {
+  async activateEvent(guildId, player, onlinePlayers) {
     try {
-      const loadedGuildConfig = await this.Database.loadGame(player.guildId);
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
-        return {
+
+        return await this.updatePlayer({
+          type: 'actions',
           updatedPlayer: newPlayer,
           msg: [`${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`],
           pm: ['You were born.']
-        };
+        });
+      }
+      if (loadedPlayer.guildId === 'None') {
+        loadedPlayer.guildId = guildId;
+      }
+      if (loadedPlayer.guildId !== guildId) {
+        return;
+      }
+      if (isNaN(loadedPlayer.gold.current)) {
+        loadedPlayer.gold.current = 100;
+        infoLog.info(loadedPlayer);
       }
       if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
       }
-      if (loadedPlayer.guildId === 'None') {
-        loadedPlayer.guildId = player.guildId;
-      }
 
+      const loadedGuildConfig = await this.Database.loadGame(player.guildId);
       console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId}`);
       await this.Helper.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       const eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
@@ -57,7 +66,7 @@ class Game {
         case 1:
           return this.Events.attackEvent(loadedPlayer, onlinePlayers, loadedGuildConfig.multiplier);
         case 2:
-          return this.Events.luckEvent(loadedPlayer, loadedGuildConfig.multiplier);
+          return this.Events.luckEvent(loadedPlayer, loadedGuildConfig.events, loadedGuildConfig.multiplier);
       }
     } catch (err) {
       errorLog.error(err);
@@ -66,7 +75,11 @@ class Game {
 
   async updatePlayer(eventResults) {
     eventResults.updatedPlayer.events++;
-    await this.Database.savePlayer(eventResults.updatedPlayer.guildId, eventResults.updatedPlayer);
+    if (isNaN(eventResults.updatedPlayer.gold.current)) {
+      eventResults.updatedPlayer.gold.current = 100;
+      infoLog.log(eventResults.updatedPlayer);
+    }
+    await this.Database.savePlayer(eventResults.updatedPlayer);
     return eventResults;
   }
 

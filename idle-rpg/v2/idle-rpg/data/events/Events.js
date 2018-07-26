@@ -129,8 +129,9 @@ class Events {
     }
   }
 
-  async luckEvent(loadedPlayer, globalMultiplier) {
+  async luckEvent(loadedPlayer, events, globalMultiplier) {
     const updatedPlayer = Object.assign({}, loadedPlayer);
+    const { isBlizzardActive } = events;
     try {
       const luckDice = await this.Helper.randomBetween(0, 100);
       if (luckDice <= 5 + (updatedPlayer.stats.luk / 4)) {
@@ -148,10 +149,10 @@ class Events {
         }
       }
 
-      // TODO: change to save event status to this.config
-      // if (this.Event.isBlizzardActive && luckDice <= 10 + (updatedPlayer.stats.luk / 4)) {
-      //   return this.Event.chanceToCatchSnowflake(updatedPlayer);
-      // }
+      if (isBlizzardActive && luckDice <= 10 + (updatedPlayer.stats.luk / 4)) {
+        const snowFlake = await this.ItemManager.generateSnowflake(updatedPlayer);
+        return this.LuckEvents.catchSnowFlake(updatedPlayer, snowFlake);
+      }
 
       if (luckDice >= 65 - (updatedPlayer.stats.luk / 4)) {
         return this.LuckEvents.itemEvent(updatedPlayer);

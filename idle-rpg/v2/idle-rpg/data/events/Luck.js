@@ -274,5 +274,35 @@ class Luck {
     }
   }
 
+  async catchSnowFlake(playerObj, snowFlake) {
+    let updatedPlayer = Object.assign({}, playerObj);
+    const eventMsg = [];
+    const eventLog = [];
+    try {
+      const snowFlakeDice = await this.Helper.randomBetween(0, 100);
+      if (snowFlakeDice <= 5) {
+        const oldItemRating = await this.Helper.calculateItemRating(updatedPlayer, updatedPlayer.equipment.relic);
+        const newItemRating = await this.Helper.calculateItemRating(updatedPlayer, snowFlake);
+        if (oldItemRating < newItemRating) {
+          eventMsg.push(`<@!${updatedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`);
+          eventLog.push('You caught a strange looking snowflake while travelling inside the blizzard.');
+          updatedPlayer = await this.Helper.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
+          await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+
+          return {
+            type: 'actions',
+            updatedPlayer,
+            msg: eventMsg,
+            pm: eventLog
+          };
+        }
+      }
+
+      return { updatedPlayer };
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
 }
 module.exports = Luck;

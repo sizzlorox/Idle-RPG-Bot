@@ -33,15 +33,15 @@ class Crons {
       runOnInit: false
     }).start();
 
-    // new CronJob({
-    //   cronTime: this.blizzardRandomTime,
-    //   onTick: () => {
-    //     this.Discord.blizzardRandom();
-    //   },
-    //   start: false,
-    //   timeZone: this.timeZone,
-    //   runOnInit: false
-    // }).start();
+    new CronJob({
+      cronTime: this.blizzardRandomTime,
+      onTick: () => {
+        this.Discord.blizzardRandom();
+      },
+      start: false,
+      timeZone: this.timeZone,
+      runOnInit: false
+    }).start();
 
     new CronJob({
       cronTime: this.leadboardUpdateTime,

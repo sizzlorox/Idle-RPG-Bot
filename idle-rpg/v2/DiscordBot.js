@@ -20,7 +20,17 @@ const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../se
 class DiscordBot {
 
   constructor() {
-    this.bot = new DiscordJS.Client();
+    this.bot = new DiscordJS.Client({
+      apiRequestMethod: 'sequential',
+      messageCacheMaxSize: 200,
+      messageCacheLifetime: 0,
+      messageSweepInterval: 0,
+      fetchAllMembers: false,
+      disableEveryone: false,
+      sync: false,
+      restWsBridgeTimeout: 5000,
+      restTimeOffset: 500
+    });
     this.discord = new Discord(this.bot);
     this.Helper = new Helper();
     this.Game = new Game(this.Helper);
@@ -51,13 +61,14 @@ class DiscordBot {
       }, console.log('Reset all personal multipliers'));
     });
     this.bot.on('message', async (message) => {
-      if (message.content.includes('(╯°□°）╯︵ ┻━┻') && message.guild && message.guild.name === 'Idle-RPG') {
+      if (message.guild && message.guild.id === guildID && message.content.includes('(╯°□°）╯︵ ┻━┻')) {
         let tableMsg = '';
         message.content.split('(╯°□°）╯︵ ┻━┻').forEach((table, index) => index === 0 ? '' : tableMsg = tableMsg.concat('┬─┬ノ(ಠ\\_ಠノ) '));
         return message.reply(tableMsg);
       }
 
-      if (message.author.id === this.bot.user.id || message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
+      if (message.author.id === this.bot.user.id
+        || message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
         return;
       }
 
@@ -82,11 +93,11 @@ class DiscordBot {
 
 
     this.bot.on('guildMemberUpdate', (oldMember, newMember) => {
-      if (oldMember.guild.id !== guildID) {
+      if (newMember.guild.id !== guildID) {
         return;
       }
 
-      if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game) {
+      if (newMember.presence.game && newMember.presence.game.streaming) {
         newMember.guild.channels.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text')
           .send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
       }
@@ -117,7 +128,7 @@ class DiscordBot {
         let guildMaxTimer = this.maxTimer;
         const guildOnlineMembers = this.discord.getOnlinePlayers(guild);
         const guildOfflineMembers = this.discord.getOfflinePlayers(guild);
-        const membersToAdd = guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId) < 0);
+        const membersToAdd = guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId && member.guildId === onlineMember.guildId || member.discordId === onlineMember.discordId && onlineMember.guildId === 'None') < 0);
         onlinePlayers.push(...membersToAdd);
         onlinePlayers = onlinePlayers.filter(member => guildOfflineMembers.findIndex(offlineMember => member.discordId === offlineMember.discordId) < 0);
         if (guildOnlineMembers.length >= 50) {
@@ -128,7 +139,7 @@ class DiscordBot {
           if (!player.timer) {
             const playerTimer = this.Helper.randomBetween(guildMinTimer, guildMaxTimer);
             player.timer = setTimeout(async () => {
-              const eventResult = await this.Game.activateEvent(player, guildOnlineMembers);
+              const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
               delete player.timer;
               return this.discord.sendMessage(guild, eventResult);
             }, playerTimer);
@@ -208,9 +219,9 @@ class DiscordBot {
 
       guildConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
       guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(eventMsg);
-      await this.Game.dbClass().updateGame(guild.id, updatedConfig);
+      await this.Game.dbClass().updateGame(guild.id, guildConfig);
       await this.Helper.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
-      await this.Game.dbClass().savePlayer(guild.id, winner);
+      await this.Game.dbClass().savePlayer(winner);
       await this.Game.dbClass().removeLotteryPlayers(guild.id);
     });
   }
@@ -235,7 +246,7 @@ class DiscordBot {
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`)
         .then(async (rankString) => {
-          const leaderboardChannel = guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+          const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
           const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
           const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
           const msg = `\`\`\`Top 10 ${subjectTitle}:
@@ -250,6 +261,21 @@ ${rankString}\`\`\``;
             ? msgCount.array()[index].edit(msg)
             : '';
         }));
+    });
+  }
+
+  blizzardRandom() {
+    this.bot.guilds.forEach(async (guild) => {
+      const blizzardDice = this.Helper.randomBetween(0, 100);
+      const guildConfig = await this.Game.dbClass().loadGame(guild.id);
+      if (blizzardDice <= 15 && !guildConfig.events.isBlizzardActive) {
+        guildConfig.events.isBlizzardActive = true;
+        await this.Game.dbClass().updateGame(guild.id, guildConfig);
+        setTimeout(() => {
+          guildConfig.events.isBlizzardActive = false;
+          this.Game.dbClass().updateGame(guild.id, guildConfig);
+        }, this.Helper.randomBetween(7200000, 72000000)); // 2-20hrs
+      }
     });
   }
 

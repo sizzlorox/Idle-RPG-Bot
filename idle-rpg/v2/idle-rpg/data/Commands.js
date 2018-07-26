@@ -17,6 +17,11 @@ class Commands {
     return this.Database.loadPlayer(author.id, enumHelper.statsSelectFields);
   }
 
+  playerEquipment(params) {
+    const { author } = params;
+    return this.Database.loadPlayer(author.id, enumHelper.equipSelectFields);
+  }
+
   playerInventory(params) {
     const { author } = params;
     return this.Database.loadPlayer(author.id, enumHelper.inventorySelectFields);
@@ -47,6 +52,8 @@ class Commands {
     if (player.lottery.joined) {
       return author.send('You\'ve already joined todays daily lottery!');
     }
+    player.lottery.joined = true;
+    player.lottery.amount += 100;
 
     const guildConfig = await this.Database.loadGame(player.guildId);
     guildConfig.dailyLottery.prizePool += 100;
@@ -120,15 +127,16 @@ ${rankString}
   }
 
   async castSpell(params) {
-    const { author, actionsChannel, spell } = params;
+    const { author, Bot, spell } = params;
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    const actionsChannel = Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
     const guildConfig = await this.Database.loadGame(player.guildId);
     switch (spell) {
       case 'bless':
         if (player.gold.current >= globalSpells.bless.spellCost) {
           player.spellCast++;
           player.gold.current -= globalSpells.bless.spellCost;
-          await this.Database.savePlayer(player.guildId, player)
+          await this.Database.savePlayer(player)
             .then(() => {
               author.send('Spell has been cast!');
             });
@@ -155,7 +163,7 @@ ${rankString}
           player.map = randomHome;
           actionsChannel.send(`${player.name} just cast ${spell} and teleported back to ${randomHome.name}.`);
           author.send(`Teleported back to ${randomHome.name}.`);
-          await this.Database.savePlayer(player.guildId, player)
+          await this.Database.savePlayer(player)
             .then(() => {
               author.send('Spell has been cast!');
             });
@@ -167,9 +175,10 @@ ${rankString}
   }
 
   placeBounty(params) {
-    const { author, actionsChannel, recipient, amount } = params;
+    const { author, Bot, recipient, amount } = params;
     return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((placer) => {
+        const actionsChannel = Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
         if (placer.gold.current >= amount) {
           placer.gold.current -= amount;
 
@@ -237,6 +246,32 @@ ${rankString}
       });
   }
 
+  // TODO: Block if current or changing server has bless active
+  async setServer(params) {
+    const { Bot, author, value } = params;
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (value === loadedPlayer.guildId) {
+      return author.send('Your primary server is already set to this.');
+    }
+    let count = 0;
+    await Bot.guilds.forEach(guild => guild.members.find(member => member.id === author.id) ? count++ : count);
+    if (count <= 1) {
+      return author.send('You must be in more than one server with this bot in order to change primary servers.');
+    }
+    const guildToSet = await Bot.guilds.find(guild => guild.id === value);
+    if (!guildToSet) {
+      return author.send('No server found with that ID.');
+    }
+    const memberInGuild = await guildToSet.members.find(member => member.id === author.id);
+    if (!memberInGuild) {
+      return author.send('You\'re not in this server.');
+    }
+    loadedPlayer.guildId = value;
+    await this.Database.setPlayerGuildId(value, loadedPlayer);
+
+    return author.send(`Primary server set to ${guildToSet.name}`);
+  }
+
   modifyMention(params) {
     const { author, value } = params;
     return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
@@ -272,6 +307,12 @@ ${rankString}
 
         return author.send('Your gender is already set to this value.');
       });
+  }
+
+  async resetLotteryPlayers(params) {
+    const { author, recipient } = params;
+    await this.Database.removeLotteryPlayers(recipient);
+    return author.send('Done');
   }
 
   setPlayerBounty(params) {

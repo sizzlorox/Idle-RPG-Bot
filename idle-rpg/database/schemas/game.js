@@ -15,6 +15,12 @@ const gameSchema = mongoose.Schema({
       default: 0
     }
   },
+  events: {
+    isBlizzardActive: {
+      type: Boolean,
+      default: false
+    }
+  },
   dailyLottery: {
     prizePool: {
       type: Number,
