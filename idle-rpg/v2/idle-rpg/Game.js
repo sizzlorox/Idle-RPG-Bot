@@ -37,16 +37,12 @@ class Game {
       if (loadedPlayer.guildId !== guildId) {
         return;
       }
-      if (isNaN(loadedPlayer.gold.current)) {
-        loadedPlayer.gold.current = 100;
-        infoLog.info(loadedPlayer);
-      }
       if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
       }
 
       const loadedGuildConfig = await this.Database.loadGame(player.guildId);
-      console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId}`);
+      console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId} - Multi: ${loadedGuildConfig.multiplier} - Bless: ${loadedGuildConfig.spells.activeBless} - PM: ${loadedPlayer.personalMultiplier}`);
       await this.Helper.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       const eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
       const msgResults = await this.updatePlayer(eventResults);
@@ -75,10 +71,6 @@ class Game {
 
   async updatePlayer(eventResults) {
     eventResults.updatedPlayer.events++;
-    if (isNaN(eventResults.updatedPlayer.gold.current)) {
-      eventResults.updatedPlayer.gold.current = 100;
-      infoLog.log(eventResults.updatedPlayer);
-    }
     await this.Database.savePlayer(eventResults.updatedPlayer);
     return eventResults;
   }
@@ -93,6 +85,11 @@ class Game {
       loadedConfig.multiplier = 1;
       await this.Database.updateGame(guildId, loadedConfig);
     }
+    if (loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1) {
+      loadedConfig.multiplier = 1;
+      loadedConfig.spells.activeBless = 0;
+      await this.Database.updateGame(guildId, loadedConfig);
+    }
     console.log(`
     Config loaded for guild ${guildId}
     Multiplier:${loadedConfig.multiplier}
@@ -100,12 +97,10 @@ class Game {
     Prize Pool:${loadedConfig.dailyLottery.prizePool}\n`);
     for (let i = 0; i < loadedConfig.spells.activeBless; i++) {
       setTimeout(() => {
+        infoLog.info(guildId);
         loadedConfig.spells.activeBless--;
-        loadedConfig.multiplier -= 1;
-        loadedConfig.multiplier = loadedConfig.multiplier <= 0 ? 1 : loadedConfig.multiplier;
-        if (loadedConfig.spells.activeBless === 0) {
-          loadedConfig.multiplier = 1;
-        }
+        loadedConfig.multiplier--;
+        loadedConfig.spells.activeBless = loadedConfig.spells.activeBless <= 0 ? 1 : loadedConfig.spells.activeBless;
         this.Database.updateGame(guildId, loadedConfig);
       }, 1800000 + (5000 * i));
     }

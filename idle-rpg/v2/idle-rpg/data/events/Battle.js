@@ -311,7 +311,7 @@ class Battle {
     return {};
   }
 
-  async playerVsPlayer(playerObj, playerToBattle) {
+  async playerVsPlayer(playerObj, playerToBattle, multiplier) {
     const updatedPlayer = Object.assign({}, playerObj);
     let result;
     const eventMsg = [];
@@ -334,7 +334,7 @@ class Battle {
         eventMsg.push(`[\`${attacker.map.name}\`] ${this.Helper.generatePlayerName(defender, true)} just killed ${this.Helper.generatePlayerName(attacker, true)} with ${this.Helper.generateGenderString(defender, 'his')} \`${defender.equipment.weapon.name}\`!
 ↳ ${this.Helper.generatePlayerName(attacker, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${this.Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
 
-        const expGain = Math.floor(attackerDamage / 8);
+        const expGain = Math.floor((attackerDamage / 8));
         eventLog.push(`Died to ${defender.name} in ${attacker.map.name}.`);
         const otherPlayerLog = `Killed ${attacker.name} in ${attacker.map.name}. [${expGain} exp]`;
         eventLog.push('```'.concat(battleResultLog).concat('```'));
@@ -352,7 +352,7 @@ class Battle {
         result = enumHelper.battle.outcomes.lost;
       } else if (defender.health <= 0 && attacker.health > 0) {
         battleResultLog = battleResultLog.replace(`  ${defender.name} has ${defender.health}/${defenderMaxHealth} HP left.`, '');
-        const expGain = Math.floor(defenderDamage / 8);
+        const expGain = Math.floor((defenderDamage / 8));
         eventMsg.push(`[\`${attacker.map.name}\`] ${this.Helper.generatePlayerName(attacker, true)} just killed \`${defender.name}\` with ${this.Helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\`!
 ↳ ${this.Helper.capitalizeFirstLetter(this.Helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${this.Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
         eventLog.push(`Killed ${defender.name} in ${attacker.map.name}. [${expGain} exp]`);
@@ -376,8 +376,8 @@ class Battle {
           : `[\`${attacker.map.name}\`] ${this.Helper.generatePlayerName(attacker, true)} attacked ${this.Helper.generatePlayerName(defender, true)} with ${this.Helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${this.Helper.generatePlayerName(defender, true)} was too strong!
 ↳ ${this.Helper.capitalizeFirstLetter(this.Helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${this.Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
 
-        const expGainAttacker = Math.floor(defenderDamage / 8);
-        const expGainDefender = Math.floor(attackerDamage / 8);
+        const expGainAttacker = Math.floor((defenderDamage / 8));
+        const expGainDefender = Math.floor((attackerDamage / 8));
         eventLog.push(`Attacked ${defender.name} in ${attacker.map.name} with ${attacker.equipment.weapon.name} and dealt ${attackerDamage} damage! [${expGainAttacker} exp]`);
         const otherPlayerLog = `Attacked by ${attacker.name} in ${attacker.map.name} with ${attacker.equipment.weapon.name} and received ${attackerDamage} damage! [${expGainDefender} exp]`;
         eventLog.push('```'.concat(battleResultLog).concat('```'));

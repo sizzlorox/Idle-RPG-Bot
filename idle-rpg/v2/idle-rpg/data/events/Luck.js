@@ -222,11 +222,11 @@ class Luck {
     }
   }
 
-  async questEvent(playerObj, mob) {
+  async questEvent(playerObj, mob, isCommand) {
     const updatedPlayer = Object.assign({}, playerObj);
     const eventMsg = [];
     const eventLog = [];
-    if (!updatedPlayer.quest.questMob.name.includes('None')) {
+    if (!updatedPlayer.quest.questMob.name.includes('None') && !isCommand) {
       return { updatedPlayer };
     }
     updatedPlayer.quest.questMob.name = mob;

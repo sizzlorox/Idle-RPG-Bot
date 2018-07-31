@@ -119,6 +119,7 @@ class Item {
       + snowFlake.stats.end) / 4);
     const itemInt = Math.round((itemRarityList[randomRarityIndex].power
       + snowFlake.stats.int) / 4);
+    const itemLuk = Math.round((randomRarityIndex + snowFlake.stats.luk) / 5);
 
     const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 

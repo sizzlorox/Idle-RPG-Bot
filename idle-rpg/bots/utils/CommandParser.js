@@ -21,7 +21,13 @@ class CommandParser {
       : messageObj.guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text').id;
     const guildId = this.Bot.guilds.find(guild => guild.members.find(member => member.id === messageObj.author.id)).id;
     const messageContent = messageObj.content;
-    const command = messageContent.includes(' ') ? messageContent.split(' ')[0].toLowerCase() : messageContent.toLowerCase();
+    let command;
+    if (messageContent.includes('irpg')) {
+      command = messageContent.includes(' ') ? `!${messageContent.split(' ')[1].toLowerCase()}` : '';
+      messageObj.content = messageContent.split(/ (.+)/)[1];
+    } else {
+      command = messageContent.includes(' ') ? messageContent.split(' ')[0].toLowerCase() : messageContent.toLowerCase();
+    }
     const authorId = messageObj.author.id;
     const channelId = messageObj.channel.id;
 
