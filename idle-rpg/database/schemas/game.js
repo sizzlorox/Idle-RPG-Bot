@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const gameSchema = mongoose.Schema({
   guildId: {
     type: String,
-    default: 'None'
+    index: {
+      unique: true,
+      dropDups: true
+    }
   },
   multiplier: {
     type: Number,

@@ -84,7 +84,7 @@ class Database {
             return reject(error);
           }
 
-          return resolve(newGame[0]);
+          return resolve(newGame);
         });
       }
 

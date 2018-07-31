@@ -81,10 +81,6 @@ class Game {
 
   async loadGuildConfig(guildId) {
     const loadedConfig = await this.Database.loadGame(guildId);
-    if (loadedConfig.spells.activeBless === 0) {
-      loadedConfig.multiplier = 1;
-      await this.Database.updateGame(guildId, loadedConfig);
-    }
     if (loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1) {
       loadedConfig.multiplier = 1;
       loadedConfig.spells.activeBless = 0;
@@ -96,12 +92,12 @@ class Game {
     Active Bless:${loadedConfig.spells.activeBless}
     Prize Pool:${loadedConfig.dailyLottery.prizePool}\n`);
     for (let i = 0; i < loadedConfig.spells.activeBless; i++) {
-      setTimeout(() => {
-        infoLog.info(guildId);
-        loadedConfig.spells.activeBless--;
-        loadedConfig.multiplier--;
-        loadedConfig.spells.activeBless = loadedConfig.spells.activeBless <= 0 ? 1 : loadedConfig.spells.activeBless;
-        this.Database.updateGame(guildId, loadedConfig);
+      setTimeout(async () => {
+        const newLoadedConfig = await this.Database.loadGame(guildId);
+        newLoadedConfig.spells.activeBless--;
+        newLoadedConfig.multiplier--;
+        newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
+        await this.Database.updateGame(guildId, newLoadedConfig);
       }, 1800000 + (5000 * i));
     }
   }

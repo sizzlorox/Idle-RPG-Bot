@@ -64,9 +64,9 @@ function pveMessageFormat(Helper, results, updatedPlayer, playerMaxHealth, multi
     }
     mobListResult.push(`  ${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`);
   });
-  let battleResult = `Battle Results:
+  let battleResult = `\`\`\`Battle Results:
   You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.
-${mobListResult.join('\n')}`;
+${mobListResult.join('\n')}\`\`\``;
 
   if (updatedPlayer.health <= 0) {
     battleResult = battleResult.replace(`  You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.`, '');
@@ -110,7 +110,7 @@ ${mobListResult.join('\n')}`;
   }
   const attackedMsg = `Attacked ${mobCountString.replace(/`/g, '')} with \`${updatedPlayer.equipment.weapon.name}\` in \`${updatedPlayer.map.name}\` `.replace(/1x /g, '');
   eventMsg.push(eventMsgResults);
-  eventLog.push(attackedMsg.replace(/1x /g, '').concat('```').concat(battleResult).concat('```'));
+  eventLog.push(attackedMsg.replace(/1x /g, '').concat(battleResult));
   eventMsg.splice(0, 2, eventMsg[0] + eventMsg[1]);
 
   return {
