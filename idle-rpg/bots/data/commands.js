@@ -642,6 +642,9 @@ const commands = [
           }
 
           const newPrefix = splitArray[2];
+          if (newPrefix.includes(' ') || newPrefix.includes('\n')) {
+            return messageObj.author.send('Please do not use a whitespace inside the prefix');
+          }
           const result = Game.fetchCommand({
             command: 'modifyServerPrefix',
             author: messageObj.author,
@@ -665,6 +668,9 @@ const commands = [
           }
 
           const newPrefix = splitArray[1];
+          if (newPrefix.includes(' ') || newPrefix.includes('\n')) {
+            return messageObj.author.send('Please do not use a whitespace inside the prefix');
+          }
           const result = await Game.fetchCommand({
             command: 'modifyServerPrefix',
             author: messageObj.author,
