@@ -1,6 +1,6 @@
 const enumHelper = require('../../../utils/enumHelper');
 const globalSpells = require('../../../game/data/globalSpells');
-const { errorLog } = require('../../../utils/logger');
+const { errorLog, infoLog } = require('../../../utils/logger');
 
 class Commands {
 
@@ -29,18 +29,22 @@ class Commands {
 
   async resetQuest(params) {
     const { author } = params;
-    const loadedPlayer = await this.Database.loadPlayer(author);
+    const loadedPlayer = await this.Database.loadPlayer(author.id);
     try {
       if (!loadedPlayer || !loadedPlayer.quest) {
         return 'I\'m sorry but you have no quest.';
       }
-      if (((new Date() - loadedPlayer.quest.updated_at) / (1000 * 60 * 60 * 24)) >= 2) {
+      if (((new Date() - loadedPlayer.quest.updated_at) / (1000 * 60 * 60 * 24)) <= 2) {
         return 'I\'m sorry but you must have a quest at least 2 days old';
       }
       const oldQuestMob = loadedPlayer.quest.questMob.name;
-      const updatedPlayer = await this.Events.retrieveNewQuest(loadedPlayer);
+      let { updatedPlayer } = await this.Events.retrieveNewQuest(loadedPlayer, true);
+      if (updatedPlayer.quest.questMob.name === oldQuestMob) {
+        const newQuestResult = await this.Events.retrieveNewQuest(loadedPlayer, true);
+        updatedPlayer = newQuestResult.updatedPlayer;
+      }
       await this.Database.savePlayer(updatedPlayer);
-      return `Quest ${oldQuestMob} has been changed to ${updatedPlayer.quest.questMob.name} Count: ${updatedPlayer.quest.questMob.count}`;
+      return `Quest ${oldQuestMob} has been changed to ${updatedPlayer.quest.questMob.name}\nCount: ${updatedPlayer.quest.questMob.count}`;
     } catch (err) {
       errorLog.error(err);
     }
@@ -74,7 +78,8 @@ class Commands {
 
   async checkMultiplier(params) {
     const { author } = params;
-    const config = await this.Database.loadGame();
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { guildId: -1 })
+    const config = await this.Database.loadGame(loadedPlayer.guildId);
     return author.send(`Current Multiplier: ${config.multiplier}x\nActive Bless: ${config.spells.activeBless}x`);
   }
 
@@ -144,12 +149,13 @@ ${rankString}
           guildConfig.spells.activeBless++;
           await this.Database.updateGame(player.guildId, guildConfig);
           actionsChannel.send(this.Helper.setImportantMessage(`${player.name} just cast ${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
-          setTimeout(() => {
-            guildConfig.multiplier--;
-            guildConfig.spells.activeBless--;
-            guildConfig.spells.activeBless = guildConfig.spells.activeBless <= 0 ? 1 : guildConfig.spells.activeBless;
-            this.Database.updateGame(player.guildId, guildConfig);
-            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}s ${spell} just wore off.\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          setTimeout(async () => {
+            const newLoadedConfig = await this.Database.loadGame(player.guildId);
+            newLoadedConfig.multiplier--;
+            newLoadedConfig.spells.activeBless--;
+            newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
+            await this.Database.updateGame(player.guildId, newLoadedConfig);
+            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}s ${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
           }, 1800000); // 30 minutes
         } else {
           author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);

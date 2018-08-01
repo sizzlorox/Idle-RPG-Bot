@@ -16,40 +16,39 @@ const commands = [
     operatorOnly: false,
     function: (params) => {
       const { messageObj } = params;
-      const helpMsg = `\`\`\`You can private message me these commands except for checking other players!
-        !top10 - Retrieves top 10 highest level players
-        !top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
-        !rank <gold, spells, level, stolen, stole, gambles, events, bounty> - Returns your current rank of selected section
-        !s, !stats - Sends a PM with your stats
-        !s, !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-sensitive)
-        !e, !equip - Sends a PM with your equipment
-        !e, !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-sensitive)
-        !c, !char, !character - Sends PM with your stats and equipment
-        !c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-sensitive)
-        !m, !map - Displays the worlds locations
-        !multi, !multiplier - Displays current multiplier
-        !cs, !castspell - Lists spells available to cast
-        !cs, !castspell <spell> - Casts a global spell onto Idle-RPG\`\`\``;
-      const helpMsg2 = `\`\`\`        !el, !eventlog - Lists up to 15 past events
-        !el, !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
-        !pl, !pvplog - Lists up to 15 past PvP events
-        !pl, !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
-        !nq, !newquest - Changes the quest mob if quest has not been updated for more than 2 days
-        !mention <on|off|action|move> - Change if events relating to you will @Mention you
-        !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
-        !gender <male|female|neutral|neuter> - Change your character's gender
-        !lottery - Joins Daily Lottery (100 gold for entry)
-        !prizepool - Displays how many players have joined the lottery and the prize pool
-        !lore <Map Name> - Retrieves the lore of map selected
-        !b, !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
-        !sb, !spellbook - Returns list of spells your character has learned
-        !i, !inv, !inventory - Displays what your character has in his/her inventory
-        !invite - Sends you invite to the official server
-        !setserver <Server ID> - Sets primary server (If your in more than one server that contains this bot).
-        !bugreport <Message> - Sends a bug report message to the official server.
-        \`\`\``;
-      messageObj.author.send(helpMsg)
-        .then(() => messageObj.author.send(helpMsg2));
+      const helpMsg = `You can private message me these commands except for checking other players!
+!top10 - Retrieves top 10 highest level players
+!top10 <gold, spells, level, stolen, stole, gambles, events, bounty> - Retrieves top 10 highest of selected section
+!rank <gold, spells, level, stolen, stole, gambles, events, bounty> - Returns your current rank of selected section
+!s, !stats - Sends a PM with your stats
+!s, !stats <@Mention of player> - Sends a PM with the players stats (without < > and case-sensitive)
+!e, !equip - Sends a PM with your equipment
+!e, !equip <@Mention of player> - Sends a PM with the players equipment (without < > and case-sensitive)
+!c, !char, !character - Sends PM with your stats and equipment
+!c, !char, !character <@Mention of player> - Sends a PM with the players equipment and stats (without < > and case-sensitive)
+!m, !map - Displays the worlds locations
+!multi, !multiplier - Displays current multiplier
+!cs, !castspell - Lists spells available to cast
+!cs, !castspell <spell> - Casts a global spell onto Idle-RPG
+!el, !eventlog - Lists up to 15 past events
+!el, !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
+!pl, !pvplog - Lists up to 15 past PvP events
+!pl, !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
+!nq, !newquest - Changes the quest mob if quest has not been updated for more than 2 days
+!mention <on|off|action|move> - Change if events relating to you will @Mention you
+!pm <on|off|filtered> - Change if events relating to you will be private messaged to you
+!gender <male|female|neutral|neuter> - Change your character's gender
+!lottery - Joins Daily Lottery (100 gold for entry)
+!prizepool - Displays how many players have joined the lottery and the prize pool
+!lore <Map Name> - Retrieves the lore of map selected
+!b, !bounty <@Mention of player> <Bounty Amount> - Puts a bounty on the death of a player
+!sb, !spellbook - Returns list of spells your character has learned
+!i, !inv, !inventory - Displays what your character has in his/her inventory
+!invite - Sends you invite to the official server
+!setserver <Server ID> - Sets primary server (If your in more than one server that contains this bot).
+!bugreport <Message> - Sends a bug report message to the official server.
+!patreon - Sends patreon link to show your support!`;
+      messageObj.author.send(helpMsg, { split: true });
     }
   },
 
@@ -161,7 +160,7 @@ const commands = [
       const { Game, messageObj } = params;
       const result = await Game.fetchCommand({
         command: 'resetQuest',
-        author: messageObj.author.id
+        author: messageObj.author
       });
       return messageObj.author.send(result);
     }
@@ -322,6 +321,18 @@ const commands = [
         command: 'prizePool',
         author: messageObj.author
       });
+    }
+  },
+
+  patreon = {
+    command: ['!patreon'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (params) => {
+      const { messageObj } = params;
+      messageObj.author.send('If you would like to show your support you can become a patron!\
+      \nKeep in mind that you gain no advantage from the others, this is purely to show your support to the developer!\
+      \n<https://www.patreon.com/sizzlorox>');
     }
   },
 
@@ -1001,7 +1012,11 @@ const commands = [
     operatorOnly: false,
     function: (params) => {
       const { messageObj } = params;
-      messageObj.author.send('Official Server: <https://discord.gg/nAEBTcj>\nInvite Bot Link: Coming Soon!');
+      messageObj.author.send('Official Server: <https://discord.gg/nAEBTcj>\
+\nInvite Bot Link: <https://discordapp.com/oauth2/authorize?client_id=385539681460420612&scope=bot&permissions=27664>\
+\n1. You\'ll need `Manage Server` Permission in order to see the server within the invite dropbox.\
+\n2. Once invited the bot will create the leaderboards, command, actions, move channel once joining.\
+\n3. The prefix used in your server will be !irpg instead of !. (eg: !irpg help)');
     }
   },
 

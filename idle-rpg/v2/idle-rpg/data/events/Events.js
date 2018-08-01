@@ -112,7 +112,7 @@ class Events {
             return this.Battle.playerVsMob(updatedPlayer, mobToBattle, (globalMultiplier + updatedPlayer.personalMultiplier));
           }
 
-          return this.Battle.playerVsPlayer(updatedPlayer, randomPlayer);
+          return this.Battle.playerVsPlayer(updatedPlayer, randomPlayer, (globalMultiplier + updatedPlayer.personalMultiplier));
         }
 
         if (updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
@@ -165,9 +165,9 @@ class Events {
   }
 
   // Used in command
-  async retrieveNewQuest(loadedPlayer) {
-    const mobForQuest = await this.MonsterManager.generateQuestMonster(updatedPlayer);
-    return this.LuckEvents.questEvent(loadedPlayer, mobForQuest);
+  async retrieveNewQuest(loadedPlayer, isCommand) {
+    const mobForQuest = await this.MonsterManager.generateQuestMonster(loadedPlayer);
+    return this.LuckEvents.questEvent(loadedPlayer, mobForQuest, isCommand);
   }
 
 }
