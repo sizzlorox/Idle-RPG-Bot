@@ -342,7 +342,7 @@ ${rankString}
   The prefix is ${value} (eg: ${value} help).
   
 • ** Can I host this in my server ?**
-  Theres a command to get the invite link!invite`);
+  Theres a command to get the invite link ${value}invite`);
 
       return true;
     } catch (err) {
