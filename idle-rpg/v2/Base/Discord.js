@@ -79,6 +79,7 @@ class Discord {
         }], 'Creating channels for Idle-RPG-Bot');
         await faqChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
         await faqChannel.setTopic('Frequently asked questions', 'Setting up Idle-RPG Channels');
+        // TODO move FAQ message somewhere else so I dont have to look everywhere to update these messages
         await faqChannel.send(`
 • **I'm not born yet, what should I do?**
 Once an event is fired for your character you will be born.
