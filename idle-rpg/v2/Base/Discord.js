@@ -93,7 +93,7 @@ The game is in super early development right now so resets are expected. Once th
 • **How can I help with the development?**
 Suggestions are always welcome, if you have experience with NodeJS you're welcome to become a contributor and develop along side with us!
 You can also support with development by becoming a patron! Keep in mind that you will not gain any advantage over the others and its simply a method of showing your support to the developer!
-Command: !irpg support
+Command: !support
 
 • **My event counter goes up but I did not see anything in the event channels**
 There are some events such as luck events which fail. When they do it does not print anything but your event counter goes up.
@@ -111,7 +111,7 @@ Yes, <https://trello.com/b/OnpWqvlp/idle-rpg>
 No.
 
 • **Whats the command prefix for this bot?**
-The prefix is !irpg (eg: !irpg help).
+The prefix is ! (eg: !help).
 
 • **Can I host this in my server?**
 Theres a command to get the invite link !invite`);
