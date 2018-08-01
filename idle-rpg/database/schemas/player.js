@@ -30,7 +30,7 @@ const newPlayerObj = (discordId, guildId, name) => {
       total: 0,
       dailyLottery: 0
     },
-    isMentionInDiscord: 'on',
+    isMentionInDiscord: guildId === '390509935097675777' ? 'on' : 'off',
     isPrivateMessage: false,
     isPrivateMessageImportant: false,
     gender: 'neutral',

@@ -16,6 +16,7 @@ class Game {
     this.Events = new Events({ Helper: this.Helper, Map: this.Map, Database: this.Database });
     this.Commands = new Commands({ Helper: this.Helper, Database: this.Database, Events: this.Events, MapManager: this.Map });
     this.Database.resetPersonalMultipliers();
+    this.guildCommandPrefixs = [];
   }
 
   async activateEvent(guildId, player, onlinePlayers) {
@@ -23,6 +24,9 @@ class Game {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
+        if (isNaN(newPlayer.gold.current)) {
+          infoLog.info(newPlayer.gold);
+        }
 
         return await this.updatePlayer({
           type: 'actions',
@@ -39,6 +43,9 @@ class Game {
       }
       if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
+      }
+      if (isNaN(loadedPlayer.gold.current)) {
+        infoLog.info(loadedPlayer.gold);
       }
 
       const loadedGuildConfig = await this.Database.loadGame(player.guildId);
@@ -79,6 +86,10 @@ class Game {
     return this.Database;
   }
 
+  getGuildCommandPrefix(guildId) {
+    return this.guildCommandPrefixs.find(guild => guild.id === guildId);
+  }
+
   async loadGuildConfig(guildId) {
     const loadedConfig = await this.Database.loadGame(guildId);
     if (loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1) {
@@ -91,6 +102,11 @@ class Game {
     Multiplier:${loadedConfig.multiplier}
     Active Bless:${loadedConfig.spells.activeBless}
     Prize Pool:${loadedConfig.dailyLottery.prizePool}\n`);
+    if (guildId !== '390509935097675777') {
+      this.guildCommandPrefixs.push({ id: loadedConfig.guildId, prefix: loadedConfig.commandPrefix });
+    } else {
+      this.guildCommandPrefixs.push({ id: loadedConfig.guildId, prefix: '!' });
+    }
     for (let i = 0; i < loadedConfig.spells.activeBless; i++) {
       setTimeout(async () => {
         const newLoadedConfig = await this.Database.loadGame(guildId);
