@@ -298,12 +298,51 @@ ${rankString}
   }
 
   async modifyServerPrefix(params) {
-    const { author, value, guildId } = params;
+    const { Bot, author, value, guildId } = params;
     try {
       const loadedConfig = await this.Database.loadGame(guildId);
       loadedConfig.commandPrefix = value;
       await this.Database.updateGame(guildId, loadedConfig);
       author.send(`Changed server ${guildId} command prefix to ${value}.`);
+      const server = await Bot.guilds.find(guild => guild.id === guildId);
+      const faqChannel = await server.channels.find(channel => channel.name === 'faq' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+      const faqMessage = await faqChannel.fetchMessages();
+      // TODO move FAQ message somewhere else so I dont have to look everywhere to update these messages
+      await faqMessage.array()[0].edit(`
+• ** I'm not born yet, what should I do?**
+  Once an event is fired for your character you will be born.
+  
+• ** How do I play ?**
+  As long as you are in the online list you will be playing the game.Does not matter what status you set as long as you are not "Invisible".
+  
+• ** Will my character be reset ?**
+  The game is in super early development right now so resets are expected.Once the game is complete resets will most likely be a yearly thing with leaderboards.
+  
+• ** How can I help with the development ?**
+  Suggestions are always welcome, if you have experience with NodeJS you're welcome to become a contributor and develop along side with us!
+  You can also support with development by becoming a patron! Keep in mind that you will not gain any advantage over the others and its simply a method of showing your support to the developer!
+  Command: ${value} support
+  
+• ** My event counter goes up but I did not see anything in the event channels **
+  There are some events such as luck events which fail.When they do it does not print anything but your event counter goes up.
+  
+• ** Is there a way to turn off all the spam from events ?**
+  Yes, you can right click the channel to mute and select the mute checkbox.
+  
+• ** Is this open source ?**
+  Yes, <https://github.com/sizzlorox/Idle-RPG-Bot>
+  
+• ** Do you guys have a trello board ?**
+  Yes, <https://trello.com/b/OnpWqvlp/idle-rpg>
+  
+• ** Can I control my character ?**
+  No.
+  
+• ** Whats the command prefix for this bot ?**
+  The prefix is ${value} (eg: ${value} help).
+  
+• ** Can I host this in my server ?**
+  Theres a command to get the invite link!invite`);
 
       return true;
     } catch (err) {

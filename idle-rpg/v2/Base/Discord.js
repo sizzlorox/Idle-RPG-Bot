@@ -75,7 +75,7 @@ class Discord {
         {
           id: this.bot.user.id,
           deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
-          allow: ['SEND_MESSAGES']
+          allow: ['SEND_MESSAGES', 'MANAGE_MESSAGES']
         }], 'Creating channels for Idle-RPG-Bot');
         await faqChannel.setParent(guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG'));
         await faqChannel.setTopic('Frequently asked questions', 'Setting up Idle-RPG Channels');
