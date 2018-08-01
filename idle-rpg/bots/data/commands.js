@@ -1085,7 +1085,7 @@ const commands = [
 \nInvite Bot Link: <https://discordapp.com/oauth2/authorize?client_id=385539681460420612&scope=bot&permissions=27664>\
 \n1. You\'ll need `Manage Server` Permission in order to see the server within the invite dropbox.\
 \n2. Once invited the bot will create the leaderboards, command, actions, move channel once joining.\
-\n3. The prefix used in your server will be !irpg instead of !. (eg: !irpg help)');
+\n3. Since multiple bots use ! as their command prefix do not forget to change your prefix if you want. (eg. !prefix ?)');
     }
   },
 
