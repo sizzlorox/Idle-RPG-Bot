@@ -10,7 +10,7 @@ const gameSchema = mongoose.Schema({
   },
   commandPrefix: {
     type: String,
-    default: '!irpg'
+    default: '!'
   },
   multiplier: {
     type: Number,
