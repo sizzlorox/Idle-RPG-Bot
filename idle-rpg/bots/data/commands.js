@@ -48,7 +48,8 @@ const commands = [
 !setserver <Server ID> - Sets primary server (If your in more than one server that contains this bot).
 !bugreport <Message> - Sends a bug report message to the official server.
 !patreon - Sends patreon link to show your support!
-!prefix - Changes server command prefix (Must have Manage Guild permission to use)`;
+!prefix <Command prefix to use> - Changes server command prefix (Must have Manage Guild permission to use) eg: !prefix ?
+!prefix <Server ID> <Command prefix to use> - Changes server command prefix (Must have Manage Guild permission to use) eg: !prefix 1111 ?`;
       messageObj.author.send(helpMsg, { split: true });
     }
   },
