@@ -82,11 +82,7 @@ class DiscordBot {
         }
       }
 
-      if (message.channel.type !== 'dm' && message.content.startsWith('!') && message.guild.id === '390509935097675777'
-        || message.channel.type !== 'dm' && message.content.startsWith('!irpg') && message.guild.id !== '390509935097675777'
-        || message.channel.type === 'dm' && message.content.startsWith('!')) {
-        return this.CommandParser.parseUserCommand(message);
-      }
+      return this.CommandParser.parseUserCommand(message);
     });
 
     this.bot.on('guildCreate', async (guild) => {

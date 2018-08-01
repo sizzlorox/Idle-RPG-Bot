@@ -47,7 +47,8 @@ const commands = [
 !invite - Sends you invite to the official server
 !setserver <Server ID> - Sets primary server (If your in more than one server that contains this bot).
 !bugreport <Message> - Sends a bug report message to the official server.
-!patreon - Sends patreon link to show your support!`;
+!patreon - Sends patreon link to show your support!
+!prefix - Changes server command prefix (Must have Manage Guild permission to use)`;
       messageObj.author.send(helpMsg, { split: true });
     }
   },
@@ -616,6 +617,65 @@ const commands = [
       spellsString = spellsString.concat(Object.keys(spells).map(spell => `${spell} - ${spells[spell].spellCost} gold - ${spells[spell].description}`).join('\n  '));
 
       return messageObj.author.send(spellsString.concat('```'));
+    }
+  },
+
+  changeServerPrefix = {
+    command: ['!prefix'],
+    operatorOnly: false,
+    serverOperatorOnly: true,
+    function: async (params) => {
+      const { Game, Bot, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitArray = messageObj.content.split(' ');
+        if (splitArray.length === 3) {
+          const guildToUpdate = Bot.guilds.find(guild => guild.id === splitArray[1]);
+          if (!guildToUpdate) {
+            return messageObj.author.send('No guild found with this ID');
+          }
+          const memberToCheckPermission = guildToUpdate.find(member => member.id === messageObj.author.id);
+          if (!memberToCheckPermission) {
+            return messageObj.author.send('You were not found within this guild');
+          }
+          if (!memberToCheckPermission.hasPermission('MANAGE_GUILD')) {
+            return messageObj.author.send('You do not have the permission to change the prefix for this guild');
+          }
+
+          const newPrefix = splitArray[2];
+          const result = Game.fetchCommand({
+            command: 'modifyServerPrefix',
+            author: messageObj.author,
+            guildId: guildToUpdate.id,
+            value: newPrefix
+          });
+          if (result) {
+            Game.getGuildCommandPrefix(guildToUpdate.id).prefix = newPrefix;
+          }
+        } else if (splitArray.length === 2) {
+          const guildToUpdate = Bot.guilds.find(guild => guild.id === messageObj.guild.id);
+          if (!guildToUpdate) {
+            return messageObj.author.send('No guild found with this ID');
+          }
+          const memberToCheckPermission = guildToUpdate.members.find(member => member.id === messageObj.author.id);
+          if (!memberToCheckPermission) {
+            return messageObj.author.send('You were not found within this guild');
+          }
+          if (!memberToCheckPermission.hasPermission('MANAGE_GUILD')) {
+            return messageObj.author.send('You do not have the permission to change the prefix for this guild');
+          }
+
+          const newPrefix = splitArray[1];
+          const result = await Game.fetchCommand({
+            command: 'modifyServerPrefix',
+            author: messageObj.author,
+            guildId: guildToUpdate.id,
+            value: newPrefix
+          });
+          if (result) {
+            Game.getGuildCommandPrefix(guildToUpdate.id).prefix = newPrefix;
+          }
+        }
+      }
     }
   },
 

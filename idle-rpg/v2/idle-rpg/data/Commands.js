@@ -184,7 +184,7 @@ ${rankString}
     const { author, Bot, recipient, amount } = params;
     return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
       .then((placer) => {
-        const actionsChannel = Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
+        const actionsChannel = Bot.guilds.find(guild => guild.id === placer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
         if (placer.gold.current >= amount) {
           placer.gold.current -= amount;
 
@@ -295,6 +295,22 @@ ${rankString}
 
         return author.send('Your @mention preference is already set to this value.');
       });
+  }
+
+  async modifyServerPrefix(params) {
+    const { author, value, guildId } = params;
+    try {
+      const loadedConfig = await this.Database.loadGame(guildId);
+      loadedConfig.commandPrefix = value;
+      await this.Database.updateGame(guildId, loadedConfig);
+      author.send(`Changed server ${guildId} command prefix to ${value}.`);
+
+      return true;
+    } catch (err) {
+      errorLog.error(err);
+
+      return false;
+    }
   }
 
   modifyGender(params) {

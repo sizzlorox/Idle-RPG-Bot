@@ -8,6 +8,10 @@ const gameSchema = mongoose.Schema({
       dropDups: true
     }
   },
+  commandPrefix: {
+    type: String,
+    default: '!irpg'
+  },
   multiplier: {
     type: Number,
     default: 1
