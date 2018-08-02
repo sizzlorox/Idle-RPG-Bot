@@ -355,12 +355,12 @@ class Database {
     }));
   }
 
-  getSameMapPlayers(playerMap, selectFields = {}) {
+  getSameMapPlayers(guildId, playerMap, selectFields = {}) {
     if (!playerMap) {
       return;
     }
 
-    return new Promise((resolve, reject) => Player.find({ 'map.name': playerMap }, (err, result) => {
+    return new Promise((resolve, reject) => Player.find({ 'map.name': playerMap, guildId }, (err, result) => {
       if (err) {
         return reject(err);
       }
