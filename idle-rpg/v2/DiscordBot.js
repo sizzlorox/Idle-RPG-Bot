@@ -257,7 +257,7 @@ class DiscordBot {
               return leaderboardChannel.send(msg);
             }
 
-            return !msg.includes(msgCount.array()[index].toString())
+            return !msg.includes(msgCount.array()[index].toString()) && msgCount.array()[index].author.id === this.bot.user.id
               ? msgCount.array()[index].edit(msg)
               : '';
           }

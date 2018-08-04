@@ -15,6 +15,10 @@ class Discord {
   }
 
   async manageGuildChannels(guild) {
+    const botGuildMember = await guild.members.find(member => member.id === this.bot.user.id);
+    if (!botGuildMember.permissions.has('MANAGE_CHANNELS')) {
+      return;
+    }
     const hasCategoryChannel = await guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG');
     const hasLeaderboardsChannel = await guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
     const hasCommandsChannel = await guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
