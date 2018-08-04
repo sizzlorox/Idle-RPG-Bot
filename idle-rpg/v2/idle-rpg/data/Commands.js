@@ -200,7 +200,7 @@ ${rankString}
                     return author.send('This player does not exist.');
                   }
                   bountyRecipient.currentBounty += amount;
-                  actionsChannel.send(this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name} 's head!`));
+                  actionsChannel.send(this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
 
                   return this.Database.savePlayer(bountyRecipient)
                     .then(() => author.send(`Bounty of ${amount} gold has been placed`));
