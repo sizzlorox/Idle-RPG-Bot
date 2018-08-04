@@ -250,10 +250,9 @@ class DiscordBot {
             const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
             const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
             const msg = `\`\`\`Top 10 ${subjectTitle}:
-  ${rankString}\`\`\``;
+${rankString}\`\`\``;
 
             if (msgCount.size < types.length) {
-              // Create message
               return leaderboardChannel.send(msg);
             }
 

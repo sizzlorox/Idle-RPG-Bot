@@ -606,12 +606,14 @@ const commands = [
     function: (params) => {
       const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
+        const amount = messageObj.content.split(' ')[2];
         return Game.fetchCommand({
           Game,
           command: 'castSpell',
           author: messageObj.author,
           Bot,
-          spell: messageObj.content.split(/ (.+)/)[1].toLowerCase()
+          amount: amount ? amount : 1,
+          spell: messageObj.content.split(' ')[1].toLowerCase()
         });
       }
       let spellsString = '```List of Spells:\n  ';
