@@ -162,7 +162,7 @@ ${rankString}
             actionsChannel.send(this.Helper.setImportantMessage(`${player.name}s ${calcAmount > 1 ? `${calcAmount}x` : ''} ${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
           }, 1800000); // 30 minutes
         } else {
-          author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold.You are lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
+          author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
         }
         break;
 
