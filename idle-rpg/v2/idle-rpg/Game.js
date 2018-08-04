@@ -44,9 +44,6 @@ class Game {
       if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
       }
-      if (isNaN(loadedPlayer.gold.current)) {
-        infoLog.info(loadedPlayer.gold);
-      }
 
       const loadedGuildConfig = await this.Database.loadGame(player.guildId);
       console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId} - Multi: ${loadedGuildConfig.multiplier} - Bless: ${loadedGuildConfig.spells.activeBless} - PM: ${loadedPlayer.personalMultiplier}`);

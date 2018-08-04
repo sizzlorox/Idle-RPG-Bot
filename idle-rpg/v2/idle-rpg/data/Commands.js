@@ -132,33 +132,37 @@ ${rankString}
   }
 
   async castSpell(params) {
-    const { author, Bot, spell } = params;
+    const { author, Bot, spell, amount } = params;
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
     const actionsChannel = Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
     const guildConfig = await this.Database.loadGame(player.guildId);
     switch (spell) {
       case 'bless':
-        if (player.gold.current >= globalSpells.bless.spellCost) {
+        let calcAmount = amount;
+        if (amount === 'all') {
+          calcAmount = Math.floor(player.gold.current / globalSpells.bless.spellCost);
+        }
+        if (player.gold.current >= (globalSpells.bless.spellCost * calcAmount) && calcAmount >= 1) {
           player.spellCast++;
-          player.gold.current -= globalSpells.bless.spellCost;
+          player.gold.current -= (globalSpells.bless.spellCost * calcAmount);
           await this.Database.savePlayer(player)
             .then(() => {
               author.send('Spell has been cast!');
             });
-          guildConfig.multiplier++;
-          guildConfig.spells.activeBless++;
+          guildConfig.multiplier += calcAmount;
+          guildConfig.spells.activeBless += calcAmount;
           await this.Database.updateGame(player.guildId, guildConfig);
-          actionsChannel.send(this.Helper.setImportantMessage(`${player.name} just cast ${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          actionsChannel.send(this.Helper.setImportantMessage(`${player.name} just cast${calcAmount > 1 ? ` ${calcAmount}x` : ''} ${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
           setTimeout(async () => {
             const newLoadedConfig = await this.Database.loadGame(player.guildId);
-            newLoadedConfig.multiplier--;
-            newLoadedConfig.spells.activeBless--;
+            newLoadedConfig.multiplier -= calcAmount;
+            newLoadedConfig.spells.activeBless -= calcAmount;
             newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
-            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}s ${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
+            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}s ${calcAmount > 1 ? `${calcAmount}x` : ''} ${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
           }, 1800000); // 30 minutes
         } else {
-          author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
+          author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
         }
         break;
 
@@ -174,7 +178,7 @@ ${rankString}
               author.send('Spell has been cast!');
             });
         } else {
-          author.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold. You are lacking ${globalSpells.home.spellCost - player.gold.current} gold.`);
+          author.send(`You do not have enough gold! This spell costs ${globalSpells.home.spellCost} gold.You are lacking ${globalSpells.home.spellCost - player.gold.current} gold.`);
         }
         break;
     }
