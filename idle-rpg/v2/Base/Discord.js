@@ -15,12 +15,12 @@ class Discord {
   }
 
   async manageGuildChannels(guild) {
-    const hasCategoryChannel = guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG');
-    const hasLeaderboardsChannel = guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
-    const hasCommandsChannel = guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
-    const hasFAQChannel = guild.channels.find(channel => channel.name === 'faq' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
-    const hasActionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
-    const hasMovementChannel = guild.channels.find(channel => channel.name === 'movement' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+    const hasCategoryChannel = await guild.channels.find(channel => channel.type === 'category' && channel.name === 'Idle-RPG');
+    const hasLeaderboardsChannel = await guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
+    const hasCommandsChannel = await guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
+    const hasFAQChannel = await guild.channels.find(channel => channel.name === 'faq' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
+    const hasActionsChannel = await guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
+    const hasMovementChannel = await guild.channels.find(channel => channel.name === 'movement' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
     if (!hasCategoryChannel) {
       console.log(`Creating Idle-RPG Category Channel for Guild: ${guild.name}`);
       infoLog.info(`Creating Idle-RPG Category Channel for Guild: ${guild.name}`);
