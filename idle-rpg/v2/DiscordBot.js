@@ -86,8 +86,8 @@ class DiscordBot {
     });
 
     this.bot.on('guildCreate', async (guild) => {
-      this.discord.manageGuildChannels(guild);
       this.Game.loadGuildConfig(guild.id);
+      this.discord.manageGuildChannels(guild);
     });
 
 
@@ -194,7 +194,7 @@ class DiscordBot {
 
     this.bot.guilds.forEach(async (guild) => {
       const guildLotteryPlayers = await this.Game.dbClass().loadLotteryPlayers(guild.id);
-      if (!guildLotteryPlayers) {
+      if (!guildLotteryPlayers || guildLotteryPlayers && guildLotteryPlayers.length <= 1) {
         return;
       }
 
@@ -246,19 +246,21 @@ class DiscordBot {
           .join('\n')}`)
         .then(async (rankString) => {
           const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
-          const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
-          const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
-          const msg = `\`\`\`Top 10 ${subjectTitle}:
-${rankString}\`\`\``;
+          if (leaderboardChannel) {
+            const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
+            const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
+            const msg = `\`\`\`Top 10 ${subjectTitle}:
+  ${rankString}\`\`\``;
 
-          if (msgCount.size < types.length) {
-            // Create message
-            return leaderboardChannel.send(msg);
+            if (msgCount.size < types.length) {
+              // Create message
+              return leaderboardChannel.send(msg);
+            }
+
+            return !msg.includes(msgCount.array()[index].toString()) && msgCount.array()[index].author.id === this.bot.user.id
+              ? msgCount.array()[index].edit(msg)
+              : '';
           }
-
-          return !msg.includes(msgCount.array()[index].toString())
-            ? msgCount.array()[index].edit(msg)
-            : '';
         }));
     });
   }
