@@ -130,7 +130,7 @@ class Game extends BaseGame {
     }
 
     await Object.keys(titles).forEach((title) => {
-      eventResults = this.manageTitles(eventResults, title);
+      eventResults.updatedPlayer = this.manageTitles(eventResults, title);
     });
 
     return eventResults;
