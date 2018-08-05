@@ -5,13 +5,18 @@ class Game {
 
   // TODO: Maybe clean this up later?
   manageTitles(eventResults, title) {
+    if (!eventResults.updatedPlayer.titles.unlocked.includes(eventResults.updatedPlayer.titles.current)) {
+      eventResults.updatedPlayer.titles.current = 'None';
+    }
+
     if (titles[title].stat.includes('.')) {
       const statSplit = titles[title].stat.split('.');
       if (eventResults.updatedPlayer[statSplit[0]][statSplit[1]] >= titles[title].requirements
         && !eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)) {
-        eventResults.updatedPlayer.titles.current === 'None'
-          ? eventResults.updatedPlayer.titles.current = titles[title].name && eventResults.updatedPlayer.titles.unlocked.push(titles[title].name)
-          : eventResults.updatedPlayer.titles.unlocked.push(titles[title].name);
+        if (eventResults.updatedPlayer.titles.current === 'None') {
+          eventResults.updatedPlayer.titles.current = titles[title].name;
+        }
+        eventResults.updatedPlayer.titles.unlocked.push(titles[title].name);
         if (eventResults.pm) {
           eventResults.pm.push(`You've just unlocked the ${titles[title].name} title!`);
         } else {
@@ -34,9 +39,10 @@ class Game {
     }
     if (eventResults.updatedPlayer[titles[title].stat] >= titles[title].requirements
       && !eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)) {
-      eventResults.updatedPlayer.titles.current === 'None'
-        ? eventResults.updatedPlayer.titles.current = titles[title].name && eventResults.updatedPlayer.titles.unlocked.push(titles[title].name)
-        : eventResults.updatedPlayer.titles.unlocked.push(titles[title].name);
+      if (eventResults.updatedPlayer.titles.current === 'None') {
+        eventResults.updatedPlayer.titles.current = titles[title].name;
+      }
+      eventResults.updatedPlayer.titles.unlocked.push(titles[title].name);
       if (eventResults.pm) {
         eventResults.pm.push(`You've just unlocked the ${titles[title].name} title!`);
       } else {
