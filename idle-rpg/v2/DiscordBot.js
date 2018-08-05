@@ -120,10 +120,6 @@ class DiscordBot {
   loadHeartBeat() {
     const interval = process.env.NODE_ENV.includes('production') ? this.tickInMinutes : 1;
     let onlinePlayers = [];
-    enumHelper.mockPlayers.push({
-      name: 'sizzlorr',
-      discordId: '237035596332138497'
-    });
 
     setInterval(() => {
       this.processDetails();
