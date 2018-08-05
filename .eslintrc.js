@@ -14,6 +14,7 @@ module.exports = {
         "padded-blocks": 0,
         "no-return-assign": 0,
         "no-confusing-arrow": 0,
-        "max-len": 0
+        "max-len": 0,
+        "no-unused-expressions": 0
     }
 };

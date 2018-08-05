@@ -1,15 +1,26 @@
 const Database = require('../../database/Database');
+const { errorLog } = require('../../utils/logger');
+
+// BASE
+const BaseGame = require('../Base/Game');
+
+// DATA
+const { newQuest } = require('../../../idle-rpg/database/schemas/quest');
+const Commands = require('../idle-rpg/data/Commands');
 const Events = require('./data/events/Events');
 const Map = require('../../game/utils/Map');
-const Commands = require('../idle-rpg/data/Commands');
-const { newQuest } = require('../../../idle-rpg/database/schemas/quest');
-const { errorLog, infoLog } = require('../../utils/logger');
+const titles = require('./data/titles');
 
-class Game {
+// HELPERS
+const { roamingNpcs } = require('../../utils/enumHelper');
+
+class Game extends BaseGame {
 
   constructor(Helper) {
+    super();
     this.activeSpells = [];
 
+    this.base = new BaseGame();
     this.Helper = Helper;
     this.Database = new Database(Helper);
     this.Map = new Map(Helper);
@@ -24,9 +35,6 @@ class Game {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
-        if (isNaN(newPlayer.gold.current)) {
-          infoLog.info(newPlayer.gold);
-        }
 
         return await this.updatePlayer({
           type: 'actions',
@@ -48,7 +56,8 @@ class Game {
       const loadedGuildConfig = await this.Database.loadGame(player.guildId);
       console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId} - Multi: ${loadedGuildConfig.multiplier} - Bless: ${loadedGuildConfig.spells.activeBless} - PM: ${loadedPlayer.personalMultiplier}`);
       await this.Helper.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
-      const eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
+      let eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
+      eventResults = await this.setPlayerTitles(eventResults);
       const msgResults = await this.updatePlayer(eventResults);
 
       return msgResults;
@@ -113,6 +122,18 @@ class Game {
         await this.Database.updateGame(guildId, newLoadedConfig);
       }, 1800000 + (5000 * i));
     }
+  }
+
+  async setPlayerTitles(eventResults) {
+    if (roamingNpcs.find(npc => npc.discordId === eventResults.updatedPlayer.discordId)) {
+      return eventResults;
+    }
+
+    await Object.keys(titles).forEach((title) => {
+      eventResults.updatedPlayer = this.manageTitles(eventResults, title);
+    });
+
+    return eventResults;
   }
 
   fetchCommand(params) {

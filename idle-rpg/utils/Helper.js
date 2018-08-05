@@ -480,6 +480,7 @@ class Helper {
 
   generateStatsString(player) {
     return `\`\`\`Here are your stats!
+    Title: ${player.titles.current}
     Health: ${player.health} / ${enumHelper.maxHealth(player.level)}
     Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
@@ -562,10 +563,14 @@ class Helper {
       || player.isMentionInDiscord === 'action' && !isAction
       || player.isMentionInDiscord === 'move' && isAction
     ) {
-      return `\`${player.name}\``;
+      return player.titles.current !== 'None'
+        ? `\`${player.name} the ${player.titles.current}\``
+        : `\`${player.name}\``;
     }
 
-    return `<@!${player.discordId}>`;
+    return player.titles.current !== 'None'
+      ? `<@!${player.discordId}> the ${player.titles.current}`
+      : `<@!${player.discordId}>`;
   }
 
   /**
