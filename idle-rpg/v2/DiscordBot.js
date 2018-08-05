@@ -162,27 +162,34 @@ class DiscordBot {
   // CRONS
   powerHourBegin() {
     this.bot.guilds.forEach((guild) => {
-      guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG')
-        .send(this.Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+      const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+      if (actionsChannel) {
+        actionsChannel.send(this.Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+      }
     });
     setTimeout(() => {
       this.bot.guilds.forEach((guild) => {
-        guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG')
-          .send(this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
-        const guildConfig = this.Game.dbClass().loadGame(guild.id);
-        guildConfig.multiplier++;
-        this.Game.dbClass().updateGame(guild.id, guildConfig);
+        const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+        if (actionsChannel) {
+          actionsChannel.send(this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+          const guildConfig = this.Game.dbClass().loadGame(guild.id);
+          guildConfig.multiplier++;
+          this.Game.dbClass().updateGame(guild.id, guildConfig);
+        }
       });
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
       this.bot.guilds.forEach((guild) => {
-        guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG')
-          .send(this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
-        const guildConfig = this.Game.dbClass().loadGame(guild.id);
-        guildConfig.multiplier--;
-        guildConfig.multiplier = guildConfig.multiplier - 1 <= 0 ? guildConfig.multiplier = 1 : guildConfig.multiplier--;
-        this.Game.dbClass().updateGame(guild.id, guildConfig);
+        const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+
+        if (actionsChannel) {
+          actionsChannel.send(this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+          const guildConfig = this.Game.dbClass().loadGame(guild.id);
+          guildConfig.multiplier--;
+          guildConfig.multiplier = guildConfig.multiplier - 1 <= 0 ? guildConfig.multiplier = 1 : guildConfig.multiplier--;
+          this.Game.dbClass().updateGame(guild.id, guildConfig);
+        }
       });
     }, 5400000); // 1hr 30 minutes
   }
