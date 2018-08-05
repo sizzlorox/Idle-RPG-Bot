@@ -91,7 +91,7 @@ class DiscordBot {
     });
 
 
-    this.bot.on('guildMemberUpdate', (oldMember, newMember) => {
+    this.bot.on('presenceUpdate', (oldMember, newMember) => {
       if (newMember.guild.id !== guildID) {
         return;
       }
@@ -120,30 +120,49 @@ class DiscordBot {
   loadHeartBeat() {
     const interval = process.env.NODE_ENV.includes('production') ? this.tickInMinutes : 1;
     let onlinePlayers = [];
+    enumHelper.mockPlayers.push({
+      name: 'sizzlorr',
+      discordId: '237035596332138497'
+    });
+
     setInterval(() => {
       this.processDetails();
       this.bot.guilds.forEach((guild) => {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
-        const guildOnlineMembers = this.discord.getOnlinePlayers(guild);
-        const guildOfflineMembers = this.discord.getOfflinePlayers(guild);
-        const membersToAdd = guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId && member.guildId === onlineMember.guildId || member.discordId === onlineMember.discordId && onlineMember.guildId === 'None') < 0);
-        onlinePlayers.push(...membersToAdd);
-        onlinePlayers = onlinePlayers.filter(member => guildOfflineMembers.findIndex(offlineMember => member.discordId === offlineMember.discordId) < 0);
-        if (guildOnlineMembers.length >= 50) {
-          guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
-          guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
-        }
-        onlinePlayers.filter(member => member.guildId === guild.id).forEach((player) => {
-          if (!player.timer) {
-            const playerTimer = this.Helper.randomBetween(guildMinTimer, guildMaxTimer);
-            player.timer = setTimeout(async () => {
-              const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
-              delete player.timer;
-              return this.discord.sendMessage(guild, eventResult);
-            }, playerTimer);
+        if (process.env.NODE_ENV.includes('production')) {
+          const guildOnlineMembers = this.discord.getOnlinePlayers(guild);
+          const guildOfflineMembers = this.discord.getOfflinePlayers(guild);
+          const membersToAdd = guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId && member.guildId === onlineMember.guildId || member.discordId === onlineMember.discordId && onlineMember.guildId === 'None') < 0);
+          onlinePlayers.push(...membersToAdd);
+          onlinePlayers = onlinePlayers.filter(member => guildOfflineMembers.findIndex(offlineMember => member.discordId === offlineMember.discordId) < 0);
+          if (guildOnlineMembers.length >= 50) {
+            guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
+            guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
           }
-        });
+
+          onlinePlayers.filter(member => member.guildId === guild.id).forEach((player) => {
+            if (!player.timer) {
+              const playerTimer = this.Helper.randomBetween(guildMinTimer, guildMaxTimer);
+              player.timer = setTimeout(async () => {
+                const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
+                delete player.timer;
+                return this.discord.sendMessage(guild, eventResult);
+              }, playerTimer);
+            }
+          });
+        } else {
+          enumHelper.mockPlayers.forEach((player) => {
+            if (!player.timer) {
+              const playerTimer = this.Helper.randomBetween(guildMinTimer, guildMaxTimer);
+              player.timer = setTimeout(async () => {
+                const eventResult = await this.Game.activateEvent(guild.id, player, enumHelper.mockPlayers);
+                delete player.timer;
+                return this.discord.sendMessage(guild, eventResult);
+              }, playerTimer);
+            }
+          });
+        }
       });
       this.bot.user.setActivity(`${onlinePlayers.length} idlers in ${this.bot.guilds.size} guilds`);
     }, 60000 * interval);

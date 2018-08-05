@@ -8,168 +8,6 @@ const Helper = require('../../utils/Helper');
 const helper = new Helper();
 const MapClass = new Map(helper);
 
-const newPlayerObj = (discordId, guildId, name) => {
-  return {
-    discordId,
-    name,
-    guildId,
-    personalMultiplier: 0,
-    class: 'Wanderer',
-    health: 105,
-    mana: 50,
-    experience: {
-      current: 0,
-      total: 0
-    },
-    map: MapClass.getRandomTown(),
-    level: 1,
-    gold: {
-      current: 0,
-      stolen: 0,
-      stole: 0,
-      total: 0,
-      dailyLottery: 0
-    },
-    isMentionInDiscord: guildId === '390509935097675777' ? 'on' : 'off',
-    isPrivateMessage: false,
-    isPrivateMessageImportant: false,
-    gender: 'neutral',
-    equipment: {
-      helmet: equipment.empty.helmet,
-      armor: equipment.starter.armor,
-      weapon: equipment.starter.weapon,
-      relic: equipment.empty.relic
-    },
-    inventory: {
-      equipment: [],
-      items: []
-    },
-    stats: {
-      str: 1,
-      dex: 1,
-      end: 1,
-      int: 1,
-      luk: 1
-    },
-    spells: [],
-    isOnline: true,
-    createdAt: new Date().getTime(),
-    events: 0,
-    gambles: 0,
-    stole: 0,
-    stolen: 0,
-    spellCast: 0,
-    currentBounty: 0,
-    kills: {
-      mob: 0,
-      player: 0
-    },
-    fled: {
-      mob: 0,
-      player: 0,
-      you: 0
-    },
-    battles: {
-      won: 0,
-      lost: 0,
-      firstDeath: 0
-    },
-    deaths: {
-      mob: 0,
-      player: 0,
-      firstDeath: 'never'
-    },
-    quest: newQuest
-  };
-};
-
-const resetPlayerObj = {
-  class: 'Wanderer',
-  health: 105,
-  mana: 50,
-  experience: {
-    current: 0,
-    lost: 0,
-    total: 0
-  },
-  personalMultiplier: 0,
-  level: 1,
-  gold: {
-    current: 0,
-    lost: 0,
-    stolen: 0,
-    stole: 0,
-    dailyLottery: 0,
-    gambles: {
-      won: 0,
-      lost: 0
-    },
-    total: 0
-  },
-  'equipment.helmet': {
-    name: 'Nothing',
-    power: 0.15,
-    previousOwners: []
-  },
-  'equipment.armor': {
-    name: 'Linen Shirt',
-    power: 0.75,
-    position: 'armor',
-    previousOwners: []
-  },
-  'equipment.weapon': {
-    name: 'Training Sword',
-    power: 0.75,
-    position: 'weapon',
-    attackType: 'melee',
-    previousOwners: []
-  },
-  inventory: {
-    equipment: [],
-    items: []
-  },
-  stats: {
-    str: 1,
-    dex: 1,
-    end: 1,
-    int: 1,
-    luk: 1
-  },
-  spells: [],
-  lottery: {
-    joined: false,
-    amount: 0
-  },
-  isOnline: true,
-  createdAt: new Date().getTime(),
-  events: 0,
-  gambles: 0,
-  stole: 0,
-  stolen: 0,
-  spellCast: 0,
-  currentBounty: 0,
-  kills: {
-    mob: 0,
-    player: 0
-  },
-  fled: {
-    mob: 0,
-    player: 0,
-    you: 0
-  },
-  battles: {
-    won: 0,
-    lost: 0,
-    firstDeath: 0
-  },
-  deaths: {
-    mob: 0,
-    player: 0,
-    firstDeath: 'never'
-  },
-  quest: newQuest,
-};
-
 const playerSchema = mongoose.Schema({
   discordId: {
     type: String,
@@ -208,6 +46,16 @@ const playerSchema = mongoose.Schema({
     total: {
       type: Number,
       default: 0
+    }
+  },
+  titles: {
+    current: {
+      type: String,
+      default: 'None'
+    },
+    unlocked: {
+      type: Array,
+      default: []
     }
   },
   map: mapSchema,
@@ -426,6 +274,176 @@ const playerSchema = mongoose.Schema({
     }
   }
 );
-// playerSchema.set('autoIndex', true);
+
+const newPlayerObj = (discordId, guildId, name) => {
+  return {
+    discordId,
+    name,
+    guildId,
+    personalMultiplier: 0,
+    class: 'Wanderer',
+    health: 105,
+    mana: 50,
+    experience: {
+      current: 0,
+      total: 0
+    },
+    map: MapClass.getRandomTown(),
+    titles: {
+      current: playerSchema.obj.titles.current.default,
+      unlocked: playerSchema.obj.titles.unlocked.default
+    },
+    level: 1,
+    gold: {
+      current: 0,
+      stolen: 0,
+      stole: 0,
+      total: 0,
+      dailyLottery: 0
+    },
+    isMentionInDiscord: guildId === '390509935097675777' ? 'on' : 'off',
+    isPrivateMessage: false,
+    isPrivateMessageImportant: false,
+    gender: 'neutral',
+    equipment: {
+      helmet: equipment.empty.helmet,
+      armor: equipment.starter.armor,
+      weapon: equipment.starter.weapon,
+      relic: equipment.empty.relic
+    },
+    inventory: {
+      equipment: [],
+      items: []
+    },
+    stats: {
+      str: 1,
+      dex: 1,
+      end: 1,
+      int: 1,
+      luk: 1
+    },
+    spells: [],
+    isOnline: true,
+    createdAt: new Date().getTime(),
+    events: 0,
+    gambles: 0,
+    stole: 0,
+    stolen: 0,
+    spellCast: 0,
+    currentBounty: 0,
+    kills: {
+      mob: 0,
+      player: 0
+    },
+    fled: {
+      mob: 0,
+      player: 0,
+      you: 0
+    },
+    battles: {
+      won: 0,
+      lost: 0,
+      firstDeath: 0
+    },
+    deaths: {
+      mob: 0,
+      player: 0,
+      firstDeath: 'never'
+    },
+    quest: newQuest
+  };
+};
+
+const resetPlayerObj = {
+  class: 'Wanderer',
+  health: 105,
+  mana: 50,
+  experience: {
+    current: 0,
+    lost: 0,
+    total: 0
+  },
+  // TODO: Convert rest of variables to utilize schema default instead of hardcoding
+  titles: {
+    current: playerSchema.obj.titles.current.default,
+    unlocked: playerSchema.obj.titles.unlocked.default
+  },
+  personalMultiplier: 0,
+  level: 1,
+  gold: {
+    current: 0,
+    lost: 0,
+    stolen: 0,
+    stole: 0,
+    dailyLottery: 0,
+    gambles: {
+      won: 0,
+      lost: 0
+    },
+    total: 0
+  },
+  'equipment.helmet': {
+    name: 'Nothing',
+    power: 0.15,
+    previousOwners: []
+  },
+  'equipment.armor': {
+    name: 'Linen Shirt',
+    power: 0.75,
+    position: 'armor',
+    previousOwners: []
+  },
+  'equipment.weapon': {
+    name: 'Training Sword',
+    power: 0.75,
+    position: 'weapon',
+    attackType: 'melee',
+    previousOwners: []
+  },
+  inventory: {
+    equipment: [],
+    items: []
+  },
+  stats: {
+    str: 1,
+    dex: 1,
+    end: 1,
+    int: 1,
+    luk: 1
+  },
+  spells: [],
+  lottery: {
+    joined: false,
+    amount: 0
+  },
+  isOnline: true,
+  createdAt: new Date().getTime(),
+  events: 0,
+  gambles: 0,
+  stole: 0,
+  stolen: 0,
+  spellCast: 0,
+  currentBounty: 0,
+  kills: {
+    mob: 0,
+    player: 0
+  },
+  fled: {
+    mob: 0,
+    player: 0,
+    you: 0
+  },
+  battles: {
+    won: 0,
+    lost: 0,
+    firstDeath: 0
+  },
+  deaths: {
+    mob: 0,
+    player: 0,
+    firstDeath: 'never'
+  },
+  quest: newQuest,
+};
 
 module.exports = { playerSchema, newPlayerObj, resetPlayerObj };

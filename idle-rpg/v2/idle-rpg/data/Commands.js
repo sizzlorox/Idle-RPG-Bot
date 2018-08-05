@@ -1,10 +1,17 @@
 const enumHelper = require('../../../utils/enumHelper');
-const globalSpells = require('../../../game/data/globalSpells');
-const { errorLog, infoLog } = require('../../../utils/logger');
+const { errorLog } = require('../../../utils/logger');
 
-class Commands {
+// BASE
+const BaseHelper = require('../../Base/Helper');
+
+// DATA
+const titles = require('./titles');
+const globalSpells = require('../../../game/data/globalSpells');
+
+class Commands extends BaseHelper {
 
   constructor(params) {
+    super();
     const { Helper, Database, Events, MapManager } = params;
     this.Helper = Helper;
     this.Database = Database;
@@ -78,9 +85,40 @@ class Commands {
 
   async checkMultiplier(params) {
     const { author } = params;
-    const loadedPlayer = await this.Database.loadPlayer(author.id, { guildId: -1 })
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { guildId: -1 });
     const config = await this.Database.loadGame(loadedPlayer.guildId);
+
     return author.send(`Current Multiplier: ${config.multiplier}x\nActive Bless: ${config.spells.activeBless}x`);
+  }
+
+  async listTitles(params) {
+    const { author } = params;
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { titles: -1 });
+    if (loadedPlayer.titles.unlocked.length <= 0) {
+      return author.send('I\'m sorry, you currently do not have any titles unlocked.');
+    }
+
+    return author.send(`You currently have ${loadedPlayer.titles.unlocked.join(', ')} unlocked!\nUse \`!st\` or \`!settitle <title>\` to change titles.`);
+  }
+
+  async setTitle(params) {
+    const { author, value } = params;
+    if (!this.objectContainsName(titles, value)) {
+      return author.send(`${value} is not a title.`);
+    }
+
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (loadedPlayer.titles.unlocked.length <= 0) {
+      return author.send('I\'m sorry, but you have no titles unlocked as of yet.');
+    }
+
+    if (!loadedPlayer.titles.unlocked.includes(value)) {
+      return author.send('You do not have this title unlocked!');
+    }
+
+    loadedPlayer.titles.current = value;
+    await this.Database.savePlayer(loadedPlayer);
+    return author.send(`Title has been set to ${value}, you're now known as ${loadedPlayer.name} the ${value}.`);
   }
 
   top10(params) {

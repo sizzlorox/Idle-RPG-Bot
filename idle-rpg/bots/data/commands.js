@@ -30,6 +30,8 @@ const commands = [
 !multi, !multiplier - Displays current multiplier
 !cs, !castspell - Lists spells available to cast
 !cs, !castspell <spell> - Casts a global spell onto Idle-RPG
+!t, !titles - Lists current unlocked titles
+!st, !settitle <title> - Sets your title to <title> (without < > and case-sensitive)
 !el, !eventlog - Lists up to 15 past events
 !el, !eventlog <@Mention of player> - Lists up to 15 past events of mentioned player
 !pl, !pvplog - Lists up to 15 past PvP events
@@ -51,6 +53,40 @@ const commands = [
 !prefix <Command prefix to use> - Changes server command prefix (Must have Manage Guild permission to use) eg: !prefix ?
 !prefix <Server ID> <Command prefix to use> - Changes server command prefix (Must have Manage Guild permission to use) eg: !prefix 1111 ?`;
       messageObj.author.send(helpMsg, { split: true });
+    }
+  },
+
+  // Lists titles
+  titles = {
+    command: ['!t', '!titles'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (params) => {
+      const { Game, messageObj } = params;
+      return Game.fetchCommand({
+        command: 'listTitles',
+        author: messageObj.author
+      });
+    }
+  },
+
+  // Set title
+  setTitle = {
+    command: ['!st', '!settitle'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (!messageObj.content.includes(' ')) {
+        return messageObj.author.send('You must select a title to set. (eg. !st <title>)');
+      }
+
+      const titleToSet = messageObj.content.split(/ (.+)/)[1];
+      return Game.fetchCommand({
+        command: 'setTitle',
+        author: messageObj.author,
+        value: titleToSet
+      });
     }
   },
 
