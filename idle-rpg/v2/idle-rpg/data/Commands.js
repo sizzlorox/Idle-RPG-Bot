@@ -143,7 +143,7 @@ ${rankString}
           calcAmount = Math.floor(player.gold.current / globalSpells.bless.spellCost);
         }
         if (player.gold.current >= (globalSpells.bless.spellCost * calcAmount) && calcAmount >= 1) {
-          player.spellCast++;
+          player.spellCast += calcAmount;
           player.gold.current -= (globalSpells.bless.spellCost * calcAmount);
           await this.Database.savePlayer(player)
             .then(() => {
