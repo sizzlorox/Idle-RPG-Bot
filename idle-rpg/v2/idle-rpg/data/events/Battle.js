@@ -473,15 +473,15 @@ class Battle {
             const removePreviousOwnerName = victimPlayer.equipment[itemKeys[luckItem]].name.replace(`${lastOwnerInList}`, `${victimPlayer.name}`);
             stolenEquip = victimPlayer.equipment[itemKeys[luckItem]];
             stolenEquip.name = removePreviousOwnerName;
-            eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenEquip.name}!`));
+            eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${stolenEquip.name}!`));
             eventLog.push(`Stole ${victimPlayer.equipment[itemKeys[luckItem]].name}`);
-            otherPlayerLog.push(`${stealingPlayer.name} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
+            otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
           } else {
             stolenEquip = victimPlayer.equipment[itemKeys[luckItem]];
             stolenEquip.name = `${victimPlayer.name}'s ${victimPlayer.equipment[itemKeys[luckItem]].name}`;
-            eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenEquip.name}!`));
+            eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${stolenEquip.name}!`));
             eventLog.push(`Stole ${stolenEquip.name}`);
-            otherPlayerLog.push(`${stealingPlayer.name} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
+            otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
           }
           victimPlayer.stolen++;
           stealingPlayer.stole++;
@@ -524,9 +524,9 @@ class Battle {
           victimPlayer.gold.current -= goldStolen;
           victimPlayer.gold.stolen += goldStolen;
 
-          eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`));
+          eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${goldStolen} gold from ${victimPlayer.name}!`));
           eventLog.push(`Stole ${goldStolen} gold from ${victimPlayer.name}`);
-          otherPlayerLog.push(`${stealingPlayer.name} stole ${goldStolen} gold from you`);
+          otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${goldStolen} gold from you`);
 
           await this.Helper.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.action);
           await this.Helper.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.action);

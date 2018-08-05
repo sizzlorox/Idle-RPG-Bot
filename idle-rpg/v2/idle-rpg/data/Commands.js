@@ -138,7 +138,7 @@ class Commands extends BaseHelper {
 
             return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
           })
-          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
+          .map((player, rank) => `Rank ${rank + 1}: ${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`;
 
         author.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
@@ -190,14 +190,14 @@ ${rankString}
           guildConfig.multiplier += calcAmount;
           guildConfig.spells.activeBless += calcAmount;
           await this.Database.updateGame(player.guildId, guildConfig);
-          actionsChannel.send(this.Helper.setImportantMessage(`${player.name} just cast${calcAmount > 1 ? ` ${calcAmount}x` : ''} ${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x` : ''} ${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
           setTimeout(async () => {
             const newLoadedConfig = await this.Database.loadGame(player.guildId);
             newLoadedConfig.multiplier -= calcAmount;
             newLoadedConfig.spells.activeBless -= calcAmount;
             newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
-            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}s ${calcAmount > 1 ? `${calcAmount}x` : ''} ${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
+            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s ${calcAmount > 1 ? `${calcAmount}x` : ''} ${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
           }, 1800000); // 30 minutes
         } else {
           author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
@@ -209,7 +209,7 @@ ${rankString}
           player.gold.current -= globalSpells.home.spellCost;
           const randomHome = this.MapManager.getRandomTown();
           player.map = randomHome;
-          actionsChannel.send(`${player.name} just cast ${spell} and teleported back to ${randomHome.name}.`);
+          actionsChannel.send(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast ${spell} and teleported back to ${randomHome.name}.`);
           author.send(`Teleported back to ${randomHome.name}.`);
           await this.Database.savePlayer(player)
             .then(() => {
