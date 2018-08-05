@@ -24,9 +24,6 @@ class Game {
       const loadedPlayer = await this.Database.loadPlayer(player.discordId);
       if (!loadedPlayer) {
         const newPlayer = await this.Database.createNewPlayer(player.discordId, player.guildId, player.name);
-        if (isNaN(newPlayer.gold.current)) {
-          infoLog.info(newPlayer.gold);
-        }
 
         return await this.updatePlayer({
           type: 'actions',
