@@ -524,7 +524,7 @@ class Battle {
           victimPlayer.gold.current -= goldStolen;
           victimPlayer.gold.stolen += goldStolen;
 
-          eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${goldStolen} gold from ${victimPlayer.name}!`));
+          eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${goldStolen} gold from ${victimPlayer.name}${victimPlayer.titles.current !== 'None' ? ` the ${victimPlayer.titles.current}` : ''}!`));
           eventLog.push(`Stole ${goldStolen} gold from ${victimPlayer.name}`);
           otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${goldStolen} gold from you`);
 
