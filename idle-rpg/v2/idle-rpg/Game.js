@@ -1,8 +1,7 @@
-const Database = require('../../database/Database');
-const { errorLog } = require('../../utils/logger');
-
 // BASE
+const { aggregation } = require('../Base/Util');
 const BaseGame = require('../Base/Game');
+const BaseHelper = require('../Base/Helper');
 
 // DATA
 const { newQuest } = require('../../../idle-rpg/database/schemas/quest');
@@ -10,17 +9,19 @@ const Commands = require('../idle-rpg/data/Commands');
 const Events = require('./data/events/Events');
 const Map = require('../../game/utils/Map');
 const titles = require('./data/titles');
-
-// HELPERS
 const { roamingNpcs } = require('../../utils/enumHelper');
 
-class Game extends BaseGame {
+// UTILS
+const Database = require('../../database/Database');
+const { errorLog } = require('../../utils/logger');
+
+class Game extends aggregation(BaseGame, BaseHelper) {
 
   constructor(Helper) {
     super();
     this.activeSpells = [];
 
-    this.base = new BaseGame();
+    // TODO: remove this Helper then finishing new BaseHelper
     this.Helper = Helper;
     this.Database = new Database(Helper);
     this.Map = new Map(Helper);
@@ -39,7 +40,7 @@ class Game extends BaseGame {
         return await this.updatePlayer({
           type: 'actions',
           updatedPlayer: newPlayer,
-          msg: [`${this.Helper.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`],
+          msg: [`${this.generatePlayerName(newPlayer, true)} was born in \`${newPlayer.map.name}\`! Welcome to the world of Idle-RPG!`],
           pm: ['You were born.']
         });
       }
@@ -55,7 +56,7 @@ class Game extends BaseGame {
 
       const loadedGuildConfig = await this.Database.loadGame(player.guildId);
       console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId} - Multi: ${loadedGuildConfig.multiplier} - Bless: ${loadedGuildConfig.spells.activeBless} - PM: ${loadedPlayer.personalMultiplier}`);
-      await this.Helper.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
+      await this.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       let eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
       eventResults = await this.setPlayerTitles(eventResults);
       const msgResults = await this.updatePlayer(eventResults);
@@ -68,7 +69,7 @@ class Game extends BaseGame {
 
   async selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers) {
     try {
-      const randomEvent = await this.Helper.randomBetween(0, 2);
+      const randomEvent = await this.randomBetween(0, 2);
       switch (randomEvent) {
         case 0:
           return this.Events.moveEvent(loadedPlayer);

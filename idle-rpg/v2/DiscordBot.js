@@ -1,15 +1,22 @@
+// BASE
+const BaseHelper = require('./Base/Helper');
+const BaseDiscord = require('./Base/Discord');
+
 const DiscordJS = require('discord.js');
 const util = require('util');
 const fs = require('fs');
+
+// DATA
 const Crons = require('../v2/idle-rpg/Crons');
 const Game = require('../v2/idle-rpg/Game');
 const Helper = require('../utils/Helper');
-const Discord = require('./Base/Discord');
 const Antispam = require('../bots/modules/Antispam');
 const CommandParser = require('../bots/utils/CommandParser');
 const enumHelper = require('../utils/enumHelper');
-const { errorLog, welcomeLog } = require('../utils/logger');
 const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../settings');
+
+// UTILS
+const { errorLog, welcomeLog } = require('../utils/logger');
 
 /*
 
@@ -17,9 +24,10 @@ const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../se
 
 */
 
-class DiscordBot {
+class DiscordBot extends BaseHelper {
 
   constructor() {
+    super();
     this.bot = new DiscordJS.Client({
       apiRequestMethod: 'sequential',
       messageCacheMaxSize: 200,
@@ -31,7 +39,7 @@ class DiscordBot {
       restWsBridgeTimeout: 5000,
       restTimeOffset: 500
     });
-    this.discord = new Discord(this.bot);
+    this.discord = new BaseDiscord(this.bot);
     this.Helper = new Helper();
     this.Game = new Game(this.Helper);
     this.Crons = new Crons({ Discord: this });
@@ -141,7 +149,7 @@ class DiscordBot {
 
           onlinePlayers.filter(member => member.guildId === guild.id).forEach((player) => {
             if (!player.timer) {
-              const playerTimer = this.Helper.randomBetween(guildMinTimer, guildMaxTimer);
+              const playerTimer = this.randomBetween(guildMinTimer, guildMaxTimer);
               player.timer = setTimeout(async () => {
                 const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
                 delete player.timer;
@@ -152,7 +160,7 @@ class DiscordBot {
         } else {
           enumHelper.mockPlayers.forEach((player) => {
             if (!player.timer) {
-              const playerTimer = this.Helper.randomBetween(guildMinTimer, guildMaxTimer);
+              const playerTimer = this.randomBetween(guildMinTimer, guildMaxTimer);
               player.timer = setTimeout(async () => {
                 const eventResult = await this.Game.activateEvent(guild.id, player, enumHelper.mockPlayers);
                 delete player.timer;
@@ -181,14 +189,14 @@ class DiscordBot {
     this.bot.guilds.forEach((guild) => {
       const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
       if (actionsChannel) {
-        actionsChannel.send(this.Helper.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
+        actionsChannel.send(this.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
       }
     });
     setTimeout(() => {
       this.bot.guilds.forEach((guild) => {
         const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
         if (actionsChannel) {
-          actionsChannel.send(this.Helper.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
+          actionsChannel.send(this.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
           const guildConfig = this.Game.dbClass().loadGame(guild.id);
           guildConfig.multiplier++;
           this.Game.dbClass().updateGame(guild.id, guildConfig);
@@ -201,7 +209,7 @@ class DiscordBot {
         const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
 
         if (actionsChannel) {
-          actionsChannel.send(this.Helper.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
+          actionsChannel.send(this.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
           const guildConfig = this.Game.dbClass().loadGame(guild.id);
           guildConfig.multiplier--;
           guildConfig.multiplier = guildConfig.multiplier - 1 <= 0 ? guildConfig.multiplier = 1 : guildConfig.multiplier--;
@@ -223,9 +231,9 @@ class DiscordBot {
       }
 
       const guildConfig = await this.Game.dbClass().loadGame(guild.id);
-      const randomWinner = this.Helper.randomBetween(0, guildLotteryPlayers.length - 1);
+      const randomWinner = this.randomBetween(0, guildLotteryPlayers.length - 1);
       const winner = guildLotteryPlayers[randomWinner];
-      const eventMsg = this.Helper.setImportantMessage(`Out of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
+      const eventMsg = this.setImportantMessage(`Out of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
       const eventLog = `Congratulations! Out of ${guildLotteryPlayers.length} contestants, you just won ${guildConfig.dailyLottery.prizePool} gold from the daily lottery!`;
       winner.gold.current += guildConfig.dailyLottery.prizePool;
       winner.gold.total += guildConfig.dailyLottery.prizePool;
@@ -240,7 +248,7 @@ class DiscordBot {
         }
       });
 
-      guildConfig.dailyLottery.prizePool = this.Helper.randomBetween(1500, 10000);
+      guildConfig.dailyLottery.prizePool = this.randomBetween(1500, 10000);
       guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(eventMsg);
       await this.Game.dbClass().updateGame(guild.id, guildConfig);
       await this.Helper.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
@@ -290,7 +298,7 @@ ${rankString}\`\`\``;
 
   blizzardRandom() {
     this.bot.guilds.forEach(async (guild) => {
-      const blizzardDice = this.Helper.randomBetween(0, 100);
+      const blizzardDice = this.randomBetween(0, 100);
       const guildConfig = await this.Game.dbClass().loadGame(guild.id);
       if (blizzardDice <= 15 && !guildConfig.events.isBlizzardActive) {
         guildConfig.events.isBlizzardActive = true;
@@ -298,7 +306,7 @@ ${rankString}\`\`\``;
         setTimeout(() => {
           guildConfig.events.isBlizzardActive = false;
           this.Game.dbClass().updateGame(guild.id, guildConfig);
-        }, this.Helper.randomBetween(7200000, 72000000)); // 2-20hrs
+        }, this.randomBetween(7200000, 72000000)); // 2-20hrs
       }
     });
   }
