@@ -47,7 +47,7 @@ class Game {
         playerObj.experience.current = 0;
         playerObj.health = 100 + (playerObj.level * 5);
         playerObj.mana = 50 + (playerObj.level * 5);
-        eventMsg.push(`\`\`\`css ${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} is now level ${playerObj.level}!\`\`\``);
+        eventMsg.push(`\`\`\`css\n${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} is now level ${playerObj.level}!\`\`\``);
         eventLog.push(`Leveled up to level ${playerObj.level}`);
         for (let i = 0; i < 4; i++) {
           const randomStat = this.randomBetween(0, 3);
@@ -91,7 +91,7 @@ class Game {
         }
 
         if (playerObj.class !== oldClass) {
-          eventMsg.push(`\`\`\`css ${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} has decided to become a ${playerObj.class}!\`\`\``);
+          eventMsg.push(`\`\`\`css\n${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} has decided to become a ${playerObj.class}!\`\`\``);
           eventLog.push(`You have become a ${playerObj.class}`);
         }
         // TODO: add this once logging events have been rewritten
