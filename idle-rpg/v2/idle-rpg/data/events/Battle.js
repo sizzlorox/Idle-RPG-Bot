@@ -1,133 +1,20 @@
+// BASE
+const { aggregation } = require('../../../Base/Util');
+const BaseGame = require('../../../Base/Game');
+const BaseHelper = require('../../../Base/Helper');
+
+// UTILS
 const { errorLog } = require('../../../../utils/logger');
+
+// DATA
 const { pvpLevelRestriction } = require('../../../../../settings');
 const enumHelper = require('../../../../utils/enumHelper');
 const BattleSimulator = require('../../../../game/utils/Battle');
 
-function pveMessageFormat(Helper, results, updatedPlayer, playerMaxHealth, multiplier) {
-  const mobListResult = [];
-  const mobListInfo = { mobs: [] };
-  let isQuestCompleted = false;
-  const eventMsg = [`[\`${results.attacker.map.name}\`] `];
-  const eventLog = [];
-  let mobCountString = '';
-  let mobKillCountString = '';
-  let mobFleeCountString = '';
-  let expGain = 0;
-  let goldGain = 0;
-  let questExpGain = 0;
-  let questGoldGain = 0;
-
-  results.defender.forEach((mob) => {
-    let infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
-    if (infoList !== -1) {
-      mobListInfo.mobs[infoList].totalCount++;
-    } else {
-      mobListInfo.mobs.push({
-        mob: mob.name,
-        totalCount: 0,
-        event: {
-          killed: 0,
-          fled: 0,
-          survived: 0
-        }
-      });
-    }
-    infoList = mobListInfo.mobs.findIndex(arrayMob => arrayMob.mob === mob.name);
-    expGain += Math.ceil(((mob.experience) + (mob.dmgDealt / 4)) / 6) * multiplier;
-
-    if (mob.health <= 0) {
-      goldGain += Math.floor((mob.gold * multiplier));
-      mobListInfo.mobs[infoList].event.killed++;
-    } else if (mob.health > 0 && updatedPlayer.health > 0) {
-      mobListInfo.mobs[infoList].event.fled++;
-      mob.health > updatedPlayer.health ? updatedPlayer.fled.you++ : updatedPlayer.fled.mob++;
-    } else if (mob.health > 0 && updatedPlayer.health <= 0) {
-      mobListInfo.mobs[infoList].event.survived++;
-    }
-
-    if (!updatedPlayer.quest.questMob.name.includes('None') && mob.name.includes(updatedPlayer.quest.questMob.name) && mob.health <= 0) {
-      updatedPlayer.quest.questMob.killCount++;
-      if (updatedPlayer.quest.questMob.killCount >= updatedPlayer.quest.questMob.count) {
-        isQuestCompleted = true;
-        questExpGain = Math.ceil((expGain * updatedPlayer.quest.questMob.count) / 2);
-        questGoldGain = Math.ceil((goldGain * updatedPlayer.quest.questMob.count) / 2);
-        updatedPlayer.quest.questMob.name = 'None';
-        updatedPlayer.quest.questMob.count = 0;
-        updatedPlayer.quest.questMob.killCount = 0;
-        updatedPlayer.quest.completed++;
-      }
-      updatedPlayer.quest.updated_at = new Date();
-    }
-
-    if (Math.floor(results.defenderDamage / (results.defender.length)) > 0) {
-      mobListResult.push(`  ${mob.name}'s ${mob.equipment.weapon.name} did ${mob.dmgDealt} damage.`);
-    }
-    mobListResult.push(`  ${mob.health <= 0 ? `${mob.name} took ${mob.dmgReceived} dmg and died.` : `${mob.name} took ${mob.dmgReceived} dmg and has ${mob.health} / ${mob.maxHealth} HP left.`}`);
-  });
-  let battleResult = `\`\`\`Battle Results:
-  You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.
-${mobListResult.join('\n')}\`\`\``;
-
-  if (updatedPlayer.health <= 0) {
-    battleResult = battleResult.replace(`  You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.`, '');
-    const killerMob = results.defender.map((mob) => {
-      if (mob.dmgDealt > 0) {
-        return mob.name;
-      }
-
-      return '';
-    }).join(', ').replace(/,$/g, '');
-    eventMsg.push(`| ${killerMob} just killed ${Helper.generatePlayerName(updatedPlayer, true)}!`);
-    eventLog.push(`${killerMob} just killed you!`);
-  }
-  const eventMsgResults = `↳ ${Helper.capitalizeFirstLetter(Helper.generateGenderString(updatedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${updatedPlayer.health}/${playerMaxHealth}]`;
-
-  mobListInfo.mobs.forEach((mobInfo, i) => {
-    const totalCount = mobInfo.event.killed + mobInfo.event.fled + mobInfo.event.survived;
-    mobCountString = i > 0 ? mobCountString.concat(`, ${totalCount}x \`${mobInfo.mob}\``) : mobCountString.concat(`${totalCount}x \`${mobInfo.mob}\``);
-    if (mobInfo.event.killed > 0) {
-      mobKillCountString = mobKillCountString !== '' ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
-    }
-    if (mobInfo.event.fled > 0 && mobInfo.event.killed === 0) {
-      mobFleeCountString = mobKillCountString !== '' ? mobFleeCountString.concat(`, ${mobInfo.event.fled}x \`${mobInfo.mob}\``) : mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
-    } else if (mobInfo.event.fled > 0) {
-      mobFleeCountString = mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
-    }
-  });
-
-  if (mobFleeCountString) {
-    eventMsg.push(results.attackerDamage > results.defenderDamage
-      ? `${mobFleeCountString} just fled from ${Helper.generatePlayerName(results.attacker, true)}!`.replace(/1x /g, '')
-      : `${Helper.generatePlayerName(results.attacker, true)} just fled from ${mobFleeCountString}!`.replace(/1x /g, ''));
-    eventLog.push(results.attackerDamage > results.defenderDamage
-      ? `${mobFleeCountString} fled from you! [${expGain} exp]`.replace(/1x /g, '')
-      : `You fled from ${mobFleeCountString}! [${expGain} exp]`.replace(/1x /g, ''));
-  }
-
-  if (mobKillCountString) {
-    eventMsg.push(`${Helper.generatePlayerName(updatedPlayer, true)}'s \`${updatedPlayer.equipment.weapon.name}\` just killed ${mobKillCountString}`.replace(/1x /g, ''));
-    eventLog.push(`You killed ${mobKillCountString}! [\`${expGain}\` exp${goldGain === 0 ? '' : ` / \`${goldGain}\` gold`}]`.replace(/1x /g, '').replace(/\n$/g, ''));
-  }
-  const attackedMsg = `Attacked ${mobCountString.replace(/`/g, '')} with \`${updatedPlayer.equipment.weapon.name}\` in \`${updatedPlayer.map.name}\` `.replace(/1x /g, '');
-  eventMsg.push(eventMsgResults);
-  eventLog.push(attackedMsg.replace(/1x /g, '').concat(battleResult));
-  eventMsg.splice(0, 2, eventMsg[0] + eventMsg[1]);
-
-  return {
-    updatedPlayer,
-    expGain,
-    goldGain,
-    questExpGain,
-    questGoldGain,
-    eventMsg,
-    eventLog,
-    isQuestCompleted
-  };
-}
-
-class Battle {
+class Battle extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
+    super();
     const { Helper, Database, MapManager, InventoryManager, ItemManager } = params;
     this.Database = Database;
     this.Helper = Helper;
@@ -150,7 +37,7 @@ class Battle {
       switch (battleResults.result) {
         case enumHelper.battle.outcomes.win:
           const dropItemResults = await this.dropItem(updatedPlayer, battleResults.updatedMob, eventMsg, eventLog);
-          const checkedWinResults = await this.Helper.checkExperience(this.Database, dropItemResults.updatedPlayer, eventMsg, eventLog);
+          const checkedWinResults = await this.checkExperience(this.Database, dropItemResults.updatedPlayer, eventMsg, eventLog);
           return {
             type: 'actions',
             updatedPlayer: checkedWinResults.updatedPlayer,
@@ -159,7 +46,7 @@ class Battle {
           };
 
         case enumHelper.battle.outcomes.fled:
-          const checkedFledResults = await this.Helper.checkExperience(this.Database, updatedPlayer, eventMsg, eventLog);
+          const checkedFledResults = await this.checkExperience(this.Database, updatedPlayer, eventMsg, eventLog);
           return {
             type: 'actions',
             updatedPlayer: checkedFledResults.updatedPlayer,
@@ -185,7 +72,7 @@ class Battle {
     const eventMsg = [];
     const eventLog = [];
     try {
-      updatedPlayer = await this.Helper.passiveRegen(updatedPlayer, ((5 * updatedPlayer.level) / 2) + (updatedPlayer.stats.end / 2), ((5 * updatedPlayer.level) / 2) + (updatedPlayer.stats.int / 2));
+      updatedPlayer = await this.passiveRegen(updatedPlayer, ((5 * updatedPlayer.level) / 2) + (updatedPlayer.stats.end / 2), ((5 * updatedPlayer.level) / 2) + (updatedPlayer.stats.int / 2));
       // TODO: Make more camp event messages to be selected randomly
       const generatedMessage = await this.Helper.randomCampEventMessage(updatedPlayer);
       eventMsg.push(generatedMessage.eventMsg);
@@ -215,7 +102,7 @@ class Battle {
         eventMsg,
         eventLog,
         isQuestCompleted
-      } = await pveMessageFormat(this.Helper, results, results.attacker, playerMaxHealth, multiplier);
+      } = await this.pveMessageFormat(results, results.attacker, playerMaxHealth, multiplier);
 
       if (updatedPlayer.health <= 0) {
         updatedPlayer.battles.lost++;
@@ -254,7 +141,7 @@ class Battle {
       updatedPlayer.battles.won++;
       await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
       if (isQuestCompleted) {
-        eventMsg.push(`${this.Helper.generatePlayerName(updatedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
+        eventMsg.push(`${this.generatePlayerName(updatedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
         eventLog.push(`Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
         await this.Helper.logEvent(updatedPlayer, this.Database, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, enumHelper.logTypes.action);
       }
@@ -282,9 +169,9 @@ class Battle {
         .map(player => player.chance = Math.floor((player.currentBounty * Math.log(1.2)) / 100));
 
       if (sameMapPlayers.length > 0 && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
-        const randomPlayerIndex = await this.Helper.randomBetween(0, sameMapPlayers.length - 1);
+        const randomPlayerIndex = await this.randomBetween(0, sameMapPlayers.length - 1);
         let randomPlayer;
-        if (playersWithBounty.length > 0 && await this.Helper.randomBetween(0, 100) >= 50) {
+        if (playersWithBounty.length > 0 && await this.randomBetween(0, 100) >= 50) {
           if (playersWithBounty.length > 1) {
             playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
           }
@@ -293,7 +180,7 @@ class Battle {
           const randomDice = await this.Helper.randomBetween(0, diceMax);
           const filteredBountyPlayers = playersWithBounty.filter(player => player.chance >= randomDice);
           if (filteredBountyPlayers.length > 0) {
-            const filteredBountyPlayersIndex = await this.Helper.randomBetween(0, filteredBountyPlayers.length - 1);
+            const filteredBountyPlayersIndex = await this.randomBetween(0, filteredBountyPlayers.length - 1);
             randomPlayer = filteredBountyPlayers[filteredBountyPlayersIndex];
           } else {
             randomPlayer = sameMapPlayers[randomPlayerIndex];
@@ -331,8 +218,8 @@ class Battle {
 
       if (attacker.health <= 0 && defender.health > 0) {
         battleResultLog = battleResultLog.replace(`  ${attacker.name} has ${attacker.health}/${playerMaxHealth} HP left.`, '');
-        eventMsg.push(`[\`${attacker.map.name}\`] ${this.Helper.generatePlayerName(defender, true)} just killed ${this.Helper.generatePlayerName(attacker, true)} with ${this.Helper.generateGenderString(defender, 'his')} \`${defender.equipment.weapon.name}\`!
-↳ ${this.Helper.generatePlayerName(attacker, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${this.Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
+        eventMsg.push(`[\`${attacker.map.name}\`] ${this.generatePlayerName(defender, true)} just killed ${this.generatePlayerName(attacker, true)} with ${this.generateGenderString(defender, 'his')} \`${defender.equipment.weapon.name}\`!
+↳ ${this.generatePlayerName(attacker, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${this.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
 
         const expGain = Math.floor((attackerDamage / 8));
         eventLog.push(`Died to ${defender.name} in ${attacker.map.name}.`);
@@ -353,8 +240,8 @@ class Battle {
       } else if (defender.health <= 0 && attacker.health > 0) {
         battleResultLog = battleResultLog.replace(`  ${defender.name} has ${defender.health}/${defenderMaxHealth} HP left.`, '');
         const expGain = Math.floor((defenderDamage / 8));
-        eventMsg.push(`[\`${attacker.map.name}\`] ${this.Helper.generatePlayerName(attacker, true)} just killed \`${defender.name}\` with ${this.Helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\`!
-↳ ${this.Helper.capitalizeFirstLetter(this.Helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${this.Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
+        eventMsg.push(`[\`${attacker.map.name}\`] ${this.generatePlayerName(attacker, true)} just killed \`${defender.name}\` with ${this.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\`!
+↳ ${this.capitalizeFirstLetter(this.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${this.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
         eventLog.push(`Killed ${defender.name} in ${attacker.map.name}. [${expGain} exp]`);
         const otherPlayerLog = `Died to ${attacker.name} in ${attacker.map.name}.`;
         eventLog.push('```'.concat(battleResultLog).concat('```'));
@@ -371,10 +258,10 @@ class Battle {
         result = enumHelper.battle.outcomes.win;
       } else if (defender.health > 0 && attacker.health > 0) {
         eventMsg.push(attackerDamage > defenderDamage
-          ? `[\`${attacker.map.name}\`] ${this.Helper.generatePlayerName(attacker, true)} attacked ${this.Helper.generatePlayerName(defender, true)} with ${this.Helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${this.Helper.generateGenderString(defender, 'he')} managed to get away!
-↳ ${this.Helper.capitalizeFirstLetter(this.Helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${this.Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`
-          : `[\`${attacker.map.name}\`] ${this.Helper.generatePlayerName(attacker, true)} attacked ${this.Helper.generatePlayerName(defender, true)} with ${this.Helper.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${this.Helper.generatePlayerName(defender, true)} was too strong!
-↳ ${this.Helper.capitalizeFirstLetter(this.Helper.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${this.Helper.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
+          ? `[\`${attacker.map.name}\`] ${this.generatePlayerName(attacker, true)} attacked ${this.generatePlayerName(defender, true)} with ${this.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${this.generateGenderString(defender, 'he')} managed to get away!
+↳ ${this.capitalizeFirstLetter(this.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${this.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`
+          : `[\`${attacker.map.name}\`] ${this.generatePlayerName(attacker, true)} attacked ${this.generatePlayerName(defender, true)} with ${this.generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${this.generatePlayerName(defender, true)} was too strong!
+↳ ${this.capitalizeFirstLetter(this.generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${this.generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
 
         const expGainAttacker = Math.floor((defenderDamage / 8));
         const expGainDefender = Math.floor((attackerDamage / 8));
@@ -405,7 +292,7 @@ class Battle {
           otherPlayerPmMsg.push(...winResults.otherPlayerPmMsg);
           const victimCheckHealth = await this.Helper.checkHealth(this.Database, this.MapManager, winResults.victimPlayer, winResults.stealingPlayer, eventMsg, otherPlayerPmMsg, eventLog);
           await this.Database.savePlayer(victimCheckHealth.updatedPlayer);
-          const winnerCheckExp = await this.Helper.checkExperience(this.Database, winResults.stealingPlayer, eventMsg, eventLog);
+          const winnerCheckExp = await this.checkExperience(this.Database, winResults.stealingPlayer, eventMsg, eventLog);
 
           return {
             type: 'actions',
@@ -417,9 +304,9 @@ class Battle {
           };
 
         case enumHelper.battle.outcomes.fled:
-          const fledUpdatedDefender = await this.Helper.checkExperience(this.Database, defender, eventMsg, otherPlayerPmMsg);
+          const fledUpdatedDefender = await this.checkExperience(this.Database, defender, eventMsg, otherPlayerPmMsg);
           await this.Database.savePlayer(fledUpdatedDefender.updatedPlayer);
-          const fledResult = await this.Helper.checkExperience(this.Database, attacker, eventMsg, eventLog);
+          const fledResult = await this.checkExperience(this.Database, attacker, eventMsg, eventLog);
 
           return {
             type: 'actions',
@@ -435,7 +322,7 @@ class Battle {
           eventMsg.push(...loseResults.msg);
           eventLog.push(...loseResults.otherPlayerPmMsg);
           otherPlayerPmMsg.push(...loseResults.pm);
-          const lostUpdatedDefender = await this.Helper.checkExperience(this.Database, loseResults.stealingPlayer, eventMsg, otherPlayerPmMsg);
+          const lostUpdatedDefender = await this.checkExperience(this.Database, loseResults.stealingPlayer, eventMsg, otherPlayerPmMsg);
           await this.Database.savePlayer(lostUpdatedDefender.updatedPlayer);
           const loserCheckHealth = await this.Helper.checkHealth(this.Database, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer, eventMsg, eventLog, otherPlayerPmMsg);
 
@@ -458,12 +345,12 @@ class Battle {
     const eventLog = [];
     const otherPlayerLog = [];
     try {
-      const luckStealChance = await this.Helper.randomBetween(0, 100);
+      const luckStealChance = await this.randomBetween(0, 100);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
 
       if (luckStealChance > (90 - canSteal)) {
-        const luckItem = await this.Helper.randomBetween(0, 2);
+        const luckItem = await this.randomBetween(0, 2);
         const itemKeys = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
 
         if (![enumHelper.equipment.empty.armor.name, enumHelper.equipment.empty.weapon.name].includes(victimPlayer.equipment[itemKeys[luckItem]].name)) {
@@ -473,15 +360,15 @@ class Battle {
             const removePreviousOwnerName = victimPlayer.equipment[itemKeys[luckItem]].name.replace(`${lastOwnerInList}`, `${victimPlayer.name}`);
             stolenEquip = victimPlayer.equipment[itemKeys[luckItem]];
             stolenEquip.name = removePreviousOwnerName;
-            eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenEquip.name}!`));
+            eventMsg.push(this.setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${stolenEquip.name}!`));
             eventLog.push(`Stole ${victimPlayer.equipment[itemKeys[luckItem]].name}`);
-            otherPlayerLog.push(`${stealingPlayer.name} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
+            otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
           } else {
             stolenEquip = victimPlayer.equipment[itemKeys[luckItem]];
             stolenEquip.name = `${victimPlayer.name}'s ${victimPlayer.equipment[itemKeys[luckItem]].name}`;
-            eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name} just stole ${stolenEquip.name}!`));
+            eventMsg.push(this.setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${stolenEquip.name}!`));
             eventLog.push(`Stole ${stolenEquip.name}`);
-            otherPlayerLog.push(`${stealingPlayer.name} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
+            otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
           }
           victimPlayer.stolen++;
           stealingPlayer.stole++;
@@ -524,9 +411,9 @@ class Battle {
           victimPlayer.gold.current -= goldStolen;
           victimPlayer.gold.stolen += goldStolen;
 
-          eventMsg.push(this.Helper.setImportantMessage(`${stealingPlayer.name} just stole ${goldStolen} gold from ${victimPlayer.name}!`));
+          eventMsg.push(this.setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${goldStolen} gold from ${victimPlayer.name}${victimPlayer.titles.current !== 'None' ? ` the ${victimPlayer.titles.current}` : ''}!`));
           eventLog.push(`Stole ${goldStolen} gold from ${victimPlayer.name}`);
-          otherPlayerLog.push(`${stealingPlayer.name} stole ${goldStolen} gold from you`);
+          otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${goldStolen} gold from you`);
 
           await this.Helper.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.action);
           await this.Helper.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.action);
@@ -544,7 +431,7 @@ class Battle {
   async dropItem(playerObj, mob, eventMsg, eventLog) {
     let updatedPlayer = Object.assign({}, playerObj);
     try {
-      const dropitemChance = await this.Helper.randomBetween(0, 100);
+      const dropitemChance = await this.randomBetween(0, 100);
       if (dropitemChance <= 15 + (updatedPlayer.stats.luk / 4)) {
         const item = await this.ItemManager.generateItem(updatedPlayer, mob.find(obj => obj.health <= 0));
         if (item.position !== enumHelper.inventory.position) {
@@ -560,9 +447,9 @@ class Battle {
         }
 
         if (!item.isXmasEvent) {
-          eventMsg.push(`${this.Helper.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\``);
+          eventMsg.push(`${this.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\``);
         } else {
-          eventMsg.push(`**${this.Helper.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`);
+          eventMsg.push(`**${this.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`);
         }
         eventLog.push(`Received ${item.name} from ${mob[0].name}`);
         await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);

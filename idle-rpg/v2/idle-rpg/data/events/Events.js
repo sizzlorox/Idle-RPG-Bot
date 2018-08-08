@@ -1,4 +1,10 @@
+// BASE
+const BaseHelper = require('../../../Base/Helper');
+
+// UTILS
 const { errorLog } = require('../../../../utils/logger');
+
+// DATA
 const enumHelper = require('../../../../utils/enumHelper');
 const Town = require('./Town');
 const Battle = require('./Battle');
@@ -8,9 +14,10 @@ const Spell = require('../../../../game/utils/Spell');
 const Item = require('../../../../game/utils/Item');
 const Inventory = require('../../../../game/utils/Inventory');
 
-class Events {
+class Events extends BaseHelper {
 
   constructor(params) {
+    super();
     const { Helper, Map, Database } = params;
     this.Helper = Helper;
     this.MapManager = Map;
@@ -55,7 +62,7 @@ class Events {
       updatedPlayer.previousMap = updatedPlayer.map.name;
       updatedPlayer.map = mapObj.map;
       updatedPlayer.travelled++;
-      eventMsg.push(`${this.Helper.generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`);
+      eventMsg.push(`${this.generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`);
       eventLog.push(`Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`);
       await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.move);
 
@@ -73,7 +80,7 @@ class Events {
   async attackEvent(loadedPlayer, onlinePlayers, globalMultiplier) {
     let updatedPlayer = Object.assign({}, loadedPlayer);
     try {
-      const luckDice = await this.Helper.randomBetween(0, 100);
+      const luckDice = await this.randomBetween(0, 100);
       if (this.MapManager.getTowns().includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
         const eventMsg = [];
         const eventLog = [];
@@ -133,7 +140,7 @@ class Events {
     const updatedPlayer = Object.assign({}, loadedPlayer);
     const { isBlizzardActive } = events;
     try {
-      const luckDice = await this.Helper.randomBetween(0, 100);
+      const luckDice = await this.randomBetween(0, 100);
       if (luckDice <= 5 + (updatedPlayer.stats.luk / 4)) {
         return this.LuckEvents.godsEvent(updatedPlayer);
       }
