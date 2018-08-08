@@ -94,7 +94,8 @@ class Game {
           eventMsg.push(`\`\`\`css ${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} has decided to become a ${playerObj.class}!\`\`\``);
           eventLog.push(`You have become a ${playerObj.class}`);
         }
-        this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
+        // TODO: add this once logging events have been rewritten
+        // this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
 
         return {
           updatedPlayer: playerObj,
