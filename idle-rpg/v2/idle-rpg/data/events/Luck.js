@@ -160,12 +160,12 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
       eventMsg.push(generatedItemMsg.eventMsg);
       eventLog.push(generatedItemMsg.eventLog);
       if (item.position !== enumHelper.inventory.position) {
-        const oldItemRating = await this.Helper.calculateItemRating(updatedPlayer, updatedPlayer.equipment[item.position]);
-        const newItemRating = await this.Helper.calculateItemRating(updatedPlayer, item);
+        const oldItemRating = await this.calculateItemRating(updatedPlayer, updatedPlayer.equipment[item.position]);
+        const newItemRating = await this.calculateItemRating(updatedPlayer, item);
         if (oldItemRating > newItemRating) {
           updatedPlayer = await this.InventoryManager.addEquipmentIntoInventory(updatedPlayer, item);
         } else {
-          updatedPlayer = await this.Helper.setPlayerEquipment(updatedPlayer, item.position, item);
+          updatedPlayer = await this.setPlayerEquipment(updatedPlayer, item.position, item);
         }
       } else {
         updatedPlayer = await this.InventoryManager.addItemIntoInventory(updatedPlayer, item);
@@ -290,12 +290,12 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     try {
       const snowFlakeDice = await this.randomBetween(0, 100);
       if (snowFlakeDice <= 5) {
-        const oldItemRating = await this.Helper.calculateItemRating(updatedPlayer, updatedPlayer.equipment.relic);
-        const newItemRating = await this.Helper.calculateItemRating(updatedPlayer, snowFlake);
+        const oldItemRating = await this.calculateItemRating(updatedPlayer, updatedPlayer.equipment.relic);
+        const newItemRating = await this.calculateItemRating(updatedPlayer, snowFlake);
         if (oldItemRating < newItemRating) {
           eventMsg.push(`<@!${updatedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`);
           eventLog.push('You caught a strange looking snowflake while travelling inside the blizzard.');
-          updatedPlayer = await this.Helper.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
+          updatedPlayer = await this.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
           await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
           return {

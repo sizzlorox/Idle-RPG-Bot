@@ -1,14 +1,17 @@
-const enumHelper = require('../../../utils/enumHelper');
-const { errorLog } = require('../../../utils/logger');
-
 // BASE
+const { aggregation } = require('../../Base/Util');
+const BaseGame = require('../../Base/Game');
 const BaseHelper = require('../../Base/Helper');
 
 // DATA
 const titles = require('./titles');
 const globalSpells = require('../../../game/data/globalSpells');
+const enumHelper = require('../../../utils/enumHelper');
 
-class Commands extends BaseHelper {
+// UTILS
+const { errorLog } = require('../../../utils/logger');
+
+class Commands extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
     super();
@@ -19,14 +22,36 @@ class Commands extends BaseHelper {
     this.MapManager = MapManager;
   }
 
-  playerStats(params) {
+  async playerStats(params) {
     const { author } = params;
-    return this.Database.loadPlayer(author.id, enumHelper.statsSelectFields);
+    const loadedPlayer = await this.Database.loadPlayer(author.id, enumHelper.statsSelectFields);
+    if (!loadedPlayer) {
+      return loadedPlayer.discordId !== author.id
+        ? author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
+        : author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+    }
+    const result = this.generateStatsString(loadedPlayer);
+
+    return loadedPlayer.discordId === author.id
+      ? author.send(result)
+      : author.send(result.replace('Here are your stats!', `Here is ${loadedPlayer.name}s stats!`)
+        .replace('Heres your equipment!', `Here is ${loadedPlayer.name}s equipment!`));
   }
 
-  playerEquipment(params) {
+  async playerEquipment(params) {
     const { author } = params;
-    return this.Database.loadPlayer(author.id, enumHelper.equipSelectFields);
+    const loadedPlayer = await this.Database.loadPlayer(author.id, enumHelper.equipSelectFields);
+    if (!loadedPlayer) {
+      return loadedPlayer.discordId !== author.id
+        ? author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
+        : author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+    }
+    const result = this.generateEquipmentsString(loadedPlayer);
+
+    return loadedPlayer.discordId === author.id
+      ? author.send(result)
+      : author.send(result.replace('Heres your equipment!', `Here is ${loadedPlayer.name}s equipment!`)
+        .replace('Heres your equipment!', `Here is ${loadedPlayer.name}s equipment!`));
   }
 
   playerInventory(params) {

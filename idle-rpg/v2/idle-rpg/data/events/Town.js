@@ -71,8 +71,8 @@ class Town extends BaseHelper {
 
       if (item.position !== enumHelper.inventory.position) {
         // updatedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
-        const oldItemRating = await this.Helper.calculateItemRating(updatedPlayer, updatedPlayer.equipment[item.position]);
-        const newItemRating = await this.Helper.calculateItemRating(updatedPlayer, item);
+        const oldItemRating = await this.calculateItemRating(updatedPlayer, updatedPlayer.equipment[item.position]);
+        const newItemRating = await this.calculateItemRating(updatedPlayer, item);
         if (oldItemRating > newItemRating) {
           return {
             updatedPlayer
@@ -80,7 +80,7 @@ class Town extends BaseHelper {
         }
 
         updatedPlayer.gold.current -= itemCost;
-        updatedPlayer = await this.Helper.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types[item.position].position, item);
+        updatedPlayer = await this.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types[item.position].position, item);
       } else if (updatedPlayer.inventory.items.length >= enumHelper.inventory.maxItemAmount) {
         return {
           updatedPlayer,
