@@ -225,7 +225,8 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
         eventLog.push(`Died to ${defender.name} in ${attacker.map.name}.`);
         const otherPlayerLog = `Killed ${attacker.name} in ${attacker.map.name}. [${expGain} exp]`;
         eventLog.push('```'.concat(battleResultLog).concat('```'));
-        otherPlayerPmMsg.push(otherPlayerLog.concat('```').concat(battleResultLog).concat('```'));
+        otherPlayerPmMsg.push(otherPlayerLog);
+        otherPlayerPmMsg.push('```'.concat(battleResultLog).concat('```'));
 
         attacker.battles.lost++;
         defender.battles.won++;
@@ -245,7 +246,8 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
         eventLog.push(`Killed ${defender.name} in ${attacker.map.name}. [${expGain} exp]`);
         const otherPlayerLog = `Died to ${attacker.name} in ${attacker.map.name}.`;
         eventLog.push('```'.concat(battleResultLog).concat('```'));
-        otherPlayerPmMsg.push(otherPlayerLog.concat('```').concat(battleResultLog).concat('```'));
+        otherPlayerPmMsg.push(otherPlayerLog);
+        otherPlayerPmMsg.push('```'.concat(battleResultLog).concat('```'));
 
         attacker.battles.won++;
         defender.battles.lost++;
@@ -268,7 +270,8 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
         eventLog.push(`Attacked ${defender.name} in ${attacker.map.name} with ${attacker.equipment.weapon.name} and dealt ${attackerDamage} damage! [${expGainAttacker} exp]`);
         const otherPlayerLog = `Attacked by ${attacker.name} in ${attacker.map.name} with ${attacker.equipment.weapon.name} and received ${attackerDamage} damage! [${expGainDefender} exp]`;
         eventLog.push('```'.concat(battleResultLog).concat('```'));
-        otherPlayerPmMsg.push(otherPlayerLog.concat('```').concat(battleResultLog).concat('```'));
+        otherPlayerPmMsg.push(otherPlayerLog);
+        otherPlayerPmMsg.push('```'.concat(battleResultLog).concat('```'));
 
         attacker.experience.current += expGainAttacker;
         attacker.experience.total += expGainAttacker;
