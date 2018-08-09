@@ -111,11 +111,13 @@ const commands = [
 
         await Game.fetchCommand({
           command: 'playerStats',
-          author: playerObj[0]
+          author: messageObj.author,
+          playerToCheck: playerObj[0]
         });
         return Game.fetchCommand({
           command: 'playerEquipment',
-          author: playerObj[0]
+          author: messageObj.author,
+          playerToCheck: playerObj[0]
         });
       }
 
@@ -209,7 +211,8 @@ const commands = [
 
         return Game.fetchCommand({
           command: 'playerStats',
-          author: playerObj.array()[0]
+          author: messageObj.author,
+          playerToCheck: playerObj[0]
         });
       }
 
@@ -237,7 +240,8 @@ const commands = [
 
         return Game.fetchCommand({
           command: 'playerEquipment',
-          author: playerObj.array()[0]
+          author: messageObj.author,
+          playerToCheck: playerObj[0]
         });
       }
 

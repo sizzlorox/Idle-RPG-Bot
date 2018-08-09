@@ -1,4 +1,6 @@
 // BASE
+const { aggregation } = require('../../../Base/Util');
+const BaseGame = require('../../../Base/Game');
 const BaseHelper = require('../../../Base/Helper');
 
 // UTILS
@@ -7,7 +9,7 @@ const { errorLog } = require('../../../../utils/logger');
 // DATA
 const enumHelper = require('../../../../utils/enumHelper');
 
-class Town extends BaseHelper {
+class Town extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
     super();

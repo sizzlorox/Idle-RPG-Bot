@@ -155,8 +155,8 @@ class Game {
    * @param {Array} eventLog
    * @returns {Object} playerObj
    */
-  checkExperience(Database, playerObj, eventMsg, eventLog) {
-    const updatedPlayer = Object.assign({}, playerObj);
+  async checkExperience(Database, playerObj, eventMsg, eventLog) {
+    const updatedPlayer = await Object.assign({}, playerObj);
 
     try {
       if (updatedPlayer.experience.current >= updatedPlayer.level * 15) {
