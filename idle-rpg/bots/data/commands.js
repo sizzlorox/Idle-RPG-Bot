@@ -94,12 +94,12 @@ const commands = [
     command: ['!character', '!c', '!char'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (params) => {
-      const { Game, Helper, Bot, messageObj } = params;
+    function: async (params) => {
+      const { Game, Bot, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot).array();
+        const playerObj = await Bot.users.filter(player => player.id === checkPlayer && !player.bot).array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           messageObj.author.send(`${checkPlayer} was not found!`);
           return;
@@ -109,36 +109,24 @@ const commands = [
           });
         }
 
-        return Game.fetchCommand({
+        await Game.fetchCommand({
           command: 'playerStats',
           author: playerObj[0]
-        })
-          .then((playerStats) => {
-            if (!playerStats) {
-              return messageObj.author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-            }
-
-            const stats = Helper.generateStatsString(playerStats);
-            const equip = Helper.generateEquipmentsString(playerStats);
-            messageObj.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`))
-              .then(() => messageObj.author.send(equip.replace('Heres your equipment!', `Here is ${playerStats.name}s equipment!`)));
-          });
+        });
+        return Game.fetchCommand({
+          command: 'playerEquipment',
+          author: playerObj[0]
+        });
       }
 
-      return Game.fetchCommand({
+      await Game.fetchCommand({
         command: 'playerStats',
         author: messageObj.author
-      })
-        .then((playerStats) => {
-          if (!playerStats) {
-            return messageObj.author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
-          }
-
-          const stats = Helper.generateStatsString(playerStats);
-          const equip = Helper.generateEquipmentsString(playerStats);
-          messageObj.author.send(stats)
-            .then(() => messageObj.author.send(equip));
-        });
+      });
+      return Game.fetchCommand({
+        command: 'playerEquipment',
+        author: messageObj.author
+      });
     }
   },
 
@@ -209,7 +197,7 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, Helper, Bot, messageObj } = params;
+      const { Game, Bot, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -222,29 +210,13 @@ const commands = [
         return Game.fetchCommand({
           command: 'playerStats',
           author: playerObj.array()[0]
-        })
-          .then((playerStats) => {
-            if (!playerStats) {
-              return messageObj.author.send('This players stats were not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-            }
-
-            const stats = Helper.generateStatsString(playerStats);
-            messageObj.author.send(stats.replace('Here are your stats!', `Here is ${playerStats.name}s stats!`));
-          });
+        });
       }
 
-      Game.fetchCommand({
+      return Game.fetchCommand({
         command: 'playerStats',
         author: messageObj.author
-      })
-        .then((playerStats) => {
-          if (!playerStats) {
-            return messageObj.author.send('Your stats were not found! You probably were not born yet. Please be patient until destiny has chosen you.');
-          }
-
-          const stats = Helper.generateStatsString(playerStats);
-          messageObj.author.send(stats);
-        });
+      });
     }
   },
 
@@ -253,7 +225,7 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, Helper, Bot, messageObj } = params;
+      const { Game, Bot, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -266,29 +238,13 @@ const commands = [
         return Game.fetchCommand({
           command: 'playerEquipment',
           author: playerObj.array()[0]
-        })
-          .then((playerEquipment) => {
-            if (!playerEquipment) {
-              return messageObj.author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-            }
-
-            const equip = Helper.generateEquipmentsString(playerEquipment)
-            messageObj.author.send(equip.replace('Heres your equipment!', `Here is ${playerEquipment.name}s equipment!`));
-          });
+        });
       }
 
-      Game.fetchCommand({
+      return Game.fetchCommand({
         command: 'playerEquipment',
         author: messageObj.author
-      })
-        .then((playerEquipment) => {
-          if (!playerEquipment) {
-            return messageObj.author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
-          }
-
-          const equip = Helper.generateEquipmentsString(playerEquipment);
-          messageObj.author.send(equip);
-        });
+      });
     }
   },
 

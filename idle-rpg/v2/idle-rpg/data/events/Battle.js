@@ -55,7 +55,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           };
 
         case enumHelper.battle.outcomes.lost:
-          const checkLostResults = await this.Helper.checkHealth(this.Database, this.MapManager, updatedPlayer, battleResults.updatedMob, eventMsg, eventLog);
+          const checkLostResults = await this.checkHealth(this.Database, this.MapManager, updatedPlayer, battleResults.updatedMob, eventMsg, eventLog);
           return {
             type: 'actions',
             updatedPlayer: checkLostResults.updatedPlayer,
@@ -290,7 +290,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           eventMsg.push(...winResults.msg);
           eventLog.push(...winResults.pm);
           otherPlayerPmMsg.push(...winResults.otherPlayerPmMsg);
-          const victimCheckHealth = await this.Helper.checkHealth(this.Database, this.MapManager, winResults.victimPlayer, winResults.stealingPlayer, eventMsg, otherPlayerPmMsg, eventLog);
+          const victimCheckHealth = await this.checkHealth(this.Database, this.MapManager, winResults.victimPlayer, winResults.stealingPlayer, eventMsg, otherPlayerPmMsg, eventLog);
           await this.Database.savePlayer(victimCheckHealth.updatedPlayer);
           const winnerCheckExp = await this.checkExperience(this.Database, winResults.stealingPlayer, eventMsg, eventLog);
 
@@ -324,7 +324,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           otherPlayerPmMsg.push(...loseResults.pm);
           const lostUpdatedDefender = await this.checkExperience(this.Database, loseResults.stealingPlayer, eventMsg, otherPlayerPmMsg);
           await this.Database.savePlayer(lostUpdatedDefender.updatedPlayer);
-          const loserCheckHealth = await this.Helper.checkHealth(this.Database, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer, eventMsg, eventLog, otherPlayerPmMsg);
+          const loserCheckHealth = await this.checkHealth(this.Database, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer, eventMsg, eventLog, otherPlayerPmMsg);
 
           return {
             type: 'actions',
@@ -373,10 +373,10 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           victimPlayer.stolen++;
           stealingPlayer.stole++;
           if (victimPlayer.equipment[itemKeys[luckItem]].name !== enumHelper.equipment.empty[itemKeys[luckItem]].name) {
-            const oldItemRating = await this.Helper.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
-            const newItemRating = await this.Helper.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
+            const oldItemRating = await this.calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
+            const newItemRating = await this.calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
             if (oldItemRating < newItemRating) {
-              stealingPlayer = await this.Helper.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, stolenEquip);
+              stealingPlayer = await this.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, stolenEquip);
               if (victimPlayer.equipment[itemKeys[luckItem]].previousOwners.length > 0) {
                 stealingPlayer.equipment[itemKeys[luckItem]].previousOwners = victimPlayer.equipment[itemKeys[luckItem]].previousOwners;
                 stealingPlayer.equipment[itemKeys[luckItem]].previousOwners.push(victimPlayer.name);
@@ -389,9 +389,9 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
             if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find(equip => equip.position === enumHelper.equipment.types[itemKeys[luckItem]].position) !== undefined) {
               const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types[itemKeys[luckItem]].position)
                 .sort((item1, item2) => item2.power - item1.power)[0];
-              victimPlayer = await this.Helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, equipFromInventory);
+              victimPlayer = await this.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, equipFromInventory);
             } else {
-              victimPlayer = await this.Helper.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, enumHelper.equipment.empty[itemKeys[luckItem]]);
+              victimPlayer = await this.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, enumHelper.equipment.empty[itemKeys[luckItem]]);
             }
           }
         }
@@ -435,12 +435,12 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
       if (dropitemChance <= 15 + (updatedPlayer.stats.luk / 4)) {
         const item = await this.ItemManager.generateItem(updatedPlayer, mob.find(obj => obj.health <= 0));
         if (item.position !== enumHelper.inventory.position) {
-          const oldItemRating = await this.Helper.calculateItemRating(updatedPlayer, updatedPlayer.equipment[item.position]);
-          const newItemRating = await this.Helper.calculateItemRating(updatedPlayer, item);
+          const oldItemRating = await this.calculateItemRating(updatedPlayer, updatedPlayer.equipment[item.position]);
+          const newItemRating = await this.calculateItemRating(updatedPlayer, item);
           if (oldItemRating > newItemRating) {
             updatedPlayer = await this.InventoryManager.addEquipmentIntoInventory(updatedPlayer, item);
           } else {
-            updatedPlayer = await this.Helper.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types[item.position].position, item);
+            updatedPlayer = await this.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types[item.position].position, item);
           }
         } else {
           updatedPlayer = await this.InventoryManager.addItemIntoInventory(updatedPlayer, item);

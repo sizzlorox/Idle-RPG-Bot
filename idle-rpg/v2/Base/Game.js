@@ -33,6 +33,121 @@ class Game {
   }
 
   /**
+   * Checks players health, and if killer is mob or another player
+   * @param {Object} Database
+   * @param {Object} MapClass
+   * @param {Object} playerObj
+   * @param {Object} attackerObj
+   * @param {Array} eventMsg
+   * @param {Array} eventLog
+   * @param {Array} otherPlayerPmMsg
+   * @returns {Object} playerObj
+   */
+  checkHealth(Database, MapClass, playerObj, attackerObj, eventMsg, eventLog, otherPlayerPmMsg) {
+    const updatedPlayer = Object.assign({}, playerObj);
+    const updatedAttacker = Object.assign({}, attackerObj);
+
+    try {
+      if (updatedPlayer.health <= 0) {
+        const expLoss = Math.ceil(updatedPlayer.experience.current / 8);
+        const goldLoss = Math.ceil(updatedPlayer.gold.current / 12);
+        eventMsg.push(this.setImportantMessage(`${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}! Game over man... Game over.`));
+        eventLog.push(`You died${expLoss === 0 ? '' : ` and lost ${expLoss} exp`}${goldLoss === 0 ? '' : ` and lost ${goldLoss} gold`}. Game over man... Game over.`);
+        let bountyEventLog;
+        updatedPlayer.health = 100 + (updatedPlayer.level * 5);
+        updatedPlayer.mana = 50 + (updatedPlayer.level * 5);
+        updatedPlayer.map = MapClass.getRandomTown();
+        updatedPlayer.experience.current -= expLoss;
+        updatedPlayer.experience.lost += expLoss;
+        updatedPlayer.gold.current -= goldLoss;
+        updatedPlayer.gold.lost += goldLoss;
+        updatedPlayer.inventory = {
+          equipment: [],
+          items: []
+        };
+
+        const breakChance = this.randomBetween(0, 100);
+        if (breakChance < 15) {
+          const randomEquip = this.randomBetween(0, 2);
+          switch (randomEquip) {
+            case 0:
+              if (updatedPlayer.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
+                eventMsg.push(this.setImportantMessage(`${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.helmet.name} just broke!`));
+                eventLog.push(`Your ${updatedPlayer.equipment.helmet.name} just broke!`);
+                this.setPlayerEquipment(
+                  updatedPlayer,
+                  enumHelper.equipment.types.helmet.position,
+                  enumHelper.equipment.empty.helmet
+                );
+              }
+              break;
+            case 1:
+              if (updatedPlayer.equipment.armor.name !== enumHelper.equipment.empty.armor.name) {
+                eventMsg.push(this.setImportantMessage(`${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.armor.name} just broke!`));
+                eventLog.push(`Your ${updatedPlayer.equipment.armor.name} just broke!`);
+                this.setPlayerEquipment(
+                  updatedPlayer,
+                  enumHelper.equipment.types.armor.position,
+                  enumHelper.equipment.empty.armor
+                );
+              }
+              break;
+            case 2:
+              if (updatedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
+                eventMsg.push(this.setImportantMessage(`${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s ${updatedPlayer.equipment.weapon.name} just broke!`));
+                eventLog.push(`Your ${updatedPlayer.equipment.weapon.name} just broke!`);
+                this.setPlayerEquipment(
+                  updatedPlayer,
+                  enumHelper.equipment.types.weapon.position,
+                  enumHelper.equipment.empty.weapon
+                );
+              }
+              break;
+          }
+        }
+
+        if (updatedPlayer.deaths.firstDeath === 'never') {
+          updatedPlayer.deaths.firstDeath = new Date().getTime();
+        }
+
+        if (!updatedAttacker.discordId) {
+          updatedPlayer.deaths.mob++;
+        } else {
+          if (updatedPlayer.currentBounty > 0) {
+            const bountyGain = Math.ceil(updatedPlayer.currentBounty / 1.25);
+            bountyEventLog = `Claimed ${bountyGain} gold for ${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}'s head`;
+            updatedAttacker.gold.current += Number(bountyGain);
+            updatedAttacker.gold.total += Number(bountyGain);
+            updatedPlayer.currentBounty = 0;
+            eventMsg.push(this.setImportantMessage(`${updatedAttacker.name}${updatedAttacker.titles.current !== 'None' ? ` the ${updatedAttacker.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing ${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''}!`));
+            eventLog.push(`You just claimed ${bountyGain} gold as a reward for killing ${updatedPlayer.name}!`)
+            otherPlayerPmMsg.push(`${updatedAttacker.name}${updatedAttacker.titles.current !== 'None' ? ` the ${updatedAttacker.titles.current}` : ''} just claimed ${bountyGain} gold as a reward for killing you!`);
+            // this.logEvent(updatedAttacker, Database, bountyEventLog, enumHelper.logTypes.action);
+          }
+
+          updatedPlayer.deaths.player++;
+          updatedAttacker.kills.player++;
+          Database.savePlayer(updatedAttacker);
+        }
+        // TODO: add when log has been rewritten to V2
+        // this.logEvent(updatedPlayer, Database, eventLog, enumHelper.logTypes.action);
+
+        return {
+          updatedPlayer,
+          msg: eventMsg,
+          pm: eventLog,
+          updatedAttacker,
+          otherPlayerPmMsg
+        };
+      }
+
+      return { updatedPlayer };
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
+  /**
    * Checks current playerObj experience and returns an updated playerObj
    * @param {Object} Database
    * @param {Object} playerObj
@@ -41,38 +156,40 @@ class Game {
    * @returns {Object} playerObj
    */
   checkExperience(Database, playerObj, eventMsg, eventLog) {
+    const updatedPlayer = Object.assign({}, playerObj);
+
     try {
-      if (playerObj.experience.current >= playerObj.level * 15) {
-        playerObj.level++;
-        playerObj.experience.current = 0;
-        playerObj.health = 100 + (playerObj.level * 5);
-        playerObj.mana = 50 + (playerObj.level * 5);
-        eventMsg.push(`\`\`\`css\n${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} is now level ${playerObj.level}!\`\`\``);
-        eventLog.push(`Leveled up to level ${playerObj.level}`);
+      if (updatedPlayer.experience.current >= updatedPlayer.level * 15) {
+        updatedPlayer.level++;
+        updatedPlayer.experience.current = 0;
+        updatedPlayer.health = 100 + (updatedPlayer.level * 5);
+        updatedPlayer.mana = 50 + (updatedPlayer.level * 5);
+        eventMsg.push(`\`\`\`css\n${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} is now level ${updatedPlayer.level}!\`\`\``);
+        eventLog.push(`Leveled up to level ${updatedPlayer.level}`);
         for (let i = 0; i < 4; i++) {
           const randomStat = this.randomBetween(0, 3);
           switch (randomStat) {
             case 0:
-              playerObj.stats.str++;
+              updatedPlayer.stats.str++;
               break;
             case 1:
-              playerObj.stats.dex++;
+              updatedPlayer.stats.dex++;
               break;
             case 2:
-              playerObj.stats.end++;
+              updatedPlayer.stats.end++;
               break;
             case 3:
-              playerObj.stats.int++;
+              updatedPlayer.stats.int++;
               break;
           }
         }
-        const oldClass = playerObj.class;
+        const oldClass = updatedPlayer.class;
 
-        const playerStats = Object.keys(playerObj.stats).map((key) => {
+        const playerStats = Object.keys(updatedPlayer.stats).map((key) => {
           if (['str', 'dex', 'int'].includes(key)) {
             return {
               key,
-              value: playerObj.stats[key]
+              value: updatedPlayer.stats[key]
             };
           }
         }).filter(obj => obj !== undefined)
@@ -80,34 +197,62 @@ class Game {
 
         switch (playerStats[0].key) {
           case 'str':
-            playerObj.class = 'Knight';
+            updatedPlayer.class = 'Knight';
             break;
           case 'dex':
-            playerObj.class = 'Thief';
+            updatedPlayer.class = 'Thief';
             break;
           case 'int':
-            playerObj.class = 'Mage';
+            updatedPlayer.class = 'Mage';
             break;
         }
 
-        if (playerObj.class !== oldClass) {
-          eventMsg.push(`\`\`\`css\n${playerObj.name}${playerObj.titles.current !== 'None' ? ` the ${playerObj.titles.current}` : ''} has decided to become a ${playerObj.class}!\`\`\``);
-          eventLog.push(`You have become a ${playerObj.class}`);
+        if (updatedPlayer.class !== oldClass) {
+          eventMsg.push(`\`\`\`css\n${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} has decided to become a ${updatedPlayer.class}!\`\`\``);
+          eventLog.push(`You have become a ${updatedPlayer.class}`);
         }
         // TODO: add this once logging events have been rewritten
-        // this.logEvent(playerObj, Database, eventLog, enumHelper.logTypes.action);
+        // this.logEvent(updatedPlayer, Database, eventLog, enumHelper.logTypes.action);
 
         return {
-          updatedPlayer: playerObj,
+          updatedPlayer,
           msg: eventMsg,
           pm: eventLog
         };
       }
 
-      return { updatedPlayer: playerObj };
+      return { updatedPlayer };
     } catch (err) {
       errorLog.error(err);
     }
+  }
+
+  /**
+   * Updates player equipment with item
+   * @param {Object} playerObj
+   * @param {Object} equipment
+   * @param {Object} item
+   * @returns {Object} updatedPlayer 
+   */
+  setPlayerEquipment(playerObj, equipment, item) {
+    const updatedPlayer = Object.assign({}, playerObj);
+
+    updatedPlayer.equipment[equipment].name = item.name;
+    if (equipment !== enumHelper.equipment.types.relic.position) {
+      updatedPlayer.equipment[equipment].power = item.power;
+      if (equipment === enumHelper.equipment.types.weapon.position) {
+        updatedPlayer.equipment[equipment].attackType = item.attackType;
+      }
+    } else if (equipment === enumHelper.equipment.types.relic.position) {
+      updatedPlayer.equipment[equipment].str = item.stats.str;
+      updatedPlayer.equipment[equipment].dex = item.stats.dex;
+      updatedPlayer.equipment[equipment].end = item.stats.end;
+      updatedPlayer.equipment[equipment].int = item.stats.int;
+      updatedPlayer.equipment[equipment].luk = item.stats.luk;
+    }
+    updatedPlayer.equipment[equipment].previousOwners = item.previousOwners;
+
+    return updatedPlayer;
   }
 
   // TODO: Maybe clean this up later?

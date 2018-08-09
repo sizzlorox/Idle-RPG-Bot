@@ -36,6 +36,120 @@ class Helper {
   }
 
   /**
+   * Generates stats String from player object
+   * @param {Object} player
+   * @returns String
+   */
+  generateStatsString(player) {
+    return `\`\`\`Here are your stats!
+    Title: ${player.titles.current}
+    Health: ${player.health} / ${enumHelper.maxHealth(player.level)}
+    Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
+    Level: ${player.level}
+    Personal Multiplier: ${player.personalMultiplier}x
+    Experience: 
+      Current: ${player.experience.current}
+      Lost: ${player.experience.lost}
+      Total: ${player.experience.total}
+      TNL: ${(player.level * 15) - player.experience.current} / ${(player.level * 15)}
+    Class: ${player.class}
+    Gender: ${player.gender}
+    Gold:
+      Current: ${player.gold.current}
+      Lost: ${player.gold.lost}
+      Stolen from you: ${player.gold.stolen}
+      Stole from others: ${player.gold.stole}
+      Lottery: ${player.gold.dailyLottery}
+      Gambles: 
+        Count: ${player.gambles}
+        Won: ${player.gold.gambles.won}
+        Lost: ${player.gold.gambles.lost}
+      Total: ${player.gold.total}
+    Map: ${player.map.name}
+    Bounty: ${player.currentBounty}
+
+    Stats (Sum of stats with equipment):
+      Strength: ${player.stats.str} (${this.sumPlayerTotalStrength(player)})
+      Dexterity: ${player.stats.dex} (${this.sumPlayerTotalDexterity(player)})
+      Endurance: ${player.stats.end} (${this.sumPlayerTotalEndurance(player)})
+      Intelligence: ${player.stats.int} (${this.sumPlayerTotalIntelligence(player)})
+      Luck: ${player.stats.luk} (${this.sumPlayerTotalLuck(player)})
+
+    Quest:
+      Monster: ${player.quest.questMob.name}
+      Count: ${player.quest.questMob.count}
+      Kills Left: ${player.quest.questMob.count - player.quest.questMob.killCount}
+      Completed: ${player.quest.completed}
+      Last Update: ${this.getTimePassed(player.quest.updated_at.getTime())}
+
+    Born: ${this.getTimePassed(player.createdAt)}
+    Travelled: ${player.travelled}
+    Events: ${player.events}
+    Items Stolen: ${player.stole}
+    Items Lost: ${player.stolen}
+    Spells Cast: ${player.spellCast}
+    Kills:
+      Monsters: ${player.kills.mob}
+      Players: ${player.kills.player}
+    Fled:
+      Monsters: ${player.fled.mob}
+      Players: ${player.fled.player}
+      You: ${player.fled.you}
+    Battles:
+      Won: ${player.battles.won}
+      Lost: ${player.battles.lost}
+    Deaths:
+      By Monsters: ${player.deaths.mob}
+      By Players: ${player.deaths.player}\`\`\``;
+  }
+
+  /**
+   * Generates equipment string
+   * @param {Object} player
+   * @returns String
+   */
+  generateEquipmentsString(player) {
+    const weaponRating = this.calculateItemRating(player, player.equipment.weapon);
+    return `\`\`\`Here is your inventory!
+        Helmet: ${player.equipment.helmet.name}
+          Defense: ${player.equipment.helmet.power}
+          ${this.generatePreviousOwnerString(player.equipment.helmet)}
+        Armor: ${player.equipment.armor.name}
+          Defense: ${player.equipment.armor.power}
+          ${this.generatePreviousOwnerString(player.equipment.armor)}
+        Weapon: ${player.equipment.weapon.name}
+          BaseAttackPower: ${player.equipment.weapon.power}
+          AttackPower: ${Number(weaponRating)}
+          AttackType: ${player.equipment.weapon.attackType}
+          ${this.generatePreviousOwnerString(player.equipment.weapon)}
+        Relic: ${player.equipment.relic.name}
+          Stats:
+            Strength: ${player.equipment.relic.str}
+            Dexterity: ${player.equipment.relic.dex}
+            Endurance: ${player.equipment.relic.end}
+            Intelligence: ${player.equipment.relic.int}
+            Luck: ${player.equipment.relic.luk}
+          ${this.generatePreviousOwnerString(player.equipment.relic)}
+            \`\`\``;
+  }
+
+  /**
+   * Generates List of owners of equipment
+   * @param {Object} equipment
+   * @returns String
+   */
+  generatePreviousOwnerString(equipment) {
+    if (equipment.previousOwners && equipment.previousOwners.length > 0) {
+      let result = 'Previous Owners:\n            ';
+      result = result.concat(equipment.previousOwners.join('\n            '));
+      result = result.concat('\n');
+      return result;
+    }
+
+    return '';
+  }
+
+  /**
    * Returns a player name as a String formatted with discords <@!Mention> if player has isMention activated
    * @param {PlayerObj} player
    * @param {Boolean} isAction
@@ -193,9 +307,118 @@ ${mobListResult.join('\n')}\`\`\``;
     };
   }
 
+  /**
+   * Calculates item rating taking players stats into account
+   * @param {Object} player
+   * @param {Object} item
+   * @returns Number
+   */
+  calculateItemRating(player, item) {
+    if (player && item.position !== enumHelper.equipment.types.relic.position) {
+      if (item.position !== enumHelper.equipment.types.weapon.position) {
+        return item.power;
+      }
+
+      switch (item.attackType) {
+        case 'melee':
+          return Math.ceil((this.sumPlayerTotalStrength(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)));
+
+        case 'range':
+          return Math.ceil((this.sumPlayerTotalDexterity(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)));
+
+        case 'magic':
+          return Math.ceil((this.sumPlayerTotalIntelligence(player) + item.power)
+            + (this.sumPlayerTotalDexterity(player)));
+      }
+    }
+
+    return Math.ceil(item.str + item.dex + item.end + item.int + item.luk);
+  }
+
+  /**
+   * Returns sum of players strength
+   * @param {Object} player
+   * @returns Number
+   */
+  sumPlayerTotalStrength(player) {
+    return player.stats.str
+      + player.equipment.relic.str;
+  }
+
+  /**
+  * Returns sum of players dexterity
+  * @param {Object} player
+  * @returns Number
+  */
+  sumPlayerTotalDexterity(player) {
+    return player.stats.dex
+      + player.equipment.relic.dex;
+  }
+
+  /**
+  * Returns sum of players endurance
+  * @param {Object} player
+  * @returns Number
+  */
+  sumPlayerTotalEndurance(player) {
+    return player.stats.end
+      + player.equipment.relic.end;
+  }
+
+  /**
+  * Returns sum of players intelligence
+  * @param {Object} player
+  * @returns Number
+  */
+  sumPlayerTotalIntelligence(player) {
+    return player.stats.int
+      + player.equipment.relic.int;
+  }
+
+  /**
+  * Returns sum of players luck
+  * @param {Object} player
+  * @returns Number
+  */
+  sumPlayerTotalLuck(player) {
+    return player.stats.luk
+      + player.equipment.relic.luk;
+  }
+
   /*
     GENERAL HELPERS
   */
+
+  /**
+   * Converts seconds to time format
+   * Utilizes https://stackoverflow.com/questions/6312993/javascript-seconds-to-time-string-with-format-hhmmss#6313008
+   * @param {Date} duration
+   * @returns String
+   */
+  secondsToTimeFormat(duration) {
+    const secNum = parseInt(duration, 10); // don't forget the second param
+    let days = Math.floor(secNum / 86400);
+    let hours = Math.floor(secNum / 3600) % 24;
+    let minutes = Math.floor((secNum - (hours * 3600)) / 60) % 60;
+    let seconds = secNum % 60;
+
+    days = days < 10 ? `0${days}` : days;
+    hours = hours < 10 ? `0${hours}` : hours;
+    minutes = minutes < 10 ? `0${minutes}` : minutes;
+    seconds = seconds < 10 ? `0${seconds}` : seconds;
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  /**
+   * Returns formatted string of time passed since timeStamp
+   * @param {Date} timeStamp
+   * @returns String
+   */
+  getTimePassed(timeStamp) {
+    return this.secondsToTimeFormat((new Date().getTime() - timeStamp) / 1000);
+  }
 
   /**
    * Returns a codeblock for discord
