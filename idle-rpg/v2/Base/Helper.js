@@ -110,7 +110,7 @@ class Helper {
    */
   generateEquipmentsString(player) {
     const weaponRating = this.calculateItemRating(player, player.equipment.weapon);
-    return `\`\`\`Here is your inventory!
+    return `\`\`\`Here is your equipment!
         Helmet: ${player.equipment.helmet.name}
           Defense: ${player.equipment.helmet.power}
           ${this.generatePreviousOwnerString(player.equipment.helmet)}

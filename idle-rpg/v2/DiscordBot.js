@@ -16,7 +16,7 @@ const enumHelper = require('../utils/enumHelper');
 const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../settings');
 
 // UTILS
-const { errorLog, welcomeLog } = require('../utils/logger');
+const { errorLog, welcomeLog, infoLog } = require('../utils/logger');
 
 /*
 
@@ -125,6 +125,8 @@ class DiscordBot extends BaseHelper {
       welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.find(channel => channel.name === 'faq' && channel.type === 'text').id}> or PM me !help.`);
       welcomeLog.info(member);
     });
+
+    this.bot.on('rateLimit', infoLog.info);
   }
 
   loadHeartBeat() {
