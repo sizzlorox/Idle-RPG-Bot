@@ -82,7 +82,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
           updatedPlayer.experience.total += luckExpAthena;
           eventMsg.push(`Athena shared her wisdom with ${this.generatePlayerName(updatedPlayer, true)} making ${this.generateGenderString(updatedPlayer, 'him')} gain ${luckExpAthena} experience!`);
           eventLog.push(`Athena shared her wisdom with you making you gain ${luckExpAthena} experience`);
-          const checkedExp = await this.checkExperience(this.Database, updatedPlayer, eventMsg, eventLog);
+          const checkedExp = await this.checkExperience(updatedPlayer, eventMsg, eventLog);
           return {
             type: 'actions',
             updatedPlayer: checkedExp.updatedPlayer,

@@ -37,7 +37,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
       switch (battleResults.result) {
         case enumHelper.battle.outcomes.win:
           const dropItemResults = await this.dropItem(updatedPlayer, battleResults.updatedMob, eventMsg, eventLog);
-          const checkedWinResults = await this.checkExperience(this.Database, dropItemResults.updatedPlayer, eventMsg, eventLog);
+          const checkedWinResults = await this.checkExperience(dropItemResults.updatedPlayer, eventMsg, eventLog);
           return {
             type: 'actions',
             updatedPlayer: checkedWinResults.updatedPlayer,
@@ -46,7 +46,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           };
 
         case enumHelper.battle.outcomes.fled:
-          const checkedFledResults = await this.checkExperience(this.Database, updatedPlayer, eventMsg, eventLog);
+          const checkedFledResults = await this.checkExperience(updatedPlayer, eventMsg, eventLog);
           return {
             type: 'actions',
             updatedPlayer: checkedFledResults.updatedPlayer,
@@ -181,12 +181,12 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           const filteredBountyPlayers = playersWithBounty.filter(player => player.chance >= randomDice);
           if (filteredBountyPlayers.length > 0) {
             const filteredBountyPlayersIndex = await this.randomBetween(0, filteredBountyPlayers.length - 1);
-            randomPlayer = filteredBountyPlayers[filteredBountyPlayersIndex];
+            randomPlayer = filteredBountyPlayers[filteredBountyPlayersIndex]._doc;
           } else {
-            randomPlayer = sameMapPlayers[randomPlayerIndex];
+            randomPlayer = sameMapPlayers[randomPlayerIndex]._doc;
           }
         } else {
-          randomPlayer = sameMapPlayers[randomPlayerIndex];
+          randomPlayer = sameMapPlayers[randomPlayerIndex]._doc;
         }
 
         if (updatedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name && randomPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
@@ -295,7 +295,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           otherPlayerPmMsg.push(...winResults.otherPlayerPmMsg);
           const victimCheckHealth = await this.checkHealth(this.Database, this.MapManager, winResults.victimPlayer, winResults.stealingPlayer, eventMsg, otherPlayerPmMsg, eventLog);
           await this.Database.savePlayer(victimCheckHealth.updatedPlayer);
-          const winnerCheckExp = await this.checkExperience(this.Database, winResults.stealingPlayer, eventMsg, eventLog);
+          const winnerCheckExp = await this.checkExperience(winResults.stealingPlayer, eventMsg, eventLog);
 
           return {
             type: 'actions',
@@ -307,9 +307,9 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           };
 
         case enumHelper.battle.outcomes.fled:
-          const fledUpdatedDefender = await this.checkExperience(this.Database, defender, eventMsg, otherPlayerPmMsg);
+          const fledUpdatedDefender = await this.checkExperience(defender, eventMsg, otherPlayerPmMsg);
           await this.Database.savePlayer(fledUpdatedDefender.updatedPlayer);
-          const fledResult = await this.checkExperience(this.Database, attacker, eventMsg, eventLog);
+          const fledResult = await this.checkExperience(attacker, eventMsg, eventLog);
 
           return {
             type: 'actions',
@@ -325,7 +325,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           eventMsg.push(...loseResults.msg);
           eventLog.push(...loseResults.otherPlayerPmMsg);
           otherPlayerPmMsg.push(...loseResults.pm);
-          const lostUpdatedDefender = await this.checkExperience(this.Database, loseResults.stealingPlayer, eventMsg, otherPlayerPmMsg);
+          const lostUpdatedDefender = await this.checkExperience(loseResults.stealingPlayer, eventMsg, otherPlayerPmMsg);
           await this.Database.savePlayer(lostUpdatedDefender.updatedPlayer);
           const loserCheckHealth = await this.checkHealth(this.Database, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer, eventMsg, eventLog, otherPlayerPmMsg);
 

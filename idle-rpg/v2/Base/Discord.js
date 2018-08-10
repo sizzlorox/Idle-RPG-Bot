@@ -203,10 +203,9 @@ Theres a command to get the invite link !invite`);
       }
       // TODO add check to parent once you find out why its still null
       const channelToSend = await guild.channels.find(channel => channel.name === result.type && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
-      if (!channelToSend) {
-        infoLog.info({ guild: guild.id, message });
+      if (channelToSend) {
+        await channelToSend.send(message, { split: true });
       }
-      await channelToSend.send(message, { split: true });
       if (result.updatedPlayer.isPrivateMessage && result.updatedPlayer.isPrivateMessageImportant && result.type === 'actions'
         || result.updatedPlayer.isPrivateMessage && !result.updatedPlayer.isPrivateMessageImportant) {
         const guildMember = await guild.members.find(member => member.id === result.updatedPlayer.discordId);

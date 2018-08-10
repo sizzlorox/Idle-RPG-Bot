@@ -138,7 +138,7 @@ const enumHelper = {
   ],
 
   // if .fill(undefined) is not used to fill the array with any data, the undefined pointers make the array return as [] with a length of 30 even while mapping.
-  mockPlayers: new Array(30)
+  mockPlayers: new Array(1)
     .fill(undefined)
     .map((obj, index) => Object.assign({}, {
       name: `Mocktester${index}`,

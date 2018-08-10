@@ -253,7 +253,7 @@ const playerSchema = mongoose.Schema({
     player: Number,
     firstDeath: {
       type: String,
-      default: 'never'
+      default: 'never',
     }
   },
   quest: {
@@ -263,7 +263,7 @@ const playerSchema = mongoose.Schema({
   },
   updated_at: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   }
 },
   // TODO remove old createdAt above on next reset

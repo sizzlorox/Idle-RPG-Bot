@@ -3,7 +3,7 @@ const titles = require('../idle-rpg/data/titles');
 const enumHelper = require('../../utils/enumHelper');
 
 // UTILS
-const { errorLog } = require('../../utils/logger');
+const { errorLog, infoLog } = require('../../utils/logger');
 
 class Game {
 
@@ -155,8 +155,11 @@ class Game {
    * @param {Array} eventLog
    * @returns {Object} playerObj
    */
-  async checkExperience(Database, playerObj, eventMsg, eventLog) {
+  async checkExperience(playerObj, eventMsg, eventLog) {
     const updatedPlayer = await Object.assign({}, playerObj);
+    if (!updatedPlayer.experience) {
+      infoLog.info({ where: 'BaseGame', updatedPlayer });
+    }
 
     try {
       if (updatedPlayer.experience.current >= updatedPlayer.level * 15) {
