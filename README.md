@@ -15,6 +15,7 @@ Anyobody who is willing to join in on this project is welcome to do so!
 
 To see this bot in action it is currently running at this discord server:
 [Idle-RPG Discord Server](https://discord.gg/nAEBTcj)
+[Idle-RPG Trello Board](https://trello.com/b/OnpWqvlp/idle-rpg)
 
 # Setup
 Create a .env file in the project root directory with these env variables: (Without < >)
