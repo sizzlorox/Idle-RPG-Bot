@@ -104,7 +104,8 @@ class DiscordBot extends BaseHelper {
         return;
       }
 
-      if (newMember.presence.game && newMember.presence.game.streaming) {
+      if (oldMember.presence.game && !oldMember.presence.game.streaming && newMember.presence.game && newMember.presence.game.streaming
+        || !oldMember.presence.game && newMember.presence.game && newMember.presence.game.streaming) {
         const streamChannel = newMember.guild.channels.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text');
         if (streamChannel) {
           streamChannel.send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);

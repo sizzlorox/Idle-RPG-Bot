@@ -49,21 +49,21 @@ class Helper {
     Personal Multiplier: ${player.personalMultiplier}x
     Experience: 
       Current: ${player.experience.current}
-      Lost: ${player.experience.lost}
+      Lost: ${player.experience.lost} (${((player.experience.lost / player.experience.total) * 100).toFixed(2)}%)
       Total: ${player.experience.total}
       TNL: ${(player.level * 15) - player.experience.current} / ${(player.level * 15)}
     Class: ${player.class}
     Gender: ${player.gender}
     Gold:
       Current: ${player.gold.current}
-      Lost: ${player.gold.lost}
-      Stolen from you: ${player.gold.stolen}
-      Stole from others: ${player.gold.stole}
-      Lottery: ${player.gold.dailyLottery}
+      Lost: ${player.gold.lost} (${((player.gold.lost / player.gold.total) * 100).toFixed(2)}%)
+      Stolen from you: ${player.gold.stolen} (${((player.gold.stolen / player.gold.total) * 100).toFixed(2)}%)
+      Stole from others: ${player.gold.stole} (${((player.gold.stole / player.gold.total) * 100).toFixed(2)}%)
+      Lottery: ${player.gold.dailyLottery} (${((player.gold.dailyLottery / player.gold.total) * 100).toFixed(2)}%)
       Gambles: 
         Count: ${player.gambles}
-        Won: ${player.gold.gambles.won}
-        Lost: ${player.gold.gambles.lost}
+        Won: ${player.gold.gambles.won} (${((player.gold.gambles.won / player.gold.total) * 100).toFixed(2)}%)
+        Lost: ${player.gold.gambles.lost} (${((player.gold.gambles.lost / player.gold.total) * 100).toFixed(2)}%)
       Total: ${player.gold.total}
     Map: ${player.map.name}
     Bounty: ${player.currentBounty}
@@ -83,7 +83,7 @@ class Helper {
       Last Update: ${this.getTimePassed(player.quest.updated_at.getTime())}
 
     Born: ${this.getTimePassed(player.createdAt)}
-    Travelled: ${player.travelled}
+    Travelled: ${player.travelled} (${((player.travelled / player.events) * 100).toFixed(2)}%)
     Events: ${player.events}
     Items Stolen: ${player.stole}
     Items Lost: ${player.stolen}
