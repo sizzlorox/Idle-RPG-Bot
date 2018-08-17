@@ -133,6 +133,16 @@ class Helper {
             \`\`\``;
   }
 
+  generateSpellBookString(player) {
+    let spellBookString = '\`\`\`Here\'s your spellbook!\n';
+    player.spells.forEach((spell) => {
+      spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
+    });
+    spellBookString = spellBookString.concat('\`\`\`');
+
+    return spellBookString;
+  }
+
   /**
    * Generates List of owners of equipment
    * @param {Object} equipment

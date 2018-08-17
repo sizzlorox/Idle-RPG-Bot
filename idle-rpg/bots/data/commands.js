@@ -257,7 +257,7 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, Helper, Bot, messageObj } = params;
+      const { Game, Bot, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -268,31 +268,16 @@ const commands = [
         }
 
         return Game.fetchCommand({
-          command: 'playerStats',
-          author: playerObj.array()[0]
-        })
-          .then((playerSpells) => {
-            if (!playerSpells) {
-              return messageObj.author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
-            }
-
-            const spellBook = Helper.generateSpellBookString(playerSpells);
-            messageObj.author.send(spellBook.replace('Here\'s your spellbook!', `Here is ${playerSpells.name}'s spellbook!`));
-          });
+          command: 'playerSpellBook',
+          author: messageObj.author,
+          playerToCheck: playerObj[0]
+        });
       }
 
-      Game.fetchCommand({
-        command: 'playerStats',
+      return Game.fetchCommand({
+        command: 'playerSpellBook',
         author: messageObj.author
-      })
-        .then((playerSpells) => {
-          if (!playerSpells) {
-            return messageObj.author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
-          }
-
-          const spellBook = Helper.generateSpellBookString(playerSpells);
-          messageObj.author.send(spellBook);
-        });
+      });
     }
   },
 
@@ -301,10 +286,11 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, messageObj } = params;
+      const { Game, Bot, messageObj } = params;
       return Game.fetchCommand({
         command: 'joinLottery',
-        author: messageObj.author
+        author: messageObj.author,
+        Bot
       });
     }
   },
