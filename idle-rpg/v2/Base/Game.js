@@ -157,9 +157,6 @@ class Game {
    */
   async checkExperience(playerObj, eventMsg, eventLog) {
     const updatedPlayer = await Object.assign({}, playerObj);
-    if (!updatedPlayer.experience) {
-      infoLog.info({ where: 'BaseGame', updatedPlayer });
-    }
 
     try {
       if (updatedPlayer.experience.current >= updatedPlayer.level * 15) {
@@ -188,7 +185,7 @@ class Game {
         }
         const oldClass = updatedPlayer.class;
 
-        const playerStats = Object.keys(updatedPlayer.stats).map((key) => {
+        const playerStats = await Object.keys(updatedPlayer.stats).map((key) => {
           if (['str', 'dex', 'int'].includes(key)) {
             return {
               key,

@@ -119,7 +119,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
         await lotteryChannel.send(`${player.name}`);
       } else {
         await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
-        await lotteryMessages.array()[3].edit(lotteryMessages.array()[3].content.concat(`\n${player.name}`));
+        await lotteryMessages.array()[2].edit(lotteryMessages.array()[2].content.concat(`\n${player.name}`));
       }
     }
 

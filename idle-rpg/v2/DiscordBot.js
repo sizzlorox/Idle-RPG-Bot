@@ -249,11 +249,10 @@ class DiscordBot extends BaseHelper {
             await lotteryChannel.send(`Idle-RPG Lottery - You must pay 100 gold to enter! PM me \`!lottery\` to join!\nOut of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the previous daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
             await lotteryChannel.send(`Current lottery prize pool: ${newPrizePool}`);
             await lotteryChannel.send('Contestants:');
-            await lotteryChannel.send('');
           } else {
             await lotteryMessages.array()[0].edit(`Idle-RPG Lottery - You must pay 100 gold to enter! PM me \`!lottery\` to join!\nOut of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the previous daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
             await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${newPrizePool}`);
-            await lotteryMessages.array()[3].edit('');
+            await lotteryMessages.array()[2].edit('Contestants:');
           }
         }
       }

@@ -35,6 +35,7 @@ class Helper {
     return result;
   }
 
+  // TODO rework % have to track better pvp and pve stats
   /**
    * Generates stats String from player object
    * @param {Object} player
