@@ -231,6 +231,8 @@ ${rankString}
         let calcAmount = amount;
         if (amount === 'all') {
           calcAmount = Math.floor(player.gold.current / globalSpells.bless.spellCost);
+        } else {
+          calcAmount = Number(amount);
         }
         if (player.gold.current >= (globalSpells.bless.spellCost * calcAmount) && calcAmount >= 1) {
           player.spellCast += calcAmount;

@@ -99,7 +99,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
 
   async loadGuildConfig(guildId) {
     const loadedConfig = await this.Database.loadGame(guildId);
-    if (loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1 || loadedConfig.multiplier <= 0) {
+    if (loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1 || loadedConfig.multiplier <= 0 || loadedConfig.multiplier > 1 && loadedConfig.spells.activeBless === 0) {
       loadedConfig.multiplier = 1;
       loadedConfig.spells.activeBless = 0;
       await this.Database.updateGame(guildId, loadedConfig);
