@@ -35,6 +35,7 @@ class Helper {
     return result;
   }
 
+  // TODO rework % have to track better pvp and pve stats
   /**
    * Generates stats String from player object
    * @param {Object} player
@@ -131,6 +132,16 @@ class Helper {
             Luck: ${player.equipment.relic.luk}
           ${this.generatePreviousOwnerString(player.equipment.relic)}
             \`\`\``;
+  }
+
+  generateSpellBookString(player) {
+    let spellBookString = '\`\`\`Here\'s your spellbook!\n';
+    player.spells.forEach((spell) => {
+      spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
+    });
+    spellBookString = spellBookString.concat('\`\`\`');
+
+    return spellBookString;
   }
 
   /**

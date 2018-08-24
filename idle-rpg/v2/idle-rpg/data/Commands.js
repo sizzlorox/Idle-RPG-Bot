@@ -52,6 +52,21 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
       : author.send(result.replace('Heres your equipment!', `Here is ${loadedPlayer.name}s equipment!`));
   }
 
+  async playerSpellBook(params) {
+    const { author, playerToCheck } = params;
+    const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
+    if (!loadedPlayer) {
+      return playerToCheck !== author.id
+        ? author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
+        : author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
+    }
+    const result = this.generateSpellBookString(loadedPlayer);
+
+    return playerToCheck === author.id
+      ? author.send(result)
+      : author.send(result.replace('Here\'s your spellbook!', `Here\'s ${loadedPlayer.name} spellbook!`));
+  }
+
   playerInventory(params) {
     const { author } = params;
     return this.Database.loadPlayer(author.id, enumHelper.inventorySelectFields);
@@ -81,7 +96,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
   }
 
   async joinLottery(params) {
-    const { author } = params;
+    const { Bot, author } = params;
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
     if (player.lottery.joined) {
       return author.send('You\'ve already joined todays daily lottery!');
@@ -93,6 +108,20 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     guildConfig.dailyLottery.prizePool += 100;
     await this.Database.updateGame(player.guildId, guildConfig);
     await this.Database.savePlayer(player);
+    const lotteryChannel = await Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.id === enumHelper.channels.lottery);
+    if (lotteryChannel) {
+      let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
+      lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
+      if (lotteryMessages.size <= 0) {
+        await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join!');
+        await lotteryChannel.send(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
+        await lotteryChannel.send('Contestants:');
+        await lotteryChannel.send(`${player.name}`);
+      } else {
+        await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
+        await lotteryMessages.array()[2].edit(lotteryMessages.array()[2].content.concat(`\n${player.name}`));
+      }
+    }
 
     return author.send('You have joined todays daily lottery! Good luck!');
   }
@@ -202,6 +231,8 @@ ${rankString}
         let calcAmount = amount;
         if (amount === 'all') {
           calcAmount = Math.floor(player.gold.current / globalSpells.bless.spellCost);
+        } else {
+          calcAmount = Number(Math.abs(amount));
         }
         if (player.gold.current >= (globalSpells.bless.spellCost * calcAmount) && calcAmount >= 1) {
           player.spellCast += calcAmount;

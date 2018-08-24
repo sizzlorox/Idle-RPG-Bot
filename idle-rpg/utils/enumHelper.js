@@ -254,6 +254,10 @@ const enumHelper = {
     { 'deaths.player': -1 },
     { 'kills.player': -1 },
     { 'quest.completed': -1 }
-  ]
+  ],
+
+  channels: {
+    lottery: '479906184854372363'
+  }
 };
 module.exports = enumHelper;

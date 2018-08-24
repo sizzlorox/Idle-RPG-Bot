@@ -187,7 +187,7 @@ Theres a command to get the invite link !invite`);
 
   async sendMessage(guild, result) {
     try {
-      if (!result || result && !result.msg && !result.pm) {
+      if (!result || result && !result.msg || result && !result.pm) {
         return;
       }
       const message = result.msg.join('\n');
