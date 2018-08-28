@@ -327,7 +327,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           otherPlayerPmMsg.push(...loseResults.pm);
           const lostUpdatedDefender = await this.checkExperience(loseResults.stealingPlayer, eventMsg, otherPlayerPmMsg);
           await this.Database.savePlayer(lostUpdatedDefender.updatedPlayer);
-          const loserCheckHealth = await this.checkHealth(this.Database, this.MapManager, loseResults.victimPlayer, loseResults.stealingPlayer, eventMsg, eventLog, otherPlayerPmMsg);
+          const loserCheckHealth = await this.checkHealth(this.Database, this.MapManager, loseResults.victimPlayer, lostUpdatedDefender.updatedPlayer, eventMsg, eventLog, otherPlayerPmMsg);
 
           return {
             type: 'actions',
