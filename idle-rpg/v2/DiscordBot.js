@@ -281,6 +281,18 @@ class DiscordBot extends BaseHelper {
   updateLeaderboards() {
     const types = enumHelper.leaderboardStats;
     this.bot.guilds.forEach((guild) => {
+      const botGuildMember = guild.members.find(member => member.id === this.bot.user.id);
+      if (!botGuildMember.permissions.has([
+        'VIEW_CHANNEL',
+        'MANAGE_CHANNELS'
+      ])) {
+        return;
+      }
+      const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
+      if (!leaderboardChannel || leaderboardChannel && !leaderboardChannel.manageable) {
+        return;
+      }
+
       types.forEach((type, index) => this.Game.dbClass().loadTop10(type, guild.id, this.bot.user.id)
         .then(top10 => `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
           .sort((player1, player2) => {
@@ -298,21 +310,21 @@ class DiscordBot extends BaseHelper {
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`)
         .then(async (rankString) => {
-          const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
-          if (leaderboardChannel) {
-            const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
-            const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
-            const msg = `\`\`\`Top 10 ${subjectTitle}:
+          if (leaderboardChannel.id === '474078821830623242') {
+            console.log(leaderboardChannel);
+          }
+          const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
+          const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
+          const msg = `\`\`\`Top 10 ${subjectTitle}:
 ${rankString}\`\`\``;
 
-            if (msgCount.size < types.length) {
-              return leaderboardChannel.send(msg);
-            }
-
-            return !msg.includes(msgCount.array()[index].toString()) && msgCount.array()[index].author.id === this.bot.user.id
-              ? msgCount.array()[index].edit(msg)
-              : '';
+          if (msgCount.size < types.length) {
+            return leaderboardChannel.send(msg);
           }
+
+          return !msg.includes(msgCount.array()[index].toString()) && msgCount.array()[index].author.id === this.bot.user.id
+            ? msgCount.array()[index].edit(msg)
+            : '';
         }));
     });
   }

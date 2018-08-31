@@ -173,30 +173,27 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     return author.send(`Title has been set to ${value}, you're now known as ${loadedPlayer.name} the ${value}.`);
   }
 
-  top10(params) {
+  async top10(params) {
     const { author, type, guildId, Bot } = params;
-    return this.Database.loadTop10(type, guildId, Bot.user.id)
-      .then((top10) => {
-        const rankString = `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
-          .sort((player1, player2) => {
-            if (Object.keys(type)[0] === 'level') {
-              return player2.experience.current - player1.experience.current && player2.level - player1.level;
-            }
+    const loadedTop10 = await this.Database.loadTop10(type, guildId, Bot.user.id);
+    const rankString = await `${loadedTop10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+      .sort((player1, player2) => {
+        if (Object.keys(type)[0] === 'level') {
+          return player2.experience.current - player1.experience.current && player2.level - player1.level;
+        }
 
-            if (Object.keys(type)[0].includes('.')) {
-              const keys = Object.keys(type)[0].split('.');
-              return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
-            }
+        if (Object.keys(type)[0].includes('.')) {
+          const keys = Object.keys(type)[0].split('.');
+          return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
+        }
 
-            return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
-          })
-          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
-          .join('\n')}`;
+        return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+      })
+      .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
+      .join('\n')}`;
 
-        author.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
-${rankString}
-        \`\`\``);
-      });
+    return author.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
+${rankString}\`\`\``);
   }
 
   getRank(params) {
@@ -276,32 +273,25 @@ ${rankString}
     }
   }
 
-  placeBounty(params) {
+  async placeBounty(params) {
     const { author, Bot, recipient, amount } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((placer) => {
-        const actionsChannel = Bot.guilds.find(guild => guild.id === placer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
-        if (placer.gold.current >= amount) {
-          placer.gold.current -= amount;
+    const bountyPlacer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (bountyPlacer.gold.current < amount) {
+      return author.send('You need more gold to place this bounty');
+    }
+    const bountyRecipient = await this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 });
+    if (!bountyRecipient) {
+      return author.send('This player does not exist.');
+    }
 
-          return this.Database.savePlayer(placer)
-            .then(() => {
-              return this.Database.loadPlayer(recipient)
-                .then((bountyRecipient) => {
-                  if (!bountyRecipient) {
-                    return author.send('This player does not exist.');
-                  }
-                  bountyRecipient.currentBounty += amount;
-                  actionsChannel.send(this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
+    bountyPlacer.gold.current -= Number(amount);
+    bountyRecipient.currentBounty += Number(amount);
+    const actionsChannel = await Bot.guilds.find(guild => guild.id === bountyPlacer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
+    await this.Database.savePlayer(bountyPlacer);
+    await this.Database.savePlayer(bountyRecipient);
+    await actionsChannel.send(this.Helper.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
 
-                  return this.Database.savePlayer(bountyRecipient)
-                    .then(() => author.send(`Bounty of ${amount} gold has been placed`));
-                });
-            });
-        }
-
-        return author.send('You need more gold to place this bounty');
-      });
+    return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
   }
 
   playerEventLog(params) {
@@ -328,24 +318,21 @@ ${rankString}
       });
   }
 
-  modifyPM(params) {
+  async modifyPM(params) {
     const { author, value, filtered } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((castingPlayer) => {
-        if (!castingPlayer) {
-          return author.send('Please set this after you have been born');
-        }
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (!loadedPlayer) {
+      return author.send('Please set this after you have been born');
+    }
 
-        if (castingPlayer.isPrivateMessage !== value || castingPlayer.isPrivateMessageImportant !== filtered) {
-          castingPlayer.isPrivateMessage = value;
-          castingPlayer.isPrivateMessageImportant = filtered;
+    if (loadedPlayer.isPrivateMessage === value || loadedPlayer.isPrivateMessageImportant === filtered) {
+      return author.send('Your PM preference is already set to this value.');
+    }
+    loadedPlayer.isPrivateMessage = value;
+    loadedPlayer.isPrivateMessageImportant = filtered;
+    await this.Database.savePlayer(loadedPlayer);
 
-          return this.Database.savePlayer(castingPlayer)
-            .then(() => author.send('Preference for being PMed has been updated.'));
-        }
-
-        return author.send('Your PM preference is already set to this value.');
-      });
+    return author.send('Preference for being PMed has been updated.');
   }
 
   // TODO: Block if current or changing server has bless active
