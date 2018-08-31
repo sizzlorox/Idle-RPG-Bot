@@ -300,6 +300,9 @@ class DiscordBot extends BaseHelper {
         .then(async (rankString) => {
           const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
           if (leaderboardChannel) {
+            if (!botGuildMember.permissions.has('MANAGE_MESSAGES')) {
+              return;
+            }
             const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
             const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
             const msg = `\`\`\`Top 10 ${subjectTitle}:
