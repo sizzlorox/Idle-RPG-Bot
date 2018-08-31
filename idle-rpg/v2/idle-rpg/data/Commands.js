@@ -286,7 +286,7 @@ ${rankString}\`\`\``);
 
     bountyPlacer.gold.current -= Number(amount);
     bountyRecipient.currentBounty += Number(amount);
-    const actionsChannel = await Bot.guilds.find(guild => guild.id === placer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const actionsChannel = await Bot.guilds.find(guild => guild.id === bountyPlacer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
     await this.Database.savePlayer(bountyPlacer);
     await this.Database.savePlayer(bountyRecipient);
 
