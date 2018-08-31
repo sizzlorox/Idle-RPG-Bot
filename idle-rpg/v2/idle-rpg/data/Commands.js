@@ -273,32 +273,24 @@ ${rankString}\`\`\``);
     }
   }
 
-  placeBounty(params) {
+  async placeBounty(params) {
     const { author, Bot, recipient, amount } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((placer) => {
-        const actionsChannel = Bot.guilds.find(guild => guild.id === placer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
-        if (placer.gold.current >= amount) {
-          placer.gold.current -= amount;
+    const bountyPlacer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (bountyPlacer.gold.current < amount) {
+      return author.send('You need more gold to place this bounty');
+    }
 
-          return this.Database.savePlayer(placer)
-            .then(() => {
-              return this.Database.loadPlayer(recipient)
-                .then((bountyRecipient) => {
-                  if (!bountyRecipient) {
-                    return author.send('This player does not exist.');
-                  }
-                  bountyRecipient.currentBounty += amount;
-                  actionsChannel.send(this.Helper.setImportantMessage(`${placer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
+    bountyPlacer.gold.current -= Number(amount);
+    const bountyRecipient = await this.Database.loadPlayer(recipient, { pastEvents: 0, pastPvpEvents: 0 });
+    if (!bountyRecipient) {
+      return author.send('This player does not exist.');
+    }
+    bountyRecipient.currentBounty += Number(amount);
+    const actionsChannel = await Bot.guilds.find(guild => guild.id === placer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
+    await this.Database.savePlayer(bountyPlacer);
+    await this.Database.savePlayer(bountyRecipient);
 
-                  return this.Database.savePlayer(bountyRecipient)
-                    .then(() => author.send(`Bounty of ${amount} gold has been placed`));
-                });
-            });
-        }
-
-        return author.send('You need more gold to place this bounty');
-      });
+    return actionsChannel.send(this.Helper.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
   }
 
   playerEventLog(params) {
