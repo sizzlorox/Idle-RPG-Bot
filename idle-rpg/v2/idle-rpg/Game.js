@@ -44,6 +44,11 @@ class Game extends aggregation(BaseGame, BaseHelper) {
           pm: ['You were born.']
         });
       }
+
+      // Update players name in case they altered their discord name
+      loadedPlayer.name = player.name;
+
+      // TODO: Remove these later
       if (loadedPlayer.guildId === 'None') {
         loadedPlayer.guildId = guildId;
       }

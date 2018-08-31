@@ -318,24 +318,21 @@ ${rankString}\`\`\``);
       });
   }
 
-  modifyPM(params) {
+  async modifyPM(params) {
     const { author, value, filtered } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((castingPlayer) => {
-        if (!castingPlayer) {
-          return author.send('Please set this after you have been born');
-        }
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (!loadedPlayer) {
+      return author.send('Please set this after you have been born');
+    }
 
-        if (castingPlayer.isPrivateMessage !== value || castingPlayer.isPrivateMessageImportant !== filtered) {
-          castingPlayer.isPrivateMessage = value;
-          castingPlayer.isPrivateMessageImportant = filtered;
+    if (loadedPlayer.isPrivateMessage === value || loadedPlayer.isPrivateMessageImportant === filtered) {
+      return author.send('Your PM preference is already set to this value.');
+    }
+    loadedPlayer.isPrivateMessage = value;
+    loadedPlayer.isPrivateMessageImportant = filtered;
+    await this.Database.savePlayer(loadedPlayer);
 
-          return this.Database.savePlayer(castingPlayer)
-            .then(() => author.send('Preference for being PMed has been updated.'));
-        }
-
-        return author.send('Your PM preference is already set to this value.');
-      });
+    return author.send('Preference for being PMed has been updated.');
   }
 
   // TODO: Block if current or changing server has bless active
