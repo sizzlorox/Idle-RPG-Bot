@@ -193,8 +193,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
       .join('\n')}`;
 
     return author.send(`\`\`\`Top 10 ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}`}:
-  ${rankString}
-          \`\`\``);
+${rankString}\`\`\``);
   }
 
   getRank(params) {
