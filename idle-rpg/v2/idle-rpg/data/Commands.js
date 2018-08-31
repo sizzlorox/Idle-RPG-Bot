@@ -289,8 +289,9 @@ ${rankString}\`\`\``);
     const actionsChannel = await Bot.guilds.find(guild => guild.id === bountyPlacer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
     await this.Database.savePlayer(bountyPlacer);
     await this.Database.savePlayer(bountyRecipient);
+    await actionsChannel.send(this.Helper.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
 
-    return actionsChannel.send(this.Helper.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
+    return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
   }
 
   playerEventLog(params) {
