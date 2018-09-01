@@ -432,22 +432,20 @@ ${rankString}\`\`\``);
     }
   }
 
-  modifyGender(params) {
+  async modifyGender(params) {
     const { author, value } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((castingPlayer) => {
-        if (!castingPlayer) {
-          return author.send('Please set this after you have been born');
-        }
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (!loadedPlayer) {
+      return author.send('Please set this after you have been born');
+    }
 
-        if (castingPlayer.gender !== value) {
-          castingPlayer.gender = value;
-          return this.Database.savePlayer(castingPlayer)
-            .then(() => author.send('Gender has been updated.'));
-        }
+    if (loadedPlayer.gender === value) {
+      return author.send('Your gender is already set to this value.');
+    }
+    loadedPlayer.gender = value;
+    await this.Database.savePlayer(loadedPlayer);
 
-        return author.send('Your gender is already set to this value.');
-      });
+    return author.send('Gender has been updated.');
   }
 
   async resetLotteryPlayers(params) {
