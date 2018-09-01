@@ -53,6 +53,11 @@ class DiscordBot extends BaseHelper {
     this.minTimer = (minimalTimer * 1000) * 60;
     this.maxTimer = (maximumTimer * 1000) * 60;
     this.tickInMinutes = 2;
+    this.heapLog = {
+      maxRSS: '',
+      maxTotal: '',
+      maxUsed: ''
+    };
   }
 
   loadEventListeners() {
@@ -180,9 +185,21 @@ class DiscordBot extends BaseHelper {
   processDetails() {
     let memoryUsage = util.inspect(process.memoryUsage());
     memoryUsage = JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
+    const currentRSS = (memoryUsage.rss / 1048576).toFixed(2);
+    const currentTotal = (memoryUsage.heapTotal / 1048576).toFixed(2);
+    const currentUsed = (memoryUsage.heapUsed / 1048576).toFixed(2);
+    if (this.heapLog.maxRSS < currentRSS) {
+      this.heapLog.maxRSS = currentRSS;
+    }
+    if (this.heapLog.maxTotal < currentTotal) {
+      this.heapLog.maxTotal = currentTotal;
+    }
+    if (this.heapLog.maxUsed < currentUsed) {
+      this.heapLog.maxUsed = currentUsed;
+    }
 
     console.log('------------');
-    console.log(`\n\nHeap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
+    console.log(`\n\n${new Date()}\nHeap Usage:\n  RSS: ${currentRSS}MB (${this.heapLog.maxRSS}MB)\n  HeapTotal: ${currentTotal}MB (${this.heapLog.maxTotal}MB)\n  HeapUsed: ${currentUsed}MB (${this.heapLog.maxUsed}MB)`);
     console.log(`Current Up Time: ${this.Helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
     console.log('------------');
   }

@@ -60,7 +60,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       }
 
       const loadedGuildConfig = await this.Database.loadGame(player.guildId);
-      console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId} - Multi: ${loadedGuildConfig.multiplier} - Bless: ${loadedGuildConfig.spells.activeBless} - PM: ${loadedPlayer.personalMultiplier}`);
+      // console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId} - Multi: ${loadedGuildConfig.multiplier} - Bless: ${loadedGuildConfig.spells.activeBless} - PM: ${loadedPlayer.personalMultiplier}`);
       await this.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       let eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
       eventResults = await this.setPlayerTitles(eventResults);

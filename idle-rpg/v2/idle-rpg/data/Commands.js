@@ -335,6 +335,22 @@ ${rankString}\`\`\``);
     return author.send('Preference for being PMed has been updated.');
   }
 
+  async modifyMention(params) {
+    const { author, value } = params;
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (!loadedPlayer) {
+      return author.send('Please set this after you have been born');
+    }
+
+    if (loadedPlayer.isMentionInDiscord === value) {
+      return author.send('Your @mention preference is already set to this value.');
+    }
+    loadedPlayer.isMentionInDiscord = value;
+    await this.Database.savePlayer(loadedPlayer);
+
+    return author.send('Preference for being @mention has been updated.');
+  }
+
   // TODO: Block if current or changing server has bless active
   async setServer(params) {
     const { Bot, author, value } = params;
@@ -359,25 +375,6 @@ ${rankString}\`\`\``);
     await this.Database.setPlayerGuildId(value, loadedPlayer);
 
     return author.send(`Primary server set to ${guildToSet.name}`);
-  }
-
-  modifyMention(params) {
-    const { author, value } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((castingPlayer) => {
-        if (!castingPlayer) {
-          return author.send('Please set this after you have been born');
-        }
-
-        if (castingPlayer.isMentionInDiscord !== value) {
-          castingPlayer.isMentionInDiscord = value;
-
-          return this.Database.savePlayer(castingPlayer)
-            .then(() => author.send('Preference for being @mention has been updated.'));
-        }
-
-        return author.send('Your @mention preference is already set to this value.');
-      });
   }
 
   async modifyServerPrefix(params) {
