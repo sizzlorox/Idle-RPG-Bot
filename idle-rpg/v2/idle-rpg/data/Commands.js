@@ -231,6 +231,9 @@ ${rankString}\`\`\``);
         } else {
           calcAmount = Number(Math.abs(amount));
         }
+        if (calcAmount <= 0 || isNaN(calcAmount)) {
+          return author.send('You must cast a valid amount');
+        }
         if (player.gold.current >= (globalSpells.bless.spellCost * calcAmount) && calcAmount >= 1) {
           player.spellCast += calcAmount;
           player.gold.current -= (globalSpells.bless.spellCost * calcAmount);
@@ -241,14 +244,14 @@ ${rankString}\`\`\``);
           guildConfig.multiplier += calcAmount;
           guildConfig.spells.activeBless += calcAmount;
           await this.Database.updateGame(player.guildId, guildConfig);
-          actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x` : ''} ${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x` : ' '}${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
           setTimeout(async () => {
             const newLoadedConfig = await this.Database.loadGame(player.guildId);
             newLoadedConfig.multiplier -= calcAmount;
             newLoadedConfig.spells.activeBless -= calcAmount;
             newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
-            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s ${calcAmount > 1 ? `${calcAmount}x` : ''} ${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
+            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
           }, 1800000); // 30 minutes
         } else {
           author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
@@ -335,6 +338,22 @@ ${rankString}\`\`\``);
     return author.send('Preference for being PMed has been updated.');
   }
 
+  async modifyMention(params) {
+    const { author, value } = params;
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (!loadedPlayer) {
+      return author.send('Please set this after you have been born');
+    }
+
+    if (loadedPlayer.isMentionInDiscord === value) {
+      return author.send('Your @mention preference is already set to this value.');
+    }
+    loadedPlayer.isMentionInDiscord = value;
+    await this.Database.savePlayer(loadedPlayer);
+
+    return author.send('Preference for being @mention has been updated.');
+  }
+
   // TODO: Block if current or changing server has bless active
   async setServer(params) {
     const { Bot, author, value } = params;
@@ -359,25 +378,6 @@ ${rankString}\`\`\``);
     await this.Database.setPlayerGuildId(value, loadedPlayer);
 
     return author.send(`Primary server set to ${guildToSet.name}`);
-  }
-
-  modifyMention(params) {
-    const { author, value } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((castingPlayer) => {
-        if (!castingPlayer) {
-          return author.send('Please set this after you have been born');
-        }
-
-        if (castingPlayer.isMentionInDiscord !== value) {
-          castingPlayer.isMentionInDiscord = value;
-
-          return this.Database.savePlayer(castingPlayer)
-            .then(() => author.send('Preference for being @mention has been updated.'));
-        }
-
-        return author.send('Your @mention preference is already set to this value.');
-      });
   }
 
   async modifyServerPrefix(params) {
@@ -435,22 +435,20 @@ ${rankString}\`\`\``);
     }
   }
 
-  modifyGender(params) {
+  async modifyGender(params) {
     const { author, value } = params;
-    return this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 })
-      .then((castingPlayer) => {
-        if (!castingPlayer) {
-          return author.send('Please set this after you have been born');
-        }
+    const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
+    if (!loadedPlayer) {
+      return author.send('Please set this after you have been born');
+    }
 
-        if (castingPlayer.gender !== value) {
-          castingPlayer.gender = value;
-          return this.Database.savePlayer(castingPlayer)
-            .then(() => author.send('Gender has been updated.'));
-        }
+    if (loadedPlayer.gender === value) {
+      return author.send('Your gender is already set to this value.');
+    }
+    loadedPlayer.gender = value;
+    await this.Database.savePlayer(loadedPlayer);
 
-        return author.send('Your gender is already set to this value.');
-      });
+    return author.send('Gender has been updated.');
   }
 
   async resetLotteryPlayers(params) {
