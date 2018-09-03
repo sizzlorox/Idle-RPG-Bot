@@ -231,6 +231,9 @@ ${rankString}\`\`\``);
         } else {
           calcAmount = Number(Math.abs(amount));
         }
+        if (calcAmount <= 0 || isNaN(calcAmount)) {
+          return author.send('You must cast a valid amount');
+        }
         if (player.gold.current >= (globalSpells.bless.spellCost * calcAmount) && calcAmount >= 1) {
           player.spellCast += calcAmount;
           player.gold.current -= (globalSpells.bless.spellCost * calcAmount);

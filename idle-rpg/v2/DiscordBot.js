@@ -182,12 +182,12 @@ class DiscordBot extends BaseHelper {
     }, 60000 * interval);
   }
 
-  processDetails() {
-    let memoryUsage = util.inspect(process.memoryUsage());
-    memoryUsage = JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
-    const currentRSS = Number(memoryUsage.rss / 1048576).toFixed(2);
-    const currentTotal = Number(memoryUsage.heapTotal / 1048576).toFixed(2);
-    const currentUsed = Number(memoryUsage.heapUsed / 1048576).toFixed(2);
+  async processDetails() {
+    let memoryUsage = await util.inspect(process.memoryUsage());
+    memoryUsage = await JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
+    const currentRSS = await Number(memoryUsage.rss / 1048576).toFixed(2);
+    const currentTotal = await Number(memoryUsage.heapTotal / 1048576).toFixed(2);
+    const currentUsed = await Number(memoryUsage.heapUsed / 1048576).toFixed(2);
     if (this.heapLog.maxRSS < currentRSS) {
       this.heapLog.maxRSS = currentRSS;
     }
