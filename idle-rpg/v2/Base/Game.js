@@ -272,18 +272,18 @@ class Game {
         if (eventResults.pm) {
           eventResults.pm.push(`You've just unlocked the ${titles[title].name} title!`);
         } else {
-          eventResults.pm = [`You've just unlocked the ${titles[title].name} title!`]
+          eventResults.pm = [`You've just unlocked the ${titles[title].name} title!`];
         }
       } else if (eventResults.updatedPlayer[statSplit[0]][statSplit[1]] < titles[title].requirements
         && eventResults.updatedPlayer.titles.current === titles[title].name
         || eventResults.updatedPlayer[statSplit[0]][statSplit[1]] < titles[title].requirements
         && eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)) {
         eventResults.updatedPlayer.titles.current = 'None';
-        eventResults.updatedPlayer.titles.unlocked = eventResults.updatedPlayer.titles.unlocked.splice(eventResults.updatedPlayer.titles.unlocked.indexOf(titles[title].name), 1);
+        eventResults.updatedPlayer.titles.unlocked.splice(eventResults.updatedPlayer.titles.unlocked.indexOf(titles[title].name), 1);
         if (eventResults.pm) {
           eventResults.pm.push(`You've just lost the ${titles[title].name} title!`);
         } else {
-          eventResults.pm = [`You've just lost the ${titles[title].name} title!`]
+          eventResults.pm = [`You've just lost the ${titles[title].name} title!`];
         }
       }
 
@@ -298,18 +298,18 @@ class Game {
       if (eventResults.pm) {
         eventResults.pm.push(`You've just unlocked the ${titles[title].name} title!`);
       } else {
-        eventResults.pm = [`You've just unlocked the ${titles[title].name} title!`]
+        eventResults.pm = [`You've just unlocked the ${titles[title].name} title!`];
       }
     } else if (eventResults.updatedPlayer[titles[title].stat] < titles[title].requirements
       && eventResults.updatedPlayer.titles.current === titles[title].name
       || eventResults.updatedPlayer[titles[title].stat] < titles[title].requirements
       && eventResults.updatedPlayer.titles.unlocked.includes(titles[title].name)) {
       eventResults.updatedPlayer.titles.current = 'None';
-      eventResults.updatedPlayer.titles.unlocked = eventResults.updatedPlayer.titles.unlocked.splice(eventResults.updatedPlayer.titles.unlocked.indexOf(titles[title].name), 1);
+      eventResults.updatedPlayer.titles.unlocked.splice(eventResults.updatedPlayer.titles.unlocked.indexOf(titles[title].name), 1);
       if (eventResults.pm) {
         eventResults.pm.push(`You've just lost the ${titles[title].name} title!`);
       } else {
-        eventResults.pm = [`You've just lost the ${titles[title].name} title!`]
+        eventResults.pm = [`You've just lost the ${titles[title].name} title!`];
       }
     }
 
