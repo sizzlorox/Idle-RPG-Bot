@@ -53,11 +53,6 @@ class DiscordBot extends BaseHelper {
     this.minTimer = (minimalTimer * 1000) * 60;
     this.maxTimer = (maximumTimer * 1000) * 60;
     this.tickInMinutes = 2;
-    this.heapLog = {
-      maxRSS: 0,
-      maxTotal: 0,
-      maxUsed: 0
-    };
   }
 
   loadEventListeners() {
@@ -188,18 +183,9 @@ class DiscordBot extends BaseHelper {
     const currentRSS = await Number(memoryUsage.rss / 1048576).toFixed(2);
     const currentTotal = await Number(memoryUsage.heapTotal / 1048576).toFixed(2);
     const currentUsed = await Number(memoryUsage.heapUsed / 1048576).toFixed(2);
-    if (this.heapLog.maxRSS < currentRSS) {
-      this.heapLog.maxRSS = currentRSS;
-    }
-    if (this.heapLog.maxTotal < currentTotal) {
-      this.heapLog.maxTotal = currentTotal;
-    }
-    if (this.heapLog.maxUsed < currentUsed) {
-      this.heapLog.maxUsed = currentUsed;
-    }
 
     console.log('------------');
-    console.log(`\n\n${new Date()}\nHeap Usage:\n  RSS: ${currentRSS}MB (${this.heapLog.maxRSS}MB)\n  HeapTotal: ${currentTotal}MB (${this.heapLog.maxTotal}MB)\n  HeapUsed: ${currentUsed}MB (${this.heapLog.maxUsed}MB)`);
+    console.log(`\n\n${new Date()}\nHeap Usage:\n  RSS: ${currentRSS}MB\n  HeapTotal: ${currentTotal}MB\n  HeapUsed: ${currentUsed}MB`);
     console.log(`Current Up Time: ${this.Helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
     console.log('------------');
   }
