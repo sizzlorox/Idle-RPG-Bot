@@ -405,7 +405,7 @@ ${rankString}\`\`\``);
 • ** How can I help with the development ?**
   Suggestions are always welcome, if you have experience with NodeJS you're welcome to become a contributor and develop along side with us!
   You can also support with development by becoming a patron! Keep in mind that you will not gain any advantage over the others and its simply a method of showing your support to the developer!
-  Command: ${value} support
+  Command: ${value} patreon
   
 • ** My event counter goes up but I did not see anything in the event channels **
   There are some events such as luck events which fail.When they do it does not print anything but your event counter goes up.
