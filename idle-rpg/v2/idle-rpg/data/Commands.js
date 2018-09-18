@@ -26,45 +26,45 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck !== author.id
+      return playerToCheck || playerToCheck.id !== author.id
         ? author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
     const result = this.generateStatsString(loadedPlayer);
 
-    return playerToCheck === author.id
+    return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Here are your stats!', `Here is ${loadedPlayer.name}s stats!`));
+      : author.send(result.replace('Here are your stats!', `Here is ${loadedPlayer.name}'s stats!`));
   }
 
   async playerEquipment(params) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.equipSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck !== author.id
+      return playerToCheck || playerToCheck.id !== author.id
         ? author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
     const result = this.generateEquipmentsString(loadedPlayer);
 
-    return playerToCheck === author.id
+    return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Heres your equipment!', `Here is ${loadedPlayer.name}s equipment!`));
+      : author.send(result.replace('Here is your equipment!', `Here is ${loadedPlayer.name}'s equipment!`));
   }
 
   async playerSpellBook(params) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck !== author.id
+      return playerToCheck || playerToCheck.id !== author.id
         ? author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
     const result = this.generateSpellBookString(loadedPlayer);
 
-    return playerToCheck === author.id
+    return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Here\'s your spellbook!', `Here\'s ${loadedPlayer.name} spellbook!`));
+      : author.send(result.replace('Here\'s your spellbook!', `Here\'s ${loadedPlayer.name}'s spellbook!`));
   }
 
   playerInventory(params) {
