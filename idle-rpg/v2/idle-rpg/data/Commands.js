@@ -34,7 +34,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
     return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Here are your stats!', `Here is ${loadedPlayer.name}'s stats!`));
+      : author.send(result.replace('Here are your stats!', `Here are ${loadedPlayer.name}'s stats!`));
   }
 
   async playerEquipment(params) {
