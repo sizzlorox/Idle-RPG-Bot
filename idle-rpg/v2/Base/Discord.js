@@ -114,11 +114,11 @@ Yes, <https://trello.com/b/OnpWqvlp/idle-rpg>
 • **Can I control my character?**
 No.
 
-• **Whats the command prefix for this bot?**
+• **What's the command prefix for this bot?**
 The prefix is ! (eg: !help).
 
 • **Can I host this in my server?**
-Theres a command to get the invite link !invite`);
+There's a command to get the invite link !invite`);
       } catch (err) {
         console.log(err);
       }
