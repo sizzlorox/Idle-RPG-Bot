@@ -26,45 +26,45 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck !== author.id
+      return playerToCheck || playerToCheck.id !== author.id
         ? author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
     const result = this.generateStatsString(loadedPlayer);
 
-    return playerToCheck === author.id
+    return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Here are your stats!', `Here is ${loadedPlayer.name}s stats!`));
+      : author.send(result.replace('Here are your stats!', `Here are ${loadedPlayer.name}'s stats!`));
   }
 
   async playerEquipment(params) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.equipSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck !== author.id
+      return playerToCheck || playerToCheck.id !== author.id
         ? author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
     const result = this.generateEquipmentsString(loadedPlayer);
 
-    return playerToCheck === author.id
+    return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Heres your equipment!', `Here is ${loadedPlayer.name}s equipment!`));
+      : author.send(result.replace('Here is your equipment!', `Here is ${loadedPlayer.name}'s equipment!`));
   }
 
   async playerSpellBook(params) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck !== author.id
+      return playerToCheck || playerToCheck.id !== author.id
         ? author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
     const result = this.generateSpellBookString(loadedPlayer);
 
-    return playerToCheck === author.id
+    return !playerToCheck || playerToCheck.id === author.id
       ? author.send(result)
-      : author.send(result.replace('Here\'s your spellbook!', `Here\'s ${loadedPlayer.name} spellbook!`));
+      : author.send(result.replace('Here\'s your spellbook!', `Here\'s ${loadedPlayer.name}'s spellbook!`));
   }
 
   playerInventory(params) {
@@ -393,40 +393,40 @@ ${rankString}\`\`\``);
       const faqMessage = await faqChannel.fetchMessages();
       // TODO move FAQ message somewhere else so I dont have to look everywhere to update these messages
       await faqMessage.array()[0].edit(`
-• ** I'm not born yet, what should I do?**
-  Once an event is fired for your character you will be born.
+• **I'm not born yet, what should I do?**
+Once an event is fired for your character you will be born.
   
-• ** How do I play ?**
-  As long as you are in the online list you will be playing the game.Does not matter what status you set as long as you are not "Invisible".
+• **How do I play?**
+As long as you are in the online list you will be playing the game. Does not matter what status you set as long as you are not "Invisible".
   
-• ** Will my character be reset ?**
-  The game is in super early development right now so resets are expected.Once the game is complete resets will most likely be a yearly thing with leaderboards.
+• **Will my character be reset?**
+The game is in super early development right now so resets are expected. Once the game is complete resets will most likely be a yearly thing with leaderboards.
   
-• ** How can I help with the development ?**
-  Suggestions are always welcome, if you have experience with NodeJS you're welcome to become a contributor and develop along side with us!
-  You can also support with development by becoming a patron! Keep in mind that you will not gain any advantage over the others and its simply a method of showing your support to the developer!
-  Command: ${value} support
+• **How can I help with the development?**
+Suggestions are always welcome, if you have experience with NodeJS you're welcome to become a contributor and develop along side with us!
+You can also support with development by becoming a patron! Keep in mind that you will not gain any advantage over the others and its simply a method of showing your support to the developer!
+Command: ${value}patreon
   
-• ** My event counter goes up but I did not see anything in the event channels **
-  There are some events such as luck events which fail.When they do it does not print anything but your event counter goes up.
+• **My event counter goes up but I did not see anything in the event channels**
+There are some events such as luck events which fail. When they do it does not print anything but your event counter goes up.
   
-• ** Is there a way to turn off all the spam from events ?**
-  Yes, you can right click the channel to mute and select the mute checkbox.
+• **Is there a way to turn off all the spam from events?**
+Yes, you can right click the channel to mute and select the mute checkbox.
   
-• ** Is this open source ?**
-  Yes, <https://github.com/sizzlorox/Idle-RPG-Bot>
+• **Is this open source?**
+Yes, <https://github.com/sizzlorox/Idle-RPG-Bot>
   
-• ** Do you guys have a trello board ?**
-  Yes, <https://trello.com/b/OnpWqvlp/idle-rpg>
+• **Do you guys have a trello board?**
+Yes, <https://trello.com/b/OnpWqvlp/idle-rpg>
   
-• ** Can I control my character ?**
-  No.
+• **Can I control my character?**
+No.
   
-• ** Whats the command prefix for this bot ?**
-  The prefix is ${value} (eg: ${value} help).
+• **What's the command prefix for this bot?**
+The prefix is ${value} (eg: ${value}help).
   
-• ** Can I host this in my server ?**
-  Theres a command to get the invite link ${value}invite`);
+• **Can I host this in my server?**
+There's a command to get the invite link ${value}invite`);
 
       return true;
     } catch (err) {
