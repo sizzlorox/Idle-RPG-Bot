@@ -695,6 +695,9 @@ const commands = [
         if (!recipient.match(/^\d+$/)) {
           return messageObj.author.send('Please add a bounty to a player.');
         }
+        if (recipient === messageObj.author.id) {
+          return messageObj.author.send('You can\'t give yourself a bounty.');
+        }
         return Game.fetchCommand({
           command: 'placeBounty',
           author: messageObj.author,
