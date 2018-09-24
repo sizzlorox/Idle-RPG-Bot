@@ -105,12 +105,8 @@ const playerSchema = mongoose.Schema({
     default: 'on'
   },
   isPrivateMessage: {
-    type: Boolean,
-    default: false
-  },
-  isPrivateMessageImportant: {
-    type: Boolean,
-    default: false
+    type: String,
+    default: 'off'
   },
   gender: {
     type: String,
@@ -302,8 +298,7 @@ const newPlayerObj = (discordId, guildId, name) => {
       dailyLottery: 0
     },
     isMentionInDiscord: guildId === '390509935097675777' ? 'on' : 'off',
-    isPrivateMessage: false,
-    isPrivateMessageImportant: false,
+    isPrivateMessage: 'off',
     gender: 'neutral',
     equipment: {
       helmet: equipment.empty.helmet,

@@ -1,3 +1,5 @@
+const { guildID } = require('../../settings');
+
 const enumHelper = {
   logTypes: {
     action: 'ACTION',
@@ -10,6 +12,12 @@ const enumHelper = {
     'idle',
     'dnd'
   ],
+
+  pmMode: {
+    on: 'on',
+    off: 'off',
+    filtered: 'filtered'
+  },
 
   map: {
     types: {
@@ -143,7 +151,7 @@ const enumHelper = {
     .map((obj, index) => Object.assign({}, {
       name: `Mocktester${index}`,
       discordId: `Mocktester${index}`,
-      guildId: '425284596138246147'
+      guildId: guildID
     })),
 
   // source cited: https://en.wiktionary.org/wiki/Appendix:English_third-person_singular_pronouns
