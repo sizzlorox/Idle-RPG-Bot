@@ -206,11 +206,16 @@ There's a command to get the invite link !invite`);
       if (channelToSend) {
         await channelToSend.send(message, { split: true });
       }
-      if (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.on || (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.filtered && result.type === 'actions')) {
+      if (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.on
+        || (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.filtered
+          && result.type === 'actions')) {
         const guildMember = await guild.members.find(member => member.id === result.updatedPlayer.discordId);
         await guildMember.send(privateMessage, { split: true });
       }
-      if (result.attackerObj && result.attackerObj.isPrivateMessage === enumHelper.pmMode.on && result.otherPlayerPmMsg) {
+      // Usually used for PVP messages to message player that got attacked that is not owner of event
+      if (result.attackerObj
+        && (result.attackerObj.isPrivateMessage === enumHelper.pmMode.on || result.attackerObj.isPrivateMessage === enumHelper.pmMode.filtered)
+        && result.otherPlayerPmMsg) {
         const otherPlayerPrivateMessage = result.otherPlayerPmMsg.join('\n');
         const guildMember = await guild.members.find(member => member.id === result.attackerObj.discordId);
         await guildMember.send(otherPlayerPrivateMessage, { split: true });
