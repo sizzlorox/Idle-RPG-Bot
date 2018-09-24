@@ -323,17 +323,17 @@ ${rankString}\`\`\``);
   }
 
   async modifyPM(params) {
-    const { author, value, filtered } = params;
+    const { author, value } = params;
     const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
     if (!loadedPlayer) {
       return author.send('Please set this after you have been born');
     }
 
-    if (!filtered && !loadedPlayer.isPrivateMessageImportant && loadedPlayer.isPrivateMessage === value || filtered && loadedPlayer.isPrivateMessageImportant === filtered) {
+    if (loadedPlayer.isPrivateMessage === value) {
       return author.send('Your PM preference is already set to this value.');
     }
     loadedPlayer.isPrivateMessage = value;
-    loadedPlayer.isPrivateMessageImportant = filtered;
+
     await this.Database.savePlayer(loadedPlayer);
 
     return author.send('Preference for being PMed has been updated.');

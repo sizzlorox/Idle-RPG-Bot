@@ -793,23 +793,23 @@ const commands = [
       const { Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const splitCommand = messageObj.content.split(/ (.+)/);
+        let pmMode;
         switch (splitCommand[1].toLowerCase()) {
           case 'on':
+            pmMode = enumHelper.pmMode.on;
+            break;
           case 'off':
-            return Game.fetchCommand({
-              command: 'modifyPM',
-              author: messageObj.author,
-              value: splitCommand[1] === 'on',
-              filtered: false
-            });
+            pmMode = enumHelper.pmMode.off;
+            break;
           case 'filtered':
-            return Game.fetchCommand({
-              command: 'modifyPM',
-              author: messageObj.author,
-              value: true,
-              filtered: true
-            });
+            pmMode = enumHelper.pmMode.filtered
+            break;
         }
+        return Game.fetchCommand({
+          command: 'modifyPM',
+          author: messageObj.author,
+          value: pmMode
+        });
       }
 
       return messageObj.author.send(`\`\`\`Possible options:

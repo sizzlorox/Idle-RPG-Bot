@@ -11,6 +11,12 @@ const enumHelper = {
     'dnd'
   ],
 
+  pmMode: {
+    on: 'on',
+    off: 'off',
+    filtered: 'filtered'
+  },
+
   map: {
     types: {
       town: 'Town'
