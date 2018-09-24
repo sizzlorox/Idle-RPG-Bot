@@ -329,7 +329,7 @@ ${rankString}\`\`\``);
       return author.send('Please set this after you have been born');
     }
 
-    if (loadedPlayer.isPrivateMessage === value || loadedPlayer.isPrivateMessageImportant === filtered) {
+    if (!filtered && !loadedPlayer.isPrivateMessageImportant && loadedPlayer.isPrivateMessage === value || filtered && loadedPlayer.isPrivateMessageImportant === filtered) {
       return author.send('Your PM preference is already set to this value.');
     }
     loadedPlayer.isPrivateMessage = value;
