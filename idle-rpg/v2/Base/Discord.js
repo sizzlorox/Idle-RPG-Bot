@@ -1,5 +1,5 @@
 const { infoLog, actionLog, moveLog } = require('../../utils/logger');
-const { playableStatus } = require('../../utils/enumHelper');
+const enumHelper = require('../../utils/enumHelper');
 
 class Discord {
 
@@ -206,12 +206,11 @@ There's a command to get the invite link !invite`);
       if (channelToSend) {
         await channelToSend.send(message, { split: true });
       }
-      if (result.updatedPlayer.isPrivateMessage && result.updatedPlayer.isPrivateMessageImportant && result.type === 'actions'
-        || result.updatedPlayer.isPrivateMessage && !result.updatedPlayer.isPrivateMessageImportant) {
+      if (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.on || (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.filtered && result.type === 'actions')) {
         const guildMember = await guild.members.find(member => member.id === result.updatedPlayer.discordId);
         await guildMember.send(privateMessage, { split: true });
       }
-      if (result.attackerObj && result.attackerObj.isPrivateMessage && result.otherPlayerPmMsg) {
+      if (result.attackerObj && result.attackerObj.isPrivateMessage === enumHelper.pmMode.on && result.otherPlayerPmMsg) {
         const otherPlayerPrivateMessage = result.otherPlayerPmMsg.join('\n');
         const guildMember = await guild.members.find(member => member.id === result.attackerObj.discordId);
         await guildMember.send(otherPlayerPrivateMessage, { split: true });
