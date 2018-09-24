@@ -336,7 +336,7 @@ ${rankString}\`\`\``);
 
     await this.Database.savePlayer(loadedPlayer);
 
-    return author.send('Preference for being PMed has been updated.');
+    return author.send(`Preference for being PMed has been set to ${value}.`);
   }
 
   async modifyMention(params) {

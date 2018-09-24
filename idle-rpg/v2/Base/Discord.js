@@ -1,5 +1,5 @@
 const { infoLog, actionLog, moveLog } = require('../../utils/logger');
-const { enumHelper } = require('../../utils/enumHelper');
+const enumHelper = require('../../utils/enumHelper');
 
 class Discord {
 
