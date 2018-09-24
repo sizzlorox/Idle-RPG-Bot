@@ -49,14 +49,9 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       loadedPlayer.name = player.name;
 
       // TODO: Remove after reset
-      if (loadedPlayer.isPrivateMessage && !loadedPlayer.isPrivateMessageImportant) {
-        loadedPlayer.isPrivateMessage = pmMode.on;
-      } else if (loadedPlayer.isPrivateMessage && loadedPlayer.isPrivateMessageImportant) {
+      if (loadedPlayer.isPrivateMessageImportant) {
         loadedPlayer.isPrivateMessage = pmMode.filtered;
-      } else if (!loadedPlayer.isPrivateMessage) {
-        loadPlayer.isPrivateMessage = pmMode.off;
       }
-      // console.log(loadedPlayer.name, loadedPlayer.isPrivateMessage, loadedPlayer.isPrivateMessageImportant);
 
       // TODO: Remove these later
       if (loadedPlayer.guildId === 'None') {
