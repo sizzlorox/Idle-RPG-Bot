@@ -1110,13 +1110,13 @@ const commands = [
       const nextLaunch = spaceInfo.launches[0];
       const codeBlock = '\`\`\`';
       let info = codeBlock;
-      info = info.concat(`${nextLaunch.provider}s ${nextLaunch.vehicle}`);
-      info = info.concat(`\nPayLoad: ${nextLaunch.payload}`);
-      info = info.concat(`\nLocation: ${nextLaunch.location}`);
-      info = info.concat(`\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`);
-      info = info.concat(`\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`);
-      info = info.concat(`\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`);
-      info = info.concat(codeBlock);
+      info += `${nextLaunch.provider}s ${nextLaunch.vehicle}`;
+      info += `\nPayLoad: ${nextLaunch.payload}`;
+      info += `\nLocation: ${nextLaunch.location}`;
+      info += `\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`;
+      info += `\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`;
+      info += `\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`;
+      info += codeBlock;
       messageObj.reply(info);
     }
   },
