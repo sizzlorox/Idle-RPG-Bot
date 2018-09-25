@@ -113,17 +113,13 @@ class Database {
     }));
   }
 
-  loadActionLog(discordId) {
-    return new Promise((resolve, reject) => ActionLog.findOne({ playerId: discordId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!result) {
-        return ActionLog.create({ playerId: discordId });
-      }
+  async loadActionLog(discordId) {
+    const result = await ActionLog.findOne({ playerId: discordId });
 
-      return resolve(result);
-    }));
+    if (!result) {
+      ActionLog.create({ playerId: discordId });
+    }
+    return result;
   }
 
   saveActionLog(discordId, updatedActionLog) {

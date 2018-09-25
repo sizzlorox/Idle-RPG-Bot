@@ -715,36 +715,31 @@ const commands = [
     command: ['!eventlog', '!el'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (params) => {
+    function: async (params) => {
       const { Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const splitCommand = messageObj.content.split(/ (.+)/);
-        return Game.fetchCommand({
+        const result = await Game.fetchCommand({
           command: 'playerEventLog',
           author: splitCommand[1].replace(/([\<\@\!\>])/g, ''),
           amount: 15
-        })
-          .then((result) => {
-            if (!result || result.length === 0) {
-              return messageObj.author.send('This player has not activated any Events yet.');
-            }
-
-            return messageObj.author.send(`\`\`\`${result}\`\`\``);
-          });
+        });
+        if (!result || result.length === 0) {
+          return messageObj.author.send('This player has not activated any Events yet.');
+        }
+        return messageObj.author.send(`\`\`\`${result}\`\`\``, { split: { prepend: '\`\`\`', append: '\`\`\`' } });
       }
 
-      return Game.fetchCommand({
+      const result = await Game.fetchCommand({
         command: 'playerEventLog',
         author: messageObj.author.id,
         amount: 15
-      })
-        .then((result) => {
-          if (!result || result.length === 0) {
-            return messageObj.author.send('You have not activated any Events yet.');
-          }
+      });
+      if (!result || result.length === 0) {
+        return messageObj.author.send('You have not activated any Events yet.');
+      }
 
-          return messageObj.author.send(`\`\`\`${result}\`\`\``);
-        });
+      return messageObj.author.send(`\`\`\`${result}\`\`\``, { split: { prepend: '\`\`\`', append: '\`\`\`' } });
     }
   },
 
@@ -993,10 +988,8 @@ const commands = [
           command: 'giveGold',
           recipient: splitCommand[1],
           amount: splitCommand[2]
-        })
-          .then(() => {
-            messageObj.author.send('Done.');
-          });
+        });
+        return messageObj.author.send('Done.');
       }
     }
   },
@@ -1011,10 +1004,8 @@ const commands = [
         Game.fetchCommand({
           command: 'deletePlayer',
           recipient: messageObj.content.split(/ (.+)/)[1]
-        })
-          .then(() => {
-            messageObj.author.send('Done.');
-          });
+        });
+        messageObj.author.send('Done.');
       }
     }
   },

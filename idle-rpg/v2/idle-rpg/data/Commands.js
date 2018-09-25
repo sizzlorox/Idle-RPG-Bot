@@ -298,16 +298,12 @@ ${rankString}\`\`\``);
     return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
   }
 
-  playerEventLog(params) {
+  async playerEventLog(params) {
     const { author, amount } = params;
-    return this.Database.loadActionLog(author.id)
-      .then((playerLog) => {
-        if (!playerLog.log.length) {
-          return;
-        }
-
-        return this.Helper.generateLog(playerLog, amount);
-      });
+    const playerLog = await this.Database.loadActionLog(author);
+    if (playerLog.log) {
+      return this.Helper.generateLog(playerLog.log, amount);
+    }
   }
 
   playerPvpLog(params) {
