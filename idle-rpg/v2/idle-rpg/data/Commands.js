@@ -306,16 +306,12 @@ ${rankString}\`\`\``);
     }
   }
 
-  playerPvpLog(params) {
+  async playerPvpLog(params) {
     const { author, amount } = params;
-    return this.Database.loadPvpLog(author.id)
-      .then((player) => {
-        if (!player) {
-          return;
-        }
-
-        return this.Helper.generatePvpLog(player, amount);
-      });
+    const playerLog = await this.Database.loadPvpLog(author);
+    if (playerLog.log) {
+      return this.Helper.generateLog(playerLog.log, amount);
+    }
   }
 
   async modifyPM(params) {

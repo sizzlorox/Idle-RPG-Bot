@@ -747,36 +747,31 @@ const commands = [
     command: ['!pvplog', '!pl'],
     operatorOnly: false,
     channelOnlyId: commandChannel,
-    function: (params) => {
+    function: async (params) => {
       const { Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const splitCommand = messageObj.content.split(/ (.+)/);
-        return Game.fetchCommand({
+        const result = await Game.fetchCommand({
           command: 'playerPvpLog',
           author: splitCommand[1].replace(/([\<\@\!\>])/g, ''),
           amount: 15
-        })
-          .then((result) => {
-            if (!result || result.length === 0) {
-              return messageObj.author.send('This player has not had any PvP Events yet.');
-            }
-
-            return messageObj.author.send(`\`\`\`${result}\`\`\``);
-          });
+        });
+        if (!result || result.length === 0) {
+          return messageObj.author.send('This player has not had any PvP Events yet.');
+        }
+        return messageObj.author.send(`\`\`\`${result}\`\`\``, { split: { prepend: '\`\`\`', append: '\`\`\`' } });
       }
 
-      return Game.fetchCommand({
+      const result = await Game.fetchCommand({
         command: 'playerPvpLog',
         author: messageObj.author.id,
         amount: 15
-      })
-        .then((result) => {
-          if (!result || result.length === 0) {
-            return messageObj.author.send('You have not had any PvP Events yet.');
-          }
+      });
+      if (!result || result.length === 0) {
+        return messageObj.author.send('You have not had any PvP Events yet.');
+      }
 
-          return messageObj.author.send(`\`\`\`${result}\`\`\``);
-        });
+      return messageObj.author.send(`\`\`\`${result}\`\`\``, { split: { prepend: '\`\`\`', append: '\`\`\`' } });
     }
   },
 
