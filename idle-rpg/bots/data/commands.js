@@ -960,19 +960,21 @@ const commands = [
     }
   },
 
+  // Doesn't work for now.
   activateBlizzard = {
     command: '!blizzard',
     operatorOnly: true,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitCommand = message.content.split(/ (.+)/);
-        const blizzardBoolean = game.blizzardSwitch(splitCommand[1]);
+    function: (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(/ (.+)/);
+        const blizzardBoolean = Game.blizzardSwitch(splitCommand[1]);
         switch (splitCommand) {
           case 'on':
-            message.author.send(blizzardBoolean ? 'Blizzard is already activated!' : 'Blizzard activated.');
+            messageObj.author.send(blizzardBoolean ? 'Blizzard is already activated!' : 'Blizzard activated.');
             break;
           case 'off':
-            message.author.send(!blizzardBoolean ? 'Blizzard is already deactivated!' : 'Blizzard deactivated.');
+            messageObj.author.send(!blizzardBoolean ? 'Blizzard is already deactivated!' : 'Blizzard deactivated.');
             break;
         }
       }
@@ -1036,19 +1038,19 @@ const commands = [
     command: '!resetall',
     operatorOnly: true,
     channelOnlyId: commandChannel,
-    function: (game, message, discordBot) => {
-      game.deleteAllPlayers(discordBot)
-        .then(() => {
-          message.author.send('Done.');
-        });
+    function: async (params) => {
+      const { Bot, Game } = params;
+      await Game.Database.deleteAllPlayers(Bot);
+      message.author.send('Done.');
     }
   },
 
   aprilFools = {
     command: '!aprilfools',
     operatorOnly: true,
-    function: (game, message, discordBot) => {
-      const aprilfools = discordBot.guilds.find('name', 'Idle-RPG').members
+    function: (params) => {
+      const { Bot } = params;
+      const aprilfools = Bot.guilds.get(process.env.GUILD_ID).members
         .filter(player => player.presence.status === 'online' && !player.user.bot
           || player.presence.status === 'idle' && !player.user.bot
           || player.presence.status === 'dnd' && !player.user.bot);
@@ -1073,138 +1075,131 @@ const commands = [
   giveEquipmentToPlayer = {
     command: '!giveplayer',
     operatorOnly: true,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const splitArray = message.content.split(' ');
+    function: async (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitArray = messageObj.content.split(' ');
         const playerId = splitArray[1];
         const position = splitArray[2];
         const equipment = JSON.parse(splitArray.slice(3, splitArray.length).join(' '));
-        game.loadPlayer(playerId)
-          .then((player) => {
-            player.equipment[position] = equipment;
-            game.savePlayer(player)
-              .then(() => {
-                message.author.send('Done.');
-              });
-          });
+        const player = Game.Database.loadPlayer(playerId);
+        player.equipment[position] = equipment;
+        await Game.savePlayer(player);
+        messageObj.author.send('Done.');
       }
     }
   },
 
   randomRepo = {
     command: '!ranrepo',
-    function: (game, message) => {
-      GitHub.randomRepo()
-        .then((repoList) => {
-          const ranIndex = game.helperGetter().randomBetween(0, repoList.length);
-          const randomRepo = repoList[ranIndex];
-          message.reply(`\nRepo: ${randomRepo.name}\nOwner: ${randomRepo.owner.login}\n${randomRepo.url.replace('api.', '').replace('/repos', '')}`);
-        });
+    function: async (params) => {
+      const { Game, messageObj } = params;
+      const repoList = await GitHub.randomRepo();
+      const ranIndex = Game.Helper.randomBetween(0, repoList.length);
+      const randomRepo = repoList[ranIndex];
+      messageObj.reply(`\nRepo: ${randomRepo.name}\nOwner: ${randomRepo.owner.login}\n${randomRepo.url.replace('api.', '').replace('/repos', '')}`);
     }
   },
 
   nextLaunch = {
     command: '!nextlaunch',
     operatorOnly: false,
-    function: (game, message) => {
-      Space.nextLaunch()
-        .then((spaceInfo) => {
-          const nextLaunch = spaceInfo.launches[0];
-          const codeBlock = '\`\`\`';
-          let info = codeBlock;
-          info = info.concat(`${nextLaunch.provider}s ${nextLaunch.vehicle}`);
-          info = info.concat(`\nPayLoad: ${nextLaunch.payload}`);
-          info = info.concat(`\nLocation: ${nextLaunch.location}`);
-          info = info.concat(`\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`);
-          info = info.concat(`\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`);
-          info = info.concat(`\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`);
-          info = info.concat(codeBlock);
-          message.reply(info);
-        });
+    function: async (params) => {
+      const { messageObj } = params;
+      const spaceInfo = await Space.nextLaunch();
+      const nextLaunch = spaceInfo.launches[0];
+      const codeBlock = '\`\`\`';
+      let info = codeBlock;
+      info = info.concat(`${nextLaunch.provider}s ${nextLaunch.vehicle}`);
+      info = info.concat(`\nPayLoad: ${nextLaunch.payload}`);
+      info = info.concat(`\nLocation: ${nextLaunch.location}`);
+      info = info.concat(`\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`);
+      info = info.concat(`\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`);
+      info = info.concat(`\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`);
+      info = info.concat(codeBlock);
+      messageObj.reply(info);
     }
   },
 
   nextStreamlaunch = {
     command: '!nextstreamlaunch',
     operatorOnly: false,
-    function: (game, message) => {
-      Space.nextLaunch()
-        .then((spaceInfo) => {
-          let nextLaunch;
-          for (let i = 0; i < spaceInfo.launches.length; i++) {
-            if (spaceInfo.launches[i].hasStream) {
-              nextLaunch = spaceInfo.launches[i];
-              break;
-            }
-          }
-
-          const codeBlock = '\`\`\`';
-          let info = codeBlock;
-          info = info.concat(`${nextLaunch.provider}s ${nextLaunch.vehicle}`);
-          info = info.concat(`\nPayLoad: ${nextLaunch.payload}`);
-          info = info.concat(`\nLocation: ${nextLaunch.location}`);
-          info = info.concat(`\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`);
-          info = info.concat(`\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`);
-          info = info.concat(`\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`);
-          info = info.concat(codeBlock);
-          message.reply(info);
-        });
+    function: async (params) => {
+      const { messageObj } = params;
+      const spaceInfo = await Space.nextLaunch();
+      let nextLaunch;
+      for (let i = 0; i < spaceInfo.launches.length; i++) {
+        if (spaceInfo.launches[i].hasStream) {
+          nextLaunch = spaceInfo.launches[i];
+          break;
+        }
+      }
+      if (nextLaunch) {
+        const codeBlock = '\`\`\`';
+        let info = codeBlock;
+        info += `${nextLaunch.provider}s ${nextLaunch.vehicle}`;
+        info += `\nPayLoad: ${nextLaunch.payload}`;
+        info += `\nLocation: ${nextLaunch.location}`;
+        info += `\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`;
+        info += `\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`;
+        info += `\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`;
+        info += codeBlock;
+        messageObj.reply(info);
+      } else {
+        messageObj.reply('Couldn\'t find next streamed launch.');
+      }
     }
   },
 
   crypto = {
     command: '!crypto',
     operatorOnly: false,
-    function: (game, message) => {
+    function: async (params) => {
+      const { messageObj } = params;
       let currency = 'BRL';
-      if (message.content.includes(' ')) {
-        currency = message.content.split(/ (.+)/)[1];
+      // https://coinmarketcap.com/api/#endpoint_ticker
+      const validCurrencies = ['AUD', 'BRL', 'CAD', 'CHF', 'CLP', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PKR', 'PLN', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'TWD', 'ZAR', 'BTC', 'ETH', 'XRP', 'LTC', 'BCH'];
+      if (messageObj.content.includes(' ')) {
+        currency = messageObj.content.split(/ (.+)/)[1];
       }
-
-      Crypto.top5(currency)
-        .then((cyrptoInfo) => {
-          const codeBlock = '\`\`\`';
-          const currencyVar = `price_${currency.toLocaleLowerCase()}`;
-          let info = codeBlock;
-          cyrptoInfo.forEach((c) => {
-            info = info.concat(`${c.name} (${c.symbol})`);
-            info = info.concat(`\nRank: ${c.rank}`);
-            info = info.concat(`\nUSD: ${c.price_usd}`);
-            info = info.concat(`\n${currency.toUpperCase()}: ${c[currencyVar]}`);
-            info = info.concat(`\nPercent Change 1h: ${c.percent_change_1h}%`);
-            info = info.concat(`\nPercent Change 24h: ${c.percent_change_24h}%`);
-            info = info.concat(`\nPercent Change 7d: ${c.percent_change_7d}%\n\n`);
-          });
-          info = info.concat(codeBlock);
-          message.reply(info);
-        });
+      if (validCurrencies.indexOf(currency) === -1) {
+        return messageObj.reply(`That\'s not a valid currency.\nValid currencies:\n${validCurrencies.join(', ')}`);
+      }
+      const cryptoInfo = await Crypto.top5(currency);
+      const codeBlock = '\`\`\`';
+      const currencyVar = `price_${currency.toLocaleLowerCase()}`;
+      let info = codeBlock;
+      cryptoInfo.forEach((c) => {
+        info += `${c.name} (${c.symbol})`;
+        info += `\nRank: ${c.rank}`;
+        info += `\nUSD: ${c.price_usd}`;
+        info += `\n${currency.toUpperCase()}: ${c[currencyVar]}`;
+        info += `\nPercent Change 1h: ${c.percent_change_1h}%`;
+        info += `\nPercent Change 24h: ${c.percent_change_24h}%`;
+        info += `\nPercent Change 7d: ${c.percent_change_7d}%\n\n`;
+      });
+      info += codeBlock;
+      messageObj.reply(info);
     }
   },
 
   urban = {
     command: '!urban',
     operatorOnly: false,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        const word = message.content.split(/ (.+)/)[1].toLowerCase().replace(' ', '+');
+    function: async (params) => {
+      const { Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const word = messageObj.content.split(/ (.+)/)[1].toLowerCase().replace(' ', '+');
+        const result = await Urban.searchUrbanDictionary(word);
+        let definition = 'Urban Dictionary Definition of ****\n```';
+        const wordDefinition = result.list.sort((item1, item2) => {
+          return item2.thumbs_up - item1.thumbs_up;
+        })[0];
+        definition = definition.replace('****', `\`${Game.Helper.capitalizeFirstLetter(wordDefinition.word).replace('+', ' ')}\``);
 
-        return Urban.searchUrbanDictionary(word)
-          .then((result) => {
-            let definition = 'Urban Dictionary Definition of ****\n```';
-            const wordDefinition = result.list.sort((item1, item2) => {
-              return item2.thumbs_up - item1.thumbs_up;
-            })[0];
-            definition = definition.replace('****', `\`${game.helperGetter().capitalizeFirstLetter(wordDefinition.word).replace('+', ' ')}\``);
-
-            if (definition.length >= 2000) {
-              return message.reply('The result of this search was more than 2000 characters (Discords message limit) and I`m too lazy to split it for you. Have a nice day.');
-            }
-
-            return message.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`));
-          });
+        return messageObj.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`), { split: true });
       }
-
-      return message.reply('Please specify a word to look up.');
+      return messageObj.reply('Please specify a word to look up.');
     }
   }
 ];
