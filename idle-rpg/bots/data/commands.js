@@ -695,6 +695,9 @@ const commands = [
         if (!recipient.match(/^\d+$/)) {
           return messageObj.author.send('Please add a bounty to a player.');
         }
+        if (recipient === messageObj.author.id) {
+          return messageObj.author.send('You can\'t give yourself a bounty.');
+        }
         return Game.fetchCommand({
           command: 'placeBounty',
           author: messageObj.author,
@@ -794,20 +797,13 @@ const commands = [
       if (messageObj.content.includes(' ')) {
         const splitCommand = messageObj.content.split(/ (.+)/);
         switch (splitCommand[1].toLowerCase()) {
-          case 'on':
-          case 'off':
+          case enumHelper.pmMode.on:
+          case enumHelper.pmMode.off:
+          case enumHelper.pmMode.filtered:
             return Game.fetchCommand({
               command: 'modifyPM',
               author: messageObj.author,
-              value: splitCommand[1] === 'on',
-              filtered: false
-            });
-          case 'filtered':
-            return Game.fetchCommand({
-              command: 'modifyPM',
-              author: messageObj.author,
-              value: true,
-              filtered: true
+              value: splitCommand[1].toLowerCase()
             });
         }
       }

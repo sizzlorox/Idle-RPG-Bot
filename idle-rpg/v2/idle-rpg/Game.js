@@ -9,7 +9,7 @@ const Commands = require('../idle-rpg/data/Commands');
 const Events = require('./data/events/Events');
 const Map = require('../../game/utils/Map');
 const titles = require('./data/titles');
-const { roamingNpcs } = require('../../utils/enumHelper');
+const { roamingNpcs, pmMode } = require('../../utils/enumHelper');
 
 // UTILS
 const Database = require('../../database/Database');
@@ -47,6 +47,11 @@ class Game extends aggregation(BaseGame, BaseHelper) {
 
       // Update players name in case they altered their discord name
       loadedPlayer.name = player.name;
+
+      // TODO: Remove after reset
+      if (loadedPlayer.isPrivateMessageImportant) {
+        loadedPlayer.isPrivateMessage = pmMode.filtered;
+      }
 
       // TODO: Remove these later
       if (loadedPlayer.guildId === 'None') {
