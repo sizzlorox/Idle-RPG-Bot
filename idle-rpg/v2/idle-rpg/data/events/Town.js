@@ -75,7 +75,7 @@ class Town extends aggregation(BaseGame, BaseHelper) {
         // updatedPlayer.equipment[item.position].position = enumHelper.equipment.types[item.position].position;
         const oldItemRating = await this.calculateItemRating(updatedPlayer, updatedPlayer.equipment[item.position]);
         const newItemRating = await this.calculateItemRating(updatedPlayer, item);
-        if (oldItemRating > newItemRating) {
+        if (oldItemRating >= newItemRating) {
           return {
             updatedPlayer
           };
