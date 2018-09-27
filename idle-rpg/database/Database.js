@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
-const { infoLog } = require('../utils/logger');
+const { infoLog, errorLog } = require('../utils/logger');
 
 const gameSchema = require('./schemas/game');
 const { playerSchema, newPlayerObj, resetPlayerObj } = require('./schemas/player');
@@ -114,12 +114,16 @@ class Database {
   }
 
   async loadActionLog(discordId) {
-    const result = await ActionLog.findOne({ playerId: discordId });
-
-    if (!result) {
-      ActionLog.create({ playerId: discordId });
+    try {
+      const result = await ActionLog.findOne({ playerId: discordId });
+  
+      if (!result) {
+        ActionLog.create({ playerId: discordId });
+      }
+      return result;
+    } catch (err) {
+      errorLog.error(err);
     }
-    return result;
   }
 
   saveActionLog(discordId, updatedActionLog) {
@@ -310,15 +314,15 @@ class Database {
       .sort(type));
   }
 
-  loadPlayer(discordId, selectFields = {}) {
-    return new Promise((resolve, reject) => Player.findOne({ discordId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
+  async loadPlayer(discordId, selectFields = {}) {
+    try {
+      const { _doc } = await Player.findOne({ discordId })
+        .select(selectFields);
 
-      return result ? resolve(result._doc) : resolve(null);
-    })
-      .select(selectFields));
+      return _doc;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   // TODO: Change to use Base DB commands Update(Query, Value);

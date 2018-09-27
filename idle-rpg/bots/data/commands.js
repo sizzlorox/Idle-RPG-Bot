@@ -1175,16 +1175,21 @@ const commands = [
     function: async (params) => {
       const { Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
-        const word = messageObj.content.split(/ (.+)/)[1].toLowerCase().replace(' ', '+');
+        const word = messageObj.content.split(/ (.+)/)[1].replace(/ /g, '%20');
         const result = await Urban.searchUrbanDictionary(word);
+        if (result.list.length === 0) {
+          return messageObj.reply(`${word} is not in the Urban Dictionary.`);
+        }
+
         let definition = 'Urban Dictionary Definition of ****\n```';
         const wordDefinition = result.list.sort((item1, item2) => {
           return item2.thumbs_up - item1.thumbs_up;
         })[0];
-        definition = definition.replace('****', `\`${Game.Helper.capitalizeFirstLetter(wordDefinition.word).replace('+', ' ')}\``);
+        definition = definition.replace('****', `\`${Game.Helper.capitalizeFirstLetter(wordDefinition.word).replace(/%20/g, ' ')}\``);
 
         return messageObj.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`), { split: true });
       }
+
       return messageObj.reply('Please specify a word to look up.');
     }
   }
