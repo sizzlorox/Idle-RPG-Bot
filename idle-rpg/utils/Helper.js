@@ -656,19 +656,24 @@ class Helper {
             \`\`\``;
   }
 
-  generateLog(player, count) {
-    if (player.log.length === 0) {
+  generateLog(log, count) {
+    if (log.length === 0) {
       return '';
     }
 
     let logResult = 'Heres what you have done so far:\n      ';
     let logCount = 0;
-    for (let i = player.log.length - 1; i >= 0; i--) {
+    for (let i = log.length - 1; i >= 0; i--) {
       if (logCount === count) {
         break;
       }
-
-      logResult = logResult.concat(`${player.log[i].event} [${this.getTimePassed(player.log[i].timeStamp)} ago]\n      `);
+      let eventText;
+      if (typeof log[i].event === 'string') {
+        eventText = log[i].event;
+      } else {
+        eventText = log[i].event[0];
+      }
+      logResult += `${eventText} [${this.getTimePassed(log[i].timeStamp)} ago]\n      `.replace(/`/g, '');
       logCount++;
     }
 
@@ -764,7 +769,7 @@ class Helper {
         return subjectKey.replace('kills.player', 'Player kills');
       }
       if (subjectKey.includes('quest.completed')) {
-        return subjectKey.replace('quest.completed', 'Completed Quests')
+        return subjectKey.replace('quest.completed', 'Completed Quests');
       }
 
       return subjectKey.split('.')[0];
