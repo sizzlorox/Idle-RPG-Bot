@@ -1177,7 +1177,7 @@ const commands = [
       if (messageObj.content.includes(' ')) {
         const word = messageObj.content.split(/ (.+)/)[1].replace(/ /g, '%20');
         const result = await Urban.searchUrbanDictionary(word);
-        if (result.length === 0) {
+        if (result.list.length === 0) {
           return messageObj.reply(`${word} is not in the Urban Dictionary.`);
         }
 
