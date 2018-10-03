@@ -876,6 +876,32 @@ const commands = [
     }
   },
 
+  getStolenEquip = {
+    command: ['!stolenEquip', '!se'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: async (params) => {
+      const { Game, messageObj } = params;
+      const splitArray = messageObj.content.split(' ');
+      let recipient;
+      if (messageObj.content.includes(' ') && splitArray.length === 2) {
+        recipient = splitArray[1].replace(/([\<\@\!\>])/g, '');
+      } else {
+        recipient = messageObj.author.id;
+      }
+      // TODO: Better var name
+      const s = await Game.fetchCommand({
+        command: 'getStolenEquip',
+        recipient
+      });
+      // TODO: Better messages.
+      if (s) {
+        return messageObj.author.send('stolen: ' + s);
+      }
+      return messageObj.author.send('Found no stolen equip.');
+    }
+  },
+
   // Bot Operator commands
   setPlayerBounty = {
     command: '!setbounty',
