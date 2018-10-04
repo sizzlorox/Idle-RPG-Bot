@@ -437,17 +437,16 @@ class Database {
     }));
   }
 
-  async getStolenEquip(playerId) {
-    const player = await this.loadPlayer(playerId);
+  async getStolenEquip(player) {
     const guildPlayers = await Player.find({ guildId: player.guildId, discordId: { $ne: player.discordId } });
     const slots = ['weapon', 'helmet', 'armor'];
-    const stolenEquips = [];
+    let stolenEquips = '';
 
     guildPlayers.forEach((member) => {
       slots.forEach((slot) => {
         member.equipment[slot].previousOwners.forEach((owner) => {
           if (player.name === owner) {
-            stolenEquips.push(member.equipment[slot].name);
+            stolenEquips += `    ${member.name} - ${member.equipment[slot].name}\n`;
           }
         });
       });
