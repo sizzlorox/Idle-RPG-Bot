@@ -484,5 +484,10 @@ There's a command to get the invite link ${value}invite`);
       });
   }
 
+  getStolenEquip(params) {
+    const { recipient } = params;
+    return this.Database.getStolenEquip(recipient);
+  }
+
 }
 module.exports = Commands;

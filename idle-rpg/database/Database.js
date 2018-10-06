@@ -116,7 +116,7 @@ class Database {
   async loadActionLog(discordId) {
     try {
       const result = await ActionLog.findOne({ playerId: discordId });
-  
+
       if (!result) {
         ActionLog.create({ playerId: discordId });
       }
@@ -435,6 +435,24 @@ class Database {
 
       return resolve(result);
     }));
+  }
+
+  async getStolenEquip(player) {
+    const guildPlayers = await Player.find({ guildId: player.guildId, discordId: { $ne: player.discordId } });
+    const slots = ['weapon', 'helmet', 'armor'];
+    let stolenEquips = '';
+
+    guildPlayers.forEach((member) => {
+      slots.forEach((slot) => {
+        member.equipment[slot].previousOwners.forEach((owner) => {
+          if (player.name === owner) {
+            stolenEquips += `    ${member.name} - ${member.equipment[slot].name}\n`;
+          }
+        });
+      });
+    });
+
+    return stolenEquips;
   }
 
 }

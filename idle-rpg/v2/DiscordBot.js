@@ -173,7 +173,7 @@ class DiscordBot extends BaseHelper {
           });
         }
       });
-      this.bot.user.setActivity(`${onlinePlayers.length} idlers in ${this.bot.guilds.size} guilds`);
+      this.bot.user.setActivity(`${onlinePlayers.length ? onlinePlayers.length : enumHelper.mockPlayers.length} idlers in ${this.bot.guilds.size} guilds`);
     }, 60000 * interval);
   }
 
