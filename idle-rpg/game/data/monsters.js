@@ -914,7 +914,7 @@ const monsters = {
 
     yeti = {
       name: 'Yeti',
-      isXmasEvent: true,
+      holiday: 'xmas',
       isSpawnable: false,
       spawnableBiomes: [
         'Tundra'
@@ -949,7 +949,7 @@ const monsters = {
     },
     xmasGnome = {
       name: 'Christmas Gnome',
-      isXmasEvent: true,
+      holiday: 'xmas',
       isSpawnable: false,
       spawnableBiomes: [
         'Tundra'

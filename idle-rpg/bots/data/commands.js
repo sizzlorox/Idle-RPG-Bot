@@ -949,40 +949,23 @@ const commands = [
       }
     }
   },
-
-  sendChristmasFirstPreMessage = {
-    command: '!xmasfirst',
-    operatorOnly: true,
-    channelOnlyId: commandChannel,
-    function: (game, message) => {
-      game.sendChristmasFirstPreEventMessage();
-    }
-  },
-
-  sendChristmasSecondPreMessage = {
-    command: '!xmassecond',
-    operatorOnly: true,
-    channelOnlyId: commandChannel,
-    function: (game, message) => {
-      game.sendChristmasSecondPreEventMessage();
-    }
-  },
-
-  christmasEventCommand = {
-    command: '!xmas',
-    operatorOnly: true,
-    function: (game, message) => {
+  holidaysCommands = {
+    command: '!holiday',
+    operatorOnly:true,
+    function: (game,message) =>{
       if (message.content.includes(' ')) {
-        switch (message.content.split(/ (.+)/)[1].toLowerCase()) {
+        let splitCommand = message.content.split(/ (.+)/).map(e=>{e.toLowerCase()})
+        switch (splitCommand[2]) {
           case 'true':
             return game.updateChristmasEvent(true);
           case 'false':
             return game.updateChristmasEvent(false);
+          default:
+            return game.sendPreEventMessage(splitCommand[1],splitCommand[2])
         }
       }
     }
   },
-
   // Doesn't work for now.
   activateBlizzard = {
     command: '!blizzard',
