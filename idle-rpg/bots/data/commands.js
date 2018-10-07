@@ -954,7 +954,7 @@ const commands = [
     operatorOnly:true,
     function: (game,message) =>{
       if (message.content.includes(' ')) {
-        let splitCommand = message.content.split(/ (.+)/).map(e=>{e.toLowerCase()})
+        let splitCommand = message.content.split(' ').map(e=>{e.toLowerCase()})
         switch (splitCommand[2]) {
           case 'true':
             return game.updateChristmasEvent(true);
