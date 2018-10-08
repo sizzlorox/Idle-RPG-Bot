@@ -449,7 +449,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           updatedPlayer = await this.InventoryManager.addItemIntoInventory(updatedPlayer, item);
         }
 
-        if (!item.isXmasEvent) {
+        if (!item.holiday) {
           eventMsg.push(`${this.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\``);
         } else {
           eventMsg.push(`**${this.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`);

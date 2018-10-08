@@ -465,7 +465,7 @@ const items = {
       snowFlake = {
         name: 'Snowflake',
         droppedBy: ['Yeti', 'Christmas Gnome'],
-        isXmasEvent: true,
+        holiday: 'xmas',
         isDroppable: false,
         position: 'relic',
         stats: {
@@ -481,7 +481,7 @@ const items = {
       yetiTooth = {
         name: 'Yetis Tooth',
         droppedBy: ['Yeti'],
-        isXmasEvent: true,
+        holiday: 'xmas',
         isDroppable: false,
         position: 'relic',
         stats: {
@@ -497,7 +497,7 @@ const items = {
       candyCane = {
         name: 'Candy Cane',
         droppedBy: ['Yeti', 'Christmas Gnome'],
-        isXmasEvent: true,
+        holiday: 'xmas',
         isDroppable: false,
         position: 'relic',
         stats: {
