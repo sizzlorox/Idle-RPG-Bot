@@ -509,6 +509,54 @@ const items = {
         },
         gold: 3,
         rarity: 90
+      },
+      twizzler = {
+        name: 'Pack of Twizzlers',
+        droppedBy: ['Some Guy with a Thriller Costume', 'Slenderman'],
+        holiday: 'halloween',
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 0,
+          dex: 1,
+          end: 0,
+          int: 1,
+          luk: 1
+        },
+        gold: 2,
+        rarity: 90
+      },
+      corn = {
+        name: 'Candy Corn',
+        droppedBy: ['Slenderman'],
+        holiday: 'halloween',
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 1,
+          dex: 0,
+          end: 0,
+          int: 1,
+          luk: 2
+        },
+        gold: 3,
+        rarity: 60
+      },
+      twizzler = {
+        name: 'Reese\'s Butter Cups',
+        droppedBy: ['Chucky'],
+        holiday: 'halloween',
+        isDroppable: false,
+        position: 'relic',
+        stats: {
+          str: 1,
+          dex: 2,
+          end: 1,
+          int: 1,
+          luk: 2,
+        },
+        gold: 5,
+        rarity: 15
       }
     ],
 

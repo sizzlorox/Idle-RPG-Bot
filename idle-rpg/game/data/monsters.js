@@ -917,7 +917,8 @@ const monsters = {
       holiday: 'xmas',
       isSpawnable: false,
       spawnableBiomes: [
-        'Tundra'
+        map.biomes.caves,
+        map.biomes.mountains
       ],
       power: 1.75,
       health: 150,
@@ -947,12 +948,17 @@ const monsters = {
       gold: 12,
       rarity: 60
     },
+
     xmasGnome = {
       name: 'Christmas Gnome',
       holiday: 'xmas',
       isSpawnable: false,
       spawnableBiomes: [
-        'Tundra'
+        map.biomes.caves,
+        map.biomes.moors,
+        map.biomes.mountains,
+        map.biomes.plains,
+        map.biomes.forest
       ],
       power: 0.75,
       health: 45,
@@ -1895,7 +1901,7 @@ const monsters = {
       gold: 1,
       rarity: 90
     },
-    // coast, town, haunted, forest, plains, mountains, swamp, grassland, caves, plateau, moors, desert
+
     pirate = {
       name: 'Pirate',
       isSpawnable: true,
@@ -1929,6 +1935,125 @@ const monsters = {
       experience: 9,
       gold: 11,
       rarity: 65
+    },
+
+    thrillerGuy = {
+      name: 'Some Guy with a Thriller Costume',
+      holiday: 'halloween',
+      isSpawnable: false,
+      spawnableBiomes: [
+        map.biomes.haunted,
+        map.biomes.caves,
+        map.biomes.moors,
+        map.biomes.mountains,
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.swamp
+      ],
+      power: 0.75,
+      health: 45,
+      stats: {
+        str: 0.75,
+        dex: 0.75,
+        end: 0.75,
+        int: 0.75,
+        luk: 0.75
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'moonwalk',
+          power: 0.75
+        },
+        armor: {
+          name: '',
+          power: 0.75
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 5,
+      gold: 9,
+      rarity: 95
+    },
+
+    slenderMan = {
+      name: 'Slenderman',
+      isSpawnable: false,
+      spawnableBiomes: [
+        map.biomes.forest,
+        map.biomes.haunted
+      ],
+      power: 1.2,
+      health: 85,
+      stats: {
+        str: 1.4,
+        dex: 3,
+        end: 1,
+        int: 0.15,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: '???',
+          power: 4
+        },
+        armor: {
+          name: '',
+          power: 0.1
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 12,
+      gold: 11,
+      rarity: 65
+    },
+
+    chucky = {
+      name: 'Chucky',
+      isSpawnable: false,
+      spawnableBiomes: [
+        map.biomes.haunted,
+        map.biomes.caves,
+        map.biomes.moors,
+        map.biomes.mountains,
+        map.biomes.plains,
+        map.biomes.forest,
+        map.biomes.swamp
+      ],
+      power: 1.7,
+      health: 145,
+      stats: {
+        str: 0.5,
+        dex: 3.2,
+        end: 0.7,
+        int: 2,
+        luk: 1
+      },
+      equipment: {
+        weapon: {
+          attackType: 'melee',
+          name: 'stab',
+          power: 3.2
+        },
+        armor: {
+          name: '',
+          power: 2.2
+        }
+      },
+      inventory: {
+        items: []
+      },
+      spells: [],
+      experience: 40,
+      gold: 7,
+      rarity: 25
     },
   ]
 };

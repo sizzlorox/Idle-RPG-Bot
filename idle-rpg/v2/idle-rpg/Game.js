@@ -7,6 +7,8 @@ const BaseHelper = require('../Base/Helper');
 const { newQuest } = require('../../../idle-rpg/database/schemas/quest');
 const Commands = require('../idle-rpg/data/Commands');
 const Events = require('./data/events/Events');
+const Monster = require('../../game/utils/Monster');
+const Item = require('../../game/utils/Item');
 const Map = require('../../game/utils/Map');
 const titles = require('./data/titles');
 const { roamingNpcs, pmMode } = require('../../utils/enumHelper');
@@ -24,9 +26,24 @@ class Game extends aggregation(BaseGame, BaseHelper) {
     // TODO: remove this Helper then finishing new BaseHelper
     this.Helper = Helper;
     this.Database = new Database(Helper);
+    this.MonsterManager = new Monster(Helper);
+    this.ItemManager = new Item(Helper);
     this.Map = new Map(Helper);
-    this.Events = new Events({ Helper: this.Helper, Map: this.Map, Database: this.Database });
-    this.Commands = new Commands({ Helper: this.Helper, Database: this.Database, Events: this.Events, MapManager: this.Map });
+    this.Events = new Events({
+      Helper: this.Helper,
+      Map: this.Map,
+      Database: this.Database,
+      ItemManager: this.ItemManager,
+      MonsterManager: this.MonsterManager
+    });
+    this.Commands = new Commands({
+      Helper: this.Helper,
+      Database: this.Database,
+      Events: this.Events,
+      MapManager: this.Map,
+      ItemManager: this.ItemManager,
+      MonsterManager: this.MonsterManager
+    });
     this.Database.resetPersonalMultipliers();
     this.guildCommandPrefixs = [];
   }
@@ -53,10 +70,6 @@ class Game extends aggregation(BaseGame, BaseHelper) {
         loadedPlayer.isPrivateMessage = pmMode.filtered;
       }
 
-      // TODO: Remove these later
-      if (loadedPlayer.guildId === 'None') {
-        loadedPlayer.guildId = guildId;
-      }
       if (loadedPlayer.guildId !== guildId) {
         return;
       }
@@ -65,7 +78,6 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       }
 
       const loadedGuildConfig = await this.Database.loadGame(player.guildId);
-      // console.log(`User: ${player.name} - GuildId: ${loadedPlayer.guildId} - Multi: ${loadedGuildConfig.multiplier} - Bless: ${loadedGuildConfig.spells.activeBless} - PM: ${loadedPlayer.personalMultiplier}`);
       await this.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       let eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
       eventResults = await this.setPlayerTitles(eventResults);
