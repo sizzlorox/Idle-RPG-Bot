@@ -94,8 +94,8 @@ class DiscordBot extends BaseHelper {
     });
 
     this.bot.on('guildCreate', async (guild) => {
-      this.Game.loadGuildConfig(guild.id);
-      this.discord.manageGuildChannels(guild);
+      await this.Game.loadGuildConfig(guild.id);
+      await this.discord.manageGuildChannels(guild);
     });
 
 
