@@ -542,7 +542,7 @@ const items = {
         gold: 3,
         rarity: 60
       },
-      twizzler = {
+      reeses = {
         name: 'Reese\'s Butter Cups',
         droppedBy: ['Chucky'],
         holiday: 'halloween',
