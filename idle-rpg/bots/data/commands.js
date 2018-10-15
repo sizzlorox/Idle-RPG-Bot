@@ -37,6 +37,7 @@ const commands = [
 !pl, !pvplog - Lists up to 15 past PvP events
 !pl, !pvplog <@Mention of player> - Lists up to 15 past PvP events of mentioned player
 !nq, !newquest - Changes the quest mob if quest has not been updated for more than 2 days
+!se, !stolenequip <@Mention of player> - Lists players stolen equipment
 !mention <on|off|action|move> - Change if events relating to you will @Mention you
 !pm <on|off|filtered> - Change if events relating to you will be private messaged to you
 !gender <male|female|neutral|neuter> - Change your character's gender
@@ -876,6 +877,38 @@ const commands = [
     }
   },
 
+  getStolenEquip = {
+    command: ['!stolenequip', '!se'],
+    operatorOnly: false,
+    channelOnlyId: commandChannel,
+    function: async (params) => {
+      const { Game, messageObj, Bot } = params;
+      const splitArray = messageObj.content.split(' ');
+      let recipient;
+      let header;
+      if (messageObj.content.includes(' ') && splitArray.length === 2) {
+        const playerId = splitArray[1].replace(/([\<\@\!\>])/g, '');
+        const playerObj = await Bot.users.filter(player => player.id === playerId && !player.bot).array();
+        if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
+          return messageObj.author.send(`${playerId} was not found!`);
+        }
+        recipient = await Game.Database.loadPlayer(playerId);
+        header = `Here is ${recipient.name}'s stolen equipment!`;
+      } else {
+        recipient = await Game.Database.loadPlayer(messageObj.author.id);
+        header = 'Here is your stolen equipment!';
+      }
+      const stolenEquip = await Game.fetchCommand({
+        command: 'getStolenEquip',
+        recipient
+      });
+      if (stolenEquip) {
+        return messageObj.author.send(`\`\`\`${header}\n${stolenEquip}\`\`\``);
+      }
+      return messageObj.author.send(`${messageObj.author.id === recipient.discordId ? 'You have' : `${recipient.name} has`} no stolen equipment.`);
+    }
+  },
+
   // Bot Operator commands
   setPlayerBounty = {
     command: '!setbounty',
@@ -917,34 +950,31 @@ const commands = [
     }
   },
 
-  sendChristmasFirstPreMessage = {
-    command: '!xmasfirst',
+  holidaysCommands = {
+    command: '!holiday',
     operatorOnly: true,
-    channelOnlyId: commandChannel,
-    function: (game, message) => {
-      game.sendChristmasFirstPreEventMessage();
-    }
-  },
-
-  sendChristmasSecondPreMessage = {
-    command: '!xmassecond',
-    operatorOnly: true,
-    channelOnlyId: commandChannel,
-    function: (game, message) => {
-      game.sendChristmasSecondPreEventMessage();
-    }
-  },
-
-  christmasEventCommand = {
-    command: '!xmas',
-    operatorOnly: true,
-    function: (game, message) => {
-      if (message.content.includes(' ')) {
-        switch (message.content.split(/ (.+)/)[1].toLowerCase()) {
+    function: (params) => {
+      const { Game, Bot, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const splitCommand = messageObj.content.split(' ').map(e => e.toLowerCase());
+        switch (splitCommand[2]) {
           case 'true':
-            return game.updateChristmasEvent(true);
           case 'false':
-            return game.updateChristmasEvent(false);
+            return Game.fetchCommand({
+              command: 'updateHoliday',
+              Bot,
+              author: messageObj.author,
+              whichHoliday: splitCommand[1],
+              isStarting: splitCommand[2] === 'true'
+            });
+          default:
+            return Game.fetchCommand({
+              command: 'sendPreEventMessage',
+              Bot,
+              author: messageObj.author,
+              whichHoliday: splitCommand[1],
+              whichMessage: splitCommand[2]
+            });
         }
       }
     }

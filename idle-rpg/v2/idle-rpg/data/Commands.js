@@ -7,6 +7,7 @@ const BaseHelper = require('../../Base/Helper');
 const titles = require('./titles');
 const globalSpells = require('../../../game/data/globalSpells');
 const enumHelper = require('../../../utils/enumHelper');
+const holidays = require('../data/holidays');
 
 // UTILS
 const { errorLog } = require('../../../utils/logger');
@@ -15,11 +16,13 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
     super();
-    const { Helper, Database, Events, MapManager } = params;
+    const { Helper, Database, Events, MapManager, ItemManager, MonsterManager } = params;
     this.Helper = Helper;
     this.Database = Database;
     this.Events = Events;
     this.MapManager = MapManager;
+    this.ItemManager = ItemManager;
+    this.MonsterManager = MonsterManager;
   }
 
   async playerStats(params) {
@@ -482,6 +485,74 @@ There's a command to get the invite link ${value}invite`);
         updatingPlayer.gold.total += Number(amount);
         this.Database.savePlayer(updatingPlayer);
       });
+  }
+
+  getStolenEquip(params) {
+    const { recipient } = params;
+    return this.Database.getStolenEquip(recipient);
+  }
+
+  async sendPreEventMessage(params) {
+    const { Bot, author, whichHoliday, whichMessage } = params;
+    switch (whichMessage) {
+      case 'preevent':
+      case 'secondpreevent':
+        const message = holidays[whichHoliday].messages[whichMessage];
+        if (message) {
+          await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+          return author.send(`Holiday ${whichHoliday} ${whichMessage} message sent`);
+        }
+
+        return author.send(`Holiday ${whichHoliday} ${whichMessage} message failed to send`);
+      default:
+        return author.send(`Holiday ${whichHoliday} ${whichMessage} message failed to send`);
+    }
+  }
+
+  // TODO change to utilize setTimeout
+  async updateHoliday(params) {
+    const { Bot, author, whichHoliday, isStarting } = params;
+    if (isStarting) {
+      await this.MonsterManager.monsters.forEach((mob) => {
+        if (mob.holiday === whichHoliday) {
+          mob.isSpawnable = true;
+        }
+      });
+      await this.ItemManager.items.forEach((type) => {
+        type.forEach((item) => {
+          if (item.holiday === whichHoliday) {
+            item.isDroppable = true;
+          }
+        });
+      });
+      const message = holidays[whichHoliday].messages.holidaystart;
+      if (message) {
+        await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+        return author.send(`Holiday ${whichHoliday} start message sent`);
+      }
+
+      return author.send(`Holiday ${whichHoliday} start message failed to send`);
+    }
+
+    await this.MonsterManager.monsters.forEach((mob) => {
+      if (mob.holiday === whichHoliday) {
+        mob.isSpawnable = false;
+      }
+    });
+    await this.ItemManager.items.forEach((type) => {
+      type.forEach((item) => {
+        if (item.holiday === whichHoliday) {
+          item.isDroppable = false;
+        }
+      });
+    });
+    const message = holidays[whichHoliday].messages.holidayend;
+    if (message) {
+      await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+      return author.send(`Holiday ${whichHoliday} end message sent`);
+    }
+
+    return author.send(`Holiday ${whichHoliday} end message failed to send`);
   }
 
 }

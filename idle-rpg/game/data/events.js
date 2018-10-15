@@ -588,7 +588,7 @@ const events = {
           }
 
           let eventMsg;
-          if (!item.isXmasEvent) {
+          if (!item.holiday) {
             eventMsg = `${helper.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\``;
           } else {
             eventMsg = `**${helper.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`;
