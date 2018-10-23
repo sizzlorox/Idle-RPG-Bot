@@ -9,23 +9,21 @@ const enumHelper = require('../../../../utils/enumHelper');
 const Town = require('./Town');
 const Battle = require('./Battle');
 const Luck = require('./Luck');
-const Monster = require('../../../../game/utils/Monster');
 const Spell = require('../../../../game/utils/Spell');
-const Item = require('../../../../game/utils/Item');
 const Inventory = require('../../../../game/utils/Inventory');
 
 class Events extends BaseHelper {
 
   constructor(params) {
     super();
-    const { Helper, Map, Database } = params;
+    const { Helper, Map, Database, ItemManager, MonsterManager } = params;
     this.Helper = Helper;
     this.MapManager = Map;
     this.Database = Database;
-    this.MonsterManager = new Monster(this.Helper);
-    this.ItemManager = new Item(this.Helper);
     this.SpellManager = new Spell(this.Helper);
     this.InventoryManager = new Inventory();
+    this.MonsterManager = MonsterManager;
+    this.ItemManager = ItemManager;
     this.Battle = new Battle({
       Helper: this.Helper,
       Database: this.Database,
@@ -141,7 +139,7 @@ class Events extends BaseHelper {
     const { isBlizzardActive } = events;
     try {
       const luckDice = await this.randomBetween(0, 100);
-      if (luckDice <= 5 + (updatedPlayer.stats.luk / 4)) {
+      if (luckDice <= 3 + (updatedPlayer.stats.luk / 4)) {
         return this.LuckEvents.godsEvent(updatedPlayer);
       }
 

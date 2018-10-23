@@ -116,7 +116,7 @@ class Database {
   async loadActionLog(discordId) {
     try {
       const result = await ActionLog.findOne({ playerId: discordId });
-  
+
       if (!result) {
         ActionLog.create({ playerId: discordId });
       }
@@ -380,11 +380,11 @@ class Database {
     }));
   }
 
-  resetAllPlayers() {
+  resetAllPlayersInGuild(guildId) {
     const resetObj = resetPlayerObj;
     resetObj.map = this.MapClass.getRandomTown();
 
-    return new Promise((resolve, reject) => Player.update({},
+    return new Promise((resolve, reject) => Player.update({ guildId },
       {
         $set: resetObj
       },
@@ -427,14 +427,32 @@ class Database {
     }));
   }
 
-  deleteAllPlayers() {
-    return new Promise((resolve, reject) => Player.remove({}, (err, result) => {
+  deleteAllPlayersInGuild(guildId) {
+    return new Promise((resolve, reject) => Player.remove({ guildId }, (err, result) => {
       if (err) {
         return reject(err);
       }
 
       return resolve(result);
     }));
+  }
+
+  async getStolenEquip(player) {
+    const guildPlayers = await Player.find({ guildId: player.guildId, discordId: { $ne: player.discordId } });
+    const slots = ['weapon', 'helmet', 'armor'];
+    let stolenEquips = '';
+
+    guildPlayers.forEach((member) => {
+      slots.forEach((slot) => {
+        member.equipment[slot].previousOwners.forEach((owner) => {
+          if (player.name === owner) {
+            stolenEquips += `    ${member.name} - ${member.equipment[slot].name}\n`;
+          }
+        });
+      });
+    });
+
+    return stolenEquips;
   }
 
 }
