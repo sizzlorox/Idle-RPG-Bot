@@ -21,7 +21,7 @@ class Item {
       let itemType;
       let randomEquipmentIndex;
       let randomTypeIndex;
-      if (mob && mob.isXmasEvent) {
+      if (mob && mob.holiday) {
         do {
           // console.log('generating relic item');
           randomTypeIndex = this.Helper.randomBetween(0, items.type[3].length - 1);
@@ -72,7 +72,7 @@ class Item {
             int: itemInt,
             luk: itemLuk
           },
-          isXmasEvent: itemType.isXmasEvent,
+          holiday: itemType.holiday,
           rating: itemRating,
           gold: Number((itemRarityList[randomRarityIndex].gold
             * itemType.gold).toFixed()) * itemType.power
@@ -81,7 +81,7 @@ class Item {
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
           position: itemType.position,
-          isXmasEvent: itemType.isXmasEvent,
+          holiday: itemType.holiday,
           power: itemRarityList[randomRarityIndex].power + itemType.power,
           gold: Number((itemRarityList[randomRarityIndex].gold
             * itemMaterialList[randomMaterialIndex].gold
@@ -91,7 +91,7 @@ class Item {
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
           position: itemType.position,
-          isXmasEvent: itemType.isXmasEvent,
+          holiday: itemType.holiday,
           power: itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power,
           attackType: itemType.attackType,
           gold: Number((itemRarityList[randomRarityIndex].gold
@@ -133,7 +133,7 @@ class Item {
         int: itemInt,
         luk: itemLuk
       },
-      isXmasEvent: snowFlake.isXmasEvent,
+      holiday: snowFlake.holiday,
       rating: itemRating,
       gold: Number((itemRarityList[randomRarityIndex].gold
         * snowFlake.gold).toFixed()) * itemRating

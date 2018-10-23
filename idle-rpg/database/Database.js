@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
-const { infoLog } = require('../utils/logger');
+const { infoLog, errorLog } = require('../utils/logger');
 
 const gameSchema = require('./schemas/game');
 const { playerSchema, newPlayerObj, resetPlayerObj } = require('./schemas/player');
@@ -113,17 +113,17 @@ class Database {
     }));
   }
 
-  loadActionLog(discordId) {
-    return new Promise((resolve, reject) => ActionLog.findOne({ playerId: discordId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!result) {
-        return ActionLog.create({ playerId: discordId });
-      }
+  async loadActionLog(discordId) {
+    try {
+      const result = await ActionLog.findOne({ playerId: discordId });
 
-      return resolve(result);
-    }));
+      if (!result) {
+        ActionLog.create({ playerId: discordId });
+      }
+      return result;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   saveActionLog(discordId, updatedActionLog) {
@@ -314,15 +314,15 @@ class Database {
       .sort(type));
   }
 
-  loadPlayer(discordId, selectFields = {}) {
-    return new Promise((resolve, reject) => Player.findOne({ discordId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
+  async loadPlayer(discordId, selectFields = {}) {
+    try {
+      const { _doc } = await Player.findOne({ discordId })
+        .select(selectFields);
 
-      return result ? resolve(result._doc) : resolve(null);
-    })
-      .select(selectFields));
+      return _doc;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   // TODO: Change to use Base DB commands Update(Query, Value);
@@ -380,11 +380,11 @@ class Database {
     }));
   }
 
-  resetAllPlayers() {
+  resetAllPlayersInGuild(guildId) {
     const resetObj = resetPlayerObj;
     resetObj.map = this.MapClass.getRandomTown();
 
-    return new Promise((resolve, reject) => Player.update({},
+    return new Promise((resolve, reject) => Player.update({ guildId },
       {
         $set: resetObj
       },
@@ -427,14 +427,32 @@ class Database {
     }));
   }
 
-  deleteAllPlayers() {
-    return new Promise((resolve, reject) => Player.remove({}, (err, result) => {
+  deleteAllPlayersInGuild(guildId) {
+    return new Promise((resolve, reject) => Player.remove({ guildId }, (err, result) => {
       if (err) {
         return reject(err);
       }
 
       return resolve(result);
     }));
+  }
+
+  async getStolenEquip(player) {
+    const guildPlayers = await Player.find({ guildId: player.guildId, discordId: { $ne: player.discordId } });
+    const slots = ['weapon', 'helmet', 'armor'];
+    let stolenEquips = '';
+
+    guildPlayers.forEach((member) => {
+      slots.forEach((slot) => {
+        member.equipment[slot].previousOwners.forEach((owner) => {
+          if (player.name === owner) {
+            stolenEquips += `    ${member.name} - ${member.equipment[slot].name}\n`;
+          }
+        });
+      });
+    });
+
+    return stolenEquips;
   }
 
 }

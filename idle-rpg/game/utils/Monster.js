@@ -67,7 +67,7 @@ class Monster {
         equipment: monsterTypeList[randomTypeIndex].equipment,
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,
-        isXmasEvent: monsterTypeList[randomTypeIndex].isXmasEvent,
+        holiday: monsterTypeList[randomTypeIndex].holiday,
         experience: Math.ceil((monsterRarityList[randomRarityIndex].experience
           * monsterTypeList[randomTypeIndex].experience) / 2),
         gold: Math.round((monsterRarityList[randomRarityIndex].gold

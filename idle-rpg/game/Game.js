@@ -5,6 +5,7 @@ const { errorLog } = require('../utils/logger');
 const globalSpells = require('./data/globalSpells');
 const { guildID, leaderboardChannelId, announcementChannelId } = require('../../settings');
 const { newQuest } = require('../database/schemas/quest');
+const holidays = require('./data/holidays');
 
 /**
  * GANE CLASS
@@ -719,7 +720,7 @@ ${rankString}
    * Deletes all players in database
    */
   deleteAllPlayers(discordBot) {
-    return this.Database.resetAllPlayers()
+    return this.Database.resetAllPlayersInGuild(guildID)
       .then(this.updateLeaderboards(discordBot))
       .then(() => {
         const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
@@ -773,48 +774,63 @@ ${rankString}
     return this.Helper.sendMessage(undefined, false, '@everyone\`\`\`python\n\'Rumour has it that some mysterious beasts appeared in Wintermere, Norpond and North Redmount. Inns and taverns all over the world are full of curious adventurers. Is it somehow connected with recent news from Olohaseth?\'\`\`\`');
   }
 
+  sendPreEventMessage(whichHoliday, whichMessage) {
+    let message = '';
+    switch (whichMessage) {
+      case 'first':
+        message = holidays[whichHoliday].messages.preevent;
+        break;
+      case 'second':
+        message = holidays[whichHoliday].messages.secondpreevent;
+        break;
+      default:
+        return errorLog.error('invalid message');
+    }
+
+    return this.Helper.sendMessage(undefined, false, message);
+  }
+
   helperGetter() {
     return this.Helper;
   }
 
-  // TODO change to utilize setTimeout
   /**
-   * Activates christmas mobs to be spawnable and items droppable
+   * Activates holiday mobs to be spawnable and items droppable
    * @param {*} isStarting
    */
-  // TODO clean up this mess
-  updateChristmasEvent(isStarting) {
+  // TODO change to utilize setTimeout
+  updateHoliday(whichHoliday, isStarting) {
     if (isStarting) {
-      this.Helper.sendMessage(undefined, false, '@everyone\`\`\`python\n\'The bravest adventurers started their expedition to the northern regions and discovered unbelievable things. It seems that Yetis had awoken from their snow caves after hundreds of years of sleep. Are they not a myth anymore?\'\`\`\`');
       this.Event.MonsterClass.monsters.forEach((mob) => {
-        if (mob.isXmasEvent) {
+        if (mob.holiday === whichHoliday) {
           mob.isSpawnable = true;
         }
       });
       this.Event.ItemClass.items.forEach((type) => {
         type.forEach((item) => {
-          if (item.isXmasEvent && item.name !== 'Snowflake') {
+          if (item.holiday === whichHoliday) {
             item.isDroppable = true;
           }
         });
       });
-      return '';
+
+      return this.Helper.sendMessage(undefined, false, holidays[whichHoliday].messages.holidaystart);
     }
 
-    this.Helper.sendMessage(undefined, false, '@everyone\`\`\`python\n\'Thousand of townsmen in Olohaseth, Kindale and other towns are celebrating end of the Darknight. It seems that Christmas Gnomes lost all their candy canes and all Yetis are back to their caves. Though noone knows for how long...\'\`\`\`');
     this.Event.MonsterClass.monsters.forEach((mob) => {
-      if (mob.isXmasEvent) {
+      if (mob.holiday === whichHoliday) {
         mob.isSpawnable = false;
       }
     });
     this.Event.ItemClass.items.forEach((type) => {
       type.forEach((item) => {
-        if (item.isXmasEvent && item.name !== 'Snowflake') {
+        if (item.holiday === whichHoliday) {
           item.isDroppable = false;
         }
       });
     });
-    return '';
+
+    return this.Helper.sendMessage(undefined, false, holidays[whichHoliday].messages.holidayend);
   }
 
   updateLeaderboards(discordBot) {

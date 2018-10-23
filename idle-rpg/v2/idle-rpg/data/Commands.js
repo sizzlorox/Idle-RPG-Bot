@@ -7,6 +7,8 @@ const BaseHelper = require('../../Base/Helper');
 const titles = require('./titles');
 const globalSpells = require('../../../game/data/globalSpells');
 const enumHelper = require('../../../utils/enumHelper');
+const holidays = require('../data/holidays');
+const { guildID } = require('../../../../settings');
 
 // UTILS
 const { errorLog } = require('../../../utils/logger');
@@ -15,11 +17,13 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
     super();
-    const { Helper, Database, Events, MapManager } = params;
+    const { Helper, Database, Events, MapManager, ItemManager, MonsterManager } = params;
     this.Helper = Helper;
     this.Database = Database;
     this.Events = Events;
     this.MapManager = MapManager;
+    this.ItemManager = ItemManager;
+    this.MonsterManager = MonsterManager;
   }
 
   async playerStats(params) {
@@ -298,28 +302,20 @@ ${rankString}\`\`\``);
     return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
   }
 
-  playerEventLog(params) {
+  async playerEventLog(params) {
     const { author, amount } = params;
-    return this.Database.loadActionLog(author.id)
-      .then((playerLog) => {
-        if (!playerLog.log.length) {
-          return;
-        }
-
-        return this.Helper.generateLog(playerLog, amount);
-      });
+    const playerLog = await this.Database.loadActionLog(author);
+    if (playerLog.log) {
+      return this.Helper.generateLog(playerLog.log, amount);
+    }
   }
 
-  playerPvpLog(params) {
+  async playerPvpLog(params) {
     const { author, amount } = params;
-    return this.Database.loadPvpLog(author.id)
-      .then((player) => {
-        if (!player) {
-          return;
-        }
-
-        return this.Helper.generatePvpLog(player, amount);
-      });
+    const playerLog = await this.Database.loadPvpLog(author);
+    if (playerLog.log) {
+      return this.Helper.generateLog(playerLog.log, amount);
+    }
   }
 
   async modifyPM(params) {
@@ -490,6 +486,103 @@ There's a command to get the invite link ${value}invite`);
         updatingPlayer.gold.total += Number(amount);
         this.Database.savePlayer(updatingPlayer);
       });
+  }
+
+  getStolenEquip(params) {
+    const { recipient } = params;
+    return this.Database.getStolenEquip(recipient);
+  }
+
+  async sendPreEventMessage(params) {
+    const { Bot, author, whichHoliday, whichMessage } = params;
+    switch (whichMessage) {
+      case 'preevent':
+      case 'secondpreevent':
+        const message = holidays[whichHoliday].messages[whichMessage];
+        if (message) {
+          await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+          return author.send(`Holiday ${whichHoliday} ${whichMessage} message sent`);
+        }
+
+        return author.send(`Holiday ${whichHoliday} ${whichMessage} message failed to send`);
+      default:
+        return author.send(`Holiday ${whichHoliday} ${whichMessage} message failed to send`);
+    }
+  }
+
+  // TODO change to utilize setTimeout
+  async updateHoliday(params) {
+    const { Bot, author, whichHoliday, isStarting } = params;
+    if (isStarting) {
+      await this.MonsterManager.monsters.forEach((mob) => {
+        if (mob.holiday === whichHoliday) {
+          mob.isSpawnable = true;
+        }
+      });
+      await this.ItemManager.items.forEach((type) => {
+        type.forEach((item) => {
+          if (item.holiday === whichHoliday) {
+            item.isDroppable = true;
+          }
+        });
+      });
+      const message = holidays[whichHoliday].messages.holidaystart;
+      if (message) {
+        await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+        return author.send(`Holiday ${whichHoliday} start message sent`);
+      }
+
+      return author.send(`Holiday ${whichHoliday} start message failed to send`);
+    }
+
+    await this.MonsterManager.monsters.forEach((mob) => {
+      if (mob.holiday === whichHoliday) {
+        mob.isSpawnable = false;
+      }
+    });
+    await this.ItemManager.items.forEach((type) => {
+      type.forEach((item) => {
+        if (item.holiday === whichHoliday) {
+          item.isDroppable = false;
+        }
+      });
+    });
+    const message = holidays[whichHoliday].messages.holidayend;
+    if (message) {
+      await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+      return author.send(`Holiday ${whichHoliday} end message sent`);
+    }
+
+    return author.send(`Holiday ${whichHoliday} end message failed to send`);
+  }
+
+  async resetPlayers(params) {
+    const { Bot, author } = params;
+    const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
+    const announcementChannel = discordBot.guilds.find('id', guildID).channels.find('id', announcementChannelId);
+    const leaderboardMessages = leaderboardChannel.fetchMessages({ limit: 10 });
+    let resetMsg = '';
+    if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
+      await leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
+    }
+
+    this.config = {
+      multiplier: 1,
+      spells: {
+        activeBless: 0
+      },
+      dailyLottery: {
+        prizePool: 1500
+      }
+    };
+
+    await this.Database.resetAllPlayersInGuild(guildID);
+    await Bot.updateLeaderboards();
+    await this.Database.resetAllLogs();
+    await this.Database.updateGame(this.config);
+    resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
+    await announcementChannel.send(resetMsg);
+    return author.send('Reset complete...');
   }
 
 }
