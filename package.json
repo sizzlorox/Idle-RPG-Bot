@@ -7,7 +7,8 @@
     "start:windows": "SET NODE_ENV=production && node app.js",
     "start": "NODE_ENV=production node app.js",
     "test:windows": "SET NODE_ENV=development && node app.js",
-    "test": "NODE_ENV=development node app.js"
+    "test": "NODE_ENV=development node app.js",
+    "debug:windows": "SET NODE_ENV=development && node %NODE_DEBUG_OPTION% app.js"
   },
   "author": "Sunny Huang",
   "license": "ISC",
