@@ -58,7 +58,9 @@ class DiscordBot extends BaseHelper {
   loadEventListeners() {
     this.bot.on('error', err => errorLog.error(err));
     this.bot.once('ready', () => {
-      this.bot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
+      if (!this.bot.user.avatarURL) { // avatarURL == null if not set
+        this.bot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
+      }
       this.bot.user.setStatus('idle');
       this.discord.loadGuilds();
       this.loadHeartBeat();
