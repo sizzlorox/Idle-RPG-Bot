@@ -10,12 +10,12 @@
 An Idle-RPG bot for Discord created using node.js with the [discord.js](https://github.com/discordjs) framework.
 This is an open-source project and is currently still in development. A lot is still to be done.
 
-This is a project to practice and learn more on how to create bots for Discord/Twitch and to practice javascript.
-Anyobody who is willing to join in on this project is welcome to do so!
+This is a project to practice and learn more on how to create a bot for Discord and to practice javascript.
+Anybody who is willing to join in on this project is welcome to do so!
 
-To see this bot in action it is currently running at this discord server:
-[Idle-RPG Discord Server](https://discord.gg/nAEBTcj)
-[Idle-RPG Trello Board](https://trello.com/b/OnpWqvlp/idle-rpg)
+To see this bot in action it is currently running at the [Idle-RPG Discord Server](https://discord.gg/nAEBTcj)
+
+There is also a [Idle-RPG Trello Board](https://trello.com/b/OnpWqvlp/idle-rpg)
 
 # Setup
 Create a .env file in the project root directory with these env variables: (Without < >)
