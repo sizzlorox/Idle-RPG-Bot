@@ -190,18 +190,15 @@ There's a command to get the invite link !invite`);
     const guildOfflineMembers = [];
     guild.members.forEach((member) => {
       if (!member.user.bot && member.id !== this.bot.user.id) {
+        const player = Object.assign({}, {
+          discordId: member.id,
+          name: member.nickname ? member.nickname : member.displayName,
+          guildId: guild.id
+        });
         if (member.presence.status.includes('offline')) {
-          guildOfflineMembers.push(Object.assign({}, {
-            discordId: member.id,
-            name: member.nickname ? member.nickname : member.displayName,
-            guildId: guild.id
-          }));
+          guildOfflineMembers.push(player);
         } else {
-          guildOnlineMembers.push(Object.assign({}, {
-            discordId: member.id,
-            name: member.nickname ? member.nickname : member.displayName,
-            guildId: guild.id
-          }));
+          guildOnlineMembers.push(player);
         }
       }
     });
