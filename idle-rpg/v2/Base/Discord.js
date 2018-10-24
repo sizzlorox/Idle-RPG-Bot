@@ -185,6 +185,29 @@ There's a command to get the invite link !invite`);
       }));
   }
 
+  getMembers(guild) {
+    const guildOnlineMembers = [];
+    const guildOfflineMembers = [];
+    guild.members.forEach((member) => {
+      if (!member.user.bot && member.id !== this.bot.user.id) {
+        if (member.presence.status.includes('offline')) {
+          guildOfflineMembers.push(Object.assign({}, {
+            discordId: member.id,
+            name: member.nickname ? member.nickname : member.displayName,
+            guildId: guild.id
+          }));
+        } else {
+          guildOnlineMembers.push(Object.assign({}, {
+            discordId: member.id,
+            name: member.nickname ? member.nickname : member.displayName,
+            guildId: guild.id
+          }));
+        }
+      }
+    });
+    return { guildOnlineMembers, guildOfflineMembers };
+  }
+
   async sendMessage(guild, result) {
     try {
       if (!result || result && !result.msg || result && !result.pm) {
