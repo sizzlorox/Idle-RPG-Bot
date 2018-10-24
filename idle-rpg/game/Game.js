@@ -720,7 +720,7 @@ ${rankString}
    * Deletes all players in database
    */
   deleteAllPlayers(discordBot) {
-    return this.Database.resetAllPlayers()
+    return this.Database.resetAllPlayersInGuild(guildID)
       .then(this.updateLeaderboards(discordBot))
       .then(() => {
         const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);

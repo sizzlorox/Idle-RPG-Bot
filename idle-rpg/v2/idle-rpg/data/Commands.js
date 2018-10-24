@@ -8,6 +8,7 @@ const titles = require('./titles');
 const globalSpells = require('../../../game/data/globalSpells');
 const enumHelper = require('../../../utils/enumHelper');
 const holidays = require('../data/holidays');
+const { guildID } = require('../../../../settings');
 
 // UTILS
 const { errorLog } = require('../../../utils/logger');
@@ -553,6 +554,35 @@ There's a command to get the invite link ${value}invite`);
     }
 
     return author.send(`Holiday ${whichHoliday} end message failed to send`);
+  }
+
+  async resetPlayers(params) {
+    const { Bot, author } = params;
+    const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
+    const announcementChannel = discordBot.guilds.find('id', guildID).channels.find('id', announcementChannelId);
+    const leaderboardMessages = leaderboardChannel.fetchMessages({ limit: 10 });
+    let resetMsg = '';
+    if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
+      await leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
+    }
+
+    this.config = {
+      multiplier: 1,
+      spells: {
+        activeBless: 0
+      },
+      dailyLottery: {
+        prizePool: 1500
+      }
+    };
+
+    await this.Database.resetAllPlayersInGuild(guildID);
+    await Bot.updateLeaderboards();
+    await this.Database.resetAllLogs();
+    await this.Database.updateGame(this.config);
+    resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
+    await announcementChannel.send(resetMsg);
+    return author.send('Reset complete...');
   }
 
 }

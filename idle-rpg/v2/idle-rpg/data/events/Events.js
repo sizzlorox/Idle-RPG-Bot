@@ -139,7 +139,7 @@ class Events extends BaseHelper {
     const { isBlizzardActive } = events;
     try {
       const luckDice = await this.randomBetween(0, 100);
-      if (luckDice <= 5 + (updatedPlayer.stats.luk / 4)) {
+      if (luckDice <= 3 + (updatedPlayer.stats.luk / 4)) {
         return this.LuckEvents.godsEvent(updatedPlayer);
       }
 

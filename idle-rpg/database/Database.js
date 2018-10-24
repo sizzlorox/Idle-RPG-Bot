@@ -380,11 +380,11 @@ class Database {
     }));
   }
 
-  resetAllPlayers() {
+  resetAllPlayersInGuild(guildId) {
     const resetObj = resetPlayerObj;
     resetObj.map = this.MapClass.getRandomTown();
 
-    return new Promise((resolve, reject) => Player.update({},
+    return new Promise((resolve, reject) => Player.update({ guildId },
       {
         $set: resetObj
       },
@@ -427,8 +427,8 @@ class Database {
     }));
   }
 
-  deleteAllPlayers() {
-    return new Promise((resolve, reject) => Player.remove({}, (err, result) => {
+  deleteAllPlayersInGuild(guildId) {
+    return new Promise((resolve, reject) => Player.remove({ guildId }, (err, result) => {
       if (err) {
         return reject(err);
       }

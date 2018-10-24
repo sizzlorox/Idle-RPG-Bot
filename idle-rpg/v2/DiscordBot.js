@@ -58,7 +58,9 @@ class DiscordBot extends BaseHelper {
   loadEventListeners() {
     this.bot.on('error', err => errorLog.error(err));
     this.bot.once('ready', () => {
-      this.bot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
+      if (!this.bot.user.avatarURL) { // avatarURL == null if not set
+        this.bot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
+      }
       this.bot.user.setStatus('idle');
       this.discord.loadGuilds();
       this.loadHeartBeat();
@@ -69,10 +71,8 @@ class DiscordBot extends BaseHelper {
       }, console.log('Reset all personal multipliers'));
     });
     this.bot.on('message', async (message) => {
-      if (message.guild && message.guild.id === guildID && message.content.includes('(╯°□°）╯︵ ┻━┻')) {
-        let tableMsg = '';
-        message.content.split('(╯°□°）╯︵ ┻━┻').forEach((table, index) => index === 0 ? '' : tableMsg = tableMsg.concat('┬─┬ノ(ಠ\\_ಠノ) '));
-        return message.reply(tableMsg);
+      if (!message.author.bot && message.guild && message.guild.id === guildID && message.content.includes('(╯°□°）╯︵ ┻━┻')) {
+        return message.reply(' ┬─┬ノ(ಠ\\_ಠノ)'.repeat(message.content.split('(╯°□°）╯︵ ┻━┻').length - 1));
       }
 
       if (message.author.id === this.bot.user.id
@@ -140,11 +140,10 @@ class DiscordBot extends BaseHelper {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
-          const guildOnlineMembers = this.discord.getOnlinePlayers(guild);
-          const guildOfflineMembers = this.discord.getOfflinePlayers(guild);
-          const membersToAdd = guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId && member.guildId === onlineMember.guildId || member.discordId === onlineMember.discordId && onlineMember.guildId === 'None') < 0);
-          onlinePlayers.push(...membersToAdd);
+          const { guildOnlineMembers, guildOfflineMembers } = this.discord.getMembers(guild);
           onlinePlayers = onlinePlayers.filter(member => guildOfflineMembers.findIndex(offlineMember => member.discordId === offlineMember.discordId) < 0);
+          onlinePlayers.push(...guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId && member.guildId === onlineMember.guildId || member.discordId === onlineMember.discordId && onlineMember.guildId === 'None') < 0));
+
           if (guildOnlineMembers.length >= 50) {
             guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
             guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
