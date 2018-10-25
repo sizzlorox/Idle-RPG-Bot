@@ -340,6 +340,18 @@ class Database {
     }));
   }
 
+  async getPlayerGuildId(player) {
+    if (!player) {
+      return;
+    }
+
+    try {
+      return this.loadPlayer(player, { guildId: 1 });
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
   savePlayer(player) {
     if (!player) {
       return;
