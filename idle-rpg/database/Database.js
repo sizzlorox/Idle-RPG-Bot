@@ -467,7 +467,7 @@ class Database {
     return stolenEquips;
   }
 
-  getGuildMemberHomeGuild(guild) {
+  getGuildPlayers(guild) {
     try {
       return Player.find({ guildId: guild.id }, { discordId: 1, guildId: 1 });
     } catch (err) {

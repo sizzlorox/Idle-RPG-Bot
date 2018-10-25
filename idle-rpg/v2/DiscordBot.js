@@ -140,11 +140,11 @@ class DiscordBot extends BaseHelper {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
-          const homes = await this.Game.Database.getGuildMemberHomeGuild(guild); // For the love of god give me better names pls. homes = array of users with only guildId and discordId where guildId === guild.id (from this scope)
+          const guildPlayers = await this.Game.Database.getGuildPlayers(guild);
           const guildOnlineMembers = [];
 
           guild.members.forEach((member) => {
-            if (homes.find(user => user.discordId === member.id && user.guildId === guild.id) && !member.user.bot && member.id !== this.bot.user.id) {
+            if (guildPlayers.find(user => user.discordId === member.id && user.guildId === guild.id) && !member.user.bot && member.id !== this.bot.user.id) {
               const player = Object.assign({}, {
                 discordId: member.id,
                 name: member.nickname ? member.nickname : member.displayName,
