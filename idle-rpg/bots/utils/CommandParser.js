@@ -27,9 +27,7 @@ class CommandParser {
       if (!messageObj.content.startsWith(guildPrefix)) {
         return;
       }
-      const command = guildPrefix === '!irpg'
-        ? messageObj.content.replace('!irpg ', '!').split(/ (.+)/)[0]
-        : messageObj.content.replace(guildPrefix, '!').split(/ (.+)/)[0];
+      const command = messageObj.content.replace(guildPrefix === '!irpg' ? '!irpg ' : guildPrefix, '!').split(/ (.+)/)[0];
       if (messageObj.content.startsWith('!irpg')) {
         messageObj.content = messageObj.content.split(/ (.+)/)[1];
       }
