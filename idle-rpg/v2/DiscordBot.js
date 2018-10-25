@@ -132,17 +132,36 @@ class DiscordBot extends BaseHelper {
 
   loadHeartBeat() {
     const interval = process.env.NODE_ENV.includes('production') ? this.tickInMinutes : 1;
-    let onlinePlayers = [];
+    const onlinePlayers = new DiscordJS.Collection();
 
     setInterval(() => {
       this.processDetails();
-      this.bot.guilds.forEach((guild) => {
+      this.bot.guilds.forEach(async (guild) => {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
-          const { guildOnlineMembers, guildOfflineMembers } = this.discord.getMembers(guild);
-          onlinePlayers = onlinePlayers.filter(member => guildOfflineMembers.findIndex(offlineMember => member.discordId === offlineMember.discordId) < 0);
-          onlinePlayers.push(...guildOnlineMembers.filter(member => onlinePlayers.findIndex(onlineMember => member.discordId === onlineMember.discordId && member.guildId === onlineMember.guildId || member.discordId === onlineMember.discordId && onlineMember.guildId === 'None') < 0));
+          const guildPlayers = await this.Game.Database.getGuildPlayers(guild);
+          const guildOnlineMembers = [];
+
+          guild.members.forEach((member) => {
+            if (guildPlayers.find(user => user.discordId === member.id && user.guildId === guild.id) && !member.user.bot && member.id !== this.bot.user.id) {
+              const player = Object.assign({}, {
+                discordId: member.id,
+                name: member.nickname ? member.nickname : member.displayName,
+                guildId: guild.id
+              });
+              if (member.presence.status.includes('offline')) {
+                if (onlinePlayers.has(player.discordId)) {
+                  onlinePlayers.delete(player.discordId);
+                }
+              } else {
+                if (!onlinePlayers.has(player.discordId) || onlinePlayers.get(player.discordId).guildId !== guild.id) {
+                  onlinePlayers.set(player.discordId, player);
+                }
+                guildOnlineMembers.push(player);
+              }
+            }
+          });
 
           if (guildOnlineMembers.length >= 50) {
             guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
@@ -172,7 +191,7 @@ class DiscordBot extends BaseHelper {
           });
         }
       });
-      this.bot.user.setActivity(`${onlinePlayers.length ? onlinePlayers.length : enumHelper.mockPlayers.length} idlers in ${this.bot.guilds.size} guilds`);
+      this.bot.user.setActivity(`${onlinePlayers.size ? onlinePlayers.size : enumHelper.mockPlayers.length} idlers in ${this.bot.guilds.size} guilds`);
     }, 60000 * interval);
   }
 
