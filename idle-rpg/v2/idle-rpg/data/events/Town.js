@@ -14,12 +14,10 @@ class Town extends aggregation(BaseGame, BaseHelper) {
   constructor(params) {
     super();
     const {
-      Helper,
       Database,
       ItemManager,
       InventoryManager
     } = params;
-    this.Helper = Helper;
     this.Database = Database;
     this.ItemManager = ItemManager;
     this.InventoryManager = InventoryManager;
@@ -42,7 +40,7 @@ class Town extends aggregation(BaseGame, BaseHelper) {
 
         eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.generatePlayerName(updatedPlayer, true)} just sold what they found adventuring for ${profit} gold!`);
         eventLog.push(`Made ${profit} gold selling what you found adventuring`);
-        await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
         return {
           type: 'actions',
@@ -94,7 +92,7 @@ class Town extends aggregation(BaseGame, BaseHelper) {
 
       eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.generatePlayerName(updatedPlayer, true)} just purchased \`${item.name}\` for ${itemCost} gold!`);
       eventLog.push(`Purchased ${item.name} from Town for ${itemCost} Gold`);
-      await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+      await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
       return {
         type: 'actions',

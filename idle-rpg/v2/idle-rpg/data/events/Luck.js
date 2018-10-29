@@ -14,8 +14,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
     super();
-    const { Helper, Database, SpellManager, ItemManager, InventoryManager } = params;
-    this.Helper = Helper;
+    const { Database, SpellManager, ItemManager, InventoryManager } = params;
     this.Database = Database;
     this.SpellManager = SpellManager;
     this.ItemManager = ItemManager;
@@ -138,7 +137,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
           break;
       }
 
-      await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+      await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
       return {
         type: 'actions',
         updatedPlayer,
@@ -156,7 +155,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     const eventLog = [];
     try {
       const item = await this.ItemManager.generateItem(updatedPlayer);
-      const generatedItemMsg = await this.Helper.randomItemEventMessage(updatedPlayer, item);
+      const generatedItemMsg = await this.randomItemEventMessage(updatedPlayer, item);
       eventMsg.push(generatedItemMsg.eventMsg);
       eventLog.push(generatedItemMsg.eventLog);
       if (item.position !== enumHelper.inventory.position) {
@@ -170,7 +169,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
       } else {
         updatedPlayer = await this.InventoryManager.addItemIntoInventory(updatedPlayer, item);
       }
-      await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+      await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
       return {
         type: 'actions',
@@ -195,7 +194,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
       }
       updatedPlayer.gambles++;
       if (luckGambleChance <= 50 - (updatedPlayer.stats.luk / 4)) {
-        const gambleMsg = await this.Helper.randomGambleEventMessage(updatedPlayer, luckGambleGold, false);
+        const gambleMsg = await this.randomGambleEventMessage(updatedPlayer, luckGambleGold, false);
         eventMsg.push(gambleMsg.eventMsg);
         eventLog.push(gambleMsg.eventLog);
         updatedPlayer.gold.current -= luckGambleGold;
@@ -203,7 +202,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
         if (updatedPlayer.gold.current <= 0) {
           updatedPlayer.gold.current = 0;
         }
-        await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
         return {
           type: 'actions',
@@ -212,13 +211,13 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
           pm: eventLog
         };
       }
-      const gambleMsg = await this.Helper.randomGambleEventMessage(updatedPlayer, luckGambleGold, true);
+      const gambleMsg = await this.randomGambleEventMessage(updatedPlayer, luckGambleGold, true);
       eventMsg.push(gambleMsg.eventMsg);
       eventLog.push(gambleMsg.eventLog);
       updatedPlayer.gold.current += luckGambleGold;
       updatedPlayer.gold.total += luckGambleGold;
       updatedPlayer.gold.gambles.won += luckGambleGold;
-      await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+      await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
       return {
         type: 'actions',
@@ -244,7 +243,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     updatedPlayer.quest.updated_at = new Date();
     eventMsg.push(`[\`${updatedPlayer.map.name}\`] Quest Master has asked ${this.generatePlayerName(updatedPlayer, true)} to kill ${updatedPlayer.quest.questMob.count === 1 ? 'a' : updatedPlayer.quest.questMob.count} ${mob}!`);
     eventLog.push(`Quest Master in ${updatedPlayer.map.name} asked you to kill ${updatedPlayer.quest.questMob.count === 1 ? 'a' : updatedPlayer.quest.questMob.count} ${mob}.`);
-    await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+    await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
     return {
       type: 'actions',
@@ -267,7 +266,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
         updatedPlayer.gold.total += goldAmount;
         eventMsg.push(`[\`${updatedPlayer.map.name}\`] ${this.generatePlayerName(updatedPlayer, true)} found ${goldAmount} gold!`);
         eventLog.push(`Found ${goldAmount} gold in ${updatedPlayer.map.name}`);
-        await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
         return {
           type: 'actions',
@@ -296,7 +295,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
           eventMsg.push(`<@!${updatedPlayer.discordId}> **just caught a strange looking snowflake within the blizzard!**`);
           eventLog.push('You caught a strange looking snowflake while travelling inside the blizzard.');
           updatedPlayer = await this.setPlayerEquipment(updatedPlayer, enumHelper.equipment.types.relic.position, snowFlake);
-          await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+          await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
           return {
             type: 'actions',

@@ -2,16 +2,17 @@ const commands = require('../data/commands');
 const { botOperator } = require('../../../settings');
 const { commandLog, errorLog } = require('../../utils/logger');
 const moment = require('moment');
+const BaseHelper = require('../../v2/Base/Helper');
 
 const commandList = commands.map(c => c.command).join('|').replace(/(,)/g, '|');
 const commandRegex = new RegExp(commandList);
 
-class CommandParser {
+class CommandParser extends BaseHelper {
 
   constructor(params) {
-    const { Game, Helper, Bot } = params;
+    super();
+    const { Game, Bot } = params;
     this.Game = Game;
-    this.Helper = Helper;
     this.Bot = Bot;
   }
 

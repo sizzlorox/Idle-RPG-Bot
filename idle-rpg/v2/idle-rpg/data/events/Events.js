@@ -16,29 +16,25 @@ class Events extends BaseHelper {
 
   constructor(params) {
     super();
-    const { Helper, Map, Database, ItemManager, MonsterManager } = params;
-    this.Helper = Helper;
+    const { Map, Database, ItemManager, MonsterManager } = params;
     this.MapManager = Map;
     this.Database = Database;
-    this.SpellManager = new Spell(this.Helper);
+    this.SpellManager = new Spell();
     this.InventoryManager = new Inventory();
     this.MonsterManager = MonsterManager;
     this.ItemManager = ItemManager;
     this.Battle = new Battle({
-      Helper: this.Helper,
       Database: this.Database,
       MapManager: this.MapManager,
       InventoryManager: this.InventoryManager,
       ItemManager: this.ItemManager
     });
     this.TownEvents = new Town({
-      Helper: this.Helper,
       Database: this.Database,
       ItemManager: this.ItemManager,
       InventoryManager: this.InventoryManager
     });
     this.LuckEvents = new Luck({
-      Helper: this.Helper,
       Database: this.Database,
       SpellManager: this.SpellManager,
       ItemManager: this.ItemManager,
@@ -62,7 +58,7 @@ class Events extends BaseHelper {
       updatedPlayer.travelled++;
       eventMsg.push(`${this.generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`);
       eventLog.push(`Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`);
-      await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.move);
+      await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.move);
 
       return {
         type: 'movement',

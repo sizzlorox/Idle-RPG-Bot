@@ -17,8 +17,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
     super();
-    const { Helper, Database, Events, MapManager, ItemManager, MonsterManager } = params;
-    this.Helper = Helper;
+    const { Database, Events, MapManager, ItemManager, MonsterManager } = params;
     this.Database = Database;
     this.Events = Events;
     this.MapManager = MapManager;
@@ -249,14 +248,14 @@ ${rankString}\`\`\``);
           guildConfig.multiplier += calcAmount;
           guildConfig.spells.activeBless += calcAmount;
           await this.Database.updateGame(player.guildId, guildConfig);
-          actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
           setTimeout(async () => {
             const newLoadedConfig = await this.Database.loadGame(player.guildId);
             newLoadedConfig.multiplier -= calcAmount;
             newLoadedConfig.spells.activeBless -= calcAmount;
             newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
-            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
+            actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
           }, 1800000); // 30 minutes
         } else {
           author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
@@ -297,7 +296,7 @@ ${rankString}\`\`\``);
     const actionsChannel = await Bot.guilds.find(guild => guild.id === bountyPlacer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
     await this.Database.savePlayer(bountyPlacer);
     await this.Database.savePlayer(bountyRecipient);
-    await actionsChannel.send(this.Helper.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
+    await actionsChannel.send(this.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
 
     return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
   }
@@ -306,7 +305,7 @@ ${rankString}\`\`\``);
     const { author, amount } = params;
     const playerLog = await this.Database.loadActionLog(author);
     if (playerLog.log) {
-      return this.Helper.generateLog(playerLog.log, amount);
+      return this.generateLog(playerLog.log, amount);
     }
   }
 
@@ -314,7 +313,7 @@ ${rankString}\`\`\``);
     const { author, amount } = params;
     const playerLog = await this.Database.loadPvpLog(author);
     if (playerLog.log) {
-      return this.Helper.generateLog(playerLog.log, amount);
+      return this.generateLog(playerLog.log, amount);
     }
   }
 

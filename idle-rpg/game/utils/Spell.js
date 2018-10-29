@@ -1,32 +1,22 @@
+const BaseHelper = require('../../v2/Base/Helper');
+
 const spells = require('../data/spells');
 
-class Spell {
-
-  constructor(Helper) {
-    this.Helper = Helper;
-  }
+class Spell extends BaseHelper {
 
   generateSpell(selectedPlayer) {
-    const randomRarityChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-    const randomSpellChance = Math.round(this.Helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-    const spellRarityList = spells.strength.filter(spellRarity => spellRarity.rarity >= randomRarityChance);
-    const spellSpellList = spells.spell.filter(spell => spell.rarity >= randomSpellChance);
-    const randomRarityIndex = this.Helper.randomBetween(0, spellRarityList.length - 1);
-
-    let spellType;
-    let randomSpellIndex;
-    do {
-      randomSpellIndex = this.Helper.randomBetween(0, spellSpellList.length - 1);
-      spellType = spellSpellList[randomSpellIndex];
-    } while (spellType === undefined);
+    const randomRarityChance = Math.round(this.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const randomSpellChance = Math.round(this.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const randomStrength = this.randomChoice(spells.strength.filter(strength => strength.rarity >= randomRarityChance));
+    const randomSpell = this.randomChoice(spells.spell.filter(spell => spell.rarity >= randomSpellChance));
 
     return {
-      name: `${spellRarityList[randomRarityIndex].name} ${spellType.name}`,
-      description: spellType.description,
-      power: spellRarityList[randomRarityIndex].power + spellType.power,
-      chance: spellType.chance,
-      function: spellType.function,
-      type: spellType.type
+      name: `${randomStrength.name} ${randomSpell.name}`,
+      description: randomSpell.description,
+      power: randomStrength.power + randomSpell.power,
+      chance: randomSpell.chance,
+      function: randomSpell.function,
+      type: randomSpell.type
     };
   }
 
