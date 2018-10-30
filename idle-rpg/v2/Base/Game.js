@@ -232,7 +232,7 @@ class Game {
    * @param {Object} playerObj
    * @param {Object} equipment
    * @param {Object} item
-   * @returns {Object} updatedPlayer 
+   * @returns {Object} updatedPlayer
    */
   setPlayerEquipment(playerObj, equipment, item) {
     const updatedPlayer = Object.assign({}, playerObj);

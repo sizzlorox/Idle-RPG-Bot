@@ -1,5 +1,7 @@
 const seedrandom = require('seedrandom');
 const enumHelper = require('../../utils/enumHelper');
+const { battleDebug } = require('../../../settings');
+const messages = require('../../game/data/messages');
 
 const RNG = seedrandom();
 
@@ -33,6 +35,10 @@ class Helper {
       result = Math.trunc(result * factor) / factor;
     } while (result === exclude);
     return result;
+  }
+
+  randomChoice(array) {
+    return array[this.randomBetween(0, array.length - 1)];
   }
 
   // TODO rework % have to track better pvp and pve stats
@@ -134,12 +140,60 @@ class Helper {
             \`\`\``;
   }
 
+  generateInventoryString(player) {
+    return this.generateInventoryEquipmentString(player)
+      .then((equipment) => {
+        return `\`\`\`Here is your inventory!
+        Equipment:
+          ${equipment}
+        
+        Items:
+          ${player.inventory.items.map(item => item.name).join('\n      ')}\`\`\``;
+      });
+  }
+
+  generateInventoryEquipmentString(player) {
+    return new Promise((resolve) => {
+      let equipString = '';
+      player.inventory.equipment.forEach((equip, index, array) => {
+        switch (equip.position) {
+          case enumHelper.equipment.types.helmet.position:
+            equipString = equipString.concat(`${equip.name}:
+            Defense: ${equip.power}
+          ${this.generatePreviousOwnerString(equip)}`);
+            break;
+
+          case enumHelper.equipment.types.armor.position:
+            equipString = equipString.concat(`${equip.name}:
+            Defense: ${equip.power}
+          ${this.generatePreviousOwnerString(equip)}`);
+            break;
+
+          case enumHelper.equipment.types.weapon.position:
+            const weaponRating = this.calculateItemRating(player, equip);
+            equipString = equipString.concat(`${equip.name}:
+            BaseAttackPower: ${equip.power}
+            AttackPower: ${Number(weaponRating)}
+            AttackType: ${equip.attackType}
+          ${this.generatePreviousOwnerString(equip)}`);
+            break;
+        }
+
+        if (index !== array.length - 1) {
+          equipString = equipString.concat('\n          ');
+        }
+      });
+
+      return resolve(equipString);
+    });
+  }
+
   generateSpellBookString(player) {
     let spellBookString = '\`\`\`Here\'s your spellbook!\n';
     player.spells.forEach((spell) => {
-      spellBookString = spellBookString.concat(`    ${spell.name} - ${spell.description}\n`);
+      spellBookString += `    ${spell.name} - ${spell.description}\n`;
     });
-    spellBookString = spellBookString.concat('\`\`\`');
+    spellBookString += '\`\`\`';
 
     return spellBookString;
   }
@@ -152,8 +206,8 @@ class Helper {
   generatePreviousOwnerString(equipment) {
     if (equipment.previousOwners && equipment.previousOwners.length > 0) {
       let result = 'Previous Owners:\n            ';
-      result = result.concat(equipment.previousOwners.join('\n            '));
-      result = result.concat('\n');
+      result += equipment.previousOwners.join('\n            ');
+      result += '\n';
       return result;
     }
 
@@ -433,7 +487,7 @@ ${mobListResult.join('\n')}\`\`\``;
 
   /**
    * Returns a codeblock for discord
-   * @param {String} message 
+   * @param {String} message
    * @returns {String} codeblock
    */
   setImportantMessage(message) {
@@ -446,8 +500,7 @@ ${mobListResult.join('\n')}\`\`\``;
    * @returns {String}
    */
   capitalizeFirstLetter(stringToCapitalize) {
-    return stringToCapitalize.charAt(0).toUpperCase()
-      .concat(stringToCapitalize.slice(1));
+    return stringToCapitalize[0].toUpperCase() + stringToCapitalize.slice(1);
   }
 
   /**
@@ -478,5 +531,175 @@ ${mobListResult.join('\n')}\`\`\``;
     return false;
   }
 
+  printBattleDebug(debugMsg) {
+    if (battleDebug) {
+      console.log(debugMsg);
+    }
+  }
+
+  logEvent(selectedPlayer, Database, msg, eventType) {
+    return new Promise((resolve) => {
+      switch (eventType) {
+        case enumHelper.logTypes.move:
+          Database.loadMoveLog(selectedPlayer.discordId)
+            .then((playerMoveLog) => {
+              if (playerMoveLog.log.length > 25) {
+                playerMoveLog.log.shift();
+              }
+
+              playerMoveLog.log.push({
+                event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
+                timeStamp: new Date().getTime()
+              });
+
+              return playerMoveLog;
+            })
+            .then(playerMoveLog => Database.saveMoveLog(selectedPlayer.discordId, playerMoveLog))
+            .catch((err) => {
+              errorLog.error(err);
+            });
+          break;
+
+        case enumHelper.logTypes.action:
+          Database.loadActionLog(selectedPlayer.discordId)
+            .then((playerActionLog) => {
+              if (playerActionLog.log.length > 25) {
+                playerActionLog.log.shift();
+              }
+
+              playerActionLog.log.push({
+                event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
+                timeStamp: new Date().getTime()
+              });
+
+              return playerActionLog;
+            })
+            .then(playerActionLog => Database.saveActionLog(selectedPlayer.discordId, playerActionLog));
+          break;
+
+        case enumHelper.logTypes.pvp:
+          Database.loadPvpLog(selectedPlayer.discordId)
+            .then((playerPvpLog) => {
+              if (playerPvpLog.log.length > 25) {
+                playerPvpLog.log.shift();
+              }
+
+              playerPvpLog.log.push({
+                event: msg.includes('`') ? msg.replace(/`/g, '') : msg,
+                timeStamp: new Date().getTime()
+              });
+
+              return playerPvpLog;
+            })
+            .then(playerPvpLog => Database.savePvpLog(selectedPlayer.discordId, playerPvpLog));
+          break;
+      }
+
+      return resolve(selectedPlayer);
+    });
+  }
+
+  generateLog(log, count) {
+    if (log.length === 0) {
+      return '';
+    }
+
+    let logResult = 'Heres what you have done so far:\n      ';
+    let logCount = 0;
+    for (let i = log.length - 1; i >= 0; i--) {
+      if (logCount === count) {
+        break;
+      }
+      let eventText;
+      if (typeof log[i].event === 'string') {
+        eventText = log[i].event;
+      } else {
+        eventText = log[i].event[0];
+      }
+      logResult += `${eventText} [${this.getTimePassed(log[i].timeStamp)} ago]\n      `.replace(/`/g, '');
+      logCount++;
+    }
+
+    return logResult;
+  }
+
+  generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item, luckGambleGold, victimPlayer, otherPlayerLog) {
+    // TODO: Maybe change these ^^^^^ into an array???
+    eventMsg = eventMsg.replace(/(\$\$)/g, selectedPlayer.map.name)
+      .replace(/(##)/g, this.generatePlayerName(selectedPlayer, true))
+      .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
+      .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
+      .replace(/(&&)/g, this.generateGenderString(selectedPlayer, 'he'));
+
+    eventLog = eventLog.replace('$$', selectedPlayer.map.name)
+      .replace(/(##)/g, selectedPlayer.name)
+      .replace(/(@@)/g, this.generateGenderString(selectedPlayer, 'him'))
+      .replace(/(\^\^)/g, this.generateGenderString(selectedPlayer, 'his'))
+      .replace(/(&&)/g, this.generateGenderString(selectedPlayer, 'he'));
+
+    if (item) {
+      eventMsg = eventMsg.replace(/(%%)/g, item.name);
+      eventLog = eventLog.replace(/(%%)/g, item.name);
+    }
+    if (luckGambleGold) {
+      eventMsg = eventMsg.replace(/(\$&)/g, luckGambleGold);
+      eventLog = eventLog.replace(/(\$&)/g, luckGambleGold);
+    }
+    if (victimPlayer) {
+      eventMsg = eventMsg.replace(/(!!)/g, this.generatePlayerName(victimPlayer, true));
+      eventLog = eventLog.replace(/(!!)/g, victimPlayer.name);
+    }
+
+    return { eventMsg, eventLog, selectedPlayer, item, victimPlayer, otherPlayerLog };
+  }
+
+  async randomCampEventMessage(selectedPlayer) {
+    const randomEventInt = await this.randomBetween(0, messages.event.camp.length - 1);
+    const { eventMsg, eventLog } = messages.event.camp[randomEventInt];
+
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
+  }
+
+  async randomItemEventMessage(selectedPlayer, item) {
+    const randomEventInt = await this.randomBetween(0, messages.event.item.length - 1);
+    const { eventMsg, eventLog } = messages.event.item[randomEventInt];
+
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
+  }
+
+  async randomGambleEventMessage(selectedPlayer, luckGambleGold, isWin) {
+    if (isWin) {
+      const randomEventInt = await this.randomBetween(0, messages.event.gamble.win.length - 1);
+      const { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
+
+      return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
+    }
+
+    const randomEventInt = await this.randomBetween(0, messages.event.gamble.lose.length - 1);
+    const { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
+
+    return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
+  }
+
+  formatLeaderboards(subjectKey) {
+    if (subjectKey.includes('.')) {
+      if (subjectKey.includes('deaths.mob')) {
+        return subjectKey.replace('deaths.mob', 'Killed by mob');
+      }
+      if (subjectKey.includes('deaths.player')) {
+        return subjectKey.replace('deaths.player', 'Killed by player');
+      }
+      if (subjectKey.includes('kills.player')) {
+        return subjectKey.replace('kills.player', 'Player kills');
+      }
+      if (subjectKey.includes('quest.completed')) {
+        return subjectKey.replace('quest.completed', 'Completed Quests');
+      }
+
+      return subjectKey.split('.')[0];
+    }
+
+    return subjectKey.replace('currentBounty', 'Bounty').replace('spellCast', 'Spells Cast');
+  }
 }
 module.exports = Helper;

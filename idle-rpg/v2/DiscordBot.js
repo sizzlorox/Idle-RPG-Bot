@@ -9,7 +9,6 @@ const fs = require('fs');
 // DATA
 const Crons = require('../v2/idle-rpg/Crons');
 const Game = require('../v2/idle-rpg/Game');
-const Helper = require('../utils/Helper');
 const Antispam = require('../bots/modules/Antispam');
 const CommandParser = require('../bots/utils/CommandParser');
 const enumHelper = require('../utils/enumHelper');
@@ -40,12 +39,10 @@ class DiscordBot extends BaseHelper {
       restTimeOffset: 500
     });
     this.discord = new BaseDiscord(this.bot);
-    this.Helper = new Helper();
-    this.Game = new Game(this.Helper);
+    this.Game = new Game();
     this.Crons = new Crons({ Discord: this });
     this.CommandParser = new CommandParser({
       Game: this.Game,
-      Helper: this.Helper,
       Bot: this.bot
     });
     this.loadEventListeners();
@@ -104,8 +101,7 @@ class DiscordBot extends BaseHelper {
         return;
       }
 
-      if (oldMember.presence.game && !oldMember.presence.game.streaming && newMember.presence.game && newMember.presence.game.streaming
-        || !oldMember.presence.game && newMember.presence.game && newMember.presence.game.streaming) {
+      if (((oldMember.presence.game && !oldMember.presence.game.streaming) || !oldMember.presence.game) && newMember.presence.game && newMember.presence.game.streaming) {
         const streamChannel = newMember.guild.channels.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text');
         if (streamChannel) {
           streamChannel.send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
@@ -144,7 +140,7 @@ class DiscordBot extends BaseHelper {
           const guildOnlineMembers = [];
 
           guild.members.forEach((member) => {
-            if (guildPlayers.find(user => user.discordId === member.id && user.guildId === guild.id) && !member.user.bot && member.id !== this.bot.user.id) {
+            if (!member.user.bot && guildPlayers.find(user => user.discordId === member.id && user.guildId === guild.id)) {
               const player = Object.assign({}, {
                 discordId: member.id,
                 name: member.nickname ? member.nickname : member.displayName,
@@ -204,7 +200,7 @@ class DiscordBot extends BaseHelper {
 
     console.log('------------');
     console.log(`\n\n${new Date()}\nHeap Usage:\n  RSS: ${currentRSS}MB\n  HeapTotal: ${currentTotal}MB\n  HeapUsed: ${currentUsed}MB`);
-    console.log(`Current Up Time: ${this.Helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
+    console.log(`Current Up Time: ${this.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
     console.log('------------');
   }
 
@@ -250,7 +246,7 @@ class DiscordBot extends BaseHelper {
 
     this.bot.guilds.forEach(async (guild) => {
       const guildLotteryPlayers = await this.Game.dbClass().loadLotteryPlayers(guild.id);
-      if (!guildLotteryPlayers || guildLotteryPlayers && guildLotteryPlayers.length <= 1) {
+      if (!guildLotteryPlayers || guildLotteryPlayers.length <= 1) {
         return;
       }
 
@@ -261,7 +257,7 @@ class DiscordBot extends BaseHelper {
       const eventLog = `Congratulations! Out of ${guildLotteryPlayers.length} contestants, you just won ${guildConfig.dailyLottery.prizePool} gold from the daily lottery!`;
       const newPrizePool = await this.randomBetween(1500, 10000);
 
-      if (guild.id === '390509935097675777') {
+      if (guild.id === guildID) {
         const lotteryChannel = await guild.channels.find(channel => channel.id === enumHelper.channels.lottery);
         if (lotteryChannel) {
           let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
@@ -293,7 +289,7 @@ class DiscordBot extends BaseHelper {
       guildConfig.dailyLottery.prizePool = newPrizePool;
       guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(eventMsg);
       await this.Game.dbClass().updateGame(guild.id, guildConfig);
-      await this.Helper.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
+      await this.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
       await this.Game.dbClass().savePlayer(winner);
       await this.Game.dbClass().removeLotteryPlayers(guild.id);
     });
@@ -332,7 +328,7 @@ class DiscordBot extends BaseHelper {
           .join('\n')}`)
         .then(async (rankString) => {
           const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
-          const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
+          const subjectTitle = this.formatLeaderboards(Object.keys(type)[0]);
           const msg = `\`\`\`Top 10 ${subjectTitle}:
 ${rankString}\`\`\``;
 

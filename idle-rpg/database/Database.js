@@ -58,8 +58,8 @@ mongoose.connection.on('error', (err) => {
 
 class Database {
 
-  constructor(Helper) {
-    this.MapClass = new Map(Helper);
+  constructor() {
+    this.MapClass = new Map();
     connect();
   }
 

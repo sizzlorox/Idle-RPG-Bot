@@ -15,13 +15,12 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
     super();
-    const { Helper, Database, MapManager, InventoryManager, ItemManager } = params;
+    const { Database, MapManager, InventoryManager, ItemManager } = params;
     this.Database = Database;
-    this.Helper = Helper;
     this.MapManager = MapManager;
     this.InventoryManager = InventoryManager;
     this.ItemManager = ItemManager;
-    this.BattleSimulator = new BattleSimulator(this.Helper);
+    this.BattleSimulator = new BattleSimulator();
   }
 
   async playerVsMob(playerObj, mobToBattle, multiplier) {
@@ -74,10 +73,10 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
     try {
       updatedPlayer = await this.passiveRegen(updatedPlayer, ((5 * updatedPlayer.level) / 2) + (updatedPlayer.stats.end / 2), ((5 * updatedPlayer.level) / 2) + (updatedPlayer.stats.int / 2));
       // TODO: Make more camp event messages to be selected randomly
-      const generatedMessage = await this.Helper.randomCampEventMessage(updatedPlayer);
+      const generatedMessage = await this.randomCampEventMessage(updatedPlayer);
       eventMsg.push(generatedMessage.eventMsg);
       eventLog.push(generatedMessage.eventLog)
-      await this.Helper.logEvent(updatedPlayer, this.Database, generatedMessage.eventLog, enumHelper.logTypes.action);
+      await this.logEvent(updatedPlayer, this.Database, generatedMessage.eventLog, enumHelper.logTypes.action);
 
       return {
         type: 'actions',
@@ -106,7 +105,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
 
       if (updatedPlayer.health <= 0) {
         updatedPlayer.battles.lost++;
-        await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
         return {
           result: enumHelper.battle.outcomes.lost,
@@ -122,7 +121,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
         updatedPlayer.experience.total += expGain;
         updatedPlayer.gold.current += goldGain + questGoldGain;
         updatedPlayer.gold.total += goldGain + questGoldGain;
-        await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
         return {
           result: enumHelper.battle.outcomes.fled,
@@ -139,11 +138,11 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
       updatedPlayer.gold.total += goldGain + questGoldGain;
       updatedPlayer.kills.mob++;
       updatedPlayer.battles.won++;
-      await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+      await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
       if (isQuestCompleted) {
         eventMsg.push(`${this.generatePlayerName(updatedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
         eventLog.push(`Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
-        await this.Helper.logEvent(updatedPlayer, this.Database, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, enumHelper.logTypes.action);
+        await this.logEvent(updatedPlayer, this.Database, `Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`, enumHelper.logTypes.action);
       }
 
       return {
@@ -177,7 +176,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           }
 
           const diceMax = playersWithBounty[0].chance;
-          const randomDice = await this.Helper.randomBetween(0, diceMax);
+          const randomDice = await this.randomBetween(0, diceMax);
           const filteredBountyPlayers = playersWithBounty.filter(player => player.chance >= randomDice);
           if (filteredBountyPlayers.length > 0) {
             const filteredBountyPlayersIndex = await this.randomBetween(0, filteredBountyPlayers.length - 1);
@@ -232,10 +231,10 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
         defender.battles.won++;
         defender.experience.current += expGain;
         defender.experience.total += expGain;
-        await this.Helper.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.action);
-        await this.Helper.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.action);
-        await this.Helper.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.pvp);
-        await this.Helper.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
+        await this.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.action);
+        await this.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.pvp);
+        await this.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
 
         result = enumHelper.battle.outcomes.lost;
       } else if (defender.health <= 0 && attacker.health > 0) {
@@ -253,10 +252,10 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
         defender.battles.lost++;
         attacker.experience.current += expGain;
         attacker.experience.total += expGain;
-        await this.Helper.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.action);
-        await this.Helper.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.action);
-        await this.Helper.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.pvp);
-        await this.Helper.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
+        await this.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.action);
+        await this.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.pvp);
+        await this.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
         result = enumHelper.battle.outcomes.win;
       } else if (defender.health > 0 && attacker.health > 0) {
         eventMsg.push(attackerDamage > defenderDamage
@@ -279,10 +278,10 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
         defender.experience.total += expGainDefender;
         defender.health > attacker.health ? attacker.fled.you++ && defender.fled.player++ : attacker.fled.player++ && defender.fled.you++;
 
-        await this.Helper.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.action);
-        await this.Helper.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.action);
-        await this.Helper.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.pvp);
-        await this.Helper.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
+        await this.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.action);
+        await this.logEvent(attacker, this.Database, eventLog, enumHelper.logTypes.pvp);
+        await this.logEvent(defender, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
 
         result = enumHelper.battle.outcomes.fled;
       }
@@ -398,10 +397,10 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
             }
           }
         }
-        await this.Helper.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.action);
-        await this.Helper.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.action);
-        await this.Helper.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.pvp);
-        await this.Helper.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
+        await this.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.action);
+        await this.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.pvp);
+        await this.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
 
         return { stealingPlayer, victimPlayer, msg: eventMsg, pm: eventLog, otherPlayerPmMsg: otherPlayerLog };
       } else if (victimPlayer.gold.current > victimPlayer.gold.current / 6) {
@@ -418,10 +417,10 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           eventLog.push(`Stole ${goldStolen} gold from ${victimPlayer.name}`);
           otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${goldStolen} gold from you`);
 
-          await this.Helper.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.action);
-          await this.Helper.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.action);
-          await this.Helper.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.pvp);
-          await this.Helper.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
+          await this.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+          await this.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.action);
+          await this.logEvent(stealingPlayer, this.Database, eventLog, enumHelper.logTypes.pvp);
+          await this.logEvent(victimPlayer, this.Database, otherPlayerLog, enumHelper.logTypes.pvp);
 
           return { stealingPlayer, victimPlayer, msg: eventMsg, pm: eventLog, otherPlayerPmMsg: otherPlayerLog };
         }
@@ -455,7 +454,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
           eventMsg.push(`**${this.generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${mob.find(obj => obj.health <= 0).name}!\`**`);
         }
         eventLog.push(`Received ${item.name} from ${mob[0].name}`);
-        await this.Helper.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
+        await this.logEvent(updatedPlayer, this.Database, eventLog, enumHelper.logTypes.action);
 
         return {
           type: 'actions',

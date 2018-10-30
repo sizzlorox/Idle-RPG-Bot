@@ -1,15 +1,12 @@
 const maps = require('../data/maps');
+const BaseHelper = require('../../v2/Base/Helper');
 
 const mapSize = maps[maps.length - 1].coords;
 
-class Map {
-
-  constructor(Helper) {
-    this.Helper = Helper;
-  }
+class Map extends BaseHelper {
 
   async moveToRandomMap(updatedPlayer) {
-    const movement = await this.Helper.randomBetween(0, 3);
+    const movement = await this.randomBetween(0, 3);
 
     switch (movement) {
       case 0:
@@ -112,7 +109,7 @@ class Map {
 
   getRandomTown() {
     const towns = maps.filter(area => area.type.name === 'Town');
-    return towns[this.Helper.randomBetween(0, towns.length - 1)];
+    return towns[this.randomBetween(0, towns.length - 1)];
   }
 
   getMapByName(name) {
