@@ -43,21 +43,13 @@ class Item extends BaseHelper {
       let itemObj;
 
       if (itemType.position === enumHelper.equipment.types.relic.position) {
-        const itemStr = Math.round((itemRarityList[randomRarityIndex].stats.str
-          + itemType.stats.str) / 4);
-
-        const itemDex = Math.round((itemRarityList[randomRarityIndex].stats.dex
-          + itemType.stats.dex) / 4);
-
-        const itemEnd = Math.round((itemRarityList[randomRarityIndex].stats.end
-          + itemType.stats.end) / 4);
-
-        const itemInt = Math.round((itemRarityList[randomRarityIndex].stats.int
-          + itemType.stats.int) / 4);
-
+        const itemStr = itemType.stats.str;
+        const itemDex = itemType.stats.dex;
+        const itemEnd = itemType.stats.end;
+        const itemInt = itemType.stats.int;
         const itemLuk = itemType.stats.luk;
 
-        itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
+        const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
