@@ -131,7 +131,7 @@ class DiscordBot extends BaseHelper {
     const onlinePlayers = new DiscordJS.Collection();
 
     setInterval(() => {
-      // this.processDetails();
+      this.processDetails();
       this.bot.guilds.forEach(async (guild) => {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
@@ -198,8 +198,8 @@ class DiscordBot extends BaseHelper {
       onlinePlayers.filter(player => player.guildId === null).forEach((player) => {
         player.guildId = (this.bot.guilds.find(guild => guild.members.get(player.discordId))).id;
       });
-      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? onlinePlayers.size ? onlinePlayers.size : 'loading' : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
-    }, 10000 * interval);
+      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? onlinePlayers.size : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
+    }, 60000 * interval);
   }
 
   async processDetails() {
