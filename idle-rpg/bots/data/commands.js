@@ -624,8 +624,13 @@ const commands = [
           guildId = splitArray[1];
           newPrefix = splitArray[2];
         } else if (splitArray.length === 2) {
+          if (messageObj.channel.type === 'dm') {
+            return messageObj.author.send('You need to provide the guild id and a prefix in DM\'s');
+          }
           guildId = messageObj.guild.id;
           newPrefix = splitArray[1];
+        } else {
+          return messageObj.author.send('Invalid amount of arguments. Check the help for more info.');
         }
 
         const guildToUpdate = Bot.guilds.get(guildId);
