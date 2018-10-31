@@ -1,5 +1,5 @@
 const commands = require('../data/commands');
-const { botOperator } = require('../../../settings');
+const { botOperators } = require('../../../settings');
 const { commandLog, errorLog } = require('../../utils/logger');
 const moment = require('moment');
 const BaseHelper = require('../../v2/Base/Helper');
@@ -47,7 +47,7 @@ class CommandParser extends BaseHelper {
             .then(messageObj.author.send(`Please send this to <#${commandChannelId}> or PM me.`));
         }
 
-        if (commandObj.operatorOnly && authorId !== botOperator) {
+        if (commandObj.operatorOnly && !botOperators.includes(authorId)) {
           return messageObj.delete(1500)
             .then(messageObj.author.send('This is a bot operator only command.'));
         }
