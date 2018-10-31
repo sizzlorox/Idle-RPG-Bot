@@ -338,12 +338,15 @@ const commands = [
     function: (params) => {
       const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
-        const value = messageObj.content.split(/ (.+)/)[1].replace(/([\<\@\!\>])/g, '');
+        const messageSplit = messageObj.content.split(' ');
+        const value = messageSplit[1].replace(/([\<\@\!\>])/g, '');
+        const confirmation = messageSplit[2] === 'true';
         return Game.fetchCommand({
           command: 'setServer',
           author: messageObj.author,
           Bot,
-          value
+          value,
+          confirmation
         });
       }
 
