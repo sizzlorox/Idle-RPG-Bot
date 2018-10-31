@@ -230,25 +230,20 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, Bot, messageObj } = params;
-      if (messageObj.content.includes(' ')) {
-        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
-        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot);
-        if (playerObj.size === 0) {
-          messageObj.author.send(`${checkPlayer} was not found!`);
-          return;
-        }
+      let playerObj;
 
-        return Game.fetchCommand({
-          command: 'playerEquipment',
-          author: messageObj.author,
-          playerToCheck: playerObj[0]
-        });
+      if (messageObj.content.includes(' ')) {
+        const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
+        playerObj = Bot.users.get(checkPlayer);
+        if (!playerObj || playerObj.bot) {
+          return messageObj.author.send(`${checkPlayer} was not found!`);
+        }
       }
 
       return Game.fetchCommand({
         command: 'playerEquipment',
-        author: messageObj.author
+        author: messageObj.author,
+        playerToCheck: playerObj
       });
     }
   },
