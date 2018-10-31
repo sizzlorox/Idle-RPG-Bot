@@ -207,7 +207,10 @@ const commands = [
         const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
         playerObj = Bot.users.get(checkPlayer);
         if (!playerObj || playerObj.bot) {
-          return messageObj.author.send(`${checkPlayer} was not found!`);
+          if (process.env.NODE_ENV.includes('production')) {
+            return messageObj.author.send(`${checkPlayer} was not found!`);
+          }
+          playerObj = { id: checkPlayer };
         }
       }
 
@@ -231,7 +234,10 @@ const commands = [
         const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
         playerObj = Bot.users.get(checkPlayer);
         if (!playerObj || playerObj.bot) {
-          return messageObj.author.send(`${checkPlayer} was not found!`);
+          if (process.env.NODE_ENV.includes('production')) {
+            return messageObj.author.send(`${checkPlayer} was not found!`);
+          }
+          playerObj = { id: checkPlayer };
         }
       }
 
@@ -255,7 +261,10 @@ const commands = [
         const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
         playerObj = Bot.users.get(checkPlayer);
         if (!playerObj || playerObj.bot) {
-          return messageObj.author.send(`${checkPlayer} was not found!`);
+          if (process.env.NODE_ENV.includes('production')) {
+            return messageObj.author.send(`${checkPlayer} was not found!`);
+          }
+          playerObj = { id: checkPlayer };
         }
       }
 
