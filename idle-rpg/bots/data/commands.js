@@ -623,7 +623,7 @@ const commands = [
         if (splitArray.length === 3) {
           guildId = splitArray[1];
           newPrefix = splitArray[2];
-        } else {
+        } else if (splitArray.length === 2) {
           guildId = messageObj.guild.id;
           newPrefix = splitArray[1];
         }
