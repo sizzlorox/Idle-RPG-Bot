@@ -138,7 +138,7 @@ const commands = [
     operatorOnly: false,
     channelOnlyId: commandChannel,
     function: (params) => {
-      const { Game, Helper, Bot, messageObj } = params;
+      const { Game, Bot, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
@@ -161,7 +161,7 @@ const commands = [
               return messageObj.author.send('This players inventory was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.');
             }
 
-            return Helper.generateInventoryString(playerInventory)
+            return Game.generateInventoryString(playerInventory)
               .then(inv => messageObj.author.send(inv.replace('Here is your inventory!', `Here is ${playerInventory.name}s inventory!`)));
           });
       }
@@ -175,7 +175,7 @@ const commands = [
             return messageObj.author.send('Your inventory was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
           }
 
-          Helper.generateInventoryString(playerInventory)
+          Game.generateInventoryString(playerInventory)
             .then(inv => messageObj.author.send(inv));
         });
     }
@@ -338,12 +338,15 @@ const commands = [
     function: (params) => {
       const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
-        const value = messageObj.content.split(/ (.+)/)[1].replace(/([\<\@\!\>])/g, '');
+        const messageSplit = messageObj.content.split(' ');
+        const value = messageSplit[1].replace(/([\<\@\!\>])/g, '');
+        const confirmation = messageSplit[2] === 'true';
         return Game.fetchCommand({
           command: 'setServer',
           author: messageObj.author,
           Bot,
-          value
+          value,
+          confirmation
         });
       }
 
@@ -1111,8 +1114,7 @@ const commands = [
     function: async (params) => {
       const { Game, messageObj } = params;
       const repoList = await GitHub.randomRepo();
-      const ranIndex = Game.Helper.randomBetween(0, repoList.length);
-      const randomRepo = repoList[ranIndex];
+      const randomRepo = Game.randomChoice(repoList);
       messageObj.reply(`\nRepo: ${randomRepo.name}\nOwner: ${randomRepo.owner.login}\n${randomRepo.url.replace('api.', '').replace('/repos', '')}`);
     }
   },
@@ -1215,7 +1217,7 @@ const commands = [
         const wordDefinition = result.list.sort((item1, item2) => {
           return item2.thumbs_up - item1.thumbs_up;
         })[0];
-        definition = definition.replace('****', `\`${Game.Helper.capitalizeFirstLetter(wordDefinition.word).replace(/%20/g, ' ')}\``);
+        definition = definition.replace('****', `\`${Game.capitalizeFirstLetter(wordDefinition.word).replace(/%20/g, ' ')}\``);
 
         return messageObj.reply(definition.concat(`Definition:\n${wordDefinition.definition}\n\nExample:\n${wordDefinition.example}\`\`\`\n[:thumbsup::${wordDefinition.thumbs_up} / :thumbsdown::${wordDefinition.thumbs_down}]`), { split: true });
       }

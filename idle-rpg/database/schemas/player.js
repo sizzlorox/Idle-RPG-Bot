@@ -3,10 +3,8 @@ const mapSchema = require('./map');
 const { questSchema, newQuest } = require('./quest');
 const Map = require('../../game/utils/Map');
 const { equipment } = require('../../utils/enumHelper');
-const Helper = require('../../utils/Helper');
 
-const helper = new Helper();
-const MapClass = new Map(helper);
+const MapClass = new Map();
 
 const playerSchema = mongoose.Schema({
   discordId: {

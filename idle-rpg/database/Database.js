@@ -58,8 +58,8 @@ mongoose.connection.on('error', (err) => {
 
 class Database {
 
-  constructor(Helper) {
-    this.MapClass = new Map(Helper);
+  constructor() {
+    this.MapClass = new Map();
     connect();
   }
 
@@ -340,6 +340,18 @@ class Database {
     }));
   }
 
+  async getPlayerGuildId(player) {
+    if (!player) {
+      return;
+    }
+
+    try {
+      return this.loadPlayer(player, { guildId: 1 });
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
   savePlayer(player) {
     if (!player) {
       return;
@@ -453,6 +465,14 @@ class Database {
     });
 
     return stolenEquips;
+  }
+
+  getGuildPlayers(guild) {
+    try {
+      return Player.find({ guildId: guild.id }, { discordId: 1, guildId: 1 });
+    } catch (err) {
+      errorLog.log(err);
+    }
   }
 
 }

@@ -19,25 +19,21 @@ const { errorLog } = require('../../utils/logger');
 
 class Game extends aggregation(BaseGame, BaseHelper) {
 
-  constructor(Helper) {
+  constructor() {
     super();
     this.activeSpells = [];
 
-    // TODO: remove this Helper then finishing new BaseHelper
-    this.Helper = Helper;
-    this.Database = new Database(Helper);
-    this.MonsterManager = new Monster(Helper);
-    this.ItemManager = new Item(Helper);
-    this.Map = new Map(Helper);
+    this.Database = new Database();
+    this.MonsterManager = new Monster();
+    this.ItemManager = new Item();
+    this.Map = new Map();
     this.Events = new Events({
-      Helper: this.Helper,
       Map: this.Map,
       Database: this.Database,
       ItemManager: this.ItemManager,
       MonsterManager: this.MonsterManager
     });
     this.Commands = new Commands({
-      Helper: this.Helper,
       Database: this.Database,
       Events: this.Events,
       MapManager: this.Map,
@@ -73,7 +69,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       if (loadedPlayer.guildId !== guildId) {
         return;
       }
-      if (!loadedPlayer.quest || loadedPlayer.quest && !loadedPlayer.quest.questMob) {
+      if (!loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
       }
 
@@ -121,7 +117,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
 
   async loadGuildConfig(guildId) {
     const loadedConfig = await this.Database.loadGame(guildId);
-    if (loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1 || loadedConfig.multiplier <= 0 || loadedConfig.multiplier > 1 && loadedConfig.spells.activeBless === 0) {
+    if ((loadedConfig.multiplier === 1 && loadedConfig.spells.activeBless === 1) || loadedConfig.multiplier <= 0 || (loadedConfig.multiplier > 1 && loadedConfig.spells.activeBless === 0)) {
       loadedConfig.multiplier = 1;
       loadedConfig.spells.activeBless = 0;
       await this.Database.updateGame(guildId, loadedConfig);

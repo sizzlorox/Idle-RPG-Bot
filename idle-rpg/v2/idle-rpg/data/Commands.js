@@ -17,8 +17,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
   constructor(params) {
     super();
-    const { Helper, Database, Events, MapManager, ItemManager, MonsterManager } = params;
-    this.Helper = Helper;
+    const { Database, Events, MapManager, ItemManager, MonsterManager } = params;
     this.Database = Database;
     this.Events = Events;
     this.MapManager = MapManager;
@@ -249,14 +248,14 @@ ${rankString}\`\`\``);
           guildConfig.multiplier += calcAmount;
           guildConfig.spells.activeBless += calcAmount;
           await this.Database.updateGame(player.guildId, guildConfig);
-          actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
+          actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''} just cast${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell}!!\nCurrent Active Bless: ${guildConfig.spells.activeBless}\nCurrent Multiplier is: ${guildConfig.multiplier}x`));
           setTimeout(async () => {
             const newLoadedConfig = await this.Database.loadGame(player.guildId);
             newLoadedConfig.multiplier -= calcAmount;
             newLoadedConfig.spells.activeBless -= calcAmount;
             newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
-            actionsChannel.send(this.Helper.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
+            actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
           }, 1800000); // 30 minutes
         } else {
           author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
@@ -297,7 +296,7 @@ ${rankString}\`\`\``);
     const actionsChannel = await Bot.guilds.find(guild => guild.id === bountyPlacer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
     await this.Database.savePlayer(bountyPlacer);
     await this.Database.savePlayer(bountyRecipient);
-    await actionsChannel.send(this.Helper.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
+    await actionsChannel.send(this.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
 
     return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
   }
@@ -306,7 +305,7 @@ ${rankString}\`\`\``);
     const { author, amount } = params;
     const playerLog = await this.Database.loadActionLog(author);
     if (playerLog.log) {
-      return this.Helper.generateLog(playerLog.log, amount);
+      return this.generateLog(playerLog.log, amount);
     }
   }
 
@@ -314,7 +313,7 @@ ${rankString}\`\`\``);
     const { author, amount } = params;
     const playerLog = await this.Database.loadPvpLog(author);
     if (playerLog.log) {
-      return this.Helper.generateLog(playerLog.log, amount);
+      return this.generateLog(playerLog.log, amount);
     }
   }
 
@@ -353,7 +352,10 @@ ${rankString}\`\`\``);
 
   // TODO: Block if current or changing server has bless active
   async setServer(params) {
-    const { Bot, author, value } = params;
+    const { Bot, author, value, confirmation } = params;
+    if (!confirmation && value === guildID) {
+      return author.send('Your character will be reset if joining the official server. Type `!setServer <Official Server ID> true` to confirm being reset.');
+    }
     const loadedPlayer = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
     if (value === loadedPlayer.guildId) {
       return author.send('Your primary server is already set to this.');
@@ -370,6 +372,9 @@ ${rankString}\`\`\``);
     const memberInGuild = await guildToSet.members.find(member => member.id === author.id);
     if (!memberInGuild) {
       return author.send('You\'re not in this server.');
+    }
+    if (confirmation && value === guildID) {
+      await this.Database.deletePlayer(author.id);
     }
     loadedPlayer.guildId = value;
     await this.Database.setPlayerGuildId(value, loadedPlayer);
@@ -526,6 +531,7 @@ There's a command to get the invite link ${value}invite`);
           }
         });
       });
+      return;
       const message = holidays[whichHoliday].messages.holidaystart;
       if (message) {
         await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
@@ -566,7 +572,7 @@ There's a command to get the invite link ${value}invite`);
       await leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
     }
 
-    this.config = {
+    const defaultConfig = {
       multiplier: 1,
       spells: {
         activeBless: 0
@@ -579,7 +585,7 @@ There's a command to get the invite link ${value}invite`);
     await this.Database.resetAllPlayersInGuild(guildID);
     await Bot.updateLeaderboards();
     await this.Database.resetAllLogs();
-    await this.Database.updateGame(this.config);
+    await this.Database.updateGame(defaultConfig);
     resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
     await announcementChannel.send(resetMsg);
     return author.send('Reset complete...');

@@ -2,16 +2,17 @@ const commands = require('../data/commands');
 const { botOperator } = require('../../../settings');
 const { commandLog, errorLog } = require('../../utils/logger');
 const moment = require('moment');
+const BaseHelper = require('../../v2/Base/Helper');
 
 const commandList = commands.map(c => c.command).join('|').replace(/(,)/g, '|');
 const commandRegex = new RegExp(commandList);
 
-class CommandParser {
+class CommandParser extends BaseHelper {
 
   constructor(params) {
-    const { Game, Helper, Bot } = params;
+    super();
+    const { Game, Bot } = params;
     this.Game = Game;
-    this.Helper = Helper;
     this.Bot = Bot;
   }
 
@@ -21,15 +22,13 @@ class CommandParser {
         ? messageObj.channel.type
         : messageObj.guild.channels.find(channel => channel.name === 'commands' && channel.type === 'text').id;
       const guildId = messageObj.channel.type === 'dm'
-        ? await this.Bot.guilds.find(guild => guild.members.find(member => member.id === messageObj.author.id)).id
+        ? (await this.Game.Database.getPlayerGuildId(messageObj.author.id)).guildId
         : messageObj.guild.id;
       const guildPrefix = this.Game.getGuildCommandPrefix(guildId).prefix;
       if (!messageObj.content.startsWith(guildPrefix)) {
         return;
       }
-      const command = guildPrefix === '!irpg'
-        ? messageObj.content.replace('!irpg ', '!').split(/ (.+)/)[0]
-        : messageObj.content.replace(guildPrefix, '!').split(/ (.+)/)[0];
+      const command = messageObj.content.replace(guildPrefix === '!irpg' ? '!irpg ' : guildPrefix, '!').split(/ (.+)/)[0];
       if (messageObj.content.startsWith('!irpg')) {
         messageObj.content = messageObj.content.split(/ (.+)/)[1];
       }
@@ -64,7 +63,7 @@ class CommandParser {
       }
 
       if (messageObj.content.startsWith(guildPrefix) && channelId !== commandChannelId) {
-        return messageObj.author.send(`Please check !help for more info. ${messageObj.content} was an invalid command.`);
+        return messageObj.author.send(`Please check ${guildPrefix}help for more info. ${messageObj.content} was an invalid command.`);
       }
     } catch (err) {
       errorLog.error(err);
