@@ -9,7 +9,7 @@ const settings = {
     : process.env.TEST_DISCORD_BOT_LOGIN_TOKEN,
   minimalTimer: process.env.NODE_ENV.includes('production') ? process.env.MIN_TIMER : process.env.TEST_MIN_TIMER,
   maximumTimer: process.env.NODE_ENV.includes('production') ? process.env.MAX_TIMER : process.env.TEST_MAX_TIMER,
-  botOperator: process.env.DISCORD_BOT_OPERATOR_ID,
+  botOperators: process.env.DISCORD_BOT_OPERATORS_ID.replace(' ', '').split(','),
   mongoDBUri: process.env.MONGODB_URI,
   starterTown: [3, 5],
   multiplier: 1

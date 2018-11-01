@@ -17,11 +17,11 @@ const holidays = {
     holidayName: 'halloween',
     messages: {
       preevent:
-        '@everyone```python\nTheres word going around Kindale about spooky creatures roaming about!```',
+        '@everyone```python\nThere\'s word going around Kindale about spooky creatures roaming about!```',
       secondpreevent:
         '@everyone```python\nYou\'ve been hearing strange noises lately. There\'s always a feeling something is creeping from behind, town criers have been telling travellers to stay within town as fogs have been building up randomly in various locations.```',
       holidaystart:
-        '@everyone```python\nHoly COW! You can\'t see anything! Everwhere is covered in fog! You stumble on your own footsteps as you try to continue your adventures while ignoring the strange feeling of something following you.```',
+        '@everyone```python\nHoly COW! You can\'t see anything! Everywhere is covered in fog! You stumble on your own footsteps as you try to continue your adventures while ignoring the strange feeling of something following you.```',
       holidayend:
         '@everyone```python\nThe fog seems to be going away and you now clearly see whats in your vicinity. It appears that the strange creepy noises have all of a sudden stopped.```'
     }

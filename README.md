@@ -21,7 +21,10 @@ There is also a [Idle-RPG Trello Board](https://trello.com/b/OnpWqvlp/idle-rpg)
 Create a .env file in the project root directory with these env variables: (Without < >)
 ```
 DISCORD_BOT_LOGIN_TOKEN=<Bot login token>
-DISCORD_BOT_OPERATOR_ID=<Bot Operator ID>
+DISCORD_BOT_OPERATORS_ID=<Comma seperated list of Bot Operator ID's>
+Example:
+DISCORD_BOT_OPERATORS_ID=123456789
+DISCORD_BOT_OPERATORS_ID=123456789, 987654321
 
 MIN_TIMER=<Minimal Timer in minutes>
 MAX_TIMER=<Maximum Timer in minutes>
