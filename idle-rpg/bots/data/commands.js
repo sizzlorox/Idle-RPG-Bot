@@ -201,25 +201,23 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, Bot, messageObj } = params;
-      if (messageObj.content.includes(' ')) {
-        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
-        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot);
-        if (playerObj.size === 0) {
-          messageObj.author.send(`${checkPlayer} was not found!`);
-          return;
-        }
+      let playerObj;
 
-        return Game.fetchCommand({
-          command: 'playerStats',
-          author: messageObj.author,
-          playerToCheck: playerObj[0]
-        });
+      if (messageObj.content.includes(' ')) {
+        const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
+        playerObj = Bot.users.get(checkPlayer);
+        if (!playerObj || playerObj.bot) {
+          if (process.env.NODE_ENV.includes('production')) {
+            return messageObj.author.send(`${checkPlayer} was not found!`);
+          }
+          playerObj = { id: checkPlayer };
+        }
       }
 
       return Game.fetchCommand({
         command: 'playerStats',
-        author: messageObj.author
+        author: messageObj.author,
+        playerToCheck: playerObj
       });
     }
   },
@@ -230,25 +228,23 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, Bot, messageObj } = params;
-      if (messageObj.content.includes(' ')) {
-        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
-        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot);
-        if (playerObj.size === 0) {
-          messageObj.author.send(`${checkPlayer} was not found!`);
-          return;
-        }
+      let playerObj;
 
-        return Game.fetchCommand({
-          command: 'playerEquipment',
-          author: messageObj.author,
-          playerToCheck: playerObj[0]
-        });
+      if (messageObj.content.includes(' ')) {
+        const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
+        playerObj = Bot.users.get(checkPlayer);
+        if (!playerObj || playerObj.bot) {
+          if (process.env.NODE_ENV.includes('production')) {
+            return messageObj.author.send(`${checkPlayer} was not found!`);
+          }
+          playerObj = { id: checkPlayer };
+        }
       }
 
       return Game.fetchCommand({
         command: 'playerEquipment',
-        author: messageObj.author
+        author: messageObj.author,
+        playerToCheck: playerObj
       });
     }
   },
@@ -259,25 +255,23 @@ const commands = [
     channelOnlyId: commandChannel,
     function: (params) => {
       const { Game, Bot, messageObj } = params;
-      if (messageObj.content.includes(' ')) {
-        let checkPlayer = messageObj.content.split(/ (.+)/)[1];
-        checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot);
-        if (playerObj.size === 0) {
-          messageObj.author.send(`${checkPlayer} was not found!`);
-          return;
-        }
+      let playerObj;
 
-        return Game.fetchCommand({
-          command: 'playerSpellBook',
-          author: messageObj.author,
-          playerToCheck: playerObj[0]
-        });
+      if (messageObj.content.includes(' ')) {
+        const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
+        playerObj = Bot.users.get(checkPlayer);
+        if (!playerObj || playerObj.bot) {
+          if (process.env.NODE_ENV.includes('production')) {
+            return messageObj.author.send(`${checkPlayer} was not found!`);
+          }
+          playerObj = { id: checkPlayer };
+        }
       }
 
       return Game.fetchCommand({
         command: 'playerSpellBook',
-        author: messageObj.author
+        author: messageObj.author,
+        playerToCheck: playerObj
       });
     }
   },
@@ -617,60 +611,55 @@ const commands = [
       const { Game, Bot, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const splitArray = messageObj.content.split(' ');
+        let guildId;
+        let newPrefix;
+
         if (splitArray.length === 3) {
-          const guildToUpdate = Bot.guilds.find(guild => guild.id === splitArray[1]);
-          if (!guildToUpdate) {
-            return messageObj.author.send('No guild found with this ID');
-          }
-          const memberToCheckPermission = guildToUpdate.find(member => member.id === messageObj.author.id);
-          if (!memberToCheckPermission) {
-            return messageObj.author.send('You were not found within this guild');
-          }
-          if (!memberToCheckPermission.hasPermission('MANAGE_GUILD')) {
-            return messageObj.author.send('You do not have the permission to change the prefix for this guild');
-          }
-
-          const newPrefix = splitArray[2];
-          if (newPrefix.includes(' ') || newPrefix.includes('\n')) {
-            return messageObj.author.send('Please do not use a whitespace inside the prefix');
-          }
-          const result = await Game.fetchCommand({
-            Bot,
-            command: 'modifyServerPrefix',
-            author: messageObj.author,
-            guildId: guildToUpdate.id,
-            value: newPrefix
-          });
-          if (result) {
-            Game.getGuildCommandPrefix(guildToUpdate.id).prefix = newPrefix;
-          }
+          guildId = splitArray[1];
+          newPrefix = splitArray[2];
         } else if (splitArray.length === 2) {
-          const guildToUpdate = Bot.guilds.find(guild => guild.id === messageObj.guild.id);
-          if (!guildToUpdate) {
-            return messageObj.author.send('No guild found with this ID');
+          if (messageObj.channel.type === 'dm') {
+            return messageObj.author.send('You need to provide the guild id and a prefix in DM\'s');
           }
-          const memberToCheckPermission = guildToUpdate.members.find(member => member.id === messageObj.author.id);
-          if (!memberToCheckPermission) {
-            return messageObj.author.send('You were not found within this guild');
-          }
-          if (!memberToCheckPermission.hasPermission('MANAGE_GUILD')) {
-            return messageObj.author.send('You do not have the permission to change the prefix for this guild');
-          }
+          guildId = messageObj.guild.id;
+          newPrefix = splitArray[1];
+        } else {
+          return messageObj.author.send('Invalid amount of arguments. Check the help for more info.');
+        }
 
-          const newPrefix = splitArray[1];
-          if (newPrefix.includes(' ') || newPrefix.includes('\n')) {
-            return messageObj.author.send('Please do not use a whitespace inside the prefix');
-          }
-          const result = await Game.fetchCommand({
-            Bot,
-            command: 'modifyServerPrefix',
-            author: messageObj.author,
-            guildId: guildToUpdate.id,
-            value: newPrefix
-          });
-          if (result) {
-            Game.getGuildCommandPrefix(guildToUpdate.id).prefix = newPrefix;
-          }
+        const guildToUpdate = Bot.guilds.get(guildId);
+        if (!guildToUpdate) {
+          return messageObj.author.send('No guild found with this ID');
+        }
+
+        const memberToCheckPermission = guildToUpdate.members.get(messageObj.author.id);
+        if (!memberToCheckPermission) {
+          return messageObj.author.send('You were not found within this guild');
+        }
+
+        if (!memberToCheckPermission.hasPermission('MANAGE_GUILD')) {
+          return messageObj.author.send('You do not have the permission to change the prefix for this guild');
+        }
+
+        if (newPrefix === '') {
+          return messageObj.author.send('Enter a non empty prefix');
+        }
+
+        if (newPrefix.includes('\n')) {
+          return messageObj.author.send('Please do not use line breaks inside the prefix');
+        }
+
+        const result = await Game.fetchCommand({
+          Bot,
+          command: 'modifyServerPrefix',
+          author: messageObj.author,
+          guildId: guildToUpdate.id,
+          value: newPrefix
+        });
+        if (result) {
+          Game.getGuildCommandPrefix(guildToUpdate.id).prefix = newPrefix;
+        } else {
+          messageObj.author.send('An error occurred while updating the prefix');
         }
       }
     }

@@ -29,7 +29,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck || playerToCheck.id !== author.id
+      return playerToCheck && playerToCheck.id !== author.id
         ? author.send('This character was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your character was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
@@ -44,7 +44,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.equipSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck || playerToCheck.id !== author.id
+      return playerToCheck && playerToCheck.id !== author.id
         ? author.send('This players equipment was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your equipment was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
@@ -59,7 +59,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const { author, playerToCheck } = params;
     const loadedPlayer = await this.Database.loadPlayer(playerToCheck ? playerToCheck.id : author.id, enumHelper.statsSelectFields);
     if (!loadedPlayer) {
-      return playerToCheck || playerToCheck.id !== author.id
+      return playerToCheck && playerToCheck.id !== author.id
         ? author.send('This players spellbook was not found! This player probably was not born yet. Please be patient until destiny has chosen him/her.')
         : author.send('Your spellbook was not found! You probably were not born yet. Please be patient until destiny has chosen you.');
     }
