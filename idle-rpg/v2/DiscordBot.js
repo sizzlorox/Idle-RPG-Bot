@@ -196,8 +196,10 @@ class DiscordBot extends BaseHelper {
         }
       });
       onlinePlayers.filter(player => player.guildId === null).forEach((player) => {
-        player.guildId = (this.bot.guilds.find(guild => guild.members.get(player.discordId))).id;
+        const guild = this.bot.guilds.find(g => g.members.has(player.discordId));
+        player.guildId = (guild && guild.id) || null;
       });
+      onlinePlayers.sweep(player => player.guildId === null);
       this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? onlinePlayers.size : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
     }, 60000 * interval);
   }
