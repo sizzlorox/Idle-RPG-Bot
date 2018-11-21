@@ -360,6 +360,12 @@ ${rankString}\`\`\``);
     if (value === loadedPlayer.guildId) {
       return author.send('Your primary server is already set to this.');
     }
+    if (!confirmation && value !== guildID && loadedPlayer.equipment.relic.name === 'Buggy Mess') {
+      return author.send('Your character has a relic that may only exist in this server. If you would like to continue changing servers, type `!setServer <Server ID> true` to confirm. *This will destroy your relic!*');
+    }
+    if (confirmation && value !== guildID && loadedPlayer.equipment.relic.name === 'Buggy Mess') {
+      loadedPlayer.equipment.relic.name = enumHelper.equipment.empty.relic;
+    }
     let count = 0;
     await Bot.guilds.forEach(guild => guild.members.find(member => member.id === author.id) ? count++ : count);
     if (count <= 1) {
@@ -377,7 +383,8 @@ ${rankString}\`\`\``);
       await this.Database.deletePlayer(author.id);
     }
     loadedPlayer.guildId = value;
-    await this.Database.setPlayerGuildId(value, loadedPlayer);
+    // await this.Database.setPlayerGuildId(value, loadedPlayer);
+    await this.Database.savePlayer(loadedPlayer);
 
     return author.send(`Primary server set to ${guildToSet.name}`);
   }
@@ -563,9 +570,13 @@ There's a command to get the invite link ${value}invite`);
   }
 
   async resetPlayers(params) {
-    const { Bot, author } = params;
-    const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
-    const announcementChannel = discordBot.guilds.find('id', guildID).channels.find('id', announcementChannelId);
+    const { Bot, author, guildId } = params;
+    const guild = Bot.guilds.find('id', guildId);
+    if (!guild) {
+      return author.send('No guild with that id');
+    }
+    const leaderboardChannel = guild.channels.find('id', '454306847785222154');
+    const announcementChannel = guild.channels.find('id', '391510663303790592');
     const leaderboardMessages = leaderboardChannel.fetchMessages({ limit: 10 });
     let resetMsg = '';
     if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
@@ -582,12 +593,13 @@ There's a command to get the invite link ${value}invite`);
       }
     };
 
-    await this.Database.resetAllPlayersInGuild(guildID);
-    await Bot.updateLeaderboards();
-    await this.Database.resetAllLogs();
-    await this.Database.updateGame(defaultConfig);
+    await this.Database.resetAllPlayersInGuild(guildId);
+    await this.Database.resetAllLogs(guildId);
+    await this.Database.updateGame(guildId, defaultConfig);
     resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
-    await announcementChannel.send(resetMsg);
+    if (announcementChannel) {
+      await announcementChannel.send(resetMsg);
+    }
     return author.send('Reset complete...');
   }
 

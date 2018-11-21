@@ -54,13 +54,11 @@ class Item extends BaseHelper {
         itemObj = {
           name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
           position: itemType.position,
-          stats: {
-            str: itemStr,
-            dex: itemDex,
-            end: itemEnd,
-            int: itemInt,
-            luk: itemLuk
-          },
+          str: itemStr,
+          dex: itemDex,
+          end: itemEnd,
+          int: itemInt,
+          luk: itemLuk,
           holiday: itemType.holiday,
           rating: itemRating,
           gold: Number((itemRarityList[randomRarityIndex].gold
@@ -115,13 +113,11 @@ class Item extends BaseHelper {
     return {
       name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,
       position: snowFlake.position,
-      stats: {
-        str: itemStr,
-        dex: itemDex,
-        end: itemEnd,
-        int: itemInt,
-        luk: itemLuk
-      },
+      str: itemStr,
+      dex: itemDex,
+      end: itemEnd,
+      int: itemInt,
+      luk: itemLuk,
       holiday: snowFlake.holiday,
       rating: itemRating,
       gold: Number((itemRarityList[randomRarityIndex].gold
