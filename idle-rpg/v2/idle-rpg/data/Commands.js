@@ -575,9 +575,9 @@ There's a command to get the invite link ${value}invite`);
     if (!guild) {
       return author.send('No guild with that id');
     }
-    const leaderboardChannel = guild.channels.find('id', '454306847785222154');
-    const announcementChannel = guild.channels.find('id', '391510663303790592');
-    const leaderboardMessages = leaderboardChannel.fetchMessages({ limit: 10 });
+    const leaderboardChannel = await guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
+    const announcementChannel = await guild.channels.find(channel => channel.name === 'announcements' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
+    const leaderboardMessages = await leaderboardChannel.fetchMessages({ limit: 10 });
     let resetMsg = '';
     if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
       await leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
