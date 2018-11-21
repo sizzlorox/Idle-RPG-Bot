@@ -394,17 +394,6 @@ const resetPlayerObj = {
     attackType: 'melee',
     previousOwners: []
   },
-  'equipment.relic': {
-    name: 'Buggy Mess',
-    position: 'relic',
-    str: 1,
-    dex: 1,
-    end: 1,
-    int: 1,
-    luk: 5,
-    rating: Math.round(1 + 1 + 1 + 1 + 5),
-    gold: 7500
-  },
   inventory: {
     equipment: [],
     items: []
