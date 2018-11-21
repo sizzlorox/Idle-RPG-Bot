@@ -57,9 +57,15 @@ class Game extends aggregation(BaseGame, BaseHelper) {
           pm: ['You were born.']
         });
       }
+      if (loadedPlayer.guildId !== guildId) {
+        return;
+      }
 
       // Update players name in case they altered their discord name
       loadedPlayer.name = player.name;
+      if (guildId === '390509935097675777') {
+        console.log(`[${loadedPlayer.name}] -> ${loadedPlayer.updated_at}`);
+      }
 
       // TODO: Remove after reset
       if (loadedPlayer.isPrivateMessageImportant) {

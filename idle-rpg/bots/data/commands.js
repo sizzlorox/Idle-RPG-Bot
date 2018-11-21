@@ -1044,12 +1044,26 @@ const commands = [
 
   resetAll = {
     command: '!resetall',
-    operatorOnly: true,
     channelOnlyId: commandChannel,
     function: async (params) => {
-      const { Bot, Game } = params;
-      await Game.Database.deleteAllPlayers(Bot);
-      message.author.send('Done.');
+      const { Bot, Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const guildID = messageObj.content.split(/ (.+)/)[1];
+        const guild = Bot.guilds.find(guild => guild.id === guildID);
+        if (!guild) {
+          return messageObj.author.send('This guild does not exist.');
+        }
+        if (guild.owner.id !== messageObj.author.id) {
+          return messageObj.author.send('You\'re not the owner of this server. You do not have permission to reset this servers stats');
+        }
+        return Game.fetchCommand({
+          command: 'resetPlayers',
+          author: messageObj.author,
+          Bot,
+          guildId: guildID
+        });
+      }
+      return message.author.send('You must specify a guild id to reset.');
     }
   },
 

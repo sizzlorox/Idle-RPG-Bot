@@ -244,11 +244,11 @@ class Game {
         updatedPlayer.equipment[equipment].attackType = item.attackType;
       }
     } else if (equipment === enumHelper.equipment.types.relic.position) {
-      updatedPlayer.equipment[equipment].str = item.stats.str;
-      updatedPlayer.equipment[equipment].dex = item.stats.dex;
-      updatedPlayer.equipment[equipment].end = item.stats.end;
-      updatedPlayer.equipment[equipment].int = item.stats.int;
-      updatedPlayer.equipment[equipment].luk = item.stats.luk;
+      updatedPlayer.equipment[equipment].str = item.str;
+      updatedPlayer.equipment[equipment].dex = item.dex;
+      updatedPlayer.equipment[equipment].end = item.end;
+      updatedPlayer.equipment[equipment].int = item.int;
+      updatedPlayer.equipment[equipment].luk = item.luk;
     }
     updatedPlayer.equipment[equipment].previousOwners = item.previousOwners;
 

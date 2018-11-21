@@ -316,10 +316,10 @@ class Database {
 
   async loadPlayer(discordId, selectFields = {}) {
     try {
-      const { _doc } = await Player.findOne({ discordId })
+      const player = await Player.findOne({ discordId })
         .select(selectFields);
 
-      return _doc;
+      return player ? player._doc : undefined;
     } catch (err) {
       errorLog.error(err);
     }
@@ -429,13 +429,13 @@ class Database {
       }));
   }
 
-  resetAllLogs() {
-    return new Promise((resolve, reject) => MoveLog.update({}, {}, { mulit: true }, (err, result) => {
+  resetAllLogs(guildId) {
+    return new Promise((resolve, reject) => MoveLog.update({ guildId }, {}, { mulit: true }, (err, result) => {
       if (err) {
         return reject(err);
       }
 
-      return resolve(ActionLog.update({}, {}, { multi: true }));
+      return resolve(ActionLog.update({ guildId }, {}, { multi: true }));
     }));
   }
 

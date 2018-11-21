@@ -338,6 +338,7 @@ const newPlayerObj = (discordId, guildId, name) => {
       lost: 0,
       firstDeath: 0
     },
+    travelled: 0,
     deaths: {
       mob: 0,
       player: 0,
@@ -431,6 +432,7 @@ const resetPlayerObj = {
     lost: 0,
     firstDeath: 0
   },
+  travelled: 0,
   deaths: {
     mob: 0,
     player: 0,
