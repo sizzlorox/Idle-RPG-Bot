@@ -50,6 +50,7 @@ class DiscordBot extends BaseHelper {
     this.minTimer = (minimalTimer * 1000) * 60;
     this.maxTimer = (maximumTimer * 1000) * 60;
     this.tickInMinutes = 2;
+    this.counter = {};
   }
 
   loadEventListeners() {
@@ -136,34 +137,34 @@ class DiscordBot extends BaseHelper {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
-          const guildPlayers = await this.Game.Database.getGuildPlayers(guild);
+          // const guildPlayers = await this.Game.Database.getGuildPlayers(guild);
           const guildOnlineMembers = [];
 
           guild.members.forEach((member) => {
             if (!member.user.bot) {
-              if (guildPlayers.find(user => user.discordId === member.id && user.guildId === guild.id)) {
-                const player = Object.assign({}, {
-                  discordId: member.id,
-                  name: member.nickname ? member.nickname : member.displayName,
-                  guildId: guild.id
-                });
-                if (member.presence.status === 'offline') {
-                  if (onlinePlayers.has(player.discordId)) {
-                    onlinePlayers.delete(player.discordId);
-                  }
-                } else {
-                  if (!onlinePlayers.has(player.discordId) || onlinePlayers.get(player.discordId).guildId !== guild.id) {
-                    onlinePlayers.set(player.discordId, player);
-                  }
-                  guildOnlineMembers.push(player);
+              const player = Object.assign({}, {
+                discordId: member.id,
+                name: member.nickname ? member.nickname : member.displayName,
+                guildId: guild.id
+              });
+              if (!onlinePlayers.find(user => user.discordId === member.id && user.guildId === guild.id)) {
+                if (!onlinePlayers.has(player.discordId)) {
+                  onlinePlayers.set(player.discordId, player);
                 }
-              } else if (!(member.presence.status === 'offline') && !onlinePlayers.has(member.id)) {
-                onlinePlayers.set(member.id, {
-                  discordId: member.id,
-                  name: member.nickname ? member.nickname : member.displayName,
-                  guildId: null
-                });
               }
+              if (member.presence.status === 'offline') {
+                if (onlinePlayers.has(player.discordId)) {
+                  onlinePlayers.delete(player.discordId);
+                }
+              }
+              guildOnlineMembers.push(player);
+              // else if (!(member.presence.status === 'offline') && !onlinePlayers.has(member.id)) {
+              //   onlinePlayers.set(member.id, {
+              //     discordId: member.id,
+              //     name: member.nickname ? member.nickname : member.displayName,
+              //     guildId: null
+              //   });
+              // }
             }
           });
 
@@ -195,11 +196,6 @@ class DiscordBot extends BaseHelper {
           });
         }
       });
-      onlinePlayers.filter(player => player.guildId === null).forEach((player) => {
-        const guild = this.bot.guilds.find(g => g.members.has(player.discordId));
-        player.guildId = (guild && guild.id) || null;
-      });
-      onlinePlayers.sweep(player => player.guildId === null);
       this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? onlinePlayers.size : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
     }, 60000 * interval);
   }

@@ -575,14 +575,15 @@ There's a command to get the invite link ${value}invite`);
     if (!guild) {
       return author.send('No guild with that id');
     }
-    const leaderboardChannel = await guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
-    const announcementChannel = await guild.channels.find(channel => channel.name === 'announcements' && channel.type === 'text' && channel.parent && channel.parent.name === 'Idle-RPG');
+    const leaderboardChannel = await guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text');
+    const announcementChannel = await guild.channels.find(channel => channel.name === 'announcements' && channel.type === 'text');
+    let resetMsg = '';
     if (leaderboardChannel) {
       const leaderboardMessages = await leaderboardChannel.fetchMessages({ limit: 10 });
-      let resetMsg = '';
       if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
         await leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
       }
+      resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
     }
 
     const defaultConfig = {
@@ -598,7 +599,7 @@ There's a command to get the invite link ${value}invite`);
     await this.Database.resetAllPlayersInGuild(guildId);
     await this.Database.resetAllLogs(guildId);
     await this.Database.updateGame(guildId, defaultConfig);
-    resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
+    await this.Database.removeLotteryPlayers(guildId);
     if (announcementChannel) {
       await announcementChannel.send(resetMsg);
     }
