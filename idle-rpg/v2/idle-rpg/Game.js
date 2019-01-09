@@ -60,21 +60,11 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       if (loadedPlayer.guildId !== guildId) {
         return;
       }
+      console.log(`[${loadedPlayer.name}] -> ${this.getTimePassed(loadedPlayer.updated_at)}`);
 
       // Update players name in case they altered their discord name
       loadedPlayer.name = player.name;
-      if (guildId === '390509935097675777') {
-        console.log(`[${loadedPlayer.name}] -> ${loadedPlayer.updated_at}`);
-      }
 
-      // TODO: Remove after reset
-      if (loadedPlayer.isPrivateMessageImportant) {
-        loadedPlayer.isPrivateMessage = pmMode.filtered;
-      }
-
-      if (loadedPlayer.guildId !== guildId) {
-        return;
-      }
       if (!loadedPlayer.quest && !loadedPlayer.quest.questMob) {
         loadedPlayer.quest = newQuest;
       }
