@@ -60,7 +60,6 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       if (loadedPlayer.guildId !== guildId) {
         return;
       }
-      console.log(`[${loadedPlayer.name}] -> ${this.getTimePassed(loadedPlayer.updated_at)}`);
 
       // Update players name in case they altered their discord name
       loadedPlayer.name = player.name;

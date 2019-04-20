@@ -164,7 +164,7 @@ class DiscordBot extends BaseHelper {
               //     discordId: member.id,
               //     name: member.nickname ? member.nickname : member.displayName,
               //     guildId: null
-              //   });
+              //   });-
               // }
             }
           });
