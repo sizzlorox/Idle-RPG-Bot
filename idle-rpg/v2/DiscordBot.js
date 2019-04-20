@@ -69,12 +69,15 @@ class DiscordBot extends BaseHelper {
       }, console.log('Reset all personal multipliers'));
     });
     this.bot.on('message', async (message) => {
-      if (!message.author.bot && message.guild && message.guild.id === guildID && message.content.includes('(╯°□°）╯︵ ┻━┻')) {
-        return message.reply(' ┬─┬ノ(ಠ\\_ಠノ)'.repeat(message.content.split('(╯°□°）╯︵ ┻━┻').length - 1));
+      if (message.author.bot) { // Don't listen to bots. Even Idle-RPG himself.
+        return;
       }
 
-      if (message.author.id === this.bot.user.id
-        || message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
+      if (message.guild && message.guild.id === guildID && message.content.includes('┻━┻')) {
+        return message.reply(' ┬─┬ノ(ಠ\\_ಠノ)'.repeat(message.content.split('┻━┻').length - 1));
+      }
+
+      if (message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
         return;
       }
 
@@ -116,12 +119,10 @@ class DiscordBot extends BaseHelper {
       }
 
       const welcomeChannel = member.guild.channels.find(channel => channel.name === 'newcomers' && channel.type === 'text');
-      if (!welcomeChannel) {
-        return;
+      if (welcomeChannel) {
+        welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.find(channel => channel.name === 'faq' && channel.type === 'text').id}> or PM me !help.`);
+        welcomeLog.info(member);
       }
-
-      welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.find(channel => channel.name === 'faq' && channel.type === 'text').id}> or PM me !help.`);
-      welcomeLog.info(member);
     });
 
     this.bot.on('rateLimit', infoLog.info);
@@ -163,7 +164,7 @@ class DiscordBot extends BaseHelper {
               //     discordId: member.id,
               //     name: member.nickname ? member.nickname : member.displayName,
               //     guildId: null
-              //   });
+              //   });-
               // }
             }
           });

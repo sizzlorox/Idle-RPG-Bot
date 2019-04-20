@@ -1122,55 +1122,55 @@ const commands = [
     }
   },
 
-  nextLaunch = {
-    command: '!nextlaunch',
-    operatorOnly: false,
-    function: async (params) => {
-      const { messageObj } = params;
-      const spaceInfo = await Space.nextLaunch();
-      const nextLaunch = spaceInfo.launches[0];
-      const codeBlock = '\`\`\`';
-      let info = codeBlock;
-      info += `${nextLaunch.provider}s ${nextLaunch.vehicle}`;
-      info += `\nPayLoad: ${nextLaunch.payload}`;
-      info += `\nLocation: ${nextLaunch.location}`;
-      info += `\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`;
-      info += `\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`;
-      info += `\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`;
-      info += codeBlock;
-      messageObj.reply(info);
-    }
-  },
+  // nextLaunch = {
+  //   command: '!nextlaunch',
+  //   operatorOnly: false,
+  //   function: async (params) => {
+  //     const { messageObj } = params;
+  //     const spaceInfo = await Space.nextLaunch();
+  //     const nextLaunch = spaceInfo.launches[0];
+  //     const codeBlock = '\`\`\`';
+  //     let info = codeBlock;
+  //     info += `${nextLaunch.provider}s ${nextLaunch.vehicle}`;
+  //     info += `\nPayLoad: ${nextLaunch.payload}`;
+  //     info += `\nLocation: ${nextLaunch.location}`;
+  //     info += `\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`;
+  //     info += `\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`;
+  //     info += `\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`;
+  //     info += codeBlock;
+  //     messageObj.reply(info);
+  //   }
+  // },
 
-  nextStreamlaunch = {
-    command: '!nextstreamlaunch',
-    operatorOnly: false,
-    function: async (params) => {
-      const { messageObj } = params;
-      const spaceInfo = await Space.nextLaunch();
-      let nextLaunch;
-      for (let i = 0; i < spaceInfo.launches.length; i++) {
-        if (spaceInfo.launches[i].hasStream) {
-          nextLaunch = spaceInfo.launches[i];
-          break;
-        }
-      }
-      if (nextLaunch) {
-        const codeBlock = '\`\`\`';
-        let info = codeBlock;
-        info += `${nextLaunch.provider}s ${nextLaunch.vehicle}`;
-        info += `\nPayLoad: ${nextLaunch.payload}`;
-        info += `\nLocation: ${nextLaunch.location}`;
-        info += `\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`;
-        info += `\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`;
-        info += `\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`;
-        info += codeBlock;
-        messageObj.reply(info);
-      } else {
-        messageObj.reply('Couldn\'t find next streamed launch.');
-      }
-    }
-  },
+  // nextStreamlaunch = {
+  //   command: '!nextstreamlaunch',
+  //   operatorOnly: false,
+  //   function: async (params) => {
+  //     const { messageObj } = params;
+  //     const spaceInfo = await Space.nextLaunch();
+  //     let nextLaunch;
+  //     for (let i = 0; i < spaceInfo.launches.length; i++) {
+  //       if (spaceInfo.launches[i].hasStream) {
+  //         nextLaunch = spaceInfo.launches[i];
+  //         break;
+  //       }
+  //     }
+  //     if (nextLaunch) {
+  //       const codeBlock = '\`\`\`';
+  //       let info = codeBlock;
+  //       info += `${nextLaunch.provider}s ${nextLaunch.vehicle}`;
+  //       info += `\nPayLoad: ${nextLaunch.payload}`;
+  //       info += `\nLocation: ${nextLaunch.location}`;
+  //       info += `\nLaunch Time: ${moment(nextLaunch.launchtime).utc('br')}`;
+  //       info += `\nStream: ${nextLaunch.hasStream ? 'Yes' : 'No'}`;
+  //       info += `\nDelayed: ${nextLaunch.delayed ? 'Yes' : 'No'}`;
+  //       info += codeBlock;
+  //       messageObj.reply(info);
+  //     } else {
+  //       messageObj.reply('Couldn\'t find next streamed launch.');
+  //     }
+  //   }
+  // },
 
   crypto = {
     command: '!crypto',
