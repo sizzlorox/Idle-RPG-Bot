@@ -252,7 +252,7 @@ ${rankString}\`\`\``);
           setTimeout(async () => {
             const newLoadedConfig = await this.Database.loadGame(player.guildId);
             newLoadedConfig.multiplier = Math.max(1, newLoadedConfig.multiplier - calcAmount);
-            newLoadedConfig.spells.activeBless = Math.max(0, newLoadedConfig.multiplier - calcAmount);
+            newLoadedConfig.spells.activeBless = Math.max(0, newLoadedConfig.spells.activeBless - calcAmount);
             newLoadedConfig.multiplier = newLoadedConfig.multiplier <= 0 ? 1 : newLoadedConfig.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
             actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
