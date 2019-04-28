@@ -253,7 +253,7 @@ ${rankString}\`\`\``);
             const newLoadedConfig = await this.Database.loadGame(player.guildId);
             newLoadedConfig.multiplier -= calcAmount;
             newLoadedConfig.spells.activeBless -= calcAmount;
-            newLoadedConfig.spells.multiplier = newLoadedConfig.spells.multiplier <= 0 ? 1 : newLoadedConfig.spells.multiplier;
+            newLoadedConfig.multiplier = newLoadedConfig.multiplier <= 0 ? 1 : newLoadedConfig.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
             actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
           }, 1800000); // 30 minutes
