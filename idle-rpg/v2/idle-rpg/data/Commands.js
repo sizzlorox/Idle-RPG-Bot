@@ -105,10 +105,8 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     updatedConfig.dailyLottery.prizePool = newPrizePool;
     this.config = updatedConfig;
 
-    return Promise.all([
-      this.Database.updateGame(guildId, updatedConfig),
-      this.Database.removeLotteryPlayers(guildId)
-    ]);
+    await this.Database.updateGame(guildId, updatedconfig);
+    await this.Database.removeLotteryPlayers(guildId);
   }
 
   async resetQuest(params) {
