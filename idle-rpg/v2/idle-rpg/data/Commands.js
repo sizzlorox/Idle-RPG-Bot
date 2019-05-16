@@ -75,6 +75,42 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     return this.Database.loadPlayer(author.id, enumHelper.inventorySelectFields);
   }
 
+  async resetLottery({ guildId, guild }) {
+    if (!process.env.NODE_ENV.includes('production')) {
+      return;
+    }
+
+    const lotteryPlayers = await this.Database.loadLotteryPlayers(guildId);
+    if (!lotteryPlayers.length) {
+      return;
+    }
+
+    const newPrizePool = 5000;
+    const lotteryChannel = await guild.channels.find(channel => channel.id === enumHelper.channels.lottery);
+    if (lotteryChannel) {
+      let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
+      lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
+      if (lotteryMessages.size <= 0) {
+        await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
+        await lotteryChannel.send(`Current lottery prize pool: ${newPrizePool}`);
+        await lotteryChannel.send('Contestants:');
+      } else {
+        await lotteryMessages.array()[0].edit('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
+        await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${newPrizePool}`);
+        await lotteryMessages.array()[2].edit('Contestants:');
+      }
+    }
+
+    const updatedConfig = await this.Database.loadGame(guildId);
+    updatedConfig.dailyLottery.prizePool = newPrizePool;
+    this.config = updatedConfig;
+
+    return Promise.all([
+      this.Database.updateGame(guildId, updatedConfig),
+      this.Database.removeLotteryPlayers()
+    ]);
+  }
+
   async resetQuest(params) {
     const { author } = params;
     const loadedPlayer = await this.Database.loadPlayer(author.id);

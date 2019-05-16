@@ -1031,12 +1031,15 @@ const commands = [
     command: '!resetlottery',
     operatorOnly: true,
     function: (params) => {
-      const { Game, messageObj } = params;
+      const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
+        const guildId = messageObj.content.split(/ (.+)/)[1];
+        const guild = Bot.guilds.find(guild => guild.id === guildId);
         Game.fetchCommand({
-          command: 'resetLotteryPlayers',
+          command: 'resetLottery',
           author: messageObj.author,
-          recipient: messageObj.content.split(/ (.+)/)[1]
+          guildId,
+          guild,
         });
       }
     }
