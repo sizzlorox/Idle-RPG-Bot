@@ -107,7 +107,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
 
     return Promise.all([
       this.Database.updateGame(guildId, updatedConfig),
-      this.Database.removeLotteryPlayers()
+      this.Database.removeLotteryPlayers(guildId)
     ]);
   }
 
