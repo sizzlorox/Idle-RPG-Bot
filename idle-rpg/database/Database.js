@@ -392,6 +392,21 @@ class Database {
     }));
   }
 
+  resetSinglePlayer(playerId) {
+    return new Promise((resolve, reject) => Player.update({ discordId: playerId },
+      {
+        $set: resetObj
+      },
+      (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(result);
+      })
+    );
+  }
+
   resetAllPlayersInGuild(guildId) {
     const resetObj = resetPlayerObj;
     resetObj.map = this.MapClass.getRandomTown();
