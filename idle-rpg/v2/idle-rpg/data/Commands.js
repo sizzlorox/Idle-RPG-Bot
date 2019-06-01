@@ -85,7 +85,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
       return;
     }
 
-    const newPrizePool = 5000;
+    const newPrizePool = 1500;
     const lotteryChannel = await guild.channels.find(channel => channel.id === enumHelper.channels.lottery);
     if (lotteryChannel) {
       let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
@@ -105,7 +105,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     updatedConfig.dailyLottery.prizePool = newPrizePool;
     this.config = updatedConfig;
 
-    await this.Database.updateGame(guildId, updatedconfig);
+    await this.Database.updateGame(guildId, updatedConfig);
     await this.Database.removeLotteryPlayers(guildId);
   }
 
@@ -570,7 +570,7 @@ There's a command to get the invite link ${value}invite`);
           }
         });
       });
-      return;
+
       const message = holidays[whichHoliday].messages.holidaystart;
       if (message) {
         await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
@@ -634,6 +634,24 @@ There's a command to get the invite link ${value}invite`);
         prizePool: 1500
       }
     };
+    const lotteryChannel = await guild.channels.find(channel => channel.id === enumHelper.channels.lottery);
+    if (lotteryChannel) {
+      let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
+      lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
+      if (lotteryMessages.size <= 0) {
+        await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
+        await lotteryChannel.send(`Current lottery prize pool: ${defaultConfig.dailyLottery.prizePool}`);
+        await lotteryChannel.send('Contestants:');
+      } else {
+        await lotteryMessages.array()[0].edit('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
+        await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${defaultConfig.dailyLottery.prizePool}`);
+        await lotteryMessages.array()[2].edit('Contestants:');
+      }
+    }
+
+    const updatedConfig = await this.Database.loadGame(guildId);
+    updatedConfig.dailyLottery.prizePool = newPrizePool;
+    this.config = updatedConfig;
 
     await this.Database.resetAllPlayersInGuild(guildId);
     await this.Database.resetAllLogs(guildId);
