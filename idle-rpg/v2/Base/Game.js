@@ -66,7 +66,7 @@ class Game {
           items: []
         };
 
-        const breakChance = this.randomBetween(0, 100);
+        const breakChance = this.randomBetween(0, 99);
         if (breakChance < 15) {
           const randomEquip = this.randomBetween(0, 2);
           switch (randomEquip) {

@@ -72,6 +72,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       await this.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       let eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
       eventResults = await this.setPlayerTitles(eventResults);
+      // console.log(eventResults.pm, eventResults.updatedPlayer.gold.current);
       const msgResults = await this.updatePlayer(eventResults);
 
       return msgResults;
@@ -126,6 +127,12 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       this.guildCommandPrefixs.push({ id: loadedConfig.guildId, prefix: loadedConfig.commandPrefix });
     } else {
       this.guildCommandPrefixs.push({ id: loadedConfig.guildId, prefix: '!' });
+    }
+    if (loadedConfig.events.isBlizzardActive) {
+      setTimeout(() => {
+        loadedConfig.events.isBlizzardActive = false;
+        this.Game.dbClass().updateGame(guildId, loadedConfig);
+      }, this.randomBetween(7200000, 72000000)); // 2-20hrs
     }
     for (let i = 0; i < loadedConfig.spells.activeBless; i++) {
       setTimeout(async () => {

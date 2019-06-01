@@ -388,7 +388,7 @@ class Helper {
           items: []
         };
 
-        const breakChance = await this.randomBetween(0, 100);
+        const breakChance = await this.randomBetween(0, 99);
         if (breakChance < 15) {
           const randomEquip = await this.randomBetween(0, 2);
           switch (randomEquip) {

@@ -144,7 +144,7 @@ class Game {
 
   async attackEvent(updatedPlayer, onlinePlayers) {
     try {
-      const luckDice = await this.Helper.randomBetween(0, 100);
+      const luckDice = await this.Helper.randomBetween(0, 99);
       if (this.Event.MapClass.getTowns().includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
         updatedPlayer = await this.Event.sellInTown(updatedPlayer);
          this.Event.generateTownItemEvent(updatedPlayer);
@@ -170,7 +170,7 @@ class Game {
 
   async luckEvent(updatedPlayer) {
     try {
-      const luckDice = await this.Helper.randomBetween(0, 100);
+      const luckDice = await this.Helper.randomBetween(0, 99);
       if (luckDice <= 5 + (updatedPlayer.stats.luk / 4)) {
         return this.Event.generateGodsEvent(updatedPlayer);
       }
@@ -755,7 +755,7 @@ ${rankString}
   }
 
   blizzardRandom() {
-    const blizzardDice = this.Helper.randomBetween(0, 100);
+    const blizzardDice = this.Helper.randomBetween(0, 99);
     if (blizzardDice <= 15) {
       return this.Event.blizzardRandom();
     }

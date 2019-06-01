@@ -347,12 +347,20 @@ ${rankString}\`\`\``;
 
   blizzardRandom() {
     this.bot.guilds.forEach(async (guild) => {
-      const blizzardDice = this.randomBetween(0, 100);
+      const blizzardDice = this.randomBetween(0, 99);
       const guildConfig = await this.Game.dbClass().loadGame(guild.id);
       if (blizzardDice <= 15 && !guildConfig.events.isBlizzardActive) {
+        let actionChannel = guild.channels.find(channel => channel && channel.name === 'actions' && channel.type === 'text');
+        if (actionChannel) {
+          actionChannel.send('```css A blizzard has just begun!```');
+        }
         guildConfig.events.isBlizzardActive = true;
         await this.Game.dbClass().updateGame(guild.id, guildConfig);
         setTimeout(() => {
+          actionChannel = guild.channels.find(channel => channel && channel.name === 'actions' && channel.type === 'text');
+          if (actionChannel) {
+            actionChannel.send('```css The blizzard has ended!```');
+          }
           guildConfig.events.isBlizzardActive = false;
           this.Game.dbClass().updateGame(guild.id, guildConfig);
         }, this.randomBetween(7200000, 72000000)); // 2-20hrs

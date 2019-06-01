@@ -170,7 +170,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
       if (sameMapPlayers.length > 0 && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
         const randomPlayerIndex = await this.randomBetween(0, sameMapPlayers.length - 1);
         let randomPlayer;
-        if (playersWithBounty.length > 0 && await this.randomBetween(0, 100) >= 50) {
+        if (playersWithBounty.length > 0 && await this.randomBetween(0, 99) >= 50) {
           if (playersWithBounty.length > 1) {
             playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
           }
@@ -347,7 +347,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
     const eventLog = [];
     const otherPlayerLog = [];
     try {
-      const luckStealChance = await this.randomBetween(0, 100);
+      const luckStealChance = await this.randomBetween(0, 99);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
 
@@ -433,7 +433,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
   async dropItem(playerObj, mob, eventMsg, eventLog) {
     let updatedPlayer = Object.assign({}, playerObj);
     try {
-      const dropitemChance = await this.randomBetween(0, 100);
+      const dropitemChance = await this.randomBetween(0, 99);
       if (dropitemChance <= 15 + (updatedPlayer.stats.luk / 4)) {
         const item = await this.ItemManager.generateItem(updatedPlayer, mob.find(obj => obj.health <= 0));
         if (item.position !== enumHelper.inventory.position) {

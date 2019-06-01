@@ -61,7 +61,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
 
         case 4:
           const goldTaken = Math.ceil(updatedPlayer.gold.current / 6);
-          if (updatedPlayer.gold.current < goldTaken) {
+          if (updatedPlayer.gold.current < goldTaken || goldTaken === 0) {
             eventMsg.push(`Hermes demanded some gold from ${this.generatePlayerName(updatedPlayer, true)} but as ${this.generateGenderString(updatedPlayer, 'he')} had no money, Hermes left him alone.`);
             eventLog.push('Hermes demanded gold from you but you had nothing to give');
             break;
@@ -187,7 +187,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     const eventMsg = [];
     const eventLog = [];
     try {
-      const luckGambleChance = await this.randomBetween(0, 100);
+      const luckGambleChance = await this.randomBetween(0, 99);
       const luckGambleGold = Math.floor(2 * ((Math.log(updatedPlayer.gold.current) * updatedPlayer.gold.current) / 100));
       if (updatedPlayer.gold.current < luckGambleGold) {
         return { updatedPlayer };
@@ -258,7 +258,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     const eventMsg = [];
     const eventLog = [];
     try {
-      const luckGoldChance = await this.randomBetween(0, 100);
+      const luckGoldChance = await this.randomBetween(0, 99);
       if (luckGoldChance >= 75) {
         const luckGoldDice = await this.randomBetween(5, 100);
         const goldAmount = await Math.round((luckGoldDice * updatedPlayer.stats.luk) / 2) * multiplier;
@@ -287,7 +287,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     const eventMsg = [];
     const eventLog = [];
     try {
-      const snowFlakeDice = await this.randomBetween(0, 100);
+      const snowFlakeDice = await this.randomBetween(0, 99);
       if (snowFlakeDice <= 5) {
         const oldItemRating = await this.calculateItemRating(updatedPlayer, updatedPlayer.equipment.relic);
         const newItemRating = await this.calculateItemRating(updatedPlayer, snowFlake);

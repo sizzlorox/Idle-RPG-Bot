@@ -4,8 +4,8 @@ const BaseHelper = require('../../v2/Base/Helper');
 class Monster extends BaseHelper {
 
   generateQuestMonster(selectedPlayer) {
-    const randomRarityChance = Math.round(this.randomBetween(0, 100));
-    const randomTypeChance = Math.round(this.randomBetween(0, 100));
+    const randomRarityChance = Math.round(this.randomBetween(0, 99));
+    const randomTypeChance = Math.round(this.randomBetween(0, 99));
     const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
     const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType && mobType.isSpawnable);
     const randomTypeIndex = this.randomBetween(0, monsterTypeList.length - 1);
@@ -14,8 +14,8 @@ class Monster extends BaseHelper {
   }
 
   generateMonster(selectedPlayer) {
-    const randomRarityChance = Math.round(this.randomBetween(0, 100));
-    const randomTypeChance = Math.round(this.randomBetween(0, 100));
+    const randomRarityChance = Math.round(this.randomBetween(0, 99));
+    const randomTypeChance = Math.round(this.randomBetween(0, 99));
     const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
     const monsterRarityList = monsters.rarity.filter(mobRarity => mobRarity.rarity >= randomRarityChance);
 
@@ -23,8 +23,8 @@ class Monster extends BaseHelper {
       && mobType.isSpawnable
       && mobType.spawnableBiomes.includes(selectedPlayer.map.biome.name));
 
-    const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 3;
-    const mobAmountChance = this.randomBetween(0, 100);
+    const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 2;
+    const mobAmountChance = this.randomBetween(0, 99);
     const mobAmount = mobAmountChance >= 75 ? this.randomBetween(1, Math.floor((selectedPlayer.level * Math.log(1.2)) / 2) + 1) : 1;
     const mobList = [];
     for (let currentAmount = 0; currentAmount < mobAmount; currentAmount++) {
@@ -37,30 +37,30 @@ class Monster extends BaseHelper {
         stats: {
           str: selectedPlayer.level <= 5
             ? ((monsterRarityList[randomRarityIndex].stats.str
-              * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.stats.str / 2)) / 2
+              * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.stats.str / 1.2)) / 2
             : (monsterRarityList[randomRarityIndex].stats.str
-              * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.stats.str / 2),
+              * monsterTypeList[randomTypeIndex].stats.str) + (selectedPlayer.stats.str / 1.2),
           dex: selectedPlayer.level <= 5
             ? ((monsterRarityList[randomRarityIndex].stats.dex
-              * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.stats.dex / 2)) / 2
+              * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.stats.dex / 1.2)) / 2
             : (monsterRarityList[randomRarityIndex].stats.dex
-              * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.stats.dex / 2),
+              * monsterTypeList[randomTypeIndex].stats.dex) + (selectedPlayer.stats.dex / 1.2),
           end: selectedPlayer.level <= 5
             ? ((monsterRarityList[randomRarityIndex].stats.end
-              * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.stats.end / 2)) / 2
+              * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.stats.end / 1.2)) / 2
             : (monsterRarityList[randomRarityIndex].stats.end
-              * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.stats.end / 2),
+              * monsterTypeList[randomTypeIndex].stats.end) + (selectedPlayer.stats.end / 1.2),
           int: selectedPlayer.level <= 5
             ? ((monsterRarityList[randomRarityIndex].stats.int
-              * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 2)) / 2
+              * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 1.2)) / 2
             : (monsterRarityList[randomRarityIndex].stats.int
-              * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 2),
+              * monsterTypeList[randomTypeIndex].stats.int) + (selectedPlayer.stats.int / 1.2),
           luk: (monsterRarityList[randomRarityIndex].stats.luk
             * monsterTypeList[randomTypeIndex].stats.luk)
         },
         dmgDealt: 0,
         dmgReceived: 0,
-        power: monsterRarityList[randomRarityIndex].power + monsterTypeList[randomTypeIndex].power + playerBalance,
+        power: (monsterRarityList[randomRarityIndex].power * monsterTypeList[randomTypeIndex].power) + playerBalance,
         equipment: monsterTypeList[randomTypeIndex].equipment,
         inventory: monsterTypeList[randomTypeIndex].inventory,
         spells: monsterTypeList[randomTypeIndex].spells,
