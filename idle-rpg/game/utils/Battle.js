@@ -48,17 +48,8 @@ class Battle extends BaseHelper {
   }
 
   initialAttack(attacker, defender) {
-    const attackerInitialAttackChance = this.isMonster(attacker)
-      ? attacker.stats.dex + (attacker.stats.luk / 2)
-      : this.sumPlayerTotalDexterity(attacker) + (this.sumPlayerTotalLuck(attacker) / 2);
-    const defenderInitialAttackChance = this.isMonster(defender)
-      ? defender.stats.dex + (defender.stats.luk / 2)
-      : this.sumPlayerTotalDexterity(defender) + (this.sumPlayerTotalLuck(defender) / 2);
-    if (attackerInitialAttackChance >= defenderInitialAttackChance) {
-      return attacker;
-    }
-
-    return defender;
+    const randomInitialAttack = this.randomBetween(1, 100);
+    return randomInitialAttack > 50 ? attacker : defender;
   }
 
   round(attacker, defender) {

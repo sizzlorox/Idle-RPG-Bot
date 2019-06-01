@@ -138,7 +138,6 @@ class DiscordBot extends BaseHelper {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
-          // const guildPlayers = await this.Game.Database.getGuildPlayers(guild);
           const guildOnlineMembers = [];
 
           guild.members.forEach((member) => {
@@ -159,13 +158,6 @@ class DiscordBot extends BaseHelper {
                 }
               }
               guildOnlineMembers.push(player);
-              // else if (!(member.presence.status === 'offline') && !onlinePlayers.has(member.id)) {
-              //   onlinePlayers.set(member.id, {
-              //     discordId: member.id,
-              //     name: member.nickname ? member.nickname : member.displayName,
-              //     guildId: null
-              //   });-
-              // }
             }
           });
 
