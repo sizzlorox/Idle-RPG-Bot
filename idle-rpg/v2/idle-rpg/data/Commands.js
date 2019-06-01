@@ -394,11 +394,8 @@ ${rankString}\`\`\``);
     if (value === loadedPlayer.guildId) {
       return author.send('Your primary server is already set to this.');
     }
-    if (!confirmation && value !== guildID && loadedPlayer.equipment.relic.name === 'Buggy Mess') {
+    if (!confirmation && value !== guildID && loadedPlayer.equipment.relic.name !== 'Nothing') {
       return author.send('Your character has a relic that may only exist in this server. If you would like to continue changing servers, type `!setServer <Server ID> true` to confirm. *This will destroy your relic!*');
-    }
-    if (confirmation && value !== guildID && loadedPlayer.equipment.relic.name === 'Buggy Mess') {
-      loadedPlayer.equipment.relic.name = enumHelper.equipment.empty.relic;
     }
     let count = 0;
     await Bot.guilds.forEach(guild => guild.members.find(member => member.id === author.id) ? count++ : count);
@@ -415,10 +412,11 @@ ${rankString}\`\`\``);
     }
     if (confirmation && value === guildID) {
       await this.Database.deletePlayer(author.id);
+      await this.Database.createNewPlayer(author.id, value, loadedPlayer.name);
+    } else {
+      loadedPlayer.guildId = value;
+      await this.Database.savePlayer(loadedPlayer);
     }
-    loadedPlayer.guildId = value;
-    // await this.Database.setPlayerGuildId(value, loadedPlayer);
-    await this.Database.savePlayer(loadedPlayer);
 
     return author.send(`Primary server set to ${guildToSet.name}`);
   }

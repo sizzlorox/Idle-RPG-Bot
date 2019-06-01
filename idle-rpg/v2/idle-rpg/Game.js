@@ -122,7 +122,9 @@ class Game extends aggregation(BaseGame, BaseHelper) {
     Config loaded for guild ${guildId}
     Multiplier:${loadedConfig.multiplier}
     Active Bless:${loadedConfig.spells.activeBless}
-    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n`);
+    Prize Pool:${loadedConfig.dailyLottery.prizePool}
+    Command Prefix:${loadedConfig.commandPrefix}
+    Blizard:${loadedConfig.events.isBlizzardActive}\n`);
     if (guildId !== '390509935097675777') {
       this.guildCommandPrefixs.push({ id: loadedConfig.guildId, prefix: loadedConfig.commandPrefix });
     } else {
