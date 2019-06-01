@@ -48,17 +48,8 @@ class Battle extends BaseHelper {
   }
 
   initialAttack(attacker, defender) {
-    const attackerInitialAttackChance = this.isMonster(attacker)
-      ? attacker.stats.dex + (attacker.stats.luk / 2)
-      : this.sumPlayerTotalDexterity(attacker) + (this.sumPlayerTotalLuck(attacker) / 2);
-    const defenderInitialAttackChance = this.isMonster(defender)
-      ? defender.stats.dex + (defender.stats.luk / 2)
-      : this.sumPlayerTotalDexterity(defender) + (this.sumPlayerTotalLuck(defender) / 2);
-    if (attackerInitialAttackChance >= defenderInitialAttackChance) {
-      return attacker;
-    }
-
-    return defender;
+    const randomInitialAttack = this.randomBetween(1, 100);
+    return randomInitialAttack > 50 ? attacker : defender;
   }
 
   round(attacker, defender) {
@@ -460,25 +451,22 @@ class Battle extends BaseHelper {
       case 'melee':
         attackPower = this.isMonster(player)
           ? (player.stats.str + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (this.randomBetween(1, player.stats.str) / 2)))
-          : (this.sumPlayerTotalStrength(player) + player.equipment.weapon.power)
-          + (this.sumPlayerTotalDexterity(player)
-            + ((this.sumPlayerTotalLuck(player)
+          : (this.sumPlayerTotalStrength(player) + player.equipment.weapon.power
+            + (((this.sumPlayerTotalLuck(player) * 1.5)
               + this.randomBetween(1, this.sumPlayerTotalStrength(player))) / 2));
         break;
       case 'range':
         attackPower = this.isMonster(player)
           ? (player.stats.dex + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (this.randomBetween(1, player.stats.dex) / 2)))
-          : (this.sumPlayerTotalDexterity(player) + player.equipment.weapon.power)
-          + (this.sumPlayerTotalDexterity(player)
-            + ((this.sumPlayerTotalLuck(player)
+          : (this.sumPlayerTotalDexterity(player) + player.equipment.weapon.power
+            + (((this.sumPlayerTotalLuck(player) * 1.5)
               + this.randomBetween(1, this.sumPlayerTotalDexterity(player))) / 2));
         break;
       case 'magic':
         attackPower = this.isMonster(player)
           ? (player.stats.int + player.equipment.weapon.power + player.power) + (player.stats.dex + (player.stats.luk + (this.randomBetween(1, player.stats.int) / 2)))
-          : (this.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power)
-          + (this.sumPlayerTotalDexterity(player)
-            + ((this.sumPlayerTotalLuck(player)
+          : (this.sumPlayerTotalIntelligence(player) + player.equipment.weapon.power
+            + (((this.sumPlayerTotalLuck(player) * 1.5)
               + this.randomBetween(1, this.sumPlayerTotalIntelligence(player))) / 2));
         break;
     }
@@ -490,13 +478,13 @@ class Battle extends BaseHelper {
     const physicalDefensePower = this.isMonster(player)
       ? (player.stats.end + player.equipment.armor.power + player.power) + ((player.stats.dex / 2) + (player.stats.luk / 2))
       : (this.sumPlayerTotalEndurance(player)
-        + (player.equipment.armor.power / 2))
-      + (this.sumPlayerTotalDexterity(player) + (this.sumPlayerTotalLuck(player) / 2));
+        + ((player.equipment.armor.power + player.equipment.helmet.power) / 2))
+      + (this.sumPlayerTotalDexterity(player) + ((this.sumPlayerTotalLuck(player) * 1.5) / 2));
     const magicDefensePower = this.isMonster(player)
       ? (player.stats.int + player.equipment.armor.power + player.power) + ((player.stats.dex / 2) + (player.stats.luk / 2))
       : (this.sumPlayerTotalIntelligence(player)
-        + (player.equipment.armor.power / 2))
-      + (this.sumPlayerTotalDexterity(player) + (this.sumPlayerTotalLuck(player) / 2));
+        + ((player.equipment.armor.power + player.equipment.helmet.power) / 2))
+      + (this.sumPlayerTotalDexterity(player) + ((this.sumPlayerTotalLuck(player) * 1.5) / 2));
     this.printBattleDebug(`${player.name} - ${physicalDefensePower} - ${magicDefensePower}`);
 
     return { physicalDefensePower, magicDefensePower };

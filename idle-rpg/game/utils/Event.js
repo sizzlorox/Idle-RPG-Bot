@@ -204,7 +204,7 @@ class Event {
 
   async generateLuckItemEvent(updatedPlayer) {
     try {
-      const luckItemDice = await this.Helper.randomBetween(0, 100);
+      const luckItemDice = await this.Helper.randomBetween(0, 99);
       if (luckItemDice <= 15 + (updatedPlayer.stats.luk / 4)) {
         const spell = await this.SpellManager.generateSpell(updatedPlayer);
         events.luck.item.spell(this.params, updatedPlayer, spell);

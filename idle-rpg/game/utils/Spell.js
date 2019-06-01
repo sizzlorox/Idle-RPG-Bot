@@ -5,8 +5,8 @@ const spells = require('../data/spells');
 class Spell extends BaseHelper {
 
   generateSpell(selectedPlayer) {
-    const randomRarityChance = Math.round(this.randomBetween(0, 100) - (selectedPlayer.level / 6));
-    const randomSpellChance = Math.round(this.randomBetween(0, 100) - (selectedPlayer.level / 6));
+    const randomRarityChance = Math.round(this.randomBetween(0, 99) - (selectedPlayer.level / 6));
+    const randomSpellChance = Math.round(this.randomBetween(0, 99) - (selectedPlayer.level / 6));
     const randomStrength = this.randomChoice(spells.strength.filter(strength => strength.rarity >= randomRarityChance));
     const randomSpell = this.randomChoice(spells.spell.filter(spell => spell.rarity >= randomSpellChance));
 

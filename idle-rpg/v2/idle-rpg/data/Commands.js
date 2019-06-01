@@ -105,10 +105,8 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     updatedConfig.dailyLottery.prizePool = newPrizePool;
     this.config = updatedConfig;
 
-    return Promise.all([
-      this.Database.updateGame(guildId, updatedConfig),
-      this.Database.removeLotteryPlayers(guildId)
-    ]);
+    await this.Database.updateGame(guildId, updatedconfig);
+    await this.Database.removeLotteryPlayers(guildId);
   }
 
   async resetQuest(params) {
@@ -613,11 +611,18 @@ There's a command to get the invite link ${value}invite`);
     }
     const leaderboardChannel = await guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text');
     const announcementChannel = await guild.channels.find(channel => channel.name === 'announcements' && channel.type === 'text');
+    const actionChannel = await guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const movementChannel = await guild.channels.find(channel => channel.name === 'movement' && channel.type === 'text');
     let resetMsg = '';
+    let messagePromises = [];
     if (leaderboardChannel) {
       const leaderboardMessages = await leaderboardChannel.fetchMessages({ limit: 10 });
-      if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
-        await leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
+      if (leaderboardMessages.size > 0) {
+        const messages = leaderboardMessages.array();
+        await messages.forEach(msg => {
+          resetMsg = resetMsg.concat(`${msg.content}\n`);
+          messagePromises.push(msg.delete());
+        });
       }
       resetMsg = resetMsg.concat('Server has been reset! Good luck to all Idlers!');
     }
@@ -637,7 +642,18 @@ There's a command to get the invite link ${value}invite`);
     await this.Database.updateGame(guildId, defaultConfig);
     await this.Database.removeLotteryPlayers(guildId);
     if (announcementChannel) {
-      await announcementChannel.send(resetMsg);
+      if (messagePromises.length) {
+        await Promise.all(messagePromises)
+          .then(announcementChannel.send(resetMsg));
+      } else {
+        await announcementChannel.send(resetMsg);
+      }
+    }
+    if (actionChannel) {
+      await actionChannel.send('```RESET -----------------------------------```');
+    }
+    if (movementChannel) {
+      await movementChannel.send('```RESET -----------------------------------```');
     }
     return author.send('Reset complete...');
   }

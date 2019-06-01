@@ -6,8 +6,8 @@ class Item extends BaseHelper {
 
   generateItem(updatedPlayer, mob) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.round(this.randomBetween(0, 100) - (updatedPlayer.level / 6));
-      const randomMaterialChance = Math.round(this.randomBetween(0, 100) - (updatedPlayer.level / 6));
+      const randomRarityChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
+      const randomMaterialChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
       const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
       const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
 
@@ -94,7 +94,7 @@ class Item extends BaseHelper {
   // EVENT ITEM
   generateSnowflake(updatedPlayer) {
     const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
-    const randomRarityChance = Math.round(this.randomBetween(0, 100) - (updatedPlayer.level / 6));
+    const randomRarityChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = this.randomBetween(0, itemRarityList.length - 1);
 

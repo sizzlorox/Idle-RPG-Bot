@@ -74,7 +74,7 @@ class Events extends BaseHelper {
   async attackEvent(loadedPlayer, onlinePlayers, globalMultiplier) {
     let updatedPlayer = Object.assign({}, loadedPlayer);
     try {
-      const luckDice = await this.randomBetween(0, 100);
+      const luckDice = await this.randomBetween(0, 99);
       if (this.MapManager.getTowns().includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
         const eventMsg = [];
         const eventLog = [];
@@ -134,12 +134,12 @@ class Events extends BaseHelper {
     const updatedPlayer = Object.assign({}, loadedPlayer);
     const { isBlizzardActive } = events;
     try {
-      const luckDice = await this.randomBetween(0, 100);
+      const luckDice = await this.randomBetween(0, 99);
       if (luckDice <= 3 + (updatedPlayer.stats.luk / 4)) {
         return this.LuckEvents.godsEvent(updatedPlayer);
       }
 
-      if (this.MapManager.getTowns().includes(updatedPlayer.map.name)) {
+      if (this.MapManager.getTowns().includes(updatedPlayer.map.name) && updatedPlayer.gold.current >= 18) {
         if (luckDice <= 20 + (updatedPlayer.stats.luk / 4)) {
           return this.LuckEvents.gamblingEvent(updatedPlayer);
         }

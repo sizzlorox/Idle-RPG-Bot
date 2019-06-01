@@ -273,7 +273,7 @@ const events = {
           if (sameMapPlayers.length > 0 && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
             const randomPlayerIndex = await helper.randomBetween(0, sameMapPlayers.length - 1);
             let randomPlayer;
-            if (playersWithBounty.length > 0 && await helper.randomBetween(0, 100) >= 50) {
+            if (playersWithBounty.length > 0 && await helper.randomBetween(0, 99) >= 50) {
               if (playersWithBounty.length > 1) {
                 playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
               }
@@ -474,7 +474,7 @@ const events = {
     steal: async (params, stealingPlayer, victimPlayer, InventoryManager) => {
       const { hook, db, helper } = params;
       try {
-        const luckStealChance = await helper.randomBetween(0, 100);
+        const luckStealChance = await helper.randomBetween(0, 99);
         const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
         const canSteal = !Number.isFinite(chance) ? 0 : chance;
         let eventMsg = '';
@@ -571,7 +571,7 @@ const events = {
     dropItem: async (params, updatedPlayer, mob, ItemManager, InventoryManager) => {
       const { db, helper } = params;
       try {
-        const dropitemChance = await helper.randomBetween(0, 100);
+        const dropitemChance = await helper.randomBetween(0, 99);
 
         if (dropitemChance <= 15 + (updatedPlayer.stats.luk / 4)) {
           const item = await ItemManager.generateItem(updatedPlayer, mob.find(obj => obj.health <= 0));
@@ -684,7 +684,7 @@ const events = {
     gold: async (params, updatedPlayer, multiplier) => {
       const { hook, db, helper } = params;
       try {
-        const luckGoldChance = await helper.randomBetween(0, 100);
+        const luckGoldChance = await helper.randomBetween(0, 99);
         if (luckGoldChance >= 75) {
           const luckGoldDice = await helper.randomBetween(5, 100);
           const goldAmount = await Math.round((luckGoldDice * updatedPlayer.stats.luk) / 2) * multiplier;
@@ -710,7 +710,7 @@ const events = {
     gambling: async (params, updatedPlayer) => {
       const { hook, db, helper } = params;
       try {
-        const luckGambleChance = await helper.randomBetween(0, 100);
+        const luckGambleChance = await helper.randomBetween(0, 99);
         const luckGambleGold = Math.floor(2 * ((Math.log(updatedPlayer.gold.current) * updatedPlayer.gold.current) / 100));
         if (updatedPlayer.gold.current < luckGambleGold) {
           return updatedPlayer;
@@ -948,7 +948,7 @@ const events = {
     snowFlake: async (params, updatedPlayer, snowFlake) => {
       const { hook, db, helper } = params;
       try {
-        const snowFlakeDice = await helper.randomBetween(0, 100);
+        const snowFlakeDice = await helper.randomBetween(0, 99);
         if (snowFlakeDice <= 5) {
           const oldItemRating = await helper.calculateItemRating(updatedPlayer, updatedPlayer.equipment.relic);
           const newItemRating = await helper.calculateItemRating(updatedPlayer, snowFlake);
