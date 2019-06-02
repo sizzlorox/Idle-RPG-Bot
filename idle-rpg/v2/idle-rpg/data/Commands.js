@@ -138,8 +138,13 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     if (player.lottery.joined) {
       return author.send('You\'ve already joined todays daily lottery!');
     }
+    if (player.gold.current < 100) {
+      return author.send('You do not have enough gold to join the lottery!');
+    }
+
     player.lottery.joined = true;
     player.lottery.amount += 100;
+    player.gold.current -= 100;
 
     const guildConfig = await this.Database.loadGame(player.guildId);
     guildConfig.dailyLottery.prizePool += 100;
