@@ -147,15 +147,11 @@ class DiscordBot extends BaseHelper {
                 name: member.nickname ? member.nickname : member.displayName,
                 guildId: guild.id
               });
-              if (!onlinePlayers.find(user => user.discordId === member.id && user.guildId === guild.id)) {
-                if (!onlinePlayers.has(player.discordId)) {
-                  onlinePlayers.set(player.discordId, player);
-                }
+              if (!onlinePlayers.find(user => user.discordId === member.id && user.guildId === guild.id && player.discordId === user.discordId)) {
+                onlinePlayers.set(player.discordId, player);
               }
-              if (member.presence.status === 'offline') {
-                if (onlinePlayers.has(player.discordId)) {
-                  onlinePlayers.delete(player.discordId);
-                }
+              if (member.presence.status === 'offline' && onlinePlayers.has(player.discordId)) {
+                onlinePlayers.delete(player.discordId);
               }
               guildOnlineMembers.push(player);
             }
@@ -166,16 +162,17 @@ class DiscordBot extends BaseHelper {
             guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
           }
 
-          onlinePlayers.filter(member => member.guildId === guild.id).forEach((player) => {
-            if (!player.timer) {
-              const playerTimer = this.randomBetween(guildMinTimer, guildMaxTimer);
-              player.timer = setTimeout(async () => {
-                const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
-                delete player.timer;
-                return this.discord.sendMessage(guild, eventResult);
-              }, playerTimer);
-            }
-          });
+          onlinePlayers.filter(member => member.guildId === guild.id)
+            .forEach((player) => {
+              if (!player.timer) {
+                const playerTimer = this.randomBetween(guildMinTimer, guildMaxTimer);
+                player.timer = setTimeout(async () => {
+                  const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
+                  delete player.timer;
+                  return this.discord.sendMessage(guild, eventResult);
+                }, playerTimer);
+              }
+            });
         } else {
           enumHelper.mockPlayers.forEach((player) => {
             if (!player.timer) {
