@@ -649,10 +649,6 @@ There's a command to get the invite link ${value}invite`);
       }
     }
 
-    const updatedConfig = await this.Database.loadGame(guildId);
-    updatedConfig.dailyLottery.prizePool = newPrizePool;
-    this.config = updatedConfig;
-
     await this.Database.resetAllPlayersInGuild(guildId);
     await this.Database.resetAllLogs(guildId);
     await this.Database.updateGame(guildId, defaultConfig);
