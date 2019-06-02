@@ -1,6 +1,7 @@
 .env
 .vscode
 utils/local-database/players/
+package-lock.json
 
 # Logs
 logs

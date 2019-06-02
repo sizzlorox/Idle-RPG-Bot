@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
