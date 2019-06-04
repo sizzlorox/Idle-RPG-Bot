@@ -147,11 +147,15 @@ class DiscordBot extends BaseHelper {
                 name: member.nickname ? member.nickname : member.displayName,
                 guildId: guild.id
               });
-              if (!onlinePlayers.find(user => user.discordId === member.id && user.guildId === guild.id && player.discordId === user.discordId)) {
-                onlinePlayers.set(player.discordId, player);
+              if (!onlinePlayers.find(user => user.discordId === member.id && user.guildId === guild.id)) {
+                if (!onlinePlayers.has(player.discordId)) {
+                  onlinePlayers.set(player.discordId, player);
+                }
               }
-              if (member.presence.status === 'offline' && onlinePlayers.has(player.discordId)) {
-                onlinePlayers.delete(player.discordId);
+              if (member.presence.status === 'offline') {
+                if (onlinePlayers.has(player.discordId)) {
+                  onlinePlayers.delete(player.discordId);
+                }
               }
               guildOnlineMembers.push(player);
             }
