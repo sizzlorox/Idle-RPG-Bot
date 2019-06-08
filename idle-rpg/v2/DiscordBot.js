@@ -129,8 +129,8 @@ class DiscordBot extends BaseHelper {
 
     this.bot.on('presenceUpdate', (oldMember, newMember) => {
       if (oldMember.presence.status === 'offline' && newMember.presence.status !== 'offline' && !newMember.user.bot) {
-        if (!this.onlinePlayers.has(member.id) && this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
-          this.onlinePlayers.set(member.id, {
+        if (!this.onlinePlayers.has(newMember.id) && this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
+          this.onlinePlayers.set(newMember.id, {
             name: newMember.nickname ? newMember.nickname : newMember.displayName,
             discordId: newMember.id,
             guildId: newMember.guild.id,
@@ -142,8 +142,8 @@ class DiscordBot extends BaseHelper {
       }
 
       if (newMember.presence.status === 'offline' && oldMember.presence.status !== 'offline' && !newMember.user.bot) {
-        if (this.onlinePlayers.has(member.id)) {
-          this.onlinePlayers.delete(member.id);
+        if (this.onlinePlayers.has(newMember.id)) {
+          this.onlinePlayers.delete(newMember.id);
         } else {
           console.log('presenceUpdate went offline -', 'member wasnt online when he should have been', newMember.displayName, newMember.guild.name);
           console.log(oldMember.presence.status, newMember.presence.status);
