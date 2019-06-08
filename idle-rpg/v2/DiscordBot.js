@@ -51,7 +51,7 @@ class DiscordBot extends BaseHelper {
     this.maxTimer = (maximumTimer * 1000) * 60;
     this.tickInMinutes = 2;
     this.counter = {};
-    this.onlinePlayers = new DiscordJS.Collection().array();
+    this.onlinePlayers = new DiscordJS.Collection();
   }
 
   loadEventListeners() {
@@ -67,17 +67,17 @@ class DiscordBot extends BaseHelper {
 
       this.bot.guilds.forEach((guild) => {
         this.Game.loadGuildConfig(guild.id);
-        guild.members.forEach((member) => {
-          if (!member.user.bot && member.presence.status !== 'offline') {
-            this.onlinePlayers.push({
-              name: member.nickname ? member.nickname : member.displayName,
-              discordId: member.id,
-              guildId: guild.id,
-            });
-          }
-        });
+        guild.members
+          .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
+          .map(member => Object.assign({}, {
+            name: member.nickname ? member.nickname : member.displayName,
+            discordId: member.id,
+            guildId: guild.id,
+          }))
+          .forEach(member => this.onlinePlayers.set(member.id, member));
       }, console.log('Reset all personal multipliers'));
     });
+
     this.bot.on('message', async (message) => {
       if (message.author.bot) { // Don't listen to bots. Even Idle-RPG himself.
         return;
@@ -107,30 +107,30 @@ class DiscordBot extends BaseHelper {
     this.bot.on('guildCreate', async (guild) => {
       await this.Game.loadGuildConfig(guild.id);
       await this.discord.manageGuildChannels(guild);
-      guild.members.forEach((member) => {
-        if (!member.user.bot && member.presence.status !== 'offline') {
-          this.onlinePlayers.push({
-            name: member.nickname ? member.nickname : member.displayName,
-            discordId: member.id,
-            guildId: guild.id,
-          });
-        }
-      });
+      guild.members
+        .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
+        .map(member => Object.assign({}, {
+          name: member.nickname ? member.nickname : member.displayName,
+          discordId: member.id,
+          guildId: guild.id,
+        }))
+        .forEach(member => this.onlinePlayers.set(member.id, member));
     });
 
     this.bot.on('guildDelete', async (guild) => {
-      guild.members.forEach(member => this.onlinePlayers.splice(this.onlinePlayers.findIndex(player => player.discordId === member.id && player.guildId === member.guild.id), 1));
+      guild.members.filter(member => this.onlinePlayers.has(member.id))
+        .forEach(member => this.onlinePlayers.delete(member.id));
     });
 
     this.bot.on('guildUnavailable', async (guild) => {
-      guild.members.forEach(member => this.onlinePlayers.splice(this.onlinePlayers.findIndex(player => player.discordId === member.id && player.guildId === member.guild.id), 1));
+      guild.members.filter(member => this.onlinePlayers.has(member.id))
+        .forEach(member => this.onlinePlayers.delete(member.id));
     });
 
     this.bot.on('presenceUpdate', (oldMember, newMember) => {
       if (oldMember.presence.status === 'offline' && newMember.presence.status !== 'offline' && !newMember.user.bot) {
-        const memberIndex = this.onlinePlayers.findIndex(player => player.discordId === newMember.id && player.guildId === newMember.guild.id);
-        if (memberIndex === -1) {
-          this.onlinePlayers.push({
+        if (!this.onlinePlayers.has(member.id) && this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
+          this.onlinePlayers.set(member.id, {
             name: newMember.nickname ? newMember.nickname : newMember.displayName,
             discordId: newMember.id,
             guildId: newMember.guild.id,
@@ -142,9 +142,8 @@ class DiscordBot extends BaseHelper {
       }
 
       if (newMember.presence.status === 'offline' && oldMember.presence.status !== 'offline' && !newMember.user.bot) {
-        const memberIndex = this.onlinePlayers.findIndex(player => player.discordId === newMember.id && player.guildId === newMember.guild.id);
-        if (memberIndex !== -1) {
-          this.onlinePlayers.splice(memberIndex, 1);
+        if (this.onlinePlayers.has(member.id)) {
+          this.onlinePlayers.delete(member.id);
         } else {
           console.log('presenceUpdate went offline -', 'member wasnt online when he should have been', newMember.displayName, newMember.guild.name);
           console.log(oldMember.presence.status, newMember.presence.status);
@@ -165,9 +164,8 @@ class DiscordBot extends BaseHelper {
 
     this.bot.on('guildMemberAdd', (member) => {
       if (member.presence.status !== 'offline') {
-        const memberIndex = this.onlinePlayers.findIndex(player => player.discordId === member.id && player.guildId === member.guild.id);
-        if (memberIndex === -1) {
-          this.onlinePlayers.push({
+        if (!this.onlinePlayers.has(member.id) && this.Game.dbClass().shouldBeInList(member.id, member.guild.id)) {
+          this.onlinePlayers.set(member.id, {
             name: member.nickname ? member.nickname : member.displayName,
             discordId: member.id,
             guildId: member.guild.id,
@@ -176,7 +174,7 @@ class DiscordBot extends BaseHelper {
           console.log('guildMemberAdd', 'member was online when he shouldnt have been', member.displayName, guild.name);
         }
       }
-      
+
       if (member.guild.id !== guildID) {
         return;
       }
@@ -189,13 +187,8 @@ class DiscordBot extends BaseHelper {
     });
 
     this.bot.on('guildMemberRemove', (member) => {
-      const memberIndex = this.onlinePlayers.findIndex(player => player.discordId === member.id && player.guildId === member.guild.id);
-      if (memberIndex === -1) {
-        this.onlinePlayers.push({
-          name: member.nickname ? member.nickname : member.displayName,
-          discordId: member.id,
-          guildId: member.guild.id,
-        });
+      if (this.onlinePlayers.has(member.id)) {
+        this.onlinePlayers.delete(member.id);
       } else {
         console.log('guildMemberAdd', 'member was online when he shouldnt have been', member.displayName, guild.name);
       }
@@ -213,16 +206,17 @@ class DiscordBot extends BaseHelper {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
-          const guildOnlineMembers = guild.members.filter(member => !member.user.bot && member.presence.status !== 'offline')
+          const guildOnlineMembers = guild.members
+            .filter(member => !member.user.bot && member.presence.status !== 'offline')
             .map(member => Object.assign({}, {
               name: member.nickname ? member.nickname : member.displayName,
               discordId: member.id,
               guildId: guild.id,
             }));
 
-          if (guildOnlineMembers.length >= 50) {
-            guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
-            guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
+          if (guildOnlineMembers.size >= 50) {
+            guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
+            guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
           }
           this.onlinePlayers.forEach((player) => {
             if (!player.timer && player.guildId === guild.id) {
@@ -247,7 +241,7 @@ class DiscordBot extends BaseHelper {
           });
         }
       });
-      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.length : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
+      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
     }, 60000 * interval);
   }
 
