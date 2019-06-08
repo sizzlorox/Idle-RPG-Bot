@@ -74,7 +74,6 @@ class DiscordBot extends BaseHelper {
               discordId: member.id,
               guildId: guild.id,
             });
-            this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.length : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
           }
         });
       }, console.log('Reset all personal multipliers'));
@@ -115,19 +114,16 @@ class DiscordBot extends BaseHelper {
             discordId: member.id,
             guildId: guild.id,
           });
-          this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.length : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
         }
       });
     });
 
     this.bot.on('guildDelete', async (guild) => {
       guild.members.forEach(member => this.onlinePlayers.splice(this.onlinePlayers.findIndex(player => player.discordId === member.id && player.guildId === member.guild.id), 1));
-      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.length : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
     });
 
     this.bot.on('guildUnavailable', async (guild) => {
       guild.members.forEach(member => this.onlinePlayers.splice(this.onlinePlayers.findIndex(player => player.discordId === member.id && player.guildId === member.guild.id), 1));
-      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.length : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
     });
 
     this.bot.on('presenceUpdate', (oldMember, newMember) => {
@@ -139,7 +135,6 @@ class DiscordBot extends BaseHelper {
             discordId: newMember.id,
             guildId: newMember.guild.id,
           });
-          this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.length : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
         } else {
           console.log('presenceUpdate went online -', 'member was online when he shouldnt have been', newMember.displayName, newMember.guild.name);
           console.log(oldMember.presence.status, newMember.presence.status);
@@ -150,7 +145,6 @@ class DiscordBot extends BaseHelper {
         const memberIndex = this.onlinePlayers.findIndex(player => player.discordId === newMember.id && player.guildId === newMember.guild.id);
         if (memberIndex !== -1) {
           this.onlinePlayers.splice(memberIndex, 1);
-          this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.length : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
         } else {
           console.log('presenceUpdate went offline -', 'member wasnt online when he should have been', newMember.displayName, newMember.guild.name);
           console.log(oldMember.presence.status, newMember.presence.status);
@@ -178,7 +172,6 @@ class DiscordBot extends BaseHelper {
             discordId: member.id,
             guildId: member.guild.id,
           });
-          this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.length : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`);
         } else {
           console.log('guildMemberAdd', 'member was online when he shouldnt have been', member.displayName, guild.name);
         }
