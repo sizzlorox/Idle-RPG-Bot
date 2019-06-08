@@ -213,7 +213,12 @@ class DiscordBot extends BaseHelper {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
-          const guildOnlineMembers = guild.members.filter(member => !member.user.bot && member.presence.status !== 'offline');
+          const guildOnlineMembers = guild.members.filter(member => !member.user.bot && member.presence.status !== 'offline')
+            .map(member => Object.assign({}, {
+              name: member.nickname ? member.nickname : member.displayName,
+              discordId: member.id,
+              guildId: guild.id,
+            }));
 
           if (guildOnlineMembers.length >= 50) {
             guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
