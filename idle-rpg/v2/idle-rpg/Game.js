@@ -133,7 +133,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
     if (loadedConfig.events.isBlizzardActive) {
       setTimeout(() => {
         loadedConfig.events.isBlizzardActive = false;
-        this.Game.dbClass().updateGame(guildId, loadedConfig);
+        this.dbClass().updateGame(guildId, loadedConfig);
       }, this.randomBetween(7200000, 72000000)); // 2-20hrs
     }
     for (let i = 0; i < loadedConfig.spells.activeBless; i++) {
