@@ -326,6 +326,19 @@ class Database {
     }
   }
 
+  async shouldBeInList(discordId, guildId) {
+    try {
+      const player = await Player.findOne({ discordId }).select({ guildId: 1 });
+      if (!player) {
+        return true;
+      }
+
+      return player.guildId === guildId;
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
   // TODO: Change to use Base DB commands Update(Query, Value);
   setPlayerGuildId(guildId, player) {
     if (!player) {

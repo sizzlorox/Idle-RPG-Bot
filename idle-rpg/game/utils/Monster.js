@@ -23,7 +23,7 @@ class Monster extends BaseHelper {
       && mobType.isSpawnable
       && mobType.spawnableBiomes.includes(selectedPlayer.map.biome.name));
 
-    const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 2;
+    const playerBalance = selectedPlayer.level <= 5 ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 2.5;
     const mobAmountChance = this.randomBetween(0, 99);
     const mobAmount = mobAmountChance >= 75 ? this.randomBetween(1, Math.floor((selectedPlayer.level * Math.log(1.2)) / 2) + 1) : 1;
     const mobList = [];
