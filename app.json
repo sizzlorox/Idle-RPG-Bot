@@ -1,0 +1,58 @@
+{
+    "name": "Idle-RPG-Bot",
+    "description": "This is a project to practice and learn more on how to create a bot for Discord and to practice javascript. Anybody who is willing to join in on this project is welcome to do so!",
+    "keywords": [
+        "Heroku",
+        "Idle-RPG-Bot",
+        "Idle-RPG",
+        "Discord Bot",
+        "Entertainment",
+        "RPG",
+        "Moderation",
+        "sizzlorox",
+        "JavaScript",
+        "Selfhosting"
+    ],
+    "repository": "https://github.com/sizzlorox/Idle-RPG-Bot",
+    "addons": [
+        {
+            "plan": "jawsdb:kitefin"
+        }
+    ],
+    "env": {
+        "DISCORD_BOT_LOGIN_TOKEN": {
+            "description": "Get your BOT TOKEN from https://discordapp.com/developers/applications/.",
+            "required": true
+        },
+        "DISCORD_BOT_OPERATORS_ID": {
+            "description": "Specifies which users can use the system commands of Avaire. You can add multiple by doing: <userid>, <seconduserid>.",
+            "required": false,
+            "value": "123456789, 987654321"
+        },
+        "MIN_TIMER": {
+            "description": "Minimal Timer in minutes",
+            "required": true,
+            "value": "avaire/avaire"
+        },
+        "MAX_TIMER": {
+            "description": "Maximum Timer in minutes",
+            "required": true,
+            "value": "master"
+        }
+    },
+    "formation": {
+        "worker": {
+            "quantity": 1,
+            "size": "free"
+        },
+        "web": {
+            "quantity": 0,
+            "size": "free"
+        }
+    },
+    "buildpacks": [
+        {
+            "url": "heroku/nodejs"
+        }
+    ]
+}
