@@ -11,6 +11,7 @@ const settings = {
   maximumTimer: process.env.NODE_ENV.includes('production') ? process.env.MAX_TIMER : process.env.TEST_MAX_TIMER,
   botOperators: process.env.DISCORD_BOT_OPERATORS_ID.replace(' ', '').split(','),
   mongoDBUri: process.env.MONGODB_URI,
+  JAWSDB_URL: process.env.MONGODB_URI,
   starterTown: [3, 5],
   multiplier: 1
 };
