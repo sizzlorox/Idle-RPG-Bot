@@ -25,7 +25,7 @@
             "required": true
         },
         "DISCORD_BOT_OPERATORS_ID": {
-            "description": "Specifies which users can use the system commands of Avaire. You can add multiple by doing: <userid>, <seconduserid>.",
+            "description": "Specifies which users can use the system commands of Idle-RPG-Bot. You can add multiple by doing: <userid>, <seconduserid>.",
             "required": false,
             "value": "123456789, 987654321"
         },
