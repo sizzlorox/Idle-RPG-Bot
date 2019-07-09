@@ -17,7 +17,7 @@ To see this bot in action it is currently running at the [Idle-RPG Discord Serve
 
 There is also a [Idle-RPG Trello Board](https://trello.com/b/OnpWqvlp/idle-rpg)
 
-## Deploy AvaIre on Heroku
+## Deploy Idle-RPG-Bot on Heroku
 You can deploy in a simple way to Heroku using the button below.
 
 [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
