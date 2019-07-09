@@ -20,7 +20,7 @@ There is also a [Idle-RPG Trello Board](https://trello.com/b/OnpWqvlp/idle-rpg)
 ## Deploy Idle-RPG-Bot on Heroku
 You can deploy in a simple way to Heroku using the button below.
 
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://dashboard.heroku.com/new-app?template=https://github.com/sizzlorox/Idle-RPG-Bot)
 
 # Setup
 Create a .env file in the project root directory with these env variables: (Without < >)
