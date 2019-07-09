@@ -16,7 +16,7 @@
     "repository": "https://github.com/sizzlorox/Idle-RPG-Bot",
     "addons": [
         {
-            "plan": "jawsdb:kitefin"
+            "plan": "mongolab:sandbox"
         }
     ],
     "env": {
