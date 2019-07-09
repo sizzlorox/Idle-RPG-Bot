@@ -32,12 +32,12 @@
         "MIN_TIMER": {
             "description": "Minimal Timer in minutes",
             "required": true,
-            "value": "avaire/avaire"
+            "value": "2"
         },
         "MAX_TIMER": {
             "description": "Maximum Timer in minutes",
             "required": true,
-            "value": "master"
+            "value": "5"
         }
     },
     "formation": {
