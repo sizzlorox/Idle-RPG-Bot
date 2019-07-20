@@ -72,7 +72,6 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       await this.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
       let eventResults = await this.selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers);
       eventResults = await this.setPlayerTitles(eventResults);
-      // console.log(eventResults.pm, eventResults.updatedPlayer.gold.current);
       const msgResults = await this.updatePlayer(eventResults);
 
       return msgResults;

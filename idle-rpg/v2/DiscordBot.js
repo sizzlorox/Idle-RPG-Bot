@@ -217,7 +217,7 @@ class DiscordBot extends BaseHelper {
             guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
           }
           guild.members.map(member => this.onlinePlayers.get(member.id))
-            .filter(member => member && !member.timer)
+            .filter(member => member && !member.timer && guild.id === member.guildId)
             .forEach((player) => {
               const playerTimer = this.randomBetween(guildMinTimer, guildMaxTimer);
               player.timer = setTimeout(async () => {
