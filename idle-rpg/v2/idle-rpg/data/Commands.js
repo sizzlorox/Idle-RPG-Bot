@@ -133,7 +133,11 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
   }
 
   async joinLottery(params) {
-    const { Bot, author } = params;
+    const { Bot, author, canJoinLottery } = params;
+    if (!canJoinLottery) {
+      return author.send('Joining lottery is currently disabled, please try again in a few.');
+    }
+
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
     if (player.lottery.joined) {
       return author.send('You\'ve already joined todays daily lottery!');
