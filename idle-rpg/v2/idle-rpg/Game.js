@@ -42,6 +42,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
     });
     this.Database.resetPersonalMultipliers();
     this.guildCommandPrefixs = [];
+    this.canJoinLottery = true;
   }
 
   async activateEvent(guildId, player, onlinePlayers) {
@@ -159,7 +160,15 @@ class Game extends aggregation(BaseGame, BaseHelper) {
   }
 
   fetchCommand(params) {
-    return this.Commands[params.command](params);
+    return this.Commands[params.command](Object.assign({}, params, { canJoinLottery: this.canJoinLottery }));
+  }
+
+  disableJoinLottery() {
+    this.canJoinLottery = false;
+  }
+
+  enableJoinLottery() {
+    this.canJoinLottery = true;
   }
 
 }

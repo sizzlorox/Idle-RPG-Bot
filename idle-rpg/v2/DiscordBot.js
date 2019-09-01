@@ -291,6 +291,14 @@ class DiscordBot extends BaseHelper {
     }, 5400000); // 1hr 30 minutes
   }
 
+  disableJoinLottery() {
+    this.Game.disableJoinLottery;
+  }
+
+  enableJoinLottery() {
+    this.Game.enableJoinLottery;
+  }
+
   dailyLottery() {
     if (!process.env.NODE_ENV.includes('production')) {
       return;
