@@ -292,11 +292,11 @@ class DiscordBot extends BaseHelper {
   }
 
   disableJoinLottery() {
-    this.Game.disableJoinLottery;
+    this.Game.disableJoinLottery();
   }
 
   enableJoinLottery() {
-    this.Game.enableJoinLottery;
+    this.Game.enableJoinLottery();
   }
 
   dailyLottery() {
