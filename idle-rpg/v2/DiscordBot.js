@@ -154,12 +154,12 @@ class DiscordBot extends BaseHelper {
         return;
       }
 
-      if (((oldMember.presence.game && !oldMember.presence.game.streaming) || !oldMember.presence.game) && newMember.presence.game && newMember.presence.game.streaming) {
-        const streamChannel = await newMember.guild.channels.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text');
-        if (streamChannel) {
-          streamChannel.send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
-        }
-      }
+      // if (((oldMember.presence.game && !oldMember.presence.game.streaming) || !oldMember.presence.game) && newMember.presence.game && newMember.presence.game.streaming) {
+      //   const streamChannel = await newMember.guild.channels.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text');
+      //   if (streamChannel) {
+      //     streamChannel.send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
+      //   }
+      // }
     });
 
     this.bot.on('guildMemberAdd', async (member) => {
