@@ -1,0 +1,5 @@
+# Node things
+node_modules/
+
+# General
+.env

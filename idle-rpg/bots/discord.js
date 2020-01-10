@@ -1,124 +1,241 @@
 const Discord = require('discord.js');
 const CommandParser = require('./utils/CommandParser');
 const fs = require('fs');
-const { randomBetween } = require('../utils/helper');
-const moment = require('moment');
-const logger = require('../utils/logger');
+const util = require('util');
+const { welcomeLog, errorLog, infoLog } = require('../utils/logger');
+const Antispam = require('./modules/Antispam');
+const { mockPlayers } = require('../utils/enumHelper');
 const Game = require('../game/Game');
+const Helper = require('../utils/Helper');
+const VirusTotal = require('../bots/modules/VirusTotal');
 const { CronJob } = require('cron');
+const {
+  actionWebHookId,
+  actionWebHookToken,
+  moveWebHookId,
+  moveWebHookToken,
+  welcomeChannelId,
+  faqChannelId,
+  streamChannelId,
+  botLoginToken,
+  minimalTimer,
+  maximumTimer,
+  guildID,
+  botID
+} = require('../../settings');
+
+const webHookOptions = {
+  apiRequestMethod: 'sequential',
+  shardId: 0,
+  shardCount: 0,
+  messageCacheMaxSize: 200,
+  messageCacheLifetime: 0,
+  messageSweepInterval: 0,
+  fetchAllMembers: false,
+  disableEveryone: false,
+  sync: false,
+  restWsBridgeTimeout: 5000,
+  restTimeOffset: 500
+};
+
+const helper = new Helper();
+const commandParser = new CommandParser(helper);
 
 const discordBot = new Discord.Client();
 const actionHook = new Discord.WebhookClient(
-  process.env.DISCORD_ACTION_WEBHOOK_ID,
-  process.env.DISCORD_ACTION_WEBHOOK_TOKEN,
+  actionWebHookId,
+  actionWebHookToken,
+  webHookOptions
 );
 
 const movementHook = new Discord.WebhookClient(
-  process.env.DISCORD_MOVEMENT_WEBHOOK_ID,
-  process.env.DISCORD_MOVEMENT_WEBHOOK_TOKEN
+  moveWebHookId,
+  moveWebHookToken,
+  webHookOptions
 );
 
 const hook = {
   actionHook,
-  movementHook
+  movementHook,
+  discordBot
 };
 
-const game = new Game(hook);
+const game = new Game(hook, helper);
 
 const powerHourWarnTime = '00 30 13 * * 0-6'; // 1pm every day
-const powerHourBeginTime = '00 00 14 * * 0-6'; // 2pm every day
-const powerHourEndTime = '00 00 15 * * 0-6'; // 3pm every day
+const dailyLotteryTime = '00 00 10 * * 0-6';
+const blizzardRandomTime = '00 00 9 * * 0-6';
+const leadboardUpdateTime = '00 */10 * * * 0-6';
 const timeZone = 'America/Los_Angeles';
-
-const minTimer = (process.env.MIN_TIMER * 1000) * 60;
-const maxTimer = (process.env.MAX_TIMER * 1000) * 60;
-
+let minTimer = (minimalTimer * 1000) * 60;
+let maxTimer = (maximumTimer * 1000) * 60;
 const tickInMinutes = 2;
 let onlinePlayerList = [];
+let guildName;
 
-discordBot.on('ready', () => {
-  discordBot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'), (err) => {
-    if (err) logger.error(err);
+console.log(`Current ENV: ${process.env.NODE_ENV}`);
+if (!process.env.NODE_ENV.includes('production')) {
+  onlinePlayerList = mockPlayers;
+  guildName = 'Idle-RPG-TEST';
+  console.log(`${mockPlayers.length} Mock Players loaded`);
+} else {
+  onlinePlayerList.push({
+    name: 'Pyddur, God of Beer',
+    discordId: 'pyddur'
   });
-  discordBot.user.setGame('Idle-RPG Game Master');
-  discordBot.user.setStatus('idle');
-  console.log('Idle RPG has been loaded!');
-});
+  guildName = 'Idle-RPG';
+}
 
-discordBot.on('message', (message) => {
-  if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
-    message.reply('┬─┬ノ(ಠ_ಠノ)');
+const processDetails = () => {
+  let memoryUsage = util.inspect(process.memoryUsage());
+  memoryUsage = JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
+
+  console.log('------------');
+  console.log(`\n\nHeap Usage:\n  RSS: ${(memoryUsage.rss / 1048576).toFixed(2)}MB\n  HeapTotal: ${(memoryUsage.heapTotal / 1048576).toFixed(2)}MB\n  HeapUsed: ${(memoryUsage.heapUsed / 1048576).toFixed(2)}MB`);
+  console.log(`Current Up Time: ${helper.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
+  console.log('------------');
+};
+
+const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1;
+const heartBeat = () => {
+  // TODO fix this for test env
+  const discordUsers = discordBot.guilds.size > 0
+    ? discordBot.guilds.find('id', guildID).members
+    : undefined;
+
+  if (discordUsers) {
+    const discordOfflinePlayers = discordUsers
+      .filter(player => player.presence.status === 'offline' && !player.user.bot)
+      .map((player) => {
+        return {
+          name: player.nickname ? player.nickname : player.displayName,
+          discordId: player.id
+        };
+      });
+
+    const discordOnlinePlayers = discordUsers
+      .filter(player => player.presence.status === 'online' && !player.user.bot
+        || player.presence.status === 'idle' && !player.user.bot
+        || player.presence.status === 'dnd' && !player.user.bot)
+      .map((player) => {
+        return {
+          name: player.nickname ? player.nickname : player.displayName,
+          discordId: player.id
+        };
+      });
+
+    if (process.env.NODE_ENV.includes('production')) {
+      onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
+        .filter((player, index, array) =>
+          index === array.findIndex(p => (
+            p.discordId === player.discordId
+          ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
+
+      onlinePlayerList.forEach(player => discordOfflinePlayers.filter(offPlayer => offPlayer.discordId === player.discordId));
+    }
+
+    if (onlinePlayerList.length >= 50) {
+      console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
+      minTimer = ((Number(minimalTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
+      maxTimer = ((Number(maximumTimer) + (Math.floor(onlinePlayerList.length / 50))) * 1000) * 60;
+    }
+
+    onlinePlayerList.forEach((player, index) => {
+      if (!player.timer) {
+        const playerTimer = helper.randomBetween(minTimer, maxTimer);
+        player.timer = setTimeout(() => {
+          game.selectEvent(discordBot, player, onlinePlayerList);
+          delete player.timer;
+        }, playerTimer);
+      }
+      if (process.env.NODE_ENV.includes('production') && discordOnlinePlayers.findIndex(onlinePlayer => (onlinePlayer.discordId === player.discordId)) === -1) {
+        onlinePlayerList.splice(index, 1);
+      }
+    });
   }
 
-  CommandParser.parseUserCommand(game, discordBot, hook, message);
+  processDetails();
+};
+
+discordBot.on('ready', () => {
+  discordBot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
+  discordBot.user.setActivity('Idle-RPG Game Master');
+  discordBot.user.setStatus('idle');
+  console.log('Idle RPG has been loaded!');
+
+  game.updateLeaderboards(discordBot);
+
+  console.log(`Interval delay: ${interval} minute(s)`);
+  setInterval(heartBeat, 60000 * interval);
 });
 
+discordBot.on('error', (err) => {
+  console.log(err);
+  errorLog.error(err);
+});
+
+discordBot.on('message', async (message) => {
+  if (message.author.id === botID) {
+    return;
+  }
+
+  if (message.content.startsWith('!cs') || message.content.startsWith('!castspell')) {
+    await Antispam.logAuthor(message.author.id);
+    await Antispam.logMessage(message.author.id, message.content);
+    const skip = await Antispam.checkMessageInterval(message);
+    if (skip) {
+      infoLog.info(`Spam detected by ${message.author.username}.`);
+      return;
+    }
+  }
+
+  if (message.content.includes('(╯°□°）╯︵ ┻━┻')) {
+    return message.reply('┬─┬ノ(ಠ_ಠノ)');
+  }
+
+  if (message.content.includes('¯\_(ツ)_/¯')) {
+    return message.reply('¯\_(ツ)_/¯');
+  }
+
+  if (process.env.VIRUS_TOTAL_APIKEY && message.attachments && message.attachments.size > 0) {
+    const { url } = message.attachments.array()[0];
+
+    return VirusTotal.scanUrl(url)
+      .then(VirusTotal.retrieveReport)
+      .then((reportResults) => {
+        if (reportResults.positives > 0) {
+          message.delete();
+          message.reply('This attachment has been flagged, if you believe this was a false-positive please contact one of the Admins.');
+        }
+      });
+  }
+
+  return commandParser.parseUserCommand(game, discordBot, hook, message);
+});
+
+if (streamChannelId && process.env.NODE_ENV.includes('production')) {
+  discordBot.on('presenceUpdate', (oldMember, newMember) => {
+    if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game) {
+      newMember.guild.channels.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
+    }
+  });
+}
+
 discordBot.on('guildMemberAdd', (member) => {
-  const channel = member.guild.channels.find('id', process.env.DISCORD_RPG_WELCOME_CHANNEL_ID);
+  const channel = member.guild.channels.find('id', welcomeChannelId);
   if (!channel) {
     return;
   }
 
-  channel.send(`Welcome ${member}! This channel has an Idle-RPG bot! If you have any questions check the <#${process.env.DISCORD_RPQ_FAQ_CHANNEL}> or PM me !help.`);
+  channel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${faqChannelId}> or PM me !help.`);
+  welcomeLog.info(member);
 });
 
-discordBot.login(process.env.DISCORD_BOT_LOGIN_TOKEN);
+discordBot.login(botLoginToken);
 console.log(`MinTimer: ${(minTimer / 1000) / 60} - MaxTimer: ${(maxTimer / 1000) / 60}`);
-
-const heartBeat = () => {
-  const discordUsers = discordBot.users;
-
-  const discordOfflinePlayers = discordUsers
-    .filter(player => player.presence.status === 'offline' && !player.bot)
-    .map((player) => {
-      return {
-        name: player.username,
-        discordId: player.id
-      };
-    });
-
-  const discordOnlinePlayers = discordUsers
-    .filter(player => player.presence.status === 'online' && !player.bot
-      || player.presence.status === 'idle' && !player.bot
-      || player.presence.status === 'dnd' && !player.bot)
-    .map((player) => {
-      return {
-        name: player.username,
-        discordId: player.id
-      };
-    });
-
-  onlinePlayerList = onlinePlayerList.concat(discordOnlinePlayers)
-    .filter((player, index, array) =>
-      index === array.findIndex(p => (
-        p.discordId === player.discordId
-      ) && discordOfflinePlayers.findIndex(offlinePlayer => (offlinePlayer.discordId === player.discordId)) === -1));
-
-  onlinePlayerList.forEach((player) => {
-    if (!player.timer) {
-      const playerTimer = randomBetween(minTimer, maxTimer);
-      player.timer = setTimeout(() => {
-        game.selectEvent(player, onlinePlayerList, 'twitchBot');
-        delete player.timer;
-      }, playerTimer);
-    }
-  });
-};
-
-setInterval(heartBeat, 60000 * tickInMinutes);
 
 new CronJob({
   cronTime: powerHourWarnTime,
-  onTick: () => {
-    game.powerHourWarn();
-  },
-  start: false,
-  timeZone,
-  runOnInit: false
-}).start();
-
-new CronJob({
-  cronTime: powerHourBeginTime,
   onTick: () => {
     game.powerHourBegin();
   },
@@ -128,9 +245,30 @@ new CronJob({
 }).start();
 
 new CronJob({
-  cronTime: powerHourEndTime,
+  cronTime: dailyLotteryTime,
   onTick: () => {
-    game.powerHourEnd();
+    game.dailyLottery(discordBot, guildName);
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+new CronJob({
+  cronTime: blizzardRandomTime,
+  onTick: () => {
+    game.blizzardRandom();
+  },
+  start: false,
+  timeZone,
+  runOnInit: false
+}).start();
+
+// Leaderboard Channel Updates
+new CronJob({
+  cronTime: leadboardUpdateTime,
+  onTick: () => {
+    game.updateLeaderboards(discordBot);
   },
   start: false,
   timeZone,

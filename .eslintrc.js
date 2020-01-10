@@ -11,6 +11,10 @@ module.exports = {
         "no-console": 0,
         "no-useless-escape": 0,
         "consistent-return": 0,
-        "padded-blocks": 0
+        "padded-blocks": 0,
+        "no-return-assign": 0,
+        "no-confusing-arrow": 0,
+        "max-len": 0,
+        "no-unused-expressions": 0
     }
 };

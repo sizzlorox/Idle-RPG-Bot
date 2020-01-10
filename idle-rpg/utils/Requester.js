@@ -5,6 +5,7 @@ class Requester {
 
   request(options) {
     return new Promise((resolve, reject) => {
+      console.log(options);
       const port = options.port === 443 ? https : http;
       const req = port.request(options, (res) => {
         let output = '';

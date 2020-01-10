@@ -1,6 +1,7 @@
 .env
 .vscode
 utils/local-database/players/
+package-lock.json
 
 # Logs
 logs
@@ -60,3 +61,4 @@ typings/
 
 # dotenv environment variables file
 .env
+/nbproject/private/

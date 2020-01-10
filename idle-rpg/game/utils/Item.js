@@ -1,53 +1,134 @@
-const helper = require('../../utils/helper');
 const items = require('../data/items');
+const enumHelper = require('../../utils/enumHelper');
+const BaseHelper = require('../../v2/Base/Helper');
 
-class Item {
-  generateItem(selectedPlayer) {
+class Item extends BaseHelper {
+
+  generateItem(updatedPlayer, mob) {
     return new Promise((resolve) => {
-      const randomRarityChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
-      const randomMaterialChance = Math.ceil(helper.randomBetween(0, 100) - (selectedPlayer.level / 6));
+      const randomRarityChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
+      const randomMaterialChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
       const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
       const itemMaterialList = items.material.filter(materialRarity => materialRarity.rarity >= randomMaterialChance);
 
-      const randomRarityIndex = helper.randomBetween(0, itemRarityList.length - 1);
-      const randomMaterialIndex = helper.randomBetween(0, itemMaterialList.length - 1);
-      const randomEquipmentIndex = helper.randomBetween(0, items.type.length - 1);
-      const randomTypeIndex = helper.randomBetween(0, items.type[randomEquipmentIndex].length - 1);
+      const randomRarityIndex = this.randomBetween(0, itemRarityList.length - 1);
+      const randomMaterialIndex = this.randomBetween(0, itemMaterialList.length - 1);
 
-      const itemStr = (itemRarityList[randomRarityIndex].stats.str
-        * (itemMaterialList[randomMaterialIndex].stats.str
-          + items.type[randomEquipmentIndex][randomTypeIndex].stats.str)) / 4;
+      const mobName = mob ? mob.name.replace(' ', '_').split('_')[1] : undefined;
+      let itemType;
+      let randomEquipmentIndex;
+      let randomTypeIndex;
+      if (mob && mob.holiday) {
+        do {
+          // console.log('generating relic item');
+          randomTypeIndex = this.randomBetween(0, items.type[3].length - 1);
+          if (items.type[3][randomTypeIndex].droppedBy.includes(mobName)
+            && items.type[3][randomTypeIndex].isDroppable
+          ) {
+            itemType = items.type[3][randomTypeIndex];
+          }
+        } while (itemType === undefined);
+      } else {
+        do {
+          // console.log('generating non relic item');
+          randomEquipmentIndex = this.randomBetween(0, items.type.length - 1);
+          randomTypeIndex = this.randomBetween(0, items.type[randomEquipmentIndex].length - 1);
 
-      const itemDex = (itemRarityList[randomRarityIndex].stats.dex
-        * (itemMaterialList[randomMaterialIndex].stats.dex
-          + items.type[randomEquipmentIndex][randomTypeIndex].stats.dex)) / 4;
+          if (items.type[randomEquipmentIndex][randomTypeIndex].position !== enumHelper.equipment.types.relic.position) {
+            itemType = items.type[randomEquipmentIndex][randomTypeIndex];
+          }
+        } while (itemType === undefined);
+      }
 
-      const itemEnd = (itemRarityList[randomRarityIndex].stats.end
-        * (itemMaterialList[randomMaterialIndex].stats.end
-          + items.type[randomEquipmentIndex][randomTypeIndex].stats.end)) / 4;
+      let itemObj;
 
-      const itemInt = (itemRarityList[randomRarityIndex].stats.int
-        * (itemMaterialList[randomMaterialIndex].stats.int
-          + items.type[randomEquipmentIndex][randomTypeIndex].stats.int)) / 4;
+      if (itemType.position === enumHelper.equipment.types.relic.position) {
+        const itemStr = itemType.stats.str;
+        const itemDex = itemType.stats.dex;
+        const itemEnd = itemType.stats.end;
+        const itemInt = itemType.stats.int;
+        const itemLuk = itemType.stats.luk;
 
-      const itemRating = itemStr + itemDex + itemEnd + itemInt;
+        const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
-      const itemObj = {
-        name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${items.type[randomEquipmentIndex][randomTypeIndex].name}`,
-        position: items.type[randomEquipmentIndex][randomTypeIndex].position,
-        stats: {
+        itemObj = {
+          name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
+          position: itemType.position,
           str: itemStr,
           dex: itemDex,
           end: itemEnd,
-          int: itemInt
-        },
-        rating: itemRating,
-        gold: Number((itemRarityList[randomRarityIndex].gold
-          * itemMaterialList[randomMaterialIndex].gold
-          * items.type[randomEquipmentIndex][randomTypeIndex].gold).toFixed()) * itemRating
-      };
+          int: itemInt,
+          luk: itemLuk,
+          holiday: itemType.holiday,
+          rating: itemRating,
+          gold: Number((itemRarityList[randomRarityIndex].gold
+            * itemType.gold).toFixed()) * itemType.power
+        };
+      } else if (itemType.position === enumHelper.inventory.position) {
+        itemObj = {
+          name: `${itemRarityList[randomRarityIndex].name} ${itemType.name}`,
+          position: itemType.position,
+          holiday: itemType.holiday,
+          power: itemRarityList[randomRarityIndex].power + itemType.power,
+          gold: Number((itemRarityList[randomRarityIndex].gold
+            * itemMaterialList[randomMaterialIndex].gold
+            * itemType.gold).toFixed()) * itemType.power
+        };
+      } else {
+        itemObj = {
+          name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
+          position: itemType.position,
+          holiday: itemType.holiday,
+          power: itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power,
+          attackType: itemType.attackType,
+          gold: Number((itemRarityList[randomRarityIndex].gold
+            * itemMaterialList[randomMaterialIndex].gold
+            * itemType.gold).toFixed()) * itemType.power
+        };
+      }
+
       return resolve(itemObj);
     });
   }
+
+  // EVENT ITEM
+  generateSnowflake(updatedPlayer) {
+    const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
+    const randomRarityChance = Math.round(this.randomBetween(0, 99) - (updatedPlayer.level / 6));
+    const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
+    const randomRarityIndex = this.randomBetween(0, itemRarityList.length - 1);
+
+    const itemStr = Math.round((itemRarityList[randomRarityIndex].power
+      + snowFlake.stats.str) / 4);
+    const itemDex = Math.round((itemRarityList[randomRarityIndex].power
+      + snowFlake.stats.dex) / 4);
+    const itemEnd = Math.round((itemRarityList[randomRarityIndex].power
+      + snowFlake.stats.end) / 4);
+    const itemInt = Math.round((itemRarityList[randomRarityIndex].power
+      + snowFlake.stats.int) / 4);
+    const itemLuk = Math.round((randomRarityIndex + snowFlake.stats.luk) / 5);
+
+    const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
+
+    return {
+      name: `${itemRarityList[randomRarityIndex].name} ${snowFlake.name}`,
+      position: snowFlake.position,
+      str: itemStr,
+      dex: itemDex,
+      end: itemEnd,
+      int: itemInt,
+      luk: itemLuk,
+      holiday: snowFlake.holiday,
+      rating: itemRating,
+      gold: Number((itemRarityList[randomRarityIndex].gold
+        * snowFlake.gold).toFixed()) * itemRating
+    };
+  }
+
+  // GETTER SETTERS
+  get items() {
+    return items.type;
+  }
+
 }
-module.exports = new Item();
+module.exports = Item;

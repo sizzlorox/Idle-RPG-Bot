@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  bot:
+    build: .
+    restart: always
+    environment:
+      - DISCORD_BOT_LOGIN_TOKEN=abcde
+      - DISCORD_BOT_OPERATORS_ID=12345
+      - MIN_TIMER=1
+      - MAX_TIMER=10
+      - MONGODB_URI=mongodb://mongo:27017/idle-rpg
+    links:
+      - mongo
+  mongo:
+    image: 'mongo:3.4.1'
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo:/data/db
+
+volumes:
+  mongo:
