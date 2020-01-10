@@ -1,4 +1,5 @@
 const { CronJob } = require('cron');
+const { cronLog } = require('../../utils/logger');
 
 class Crons {
 
@@ -18,6 +19,7 @@ class Crons {
     new CronJob({
       cronTime: this.powerHourWarnTime,
       onTick: () => {
+        cronLog.info("CronJob powerHourWarnTime ran");
         this.Discord.powerHourBegin();
       },
       start: false,
@@ -28,6 +30,7 @@ class Crons {
     new CronJob({
       cronTime: this.disableJoinLotteryTime,
       onTick: () => {
+        cronLog.info("CronJob disableJoinLotteryTime ran");
         this.Discord.disableJoinLottery();
       },
       start: false,
@@ -38,6 +41,7 @@ class Crons {
     new CronJob({
       cronTime: this.dailyLotteryTime,
       onTick: () => {
+        cronLog.info("CronJob dailyLotteryTime ran");
         this.Discord.dailyLottery();
       },
       start: false,
@@ -48,6 +52,7 @@ class Crons {
     new CronJob({
       cronTime: this.enableJoinLotteryTime,
       onTick: () => {
+        cronLog.info("CronJob enableJoinLotteryTime ran");
         this.Discord.enableJoinLottery();
       },
       start: false,
@@ -58,6 +63,7 @@ class Crons {
     new CronJob({
       cronTime: this.blizzardRandomTime,
       onTick: () => {
+        cronLog.info("CronJob blizzardRandomTime ran");
         this.Discord.blizzardRandom();
       },
       start: false,
@@ -68,6 +74,7 @@ class Crons {
     new CronJob({
       cronTime: this.leadboardUpdateTime,
       onTick: () => {
+        cronLog.info("CronJob updateLeaderboards ran");
         this.Discord.updateLeaderboards();
       },
       start: false,
