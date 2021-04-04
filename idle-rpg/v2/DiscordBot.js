@@ -396,7 +396,7 @@ class DiscordBot extends BaseHelper {
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`)
         .then(async (rankString) => {
-          const msgCount = await leaderboardChannel.cache.messages.fetch({ limit: 10 });
+          const msgCount = await leaderboardChannel.messages.fetch({ limit: 10 });
           const subjectTitle = this.formatLeaderboards(Object.keys(type)[0]);
           const msg = `\`\`\`Top 10 ${subjectTitle}:
 ${rankString}\`\`\``;
