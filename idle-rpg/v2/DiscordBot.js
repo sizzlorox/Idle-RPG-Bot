@@ -65,9 +65,9 @@ class DiscordBot extends BaseHelper {
       this.loadHeartBeat();
       this.Crons.loadCrons();
 
-      this.bot.guilds.forEach(async (guild) => {
+      this.bot.guilds.cache.forEach(async (guild) => {
         this.Game.loadGuildConfig(guild.id);
-        guild.members
+        guild.members.cache
           .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
           .map(member => Object.assign({}, {
             name: member.nickname ? member.nickname : member.displayName,
@@ -107,7 +107,7 @@ class DiscordBot extends BaseHelper {
     this.bot.on('guildCreate', async (guild) => {
       await this.Game.loadGuildConfig(guild.id);
       await this.discord.manageGuildChannels(guild);
-      guild.members
+      guild.members.cache
         .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
         .map(member => Object.assign({}, {
           name: member.nickname ? member.nickname : member.displayName,
@@ -118,16 +118,18 @@ class DiscordBot extends BaseHelper {
     });
 
     this.bot.on('guildDelete', async (guild) => {
-      guild.members.filter(member => this.onlinePlayers.has(member.id + member.guild.id))
+      guild.members.cache.filter(member => this.onlinePlayers.has(member.id + member.guild.id))
         .forEach(member => this.onlinePlayers.delete(member.id + member.guild.id));
     });
 
     this.bot.on('guildUnavailable', async (guild) => {
-      guild.members.filter(member => this.onlinePlayers.has(member.id + member.guild.id))
+      guild.members.cache.filter(member => this.onlinePlayers.has(member.id + member.guild.id))
         .forEach(member => this.onlinePlayers.delete(member.id + member.guild.id));
     });
 
-    this.bot.on('presenceUpdate', async (oldMember, newMember) => {
+    this.bot.on('presenceUpdate', async (oldM, newM) => {
+      const oldMember = oldM && oldM.member;
+      const newMember = newM && newM.member;
       if (!newMember.user.bot) {
         if (oldMember.presence.status === 'offline' && newMember.presence.status !== 'offline') {
           if (await this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
@@ -155,7 +157,7 @@ class DiscordBot extends BaseHelper {
       }
 
       // if (((oldMember.presence.game && !oldMember.presence.game.streaming) || !oldMember.presence.game) && newMember.presence.game && newMember.presence.game.streaming) {
-      //   const streamChannel = await newMember.guild.channels.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text');
+      //   const streamChannel = await newMember.guild.channels.cache.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text');
       //   if (streamChannel) {
       //     streamChannel.send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
       //   }
@@ -179,9 +181,9 @@ class DiscordBot extends BaseHelper {
         return;
       }
 
-      const welcomeChannel = await member.guild.channels.find(channel => channel.name === 'newcomers' && channel.type === 'text');
+      const welcomeChannel = await member.guild.channels.cache.find(channel => channel.name === 'newcomers' && channel.type === 'text');
       if (welcomeChannel) {
-        welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.find(channel => channel.name === 'faq' && channel.type === 'text').id}> or PM me !help.`);
+        welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.cache.find(channel => channel.name === 'faq' && channel.type === 'text').id}> or PM me !help.`);
         welcomeLog.info(member);
       }
     });
@@ -200,11 +202,11 @@ class DiscordBot extends BaseHelper {
 
     setInterval(() => {
       this.processDetails();
-      this.bot.guilds.forEach(async (guild) => {
+      this.bot.guilds.cache.forEach(async (guild) => {
         let guildMinTimer = this.minTimer;
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
-          const guildOnlineMembers = guild.members
+          const guildOnlineMembers = guild.members.cache
             .filter(member => !member.user.bot && member.presence.status !== 'offline')
             .map(member => Object.assign({}, {
               name: member.nickname ? member.nickname : member.displayName,
@@ -216,7 +218,7 @@ class DiscordBot extends BaseHelper {
             guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
             guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
           }
-          guild.members.map(member => this.onlinePlayers.get(member.id + member.guild.id))
+          guild.members.cache.map(member => this.onlinePlayers.get(member.id + member.guild.id))
             .filter(member => member && !member.timer && guild.id === member.guildId)
             .forEach((player) => {
               const playerTimer = this.randomBetween(guildMinTimer, guildMaxTimer);
@@ -239,7 +241,7 @@ class DiscordBot extends BaseHelper {
           });
         }
       });
-      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.size} guilds`, { type: 'WATCHING' });
+      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.cache.size} guilds`, { type: 'WATCHING' });
     }, 60000 * interval);
   }
 
@@ -258,15 +260,15 @@ class DiscordBot extends BaseHelper {
 
   // CRONS
   powerHourBegin() {
-    this.bot.guilds.forEach((guild) => {
-      const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+    this.bot.guilds.cache.forEach((guild) => {
+      const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
       if (actionsChannel) {
         actionsChannel.send(this.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
       }
     });
     setTimeout(() => {
-      this.bot.guilds.forEach((guild) => {
-        const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+      this.bot.guilds.cache.forEach((guild) => {
+        const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
         if (actionsChannel) {
           actionsChannel.send(this.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
           const guildConfig = this.Game.dbClass().loadGame(guild.id);
@@ -277,8 +279,8 @@ class DiscordBot extends BaseHelper {
     }, 1800000); // 30 minutes
 
     setTimeout(() => {
-      this.bot.guilds.forEach((guild) => {
-        const actionsChannel = guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+      this.bot.guilds.cache.forEach((guild) => {
+        const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
 
         if (actionsChannel) {
           actionsChannel.send(this.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
@@ -308,7 +310,7 @@ class DiscordBot extends BaseHelper {
 
     console.log('[DEBUG]', 'LOTTERY START');
 
-    this.bot.guilds.forEach(async (guild) => {
+    this.bot.guilds.cache.forEach(async (guild) => {
       const guildLotteryPlayers = await this.Game.dbClass().loadLotteryPlayers(guild.id);
       if (!guildLotteryPlayers || guildLotteryPlayers.length <= 1) {
         return;
@@ -322,7 +324,7 @@ class DiscordBot extends BaseHelper {
       const newPrizePool = await this.randomBetween(1500, 10000);
 
       if (guild.id === guildID) {
-        const lotteryChannel = await guild.channels.find(channel => channel.id === enumHelper.channels.lottery);
+        const lotteryChannel = await guild.channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
         if (lotteryChannel) {
           let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
           lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
@@ -342,7 +344,7 @@ class DiscordBot extends BaseHelper {
       winner.gold.dailyLottery += guildConfig.dailyLottery.prizePool;
 
       guildLotteryPlayers.forEach((player) => {
-        const discordUser = guild.members.find(member => member.id === player.discordId);
+        const discordUser = guild.members.cache.find(member => member.id === player.discordId);
         if (player.discordId !== winner.discordId && discordUser) {
           discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${guildConfig.dailyLottery.prizePool} out of ${guildLotteryPlayers.length} people.`);
         } else if (discordUser) {
@@ -351,7 +353,7 @@ class DiscordBot extends BaseHelper {
       });
 
       guildConfig.dailyLottery.prizePool = newPrizePool;
-      guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(eventMsg);
+      guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text').send(eventMsg);
       await this.Game.dbClass().updateGame(guild.id, guildConfig);
       await this.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
       await this.Game.dbClass().savePlayer(winner);
@@ -361,15 +363,15 @@ class DiscordBot extends BaseHelper {
 
   updateLeaderboards() {
     const types = enumHelper.leaderboardStats;
-    this.bot.guilds.forEach((guild) => {
-      const botGuildMember = guild.members.find(member => member.id === this.bot.user.id);
+    this.bot.guilds.cache.forEach((guild) => {
+      const botGuildMember = guild.members.cache.find(member => member.id === this.bot.user.id);
       if (!botGuildMember.permissions.has([
         'VIEW_CHANNEL',
         'MANAGE_CHANNELS'
       ])) {
         return;
       }
-      const leaderboardChannel = guild.channels.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
+      const leaderboardChannel = guild.channels.cache.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
       if (!leaderboardChannel || leaderboardChannel && !leaderboardChannel.manageable) {
         return;
       }
@@ -408,18 +410,18 @@ ${rankString}\`\`\``;
   }
 
   blizzardRandom() {
-    this.bot.guilds.forEach(async (guild) => {
+    this.bot.guilds.cache.forEach(async (guild) => {
       const blizzardDice = this.randomBetween(0, 99);
       const guildConfig = await this.Game.dbClass().loadGame(guild.id);
       if (blizzardDice <= 15 && !guildConfig.events.isBlizzardActive) {
-        let actionChannel = guild.channels.find(channel => channel && channel.name === 'actions' && channel.type === 'text');
+        let actionChannel = guild.channels.cache.find(channel => channel && channel.name === 'actions' && channel.type === 'text');
         if (actionChannel) {
           actionChannel.send('```css A blizzard has just begun!```');
         }
         guildConfig.events.isBlizzardActive = true;
         await this.Game.dbClass().updateGame(guild.id, guildConfig);
         setTimeout(() => {
-          actionChannel = guild.channels.find(channel => channel && channel.name === 'actions' && channel.type === 'text');
+          actionChannel = guild.channels.cache.find(channel => channel && channel.name === 'actions' && channel.type === 'text');
           if (actionChannel) {
             actionChannel.send('```css The blizzard has ended!```');
           }

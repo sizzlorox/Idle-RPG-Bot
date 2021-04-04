@@ -393,7 +393,7 @@ const commands = [
       const { messageObj, Bot } = params;
       if (messageObj.content.includes(' ')) {
         const report = messageObj.content.split(/ (.+)/)[1];
-        const mainServer = Bot.guilds.find(guild => guild.id === '390509935097675777');
+        const mainServer = Bot.guilds.cache.find(guild => guild.id === '390509935097675777');
         if (mainServer.members.find(member => member.id === messageObj.author.id)) {
           return messageObj.author.send('Just send this in the bug reports channel. You\'re already in the official server');
         }
@@ -627,7 +627,7 @@ const commands = [
           return messageObj.author.send('Invalid amount of arguments. Check the help for more info.');
         }
 
-        const guildToUpdate = Bot.guilds.get(guildId);
+        const guildToUpdate = Bot.guilds.cache.get(guildId);
         if (!guildToUpdate) {
           return messageObj.author.send('No guild found with this ID');
         }
@@ -1034,7 +1034,7 @@ const commands = [
       const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const guildId = messageObj.content.split(/ (.+)/)[1];
-        const guild = Bot.guilds.find(guild => guild.id === guildId);
+        const guild = Bot.guilds.cache.find(guild => guild.id === guildId);
         Game.fetchCommand({
           command: 'resetLottery',
           author: messageObj.author,
@@ -1052,7 +1052,7 @@ const commands = [
       const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const guildID = messageObj.content.split(/ (.+)/)[1];
-        const guild = Bot.guilds.find(guild => guild.id === guildID);
+        const guild = Bot.guilds.cache.find(guild => guild.id === guildID);
         if (!guild) {
           return messageObj.author.send('This guild does not exist.');
         }
@@ -1075,7 +1075,7 @@ const commands = [
     operatorOnly: true,
     function: (params) => {
       const { Bot } = params;
-      const aprilfools = Bot.guilds.get(process.env.GUILD_ID).members
+      const aprilfools = Bot.guilds.cache.get(process.env.GUILD_ID).members
         .filter(player => player.presence.status === 'online' && !player.user.bot
           || player.presence.status === 'idle' && !player.user.bot
           || player.presence.status === 'dnd' && !player.user.bot);

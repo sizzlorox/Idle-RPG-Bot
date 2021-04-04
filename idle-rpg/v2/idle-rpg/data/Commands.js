@@ -86,7 +86,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     }
 
     const newPrizePool = 1500;
-    const lotteryChannel = await guild.channels.find(channel => channel.id === enumHelper.channels.lottery);
+    const lotteryChannel = await guild.channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
     if (lotteryChannel) {
       let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
       lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
@@ -154,7 +154,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     guildConfig.dailyLottery.prizePool += 100;
     await this.Database.updateGame(player.guildId, guildConfig);
     await this.Database.savePlayer(player);
-    const lotteryChannel = await Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.id === enumHelper.channels.lottery);
+    const lotteryChannel = await Bot.guilds.cache.find(guild => guild.id === player.guildId).channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
     if (lotteryChannel) {
       let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
       lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
@@ -267,7 +267,7 @@ ${rankString}\`\`\``);
   async castSpell(params) {
     const { author, Bot, spell, amount } = params;
     const player = await this.Database.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
-    const actionsChannel = Bot.guilds.find(guild => guild.id === player.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const actionsChannel = Bot.guilds.cache.find(guild => guild.id === player.guildId).channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text');
     const guildConfig = await this.Database.loadGame(player.guildId);
     switch (spell) {
       case 'bless':
@@ -336,7 +336,7 @@ ${rankString}\`\`\``);
 
     bountyPlacer.gold.current -= Number(amount);
     bountyRecipient.currentBounty += Number(amount);
-    const actionsChannel = await Bot.guilds.find(guild => guild.id === bountyPlacer.guildId).channels.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const actionsChannel = await Bot.guilds.cache.find(guild => guild.id === bountyPlacer.guildId).channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text');
     await this.Database.savePlayer(bountyPlacer);
     await this.Database.savePlayer(bountyRecipient);
     await actionsChannel.send(this.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
@@ -407,11 +407,11 @@ ${rankString}\`\`\``);
       return author.send('Your character has a relic that may only exist in this server. If you would like to continue changing servers, type `!setServer <Server ID> true` to confirm. *This will destroy your relic!*');
     }
     let count = 0;
-    await Bot.guilds.forEach(guild => guild.members.find(member => member.id === author.id) ? count++ : count);
+    await Bot.guilds.cache.forEach(guild => guild.members.cache.find(member => member.id === author.id) ? count++ : count);
     if (count <= 1) {
       return author.send('You must be in more than one server with this bot in order to change primary servers.');
     }
-    const guildToSet = await Bot.guilds.find(guild => guild.id === value);
+    const guildToSet = await Bot.guilds.cache.find(guild => guild.id === value);
     if (!guildToSet) {
       return author.send('No server found with that ID.');
     }
@@ -437,43 +437,43 @@ ${rankString}\`\`\``);
       loadedConfig.commandPrefix = value;
       await this.Database.updateGame(guildId, loadedConfig);
       author.send(`Changed server ${guildId} command prefix to ${value}.`);
-      const server = await Bot.guilds.find(guild => guild.id === guildId);
-      const faqChannel = await server.channels.find(channel => channel.name === 'faq' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+      const server = await Bot.guilds.cache.find(guild => guild.id === guildId);
+      const faqChannel = await server.channels.cache.find(channel => channel.name === 'faq' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
       const faqMessage = await faqChannel.fetchMessages();
       // TODO move FAQ message somewhere else so I dont have to look everywhere to update these messages
       await faqMessage.array()[0].edit(`
 • **I'm not born yet, what should I do?**
 Once an event is fired for your character you will be born.
-  
+
 • **How do I play?**
 As long as you are in the online list you will be playing the game. Does not matter what status you set as long as you are not "Invisible".
-  
+
 • **Will my character be reset?**
 The game is in super early development right now so resets are expected. Once the game is complete resets will most likely be a yearly thing with leaderboards.
-  
+
 • **How can I help with the development?**
 Suggestions are always welcome, if you have experience with NodeJS you're welcome to become a contributor and develop along side with us!
 You can also support with development by becoming a patron! Keep in mind that you will not gain any advantage over the others and its simply a method of showing your support to the developer!
 Command: ${value}patreon
-  
+
 • **My event counter goes up but I did not see anything in the event channels**
 There are some events such as luck events which fail. When they do it does not print anything but your event counter goes up.
-  
+
 • **Is there a way to turn off all the spam from events?**
 Yes, you can right click the channel to mute and select the mute checkbox.
-  
+
 • **Is this open source?**
 Yes, <https://github.com/sizzlorox/Idle-RPG-Bot>
-  
+
 • **Do you guys have a trello board?**
 Yes, <https://trello.com/b/OnpWqvlp/idle-rpg>
-  
+
 • **Can I control my character?**
 No.
-  
+
 • **What's the command prefix for this bot?**
 The prefix is ${value} (eg: ${value}help).
-  
+
 • **Can I host this in my server?**
 There's a command to get the invite link ${value}invite`);
 
@@ -553,7 +553,7 @@ There's a command to get the invite link ${value}invite`);
       case 'secondpreevent':
         const message = holidays[whichHoliday].messages[whichMessage];
         if (message) {
-          await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+          await Bot.guilds.cache.forEach(guild => guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
           return author.send(`Holiday ${whichHoliday} ${whichMessage} message sent`);
         }
 
@@ -582,7 +582,7 @@ There's a command to get the invite link ${value}invite`);
 
       const message = holidays[whichHoliday].messages.holidaystart;
       if (message) {
-        await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+        await Bot.guilds.cache.forEach(guild => guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
         return author.send(`Holiday ${whichHoliday} start message sent`);
       }
 
@@ -603,7 +603,7 @@ There's a command to get the invite link ${value}invite`);
     });
     const message = holidays[whichHoliday].messages.holidayend;
     if (message) {
-      await Bot.guilds.forEach(guild => guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
+      await Bot.guilds.cache.forEach(guild => guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text').send(message));
       return author.send(`Holiday ${whichHoliday} end message sent`);
     }
 
@@ -612,14 +612,14 @@ There's a command to get the invite link ${value}invite`);
 
   async resetPlayers(params) {
     const { Bot, author, guildId } = params;
-    const guild = Bot.guilds.find('id', guildId);
+    const guild = Bot.guilds.cache.find('id', guildId);
     if (!guild) {
       return author.send('No guild with that id');
     }
-    const leaderboardChannel = await guild.channels.find(channel => channel.name === 'leaderboards' && channel.type === 'text');
-    const announcementChannel = await guild.channels.find(channel => channel.name === 'announcements' && channel.type === 'text');
-    const actionChannel = await guild.channels.find(channel => channel.name === 'actions' && channel.type === 'text');
-    const movementChannel = await guild.channels.find(channel => channel.name === 'movement' && channel.type === 'text');
+    const leaderboardChannel = await guild.channels.cache.find(channel => channel.name === 'leaderboards' && channel.type === 'text');
+    const announcementChannel = await guild.channels.cache.find(channel => channel.name === 'announcements' && channel.type === 'text');
+    const actionChannel = await guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const movementChannel = await guild.channels.cache.find(channel => channel.name === 'movement' && channel.type === 'text');
     let resetMsg = '';
     let messagePromises = [];
     if (leaderboardChannel) {
@@ -643,7 +643,7 @@ There's a command to get the invite link ${value}invite`);
         prizePool: 1500
       }
     };
-    const lotteryChannel = await guild.channels.find(channel => channel.id === enumHelper.channels.lottery);
+    const lotteryChannel = await guild.channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
     if (lotteryChannel) {
       let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
       lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);

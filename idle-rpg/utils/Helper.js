@@ -156,7 +156,7 @@ class Helper {
           return resolve();
         }
 
-        return discordHook.discordBot.guilds.find('id', guildID)
+        return discordHook.discordBot.guilds.cache.find('id', guildID)
           .members.find('id', player.discordId).send(msg)
           .then(() => {
             return resolve();
@@ -485,7 +485,7 @@ class Helper {
     Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
     Personal Multiplier: ${player.personalMultiplier}x
-    Experience: 
+    Experience:
       Current: ${player.experience.current}
       Lost: ${player.experience.lost}
       Total: ${player.experience.total}
@@ -498,7 +498,7 @@ class Helper {
       Stolen from you: ${player.gold.stolen}
       Stole from others: ${player.gold.stole}
       Lottery: ${player.gold.dailyLottery}
-      Gambles: 
+      Gambles:
         Count: ${player.gambles}
         Won: ${player.gold.gambles.won}
         Lost: ${player.gold.gambles.lost}
@@ -625,7 +625,7 @@ class Helper {
         return `\`\`\`Here is your inventory!
         Equipment:
           ${equipment}
-        
+
         Items:
           ${player.inventory.items.map(item => item.name).join('\n      ')}\`\`\``;
       });

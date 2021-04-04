@@ -537,7 +537,7 @@ ${rankString}
       return selectedPlayer;
     }
 
-    const currentGuild = discordBot.guilds.array()[0];
+    const currentGuild = discordBot.guilds.cache.array()[0];
     const playerDiscordObj = currentGuild.members
       .filterArray(member => member.id === selectedPlayer.discordId)[0];
     if (!playerDiscordObj) {
@@ -723,8 +723,8 @@ ${rankString}
     return this.Database.resetAllPlayersInGuild(guildID)
       .then(this.updateLeaderboards(discordBot))
       .then(() => {
-        const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
-        const announcementChannel = discordBot.guilds.find('id', guildID).channels.find('id', announcementChannelId);
+        const leaderboardChannel = discordBot.guilds.cache.find('id', guildID).channels.cache.find('id', leaderboardChannelId);
+        const announcementChannel = discordBot.guilds.cache.find('id', guildID).channels.cache.find('id', announcementChannelId);
         const leaderboardMessages = leaderboardChannel.fetchMessages({ limit: 10 });
         let resetMsg = '';
         if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
@@ -834,7 +834,7 @@ ${rankString}
   }
 
   updateLeaderboards(discordBot) {
-    const leaderboardChannel = discordBot.guilds.find('id', guildID).channels.find('id', leaderboardChannelId);
+    const leaderboardChannel = discordBot.guilds.cache.find('id', guildID).channels.cache.find('id', leaderboardChannelId);
     const types = enumHelper.leaderboardStats;
 
     types.forEach((type, index) => this.Database.loadTop10(type)
