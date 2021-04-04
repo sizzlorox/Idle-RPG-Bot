@@ -130,6 +130,9 @@ class DiscordBot extends BaseHelper {
     this.bot.on('presenceUpdate', async (oldM, newM) => {
       const oldMember = oldM && oldM.member;
       const newMember = newM && newM.member;
+      if (!oldMember) {
+        return
+      }
       if (!newMember.user.bot) {
         if (oldMember.presence.status === 'offline' && newMember.presence.status !== 'offline') {
           if (await this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
