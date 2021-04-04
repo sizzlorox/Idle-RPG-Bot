@@ -249,14 +249,14 @@ class DiscordBot extends BaseHelper {
   }
 
   async processDetails() {
-    let memoryUsage = await util.inspect(process.memoryUsage());
-    memoryUsage = await JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
-    const currentRSS = await Number(memoryUsage.rss / 1048576).toFixed(2);
-    const currentTotal = await Number(memoryUsage.heapTotal / 1048576).toFixed(2);
-    const currentUsed = await Number(memoryUsage.heapUsed / 1048576).toFixed(2);
+    // let memoryUsage = util.inspect(process.memoryUsage());
+    // memoryUsage = await JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
+    // const currentRSS = Number(memoryUsage.rss / 1048576).toFixed(2);
+    // const currentTotal = Number(memoryUsage.heapTotal / 1048576).toFixed(2);
+    // const currentUsed = Number(memoryUsage.heapUsed / 1048576).toFixed(2);
 
     console.log('------------');
-    console.log(`\n\n${new Date()}\nHeap Usage:\n  RSS: ${currentRSS}MB\n  HeapTotal: ${currentTotal}MB\n  HeapUsed: ${currentUsed}MB`);
+    // console.log(`\n\n${new Date()}\nHeap Usage:\n  RSS: ${currentRSS}MB\n  HeapTotal: ${currentTotal}MB\n  HeapUsed: ${currentUsed}MB`);
     console.log(`Current Up Time: ${this.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
     console.log('------------');
   }
