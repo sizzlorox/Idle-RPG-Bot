@@ -329,7 +329,7 @@ class DiscordBot extends BaseHelper {
       if (guild.id === guildID) {
         const lotteryChannel = await guild.channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
         if (lotteryChannel) {
-          let lotteryMessages = await lotteryChannel.fetchMessages({ limit: 10 });
+          let lotteryMessages = await lotteryChannel.cache.messages.fetch({ limit: 10 });
           lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
           if (lotteryMessages.size <= 0) {
             await lotteryChannel.send(`Idle-RPG Lottery - You must pay 100 gold to enter! PM me \`!lottery\` to join!\nOut of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the previous daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
@@ -396,7 +396,7 @@ class DiscordBot extends BaseHelper {
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
           .join('\n')}`)
         .then(async (rankString) => {
-          const msgCount = await leaderboardChannel.fetchMessages({ limit: 10 });
+          const msgCount = await leaderboardChannel.cache.messages.fetch({ limit: 10 });
           const subjectTitle = this.formatLeaderboards(Object.keys(type)[0]);
           const msg = `\`\`\`Top 10 ${subjectTitle}:
 ${rankString}\`\`\``;
