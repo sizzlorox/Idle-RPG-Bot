@@ -93,6 +93,9 @@ class Helper {
         case enumHelper.logTypes.move:
           Database.loadMoveLog(selectedPlayer.discordId)
             .then((playerMoveLog) => {
+              if (!playerMoveLog.log) {
+                playerMoveLog.log = []
+              }
               if (playerMoveLog.log.length > 25) {
                 playerMoveLog.log.shift();
               }
@@ -113,6 +116,9 @@ class Helper {
         case enumHelper.logTypes.action:
           Database.loadActionLog(selectedPlayer.discordId)
             .then((playerActionLog) => {
+              if (!playerActionLog.log) {
+                playerActionLog.log = []
+              }
               if (playerActionLog.log.length > 25) {
                 playerActionLog.log.shift();
               }
@@ -130,6 +136,9 @@ class Helper {
         case enumHelper.logTypes.pvp:
           Database.loadPvpLog(selectedPlayer.discordId)
             .then((playerPvpLog) => {
+              if (!playerPvpLog.log) {
+                playerPvpLog.log = []
+              }
               if (playerPvpLog.log.length > 25) {
                 playerPvpLog.log.shift();
               }

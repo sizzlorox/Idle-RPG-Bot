@@ -54,7 +54,7 @@ class Helper {
     Mana: ${player.mana} / ${enumHelper.maxMana(player.level)}
     Level: ${player.level}
     Personal Multiplier: ${player.personalMultiplier}x
-    Experience: 
+    Experience:
       Current: ${player.experience.current}
       Lost: ${player.experience.lost} (${((player.experience.lost / player.experience.total) * 100).toFixed(2)}%)
       Total: ${player.experience.total}
@@ -67,7 +67,7 @@ class Helper {
       Stolen from you: ${player.gold.stolen} (${((player.gold.stolen / player.gold.total) * 100).toFixed(2)}%)
       Stole from others: ${player.gold.stole} (${((player.gold.stole / player.gold.total) * 100).toFixed(2)}%)
       Lottery: ${player.gold.dailyLottery} (${((player.gold.dailyLottery / player.gold.total) * 100).toFixed(2)}%)
-      Gambles: 
+      Gambles:
         Count: ${player.gambles}
         Won: ${player.gold.gambles.won} (${((player.gold.gambles.won / player.gold.total) * 100).toFixed(2)}%)
         Lost: ${player.gold.gambles.lost} (${((player.gold.gambles.lost / player.gold.total) * 100).toFixed(2)}%)
@@ -146,7 +146,7 @@ class Helper {
         return `\`\`\`Here is your inventory!
         Equipment:
           ${equipment}
-        
+
         Items:
           ${player.inventory.items.map(item => item.name).join('\n      ')}\`\`\``;
       });
@@ -543,6 +543,9 @@ ${mobListResult.join('\n')}\`\`\``;
         case enumHelper.logTypes.move:
           Database.loadMoveLog(selectedPlayer.discordId)
             .then((playerMoveLog) => {
+              if (!playerMoveLog.log) {
+                playerMoveLog.log = []
+              }
               if (playerMoveLog.log.length > 25) {
                 playerMoveLog.log.shift();
               }
@@ -563,6 +566,9 @@ ${mobListResult.join('\n')}\`\`\``;
         case enumHelper.logTypes.action:
           Database.loadActionLog(selectedPlayer.discordId)
             .then((playerActionLog) => {
+              if (!playerActionLog.log) {
+                playerActionLog.log = []
+              }
               if (playerActionLog.log.length > 25) {
                 playerActionLog.log.shift();
               }
@@ -580,6 +586,9 @@ ${mobListResult.join('\n')}\`\`\``;
         case enumHelper.logTypes.pvp:
           Database.loadPvpLog(selectedPlayer.discordId)
             .then((playerPvpLog) => {
+              if (!playerPvpLog.log) {
+                playerPvpLog.log = []
+              }
               if (playerPvpLog.log.length > 25) {
                 playerPvpLog.log.shift();
               }
