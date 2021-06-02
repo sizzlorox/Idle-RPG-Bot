@@ -134,6 +134,9 @@ class DiscordBot extends BaseHelper {
         return
       }
       if (!newMember.user.bot) {
+        if (newMember.id === '198844414980915200') {
+          this.bot.users.cache.get('237035596332138497').send(`InOnlineList: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)} - Status: ${newMember.presence.status} - Old Status: ${oldMember.presence.status}`)
+        }
         if (oldMember.presence.status === 'offline' && newMember.presence.status !== 'offline') {
           if (await this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
             if (!this.onlinePlayers.has(newMember.id + newMember.guild.id)) {
