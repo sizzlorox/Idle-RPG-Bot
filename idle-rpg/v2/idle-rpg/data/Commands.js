@@ -88,7 +88,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     const newPrizePool = 1500;
     const lotteryChannel = await guild.channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
     if (lotteryChannel) {
-      let lotteryMessages = await lotteryChannel.cache.messages.fetch({ limit: 10 });
+      let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
       lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
       if (lotteryMessages.size <= 0) {
         await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');
@@ -156,7 +156,7 @@ class Commands extends aggregation(BaseGame, BaseHelper) {
     await this.Database.savePlayer(player);
     const lotteryChannel = await Bot.guilds.cache.find(guild => guild.id === player.guildId).channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
     if (lotteryChannel) {
-      let lotteryMessages = await lotteryChannel.cache.messages.fetch({ limit: 10 });
+      let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
       lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
       if (lotteryMessages.size <= 0) {
         await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join!');
@@ -623,7 +623,7 @@ There's a command to get the invite link ${value}invite`);
     let resetMsg = '';
     let messagePromises = [];
     if (leaderboardChannel) {
-      const leaderboardMessages = await leaderboardChannel.cache.messages.fetch({ limit: 10 });
+      const leaderboardMessages = await leaderboardChannel.messages.fetch({ limit: 10 });
       if (leaderboardMessages.size > 0) {
         const messages = leaderboardMessages.array();
         await messages.forEach(msg => {
@@ -645,7 +645,7 @@ There's a command to get the invite link ${value}invite`);
     };
     const lotteryChannel = await guild.channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
     if (lotteryChannel) {
-      let lotteryMessages = await lotteryChannel.cache.messages.fetch({ limit: 10 });
+      let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
       lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
       if (lotteryMessages.size <= 0) {
         await lotteryChannel.send('Idle-RPG Lottery - You must pay 100 gold to enter! PM me `!lottery` to join');

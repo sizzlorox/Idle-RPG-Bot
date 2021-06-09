@@ -725,7 +725,7 @@ ${rankString}
       .then(async () => {
         const leaderboardChannel = await discordBot.guilds.cache.find('id', guildID).channels.cache.find('id', leaderboardChannelId);
         const announcementChannel = await discordBot.guilds.cache.find('id', guildID).channels.cache.find('id', announcementChannelId);
-        const leaderboardMessages = await leaderboardChannel.cache.messages.fetch({ limit: 10 });
+        const leaderboardMessages = await leaderboardChannel.messages.fetch({ limit: 10 });
         let resetMsg = '';
         if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
           leaderboardMessages.array().forEach(msg => resetMsg = resetMsg.concat(`${msg.content}\n`) && msg.delete());
@@ -854,7 +854,7 @@ ${rankString}
         .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
         .join('\n')}`)
       .then(async (rankString) => {
-        const msgCount = await leaderboardChannel.cache.messages.fetch({ limit: 10 });
+        const msgCount = await leaderboardChannel.messages.fetch({ limit: 10 });
         const subjectTitle = this.Helper.formatLeaderboards(Object.keys(type)[0]);
         const msg = `\`\`\`Top 10 ${subjectTitle}:
 ${rankString}\`\`\``;

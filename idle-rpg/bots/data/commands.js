@@ -1027,8 +1027,8 @@ const commands = [
     }
   },
 
-  removeLotteryPlayers = {
-    command: '!resetlottery',
+  resetLottery = {
+    command: '!resetLottery',
     operatorOnly: true,
     function: (params) => {
       const { Bot, Game, messageObj } = params;
@@ -1037,6 +1037,24 @@ const commands = [
         const guild = Bot.guilds.cache.find(guild => guild.id === guildId);
         Game.fetchCommand({
           command: 'resetLottery',
+          author: messageObj.author,
+          guildId,
+          guild,
+        });
+      }
+    }
+  },
+
+  removeLotteryPlayers = {
+    command: '!resetLotteryPlayers',
+    operatorOnly: true,
+    function: (params) => {
+      const { Bot, Game, messageObj } = params;
+      if (messageObj.content.includes(' ')) {
+        const guildId = messageObj.content.split(/ (.+)/)[1];
+        const guild = Bot.guilds.cache.find(guild => guild.id === guildId);
+        Game.fetchCommand({
+          command: 'resetLotteryPlayers',
           author: messageObj.author,
           guildId,
           guild,

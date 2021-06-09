@@ -346,7 +346,7 @@ class DiscordBot extends BaseHelper {
       if (guild.id === guildID) {
         const lotteryChannel = await guild.channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
         if (lotteryChannel) {
-          let lotteryMessages = await lotteryChannel.cache.messages.fetch({ limit: 10 });
+          let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
           lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
           if (lotteryMessages.size <= 0) {
             await lotteryChannel.send(`Idle-RPG Lottery - You must pay 100 gold to enter! PM me \`!lottery\` to join!\nOut of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the previous daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
