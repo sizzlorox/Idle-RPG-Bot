@@ -128,13 +128,9 @@ class DiscordBot extends BaseHelper {
     });
 
     this.bot.on('presenceUpdate', async (oldM, newM) => {
-      const oldMember = oldM && oldM.member;
       const newMember = newM && newM.member;
-      if (!oldMember) {
-        return
-      }
       if (!newMember.user.bot) {
-        if (newMember.presence.status !== 'offline') {
+        if (newM.status !== 'offline') {
           if (await this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
             if (!this.onlinePlayers.has(newMember.id + newMember.guild.id)) {
               this.onlinePlayers.set(newMember.id + newMember.guild.id, {
@@ -146,7 +142,7 @@ class DiscordBot extends BaseHelper {
           }
         }
 
-        if (newMember.presence.status === 'offline') {
+        if (newM.status === 'offline') {
           if (await this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
             if (this.onlinePlayers.has(newMember.id + newMember.guild.id)) {
               this.onlinePlayers.delete(newMember.id + newMember.guild.id);
@@ -155,21 +151,10 @@ class DiscordBot extends BaseHelper {
         }
 
         if (newMember.id === '198844414980915200') {
-          this.bot.users.cache.get('198844414980915200').send(`Your current state is... ${newMember.presence.status}\n In bots online list: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)}`)
-          this.bot.users.cache.get('237035596332138497').send(`Their current state is... ${newMember.presence.status}\n In bots online list: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)}`)
+          this.bot.users.cache.get('198844414980915200').send(`Your current state is... ${newM.status}\n In bots online list: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)}`)
+          this.bot.users.cache.get('237035596332138497').send(`Their current state is... ${newM.status}\n In bots online list: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)}`)
         }
       }
-
-      if (newMember.guild.id !== guildID) {
-        return;
-      }
-
-      // if (((oldMember.presence.game && !oldMember.presence.game.streaming) || !oldMember.presence.game) && newMember.presence.game && newMember.presence.game.streaming) {
-      //   const streamChannel = await newMember.guild.channels.cache.find(channel => channel.name === 'stream-plug-ins' && channel.type === 'text');
-      //   if (streamChannel) {
-      //     streamChannel.send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
-      //   }
-      // }
     });
 
     this.bot.on('guildMemberAdd', async (member) => {
