@@ -186,6 +186,10 @@ class DiscordBot extends BaseHelper {
 
       const welcomeChannel = await member.guild.channels.cache.find(channel => channel.name === 'newcomers' && channel.type === 'text');
       if (welcomeChannel) {
+        // Test for url in name
+        if (/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(member.displayName)) {
+          return;
+        }
         welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.cache.find(channel => channel.name === 'faq' && channel.type === 'text').id}> or PM me !help.`);
         welcomeLog.info(member);
       }
