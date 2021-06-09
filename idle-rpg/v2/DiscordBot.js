@@ -149,11 +149,6 @@ class DiscordBot extends BaseHelper {
             }
           }
         }
-
-        if (newMember.id === '198844414980915200') {
-          this.bot.users.cache.get('198844414980915200').send(`Your current state is... ${newM.status}\n In bots online list: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)}`)
-          this.bot.users.cache.get('237035596332138497').send(`Their current state is... ${newM.status}\n In bots online list: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)}`)
-        }
       }
     });
 
@@ -226,9 +221,6 @@ class DiscordBot extends BaseHelper {
                   return;
                 }
                 const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
-                if (player.discordId === '198844414980915200') {
-                  this.bot.users.cache.get('237035596332138497').send(`Activated an event! InOnlineList: ${this.onlinePlayers.has(player.discordId + player.guildId)}`)
-                }
                 delete player.timer;
                 return this.discord.sendMessage(guild, eventResult);
               }, playerTimer);
