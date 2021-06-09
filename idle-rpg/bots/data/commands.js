@@ -1175,37 +1175,37 @@ const commands = [
   //   }
   // },
 
-  crypto = {
-    command: '!crypto',
-    operatorOnly: false,
-    function: async (params) => {
-      const { messageObj } = params;
-      let currency = 'BRL';
-      // https://coinmarketcap.com/api/#endpoint_ticker
-      const validCurrencies = ['AUD', 'BRL', 'CAD', 'CHF', 'CLP', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PKR', 'PLN', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'TWD', 'ZAR', 'BTC', 'ETH', 'XRP', 'LTC', 'BCH'];
-      if (messageObj.content.includes(' ')) {
-        currency = messageObj.content.split(/ (.+)/)[1];
-      }
-      if (validCurrencies.indexOf(currency) === -1) {
-        return messageObj.reply(`That\'s not a valid currency.\nValid currencies:\n${validCurrencies.join(', ')}`);
-      }
-      const cryptoInfo = await Crypto.top5(currency);
-      const codeBlock = '\`\`\`';
-      const currencyVar = `price_${currency.toLocaleLowerCase()}`;
-      let info = codeBlock;
-      cryptoInfo.forEach((c) => {
-        info += `${c.name} (${c.symbol})`;
-        info += `\nRank: ${c.rank}`;
-        info += `\nUSD: ${c.price_usd}`;
-        info += `\n${currency.toUpperCase()}: ${c[currencyVar]}`;
-        info += `\nPercent Change 1h: ${c.percent_change_1h}%`;
-        info += `\nPercent Change 24h: ${c.percent_change_24h}%`;
-        info += `\nPercent Change 7d: ${c.percent_change_7d}%\n\n`;
-      });
-      info += codeBlock;
-      messageObj.reply(info);
-    }
-  },
+  // crypto = {
+  //   command: '!crypto',
+  //   operatorOnly: false,
+  //   function: async (params) => {
+  //     const { messageObj } = params;
+  //     let currency = 'BRL';
+  //     // https://coinmarketcap.com/api/#endpoint_ticker
+  //     const validCurrencies = ['AUD', 'BRL', 'CAD', 'CHF', 'CLP', 'CNY', 'CZK', 'DKK', 'EUR', 'GBP', 'HKD', 'HUF', 'IDR', 'ILS', 'INR', 'JPY', 'KRW', 'MXN', 'MYR', 'NOK', 'NZD', 'PHP', 'PKR', 'PLN', 'RUB', 'SEK', 'SGD', 'THB', 'TRY', 'TWD', 'ZAR', 'BTC', 'ETH', 'XRP', 'LTC', 'BCH'];
+  //     if (messageObj.content.includes(' ')) {
+  //       currency = messageObj.content.split(/ (.+)/)[1];
+  //     }
+  //     if (validCurrencies.indexOf(currency) === -1) {
+  //       return messageObj.reply(`That\'s not a valid currency.\nValid currencies:\n${validCurrencies.join(', ')}`);
+  //     }
+  //     const cryptoInfo = await Crypto.top5(currency);
+  //     const codeBlock = '\`\`\`';
+  //     const currencyVar = `price_${currency.toLocaleLowerCase()}`;
+  //     let info = codeBlock;
+  //     cryptoInfo.forEach((c) => {
+  //       info += `${c.name} (${c.symbol})`;
+  //       info += `\nRank: ${c.rank}`;
+  //       info += `\nUSD: ${c.price_usd}`;
+  //       info += `\n${currency.toUpperCase()}: ${c[currencyVar]}`;
+  //       info += `\nPercent Change 1h: ${c.percent_change_1h}%`;
+  //       info += `\nPercent Change 24h: ${c.percent_change_24h}%`;
+  //       info += `\nPercent Change 7d: ${c.percent_change_7d}%\n\n`;
+  //     });
+  //     info += codeBlock;
+  //     messageObj.reply(info);
+  //   }
+  // },
 
   urban = {
     command: '!urban',
