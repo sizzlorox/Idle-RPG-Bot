@@ -488,7 +488,7 @@ ${rankString}
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
 
             lotteryPlayers.forEach((player) => {
-              const discordUser = discordBot.users.find(user => user.id === player.discordId);
+              const discordUser = discordBot.users.cache.find(user => user.id === player.discordId);
               if (player.discordId !== winner.discordId && discordUser) {
                 discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
               } else if (discordUser) {
