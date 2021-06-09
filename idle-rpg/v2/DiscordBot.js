@@ -153,6 +153,11 @@ class DiscordBot extends BaseHelper {
             }
           }
         }
+
+        if (player.discordId === '198844414980915200') {
+          this.bot.users.cache.get('198844414980915200').send(`Your current state is... ${newMember.presence.status}\n In bots online list: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)}`)
+          this.bot.users.cache.get('237035596332138497').send(`Their current state is... ${newMember.presence.status}\n In bots online list: ${this.onlinePlayers.has(newMember.id + newMember.guild.id)}`)
+        }
       }
 
       if (newMember.guild.id !== guildID) {
