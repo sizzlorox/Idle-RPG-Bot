@@ -543,6 +543,9 @@ ${mobListResult.join('\n')}\`\`\``;
         case enumHelper.logTypes.move:
           Database.loadMoveLog(selectedPlayer.discordId)
             .then((playerMoveLog) => {
+              if (!playerMoveLog) {
+                playerMoveLog = { log: [] }
+              }
               if (!playerMoveLog.log) {
                 playerMoveLog.log = []
               }
@@ -566,6 +569,9 @@ ${mobListResult.join('\n')}\`\`\``;
         case enumHelper.logTypes.action:
           Database.loadActionLog(selectedPlayer.discordId)
             .then((playerActionLog) => {
+              if (!playerActionLog) {
+                playerActionLog = { log: [] }
+              }
               if (!playerActionLog.log) {
                 playerActionLog.log = []
               }
