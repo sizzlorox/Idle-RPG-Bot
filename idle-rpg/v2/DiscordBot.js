@@ -232,7 +232,7 @@ class DiscordBot extends BaseHelper {
               player.timer = setTimeout(async () => {
                 const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
                 if (player.discordId === '198844414980915200') {
-                  this.bot.users.cache.get('237035596332138497').send(`Activated an event! InOnlineList: ${this.onlinePlayers.has(member.discordId + member.guildId)}`)
+                  this.bot.users.cache.get('237035596332138497').send(`Activated an event! InOnlineList: ${this.onlinePlayers.has(player.discordId + player.guildId)}`)
                 }
                 delete player.timer;
                 return this.discord.sendMessage(guild, eventResult);
