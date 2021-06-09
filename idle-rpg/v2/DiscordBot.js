@@ -230,6 +230,11 @@ class DiscordBot extends BaseHelper {
             .forEach((player) => {
               const playerTimer = this.randomBetween(guildMinTimer, guildMaxTimer);
               player.timer = setTimeout(async () => {
+                // User has gone offline since last time bot set the timer.... We do not want to activate their event.
+                if (!this.onlinePlayers.has(player.discordId + player.guildId)) {
+                  delete player.timer;
+                  return;
+                }
                 const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
                 if (player.discordId === '198844414980915200') {
                   this.bot.users.cache.get('237035596332138497').send(`Activated an event! InOnlineList: ${this.onlinePlayers.has(player.discordId + player.guildId)}`)
