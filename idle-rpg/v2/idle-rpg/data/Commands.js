@@ -612,7 +612,7 @@ There's a command to get the invite link ${value}invite`);
 
   async resetPlayers(params) {
     const { Bot, author, guildId } = params;
-    const guild = Bot.guilds.cache.find('id', guildId);
+    const guild = Bot.guilds.cache.find(g => g.id = guildId);
     if (!guild) {
       return author.send('No guild with that id');
     }
