@@ -358,9 +358,9 @@ class DiscordBot extends BaseHelper {
     });
   }
 
-  async updateLeaderboards() {
+  updateLeaderboards() {
     const types = enumHelper.leaderboardStats;
-    for (const guild in this.bot.guilds.cache) {
+    this.bot.guilds.cache.each(async (guild) => {
       const botGuildMember = await guild.members.cache.get(this.bot.user.id);
       if (!botGuildMember.permissions.has([
         'VIEW_CHANNEL',
@@ -392,19 +392,20 @@ class DiscordBot extends BaseHelper {
           .join('\n')}`
 
         const msgCount = await leaderboardChannel.messages.fetch({ limit: 10 });
-        const subjectTitle = this.formatLeaderboards(Object.keys(type)[0]);
+        const subjectTitle = this.formatLeaderboards(Object.keys(types[i])[0]);
         const msg = `\`\`\`Top 10 ${subjectTitle}:
 ${rankString}\`\`\``;
 
         if (msgCount.size < types.length) {
-          return leaderboardChannel.send(msg);
+          await leaderboardChannel.send(msg);
+          continue;
         }
 
-        return !msg.includes(msgCount.array()[index].toString()) && msgCount.array()[index].author.id === this.bot.user.id
-          ? msgCount.array()[index].edit(msg)
-          : '';
+        if (!msg.includes(msgCount.array()[i].toString()) && msgCount.array()[i].author.id === this.bot.user.id) {
+          msgCount.array()[i].edit(msg)
+        }
       }
-    }
+    })
   }
 
   blizzardRandom() {
