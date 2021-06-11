@@ -321,7 +321,7 @@ class DiscordBot extends BaseHelper {
       const newPrizePool = await this.randomBetween(1500, 10000);
 
       if (guild.id === guildID) {
-        const lotteryChannel = await guild.channels.cache.find(channel => channel.id === enumHelper.channels.lottery);
+        const lotteryChannel = await guild.channels.cache.get(enumHelper.channels.lottery);
         if (lotteryChannel) {
           let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
           lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
@@ -341,7 +341,7 @@ class DiscordBot extends BaseHelper {
       winner.gold.dailyLottery += guildConfig.dailyLottery.prizePool;
 
       guildLotteryPlayers.forEach((player) => {
-        const discordUser = guild.members.cache.find(member => member.id === player.discordId);
+        const discordUser = guild.members.cache.get(player.discordId);
         if (player.discordId !== winner.discordId && discordUser) {
           discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${guildConfig.dailyLottery.prizePool} out of ${guildLotteryPlayers.length} people.`);
         } else if (discordUser) {
@@ -358,52 +358,53 @@ class DiscordBot extends BaseHelper {
     });
   }
 
-  updateLeaderboards() {
+  async updateLeaderboards() {
     const types = enumHelper.leaderboardStats;
-    this.bot.guilds.cache.forEach((guild) => {
-      const botGuildMember = guild.members.cache.find(member => member.id === this.bot.user.id);
+    for (const guild in this.bot.guilds.cache) {
+      const botGuildMember = await guild.members.cache.get(this.bot.user.id);
       if (!botGuildMember.permissions.has([
         'VIEW_CHANNEL',
         'MANAGE_CHANNELS'
       ])) {
         return;
       }
-      const leaderboardChannel = guild.channels.cache.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
+      const leaderboardChannel = await guild.channels.cache.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
       if (!leaderboardChannel || leaderboardChannel && !leaderboardChannel.manageable) {
-        return;
+        return
       }
 
-      types.forEach((type, index) => this.Game.dbClass().loadTop10(type, guild.id, this.bot.user.id)
-        .then(top10 => `${top10.filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+      for (let i = 0; i < types.length; i++) {
+        const top10 = await this.Game.dbClass().loadTop10(types[i], guild.id, this.bot.user.id)
+        const rankString = `${top10.filter(player => Object.keys(types[i])[0].includes('.') ? player[Object.keys(types[i])[0].split('.')[0]][Object.keys(types[i])[0].split('.')[1]] : player[Object.keys(types[i])[0]] > 0)
           .sort((player1, player2) => {
-            if (Object.keys(type)[0] === 'level') {
+            if (Object.keys(types[i])[0] === 'level') {
               return player2.experience.current - player1.experience.current && player2.level - player1.level;
             }
 
-            if (Object.keys(type)[0].includes('.')) {
-              const keys = Object.keys(type)[0].split('.');
+            if (Object.keys(types[i])[0].includes('.')) {
+              const keys = Object.keys(types[i])[0].split('.');
               return player2[keys[0]][keys[1]] - player1[keys[0]][keys[1]];
             }
 
-            return player2[Object.keys(type)[0]] - player1[Object.keys(type)[0]];
+            return player2[Object.keys(types[i])[0]] - player1[Object.keys(types[i])[0]];
           })
-          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
-          .join('\n')}`)
-        .then(async (rankString) => {
-          const msgCount = await leaderboardChannel.messages.fetch({ limit: 10 });
-          const subjectTitle = this.formatLeaderboards(Object.keys(type)[0]);
-          const msg = `\`\`\`Top 10 ${subjectTitle}:
+          .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(types[i])[0].includes('.') ? `${Object.keys(types[i])[0].split('.')[0]}: ${player[Object.keys(types[i])[0].split('.')[0]][Object.keys(types[i])[0].split('.')[1]]}` : `${Object.keys(types[i])[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(types[i])[0]]}`}`)
+          .join('\n')}`
+
+        const msgCount = await leaderboardChannel.messages.fetch({ limit: 10 });
+        const subjectTitle = this.formatLeaderboards(Object.keys(type)[0]);
+        const msg = `\`\`\`Top 10 ${subjectTitle}:
 ${rankString}\`\`\``;
 
-          if (msgCount.size < types.length) {
-            return leaderboardChannel.send(msg);
-          }
+        if (msgCount.size < types.length) {
+          return leaderboardChannel.send(msg);
+        }
 
-          return !msg.includes(msgCount.array()[index].toString()) && msgCount.array()[index].author.id === this.bot.user.id
-            ? msgCount.array()[index].edit(msg)
-            : '';
-        }));
-    });
+        return !msg.includes(msgCount.array()[index].toString()) && msgCount.array()[index].author.id === this.bot.user.id
+          ? msgCount.array()[index].edit(msg)
+          : '';
+      }
+    }
   }
 
   blizzardRandom() {

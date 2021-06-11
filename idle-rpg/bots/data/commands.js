@@ -393,7 +393,7 @@ const commands = [
       const { messageObj, Bot } = params;
       if (messageObj.content.includes(' ')) {
         const report = messageObj.content.split(/ (.+)/)[1];
-        const mainServer = Bot.guilds.cache.find(guild => guild.id === '390509935097675777');
+        const mainServer = Bot.guilds.cache.get('390509935097675777');
         if (mainServer.members.find(member => member.id === messageObj.author.id)) {
           return messageObj.author.send('Just send this in the bug reports channel. You\'re already in the official server');
         }
@@ -1034,7 +1034,7 @@ const commands = [
       const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const guildId = messageObj.content.split(/ (.+)/)[1];
-        const guild = Bot.guilds.cache.find(guild => guild.id === guildId);
+        const guild = Bot.guilds.cache.get(guildId);
         Game.fetchCommand({
           command: 'resetLottery',
           author: messageObj.author,
@@ -1052,7 +1052,7 @@ const commands = [
       const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const guildId = messageObj.content.split(/ (.+)/)[1];
-        const guild = Bot.guilds.cache.find(guild => guild.id === guildId);
+        const guild = Bot.guilds.cache.get(guildId);
         Game.fetchCommand({
           command: 'resetLotteryPlayers',
           author: messageObj.author,
@@ -1070,7 +1070,7 @@ const commands = [
       const { Bot, Game, messageObj } = params;
       if (messageObj.content.includes(' ')) {
         const guildID = messageObj.content.split(/ (.+)/)[1];
-        const guild = Bot.guilds.cache.find(guild => guild.id === guildID);
+        const guild = Bot.guilds.cache.get(guildID);
         if (!guild) {
           return messageObj.author.send('This guild does not exist.');
         }

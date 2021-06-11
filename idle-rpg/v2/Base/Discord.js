@@ -15,7 +15,7 @@ class Discord {
   }
 
   async manageGuildChannels(guild) {
-    const botGuildMember = await guild.members.cache.find(member => member.id === this.bot.user.id);
+    const botGuildMember = await guild.members.cache.get(this.bot.user.id);
     if (!botGuildMember.permissions.has('MANAGE_CHANNELS')) {
       return;
     }
@@ -237,7 +237,7 @@ There's a command to get the invite link !invite`);
       if (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.on
         || (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.filtered
           && result.type === 'actions')) {
-        const guildMember = await guild.members.cache.find(member => member.id === result.updatedPlayer.discordId);
+        const guildMember = await guild.members.cache.get(result.updatedPlayer.discordId);
         await guildMember.send(privateMessage, { split: true });
       }
       // Usually used for PVP messages to message player that got attacked that is not owner of event
@@ -245,7 +245,7 @@ There's a command to get the invite link !invite`);
         && (result.attackerObj.isPrivateMessage === enumHelper.pmMode.on || result.attackerObj.isPrivateMessage === enumHelper.pmMode.filtered)
         && result.otherPlayerPmMsg) {
         const otherPlayerPrivateMessage = result.otherPlayerPmMsg.join('\n');
-        const guildMember = await guild.members.cache.find(member => member.id === result.attackerObj.discordId);
+        const guildMember = await guild.members.cache.get(result.attackerObj.discordId);
         await guildMember.send(otherPlayerPrivateMessage, { split: true });
       }
     } catch (err) {

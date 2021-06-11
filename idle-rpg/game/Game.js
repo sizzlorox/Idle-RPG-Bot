@@ -488,7 +488,7 @@ ${rankString}
             winner.gold.dailyLottery += updatedConfig.dailyLottery.prizePool;
 
             lotteryPlayers.forEach((player) => {
-              const discordUser = discordBot.users.cache.find(user => user.id === player.discordId);
+              const discordUser = discordBot.users.cache.get(player.discordId);
               if (player.discordId !== winner.discordId && discordUser) {
                 discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${updatedConfig.dailyLottery.prizePool} out of ${lotteryPlayers.length} people.`);
               } else if (discordUser) {
@@ -723,8 +723,8 @@ ${rankString}
     return this.Database.resetAllPlayersInGuild(guildID)
       .then(this.updateLeaderboards(discordBot))
       .then(async () => {
-        const leaderboardChannel = await discordBot.guilds.cache.find('id', guildID).channels.cache.find('id', leaderboardChannelId);
-        const announcementChannel = await discordBot.guilds.cache.find('id', guildID).channels.cache.find('id', announcementChannelId);
+        const leaderboardChannel = await discordBot.guilds.cache.get(guildId).channels.cache.get(leaderboardChannelId);
+        const announcementChannel = await discordBot.guilds.cache.get(guildId).channels.cache.get(announcementChannelId);
         const leaderboardMessages = await leaderboardChannel.messages.fetch({ limit: 10 });
         let resetMsg = '';
         if (leaderboardChannel.size > 0 && leaderboardMessages.size > 0) {
@@ -834,7 +834,7 @@ ${rankString}
   }
 
   updateLeaderboards(discordBot) {
-    const leaderboardChannel = discordBot.guilds.cache.find('id', guildID).channels.cache.find('id', leaderboardChannelId);
+    const leaderboardChannel = discordBot.guilds.cache.get(guildID).channels.cache.get(leaderboardChannelId);
     const types = enumHelper.leaderboardStats;
 
     types.forEach((type, index) => this.Database.loadTop10(type)

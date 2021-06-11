@@ -100,7 +100,7 @@ const interval = process.env.NODE_ENV.includes('production') ? tickInMinutes : 1
 const heartBeat = () => {
   // TODO fix this for test env
   const discordUsers = discordBot.guilds.cache.size > 0
-    ? discordBot.guilds.cache.find('id', guildID).members
+    ? discordBot.guilds.cache.get(guildID).members
     : undefined;
 
   if (discordUsers) {
@@ -216,13 +216,13 @@ discordBot.on('message', async (message) => {
 if (streamChannelId && process.env.NODE_ENV.includes('production')) {
   discordBot.on('presenceUpdate', (oldMember, newMember) => {
     if (newMember.presence.game && newMember.presence.game.streaming && !oldMember.presence.game) {
-      newMember.guild.channels.cache.find('id', streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
+      newMember.guild.channels.cache.get(streamChannelId).send(`${newMember.displayName} has started streaming \`${newMember.presence.game.name}\`! Go check the stream out if you're interested!\n<${newMember.presence.game.url}>`);
     }
   });
 }
 
 discordBot.on('guildMemberAdd', (member) => {
-  const channel = member.guild.channels.cache.find('id', welcomeChannelId);
+  const channel = member.guild.channels.cache.get(welcomeChannelId);
   if (!channel) {
     return;
   }

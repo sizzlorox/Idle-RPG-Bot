@@ -165,8 +165,8 @@ class Helper {
           return resolve();
         }
 
-        return discordHook.discordBot.guilds.cache.find('id', guildID)
-          .members.find('id', player.discordId).send(msg)
+        return discordHook.discordBot.guilds.cache.get(guildID)
+          .members.get(player.discordId).send(msg)
           .then(() => {
             return resolve();
           })
