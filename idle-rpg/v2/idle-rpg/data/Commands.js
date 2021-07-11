@@ -415,7 +415,7 @@ ${rankString}\`\`\``);
     if (!guildToSet) {
       return author.send('No server found with that ID.');
     }
-    const memberInGuild = await guildToSet.members.get(author.id);
+    const memberInGuild = await guildToSet.members.cache.get(author.id);
     if (!memberInGuild) {
       return author.send('You\'re not in this server.');
     }
