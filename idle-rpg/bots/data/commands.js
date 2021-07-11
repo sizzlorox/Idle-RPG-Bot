@@ -632,7 +632,7 @@ const commands = [
           return messageObj.author.send('No guild found with this ID');
         }
 
-        const memberToCheckPermission = guildToUpdate.members.get(messageObj.author.id);
+        const memberToCheckPermission = guildToUpdate.members.cache.get(messageObj.author.id);
         if (!memberToCheckPermission) {
           return messageObj.author.send('You were not found within this guild');
         }
