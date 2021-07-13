@@ -20,7 +20,7 @@ class CommandParser extends BaseHelper {
     try {
       const commandChannelId = await messageObj.channel.type === 'dm'
         ? messageObj.channel.type
-        : messageObj.guild.channels.cache.find(channel => channel.name === 'commands' && channel.type === 'text').id;
+        : messageObj.guild.channels.cache.find(channel => channel.name.toLowerCase() === 'commands' && channel.type === 'text').id;
       const guildId = messageObj.channel.type === 'dm'
         ? (await this.Game.Database.getPlayerGuildId(messageObj.author.id)).guildId
         : messageObj.guild.id;
