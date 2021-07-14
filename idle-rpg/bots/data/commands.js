@@ -100,7 +100,7 @@ const commands = [
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = await Bot.users.filter(player => player.id === checkPlayer && !player.bot).array();
+        const playerObj = await Bot.users.cache.filter(player => player.id === checkPlayer && !player.bot).array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           messageObj.author.send(`${checkPlayer} was not found!`);
           return;
@@ -142,7 +142,7 @@ const commands = [
       if (messageObj.content.includes(' ')) {
         let checkPlayer = messageObj.content.split(/ (.+)/)[1];
         checkPlayer = checkPlayer.replace(/([\<\@\!\>])/g, '');
-        const playerObj = Bot.users.filter(player => player.id === checkPlayer && !player.bot).array();
+        const playerObj = Bot.users.cache.filter(player => player.id === checkPlayer && !player.bot).array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           messageObj.author.send(`${checkPlayer} was not found!`);
           return;
@@ -880,7 +880,7 @@ const commands = [
       let header;
       if (messageObj.content.includes(' ') && splitArray.length === 2) {
         const playerId = splitArray[1].replace(/([\<\@\!\>])/g, '');
-        const playerObj = await Bot.users.filter(player => player.id === playerId && !player.bot).array();
+        const playerObj = await Bot.users.cache.filter(player => player.id === playerId && !player.bot).array();
         if (playerObj.length === 0 && process.env.NODE_ENV.includes('production')) {
           return messageObj.author.send(`${playerId} was not found!`);
         }
