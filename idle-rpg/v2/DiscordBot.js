@@ -87,7 +87,7 @@ class DiscordBot extends BaseHelper {
         return message.reply(' ┬─┬ノ(ಠ\\_ಠノ)'.repeat(message.content.split('┻━┻').length - 1));
       }
 
-      if (message.channel.parent && message.channel.parent.name !== 'Idle-RPG') {
+      if (message.channel.parent && message.channel.parent.name.toLowerCase() !== 'idle-rpg') {
         return;
       }
 
