@@ -205,7 +205,7 @@ const commands = [
 
       if (messageObj.content.includes(' ')) {
         const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
-        playerObj = Bot.users.get(checkPlayer);
+        playerObj = Bot.users.cache.get(checkPlayer);
         if (!playerObj || playerObj.bot) {
           if (process.env.NODE_ENV.includes('production')) {
             return messageObj.author.send(`${checkPlayer} was not found!`);
@@ -232,7 +232,7 @@ const commands = [
 
       if (messageObj.content.includes(' ')) {
         const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
-        playerObj = Bot.users.get(checkPlayer);
+        playerObj = Bot.users.cache.get(checkPlayer);
         if (!playerObj || playerObj.bot) {
           if (process.env.NODE_ENV.includes('production')) {
             return messageObj.author.send(`${checkPlayer} was not found!`);
@@ -259,7 +259,7 @@ const commands = [
 
       if (messageObj.content.includes(' ')) {
         const checkPlayer = messageObj.content.split(/ (.+)/)[1].replace(/(<[<@!>])/g, '');
-        playerObj = Bot.users.get(checkPlayer);
+        playerObj = Bot.users.cache.get(checkPlayer);
         if (!playerObj || playerObj.bot) {
           if (process.env.NODE_ENV.includes('production')) {
             return messageObj.author.send(`${checkPlayer} was not found!`);
