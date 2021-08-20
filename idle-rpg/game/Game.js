@@ -383,7 +383,7 @@ ${rankString}
                 this.Database.updateGame(this.config);
 
                 this.discordHook.actionHook.send(this.Helper.setImportantMessage(`${castingPlayer.name}s ${spell} just wore off.\nCurrent Active Bless: ${this.config.spells.activeBless}\nCurrent Multiplier is: ${this.config.multiplier}x`));
-              }, 1800000); // 30 minutes
+              }, 1800000 * 2); // 60 minutes
             } else {
               commandAuthor.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You are lacking ${globalSpells.bless.spellCost - castingPlayer.gold.current} gold.`);
             }

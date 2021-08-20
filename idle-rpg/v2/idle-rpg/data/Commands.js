@@ -299,7 +299,7 @@ ${rankString}\`\`\``);
             newLoadedConfig.multiplier = newLoadedConfig.multiplier <= 0 ? 1 : newLoadedConfig.multiplier;
             await this.Database.updateGame(player.guildId, newLoadedConfig);
             actionsChannel.send(this.setImportantMessage(`${player.name}${player.titles.current !== 'None' ? ` the ${player.titles.current}` : ''}s${calcAmount > 1 ? ` ${calcAmount}x ` : ' '}${spell} just wore off.\nCurrent Active Bless: ${newLoadedConfig.spells.activeBless}\nCurrent Multiplier is: ${newLoadedConfig.multiplier}x`));
-          }, 1800000); // 30 minutes
+          }, 1800000 * 2); // 60 minutes
         } else {
           author.send(`You do not have enough gold! This spell costs ${globalSpells.bless.spellCost} gold. You're lacking ${globalSpells.bless.spellCost - player.gold.current} gold.`);
         }
