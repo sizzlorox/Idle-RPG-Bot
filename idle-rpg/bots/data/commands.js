@@ -1074,7 +1074,7 @@ const commands = [
         if (!guild) {
           return messageObj.author.send('This guild does not exist.');
         }
-        if (guild.owner.id !== messageObj.author.id || process.env.DISCORD_BOT_OPERATORS_ID.includes(messageObj.author.id)) {
+        if (!process.env.DISCORD_BOT_OPERATORS_ID.includes(messageObj.author.id) && guild.owner.id !== messageObj.author.id) {
           return messageObj.author.send('You\'re not the owner of this server. You do not have permission to reset this servers stats');
         }
         return Game.fetchCommand({
