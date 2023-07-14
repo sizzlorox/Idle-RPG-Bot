@@ -17,6 +17,7 @@ class Discord {
   async manageGuildChannels(guild) {
     const botGuildMember = await guild.members.cache.get(this.bot.user.id);
     if (!botGuildMember.permissions.has('MANAGE_CHANNELS')) {
+      console.log(`Idle RPG does not have permission to manage channels in guild: ${guild.name} (${guild.id})`);
       return;
     }
     const categoryChannel = await guild.channels.cache.find(channel => channel.type === 'category' && channel.name.toLowerCase() === 'idle-rpg');
