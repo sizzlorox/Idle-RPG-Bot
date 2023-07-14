@@ -20,7 +20,7 @@ class Discord {
       console.log(`Idle RPG does not have permission to manage channels in guild: ${guild.name} (${guild.id})`);
       return;
     }
-    const categoryChannel = await guild.channels.cache.find(channel => channel.type === 'category' && channel.name.toLowerCase() === 'idle-rpg');
+    let categoryChannel = await guild.channels.cache.find(channel => channel.type === 'category' && channel.name.toLowerCase() === 'idle-rpg');
     const hasLeaderboardsChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'leaderboards' && channel.type === 'text' && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
     const hasCommandsChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'commands' && channel.type === 'text' && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
     const hasFAQChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'faq' && channel.type === 'text' && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
@@ -31,6 +31,7 @@ class Discord {
       infoLog.info(`Creating Idle-RPG Category Channel for Guild: ${guild.name}`);
       try {
         await guild.channels.create('Idle-RPG', [{ type: 'category', reason: 'Creating Idle-RPG Category' }]);
+        categoryChannel = await guild.channels.cache.find(channel => channel.type === 'category' && channel.name.toLowerCase() === 'idle-rpg');
       } catch (err) {
         console.log(err);
       }
