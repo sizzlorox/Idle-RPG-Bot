@@ -30,8 +30,9 @@ class Discord {
       console.log(`Creating Idle-RPG Category Channel for Guild: ${guild.name}`);
       infoLog.info(`Creating Idle-RPG Category Channel for Guild: ${guild.name}`);
       try {
-        await guild.channels.create('Idle-RPG', [{ type: 'category', reason: 'Creating Idle-RPG Category' }]);
-        categoryChannel = await guild.channels.cache.find(channel => channel.type === 'category' && channel.name.toLowerCase() === 'idle-rpg');
+        await guild.channels.create('Idle-RPG', [{ type: 'category' }]);
+        // It's being created as a text channel for some reason, lets just set it as a parent of our other channels
+        categoryChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'idle-rpg');
       } catch (err) {
         console.log(err);
       }
