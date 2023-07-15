@@ -171,5 +171,12 @@ class Game extends aggregation(BaseGame, BaseHelper) {
     this.canJoinLottery = true;
   }
 
+  /**
+   * API
+   */
+  async fetchPlayerData(discordId) {
+    return this.Database.loadPlayer(discordId);
+  }
+
 }
 module.exports = Game;

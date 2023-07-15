@@ -12,7 +12,7 @@ if (!fs.existsSync(dir)){
 console.log(`${process.env.NODE_ENV.includes('production') ? 'Running Production Env' : 'Running Development Env'}`);
 const { errorLog } = require('./idle-rpg/utils/logger');
 
-app.use(require('./web/routes'));
+app.use(require('./api/routes'));
 
 app.listen(process.env.PORT, () => {
   console.log('API Server up on port: ', process.env.PORT);

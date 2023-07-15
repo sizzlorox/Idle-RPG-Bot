@@ -8,6 +8,19 @@ router.use((req, res, next) => {
   next();
 });
 
+router.get('/map', (req, res) => {
+  const onlinePlayersDiscordIdList = DiscordBot.onlinePlayers.array().reduce((list, player) => {
+    if (player.guildId !== '390509935097675777') return list;
+
+    return list.concat(player.discordId);
+  }, []);
+  const players = DiscordBot.Game.Database.loadOnlinePlayerMaps(onlinePlayersDiscordIdList);
+
+  res.status(200).send({
+    players,
+  });
+});
+
 router.get('/', (req, res) => {
   res.status(200).send({
     onlinePlayers: DiscordBot.onlinePlayers.array().reduce((list, player) => {
