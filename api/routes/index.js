@@ -21,16 +21,16 @@ router.get('/map', async (req, res) => {
   if (!cache.has('mapResult')) {
     console.log('Fetching players for map...');
     players = await DiscordBot.Game.Database.loadOnlinePlayerMaps(onlinePlayersDiscordIdList);
-    cache.set('mapResult', players);
+    const maps = DiscordBot.Game.Map.maps.reduce((hashMap, map) => {
+      hashMap[map.id] = { ...map, players: [] };
+      return hashMap;
+    }, {});
+    players.forEach((player) => {
+      maps[player.map.id].players.push(player.name);
+    });
+    cache.set('mapResult', maps);
   }
   console.log('Fetched players');
-  const maps = DiscordBot.Game.Map.maps.reduce((hashMap, map) => {
-    hashMap[map.id] = { ...map, players: [] };
-    return hashMap;
-  }, {});
-  players.forEach((player) => {
-    maps[player.map.id].players.push(player.name);
-  });
 
   res.status(200).send({
     maps,
