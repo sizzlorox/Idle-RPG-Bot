@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
       if (player.guildId !== '390509935097675777') return list;
 
       return list.concat(player.name);
-    }, []).join(', ');
+    }, []).join(', '),
   });
 });
 
