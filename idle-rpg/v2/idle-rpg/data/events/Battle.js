@@ -168,18 +168,18 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
         .map(player => player.chance = Math.floor((player.currentBounty * Math.log(1.2)) / 100));
 
       if (sameMapPlayers.length > 0 && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
-        const randomPlayerIndex = await this.randomBetween(0, sameMapPlayers.length - 1);
+        const randomPlayerIndex = this.randomBetween(0, sameMapPlayers.length - 1);
         let randomPlayer;
-        if (playersWithBounty.length > 0 && await this.randomBetween(0, 99) >= 50) {
+        if (playersWithBounty.length > 0 && this.randomBetween(0, 99) >= 50) {
           if (playersWithBounty.length > 1) {
             playersWithBounty.sort(player1, player2 => player2.chance - player1.chance);
           }
 
           const diceMax = playersWithBounty[0].chance;
-          const randomDice = await this.randomBetween(0, diceMax);
+          const randomDice = this.randomBetween(0, diceMax);
           const filteredBountyPlayers = playersWithBounty.filter(player => player.chance >= randomDice);
           if (filteredBountyPlayers.length > 0) {
-            const filteredBountyPlayersIndex = await this.randomBetween(0, filteredBountyPlayers.length - 1);
+            const filteredBountyPlayersIndex = this.randomBetween(0, filteredBountyPlayers.length - 1);
             randomPlayer = filteredBountyPlayers[filteredBountyPlayersIndex]._doc;
           } else {
             randomPlayer = sameMapPlayers[randomPlayerIndex]._doc;
@@ -347,12 +347,12 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
     const eventLog = [];
     const otherPlayerLog = [];
     try {
-      const luckStealChance = await this.randomBetween(0, 99);
+      const luckStealChance = this.randomBetween(0, 99);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
 
       if (luckStealChance > (90 - canSteal)) {
-        const luckItem = await this.randomBetween(0, 2);
+        const luckItem = this.randomBetween(0, 2);
         const itemKeys = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
 
         if (![enumHelper.equipment.empty.armor.name, enumHelper.equipment.empty.weapon.name].includes(victimPlayer.equipment[itemKeys[luckItem]].name)) {
@@ -433,7 +433,7 @@ class Battle extends aggregation(BaseGame, BaseHelper) {
   async dropItem(playerObj, mob, eventMsg, eventLog) {
     let updatedPlayer = Object.assign({}, playerObj);
     try {
-      const dropitemChance = await this.randomBetween(0, 99);
+      const dropitemChance = this.randomBetween(0, 99);
       if (dropitemChance <= 15 + (updatedPlayer.stats.luk / 4)) {
         const item = await this.ItemManager.generateItem(updatedPlayer, mob.find(obj => obj.health <= 0));
         if (item.position !== enumHelper.inventory.position) {

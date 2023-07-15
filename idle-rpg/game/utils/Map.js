@@ -6,7 +6,7 @@ const mapSize = maps[maps.length - 1].coords;
 class Map extends BaseHelper {
 
   async moveToRandomMap(updatedPlayer) {
-    const movement = await this.randomBetween(0, 3);
+    const movement = this.randomBetween(0, 3);
 
     switch (movement) {
       case 0:

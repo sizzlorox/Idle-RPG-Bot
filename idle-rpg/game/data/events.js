@@ -624,10 +624,8 @@ const events = {
               if (spell.power > ownedSpell.power) {
                 if (spell.name.includes(spellName)) {
                   updatedPlayer.spells.splice(index, 1);
-                  shouldAddToList = true;
-                } else {
-                  shouldAddToList = true;
                 }
+                shouldAddToList = true;
               }
             });
 

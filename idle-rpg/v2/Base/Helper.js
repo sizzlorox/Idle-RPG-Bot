@@ -8,6 +8,13 @@ const RNG = seedrandom();
 class Helper {
 
   /*
+    BOT HELPERS
+  */
+  guildMemberIsOnline(member) {
+    return !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id);
+  }
+
+  /*
     GAME HELPERS
   */
 
@@ -669,14 +676,14 @@ ${mobListResult.join('\n')}\`\`\``;
   }
 
   async randomCampEventMessage(selectedPlayer) {
-    const randomEventInt = await this.randomBetween(0, messages.event.camp.length - 1);
+    const randomEventInt = this.randomBetween(0, messages.event.camp.length - 1);
     const { eventMsg, eventLog } = messages.event.camp[randomEventInt];
 
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
   }
 
   async randomItemEventMessage(selectedPlayer, item) {
-    const randomEventInt = await this.randomBetween(0, messages.event.item.length - 1);
+    const randomEventInt = this.randomBetween(0, messages.event.item.length - 1);
     const { eventMsg, eventLog } = messages.event.item[randomEventInt];
 
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
@@ -684,13 +691,13 @@ ${mobListResult.join('\n')}\`\`\``;
 
   async randomGambleEventMessage(selectedPlayer, luckGambleGold, isWin) {
     if (isWin) {
-      const randomEventInt = await this.randomBetween(0, messages.event.gamble.win.length - 1);
+      const randomEventInt = this.randomBetween(0, messages.event.gamble.win.length - 1);
       const { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
 
       return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
     }
 
-    const randomEventInt = await this.randomBetween(0, messages.event.gamble.lose.length - 1);
+    const randomEventInt = this.randomBetween(0, messages.event.gamble.lose.length - 1);
     const { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
 
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);

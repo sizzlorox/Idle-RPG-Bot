@@ -83,7 +83,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
 
   async selectEvent(loadedGuildConfig, loadedPlayer, onlinePlayers) {
     try {
-      const randomEvent = await this.randomBetween(0, 2);
+      const randomEvent = this.randomBetween(0, 2);
       switch (randomEvent) {
         case 0:
           return this.Events.moveEvent(loadedPlayer);
@@ -152,7 +152,7 @@ class Game extends aggregation(BaseGame, BaseHelper) {
       return eventResults;
     }
 
-    await Object.keys(titles).forEach((title) => {
+    Object.keys(titles).forEach((title) => {
       eventResults.updatedPlayer = this.manageTitles(eventResults, title);
     });
 

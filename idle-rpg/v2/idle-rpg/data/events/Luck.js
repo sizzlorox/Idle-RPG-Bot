@@ -26,10 +26,10 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     const eventMsg = [];
     const eventLog = [];
     try {
-      const luckEvent = await this.randomBetween(1, 7);
+      const luckEvent = this.randomBetween(1, 7);
       switch (luckEvent) {
         case 1:
-          const luckExpAmount = await this.randomBetween(5, 15 + (updatedPlayer.level * 2));
+          const luckExpAmount = this.randomBetween(5, 15 + (updatedPlayer.level * 2));
           updatedPlayer.experience.current -= luckExpAmount;
           updatedPlayer.experience.lost += luckExpAmount;
           if (updatedPlayer.experience.current < 0) {
@@ -40,7 +40,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
           break;
 
         case 2:
-          const luckHealthAmount = await this.randomBetween(5, 50 + (updatedPlayer.level * 2));
+          const luckHealthAmount = this.randomBetween(5, 50 + (updatedPlayer.level * 2));
           updatedPlayer.health -= luckHealthAmount;
           eventMsg.push(`${this.generatePlayerName(updatedPlayer, true)} was struck down by a thunderbolt from Zeus and lost ${luckHealthAmount} health because of that!`);
           eventLog.push(`Zeus struck you down with his thunderbolt and you lost ${luckHealthAmount} health`);
@@ -76,7 +76,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
           break;
 
         case 5:
-          const luckExpAthena = await this.randomBetween(5, 15 + (updatedPlayer.level * 2));
+          const luckExpAthena = this.randomBetween(5, 15 + (updatedPlayer.level * 2));
           updatedPlayer.experience.current += luckExpAthena;
           updatedPlayer.experience.total += luckExpAthena;
           eventMsg.push(`Athena shared her wisdom with ${this.generatePlayerName(updatedPlayer, true)} making ${this.generateGenderString(updatedPlayer, 'him')} gain ${luckExpAthena} experience!`);
@@ -121,8 +121,8 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
 
         case 7:
           // Might overwrite his event if currently saving if he fired and event at the same time.
-          const increaseMult = await this.randomBetween(1, 3);
-          const timeLimit = await this.randomBetween(maximumTimer * 60000, (maximumTimer * 15) * 60000);
+          const increaseMult = this.randomBetween(1, 3);
+          const timeLimit = this.randomBetween(maximumTimer * 60000, (maximumTimer * 15) * 60000);
           eventMsg.push(`Dionysus has partied with ${this.generatePlayerName(updatedPlayer, true)} increasing ${this.generateGenderString(updatedPlayer, 'his')} multiplier by ${increaseMult} for ${Math.floor(timeLimit / 60000)} minutes!`);
           eventLog.push(`Dionysus partied with you increasing your multiplier by ${increaseMult} for ${Math.ceil(timeLimit / 60000)} minutes!`);
           updatedPlayer.personalMultiplier = increaseMult;
@@ -187,7 +187,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     const eventMsg = [];
     const eventLog = [];
     try {
-      const luckGambleChance = await this.randomBetween(0, 99);
+      const luckGambleChance = this.randomBetween(0, 99);
       const luckGambleGold = Math.floor(2 * ((Math.log(updatedPlayer.gold.current) * updatedPlayer.gold.current) / 100));
       if (updatedPlayer.gold.current < luckGambleGold) {
         return { updatedPlayer };
@@ -238,7 +238,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
       return { updatedPlayer };
     }
     updatedPlayer.quest.questMob.name = mob;
-    updatedPlayer.quest.questMob.count = await this.randomBetween(1, 15);
+    updatedPlayer.quest.questMob.count = this.randomBetween(1, 15);
     updatedPlayer.quest.questMob.killCount = 0;
     updatedPlayer.quest.updated_at = new Date();
     eventMsg.push(`[\`${updatedPlayer.map.name}\`] Quest Master has asked ${this.generatePlayerName(updatedPlayer, true)} to kill ${updatedPlayer.quest.questMob.count === 1 ? 'a' : updatedPlayer.quest.questMob.count} ${mob}!`);
@@ -258,9 +258,9 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     const eventMsg = [];
     const eventLog = [];
     try {
-      const luckGoldChance = await this.randomBetween(0, 99);
+      const luckGoldChance = this.randomBetween(0, 99);
       if (luckGoldChance >= 75) {
-        const luckGoldDice = await this.randomBetween(5, 100);
+        const luckGoldDice = this.randomBetween(5, 100);
         const goldAmount = await Math.round((luckGoldDice * updatedPlayer.stats.luk) / 2) * multiplier;
         updatedPlayer.gold.current += goldAmount;
         updatedPlayer.gold.total += goldAmount;
@@ -287,7 +287,7 @@ class Luck extends aggregation(BaseGame, BaseHelper) {
     const eventMsg = [];
     const eventLog = [];
     try {
-      const snowFlakeDice = await this.randomBetween(0, 99);
+      const snowFlakeDice = this.randomBetween(0, 99);
       if (snowFlakeDice <= 5) {
         const oldItemRating = await this.calculateItemRating(updatedPlayer, updatedPlayer.equipment.relic);
         const newItemRating = await this.calculateItemRating(updatedPlayer, snowFlake);

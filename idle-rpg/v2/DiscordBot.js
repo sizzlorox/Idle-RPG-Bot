@@ -3,7 +3,6 @@ const BaseHelper = require('./Base/Helper');
 const BaseDiscord = require('./Base/Discord');
 
 const DiscordJS = require('discord.js');
-const util = require('util');
 const fs = require('fs');
 
 // DATA
@@ -16,6 +15,7 @@ const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../se
 
 // UTILS
 const { errorLog, welcomeLog, infoLog } = require('../utils/logger');
+const internal = require('stream');
 
 /*
 
@@ -52,6 +52,7 @@ class DiscordBot extends BaseHelper {
     this.maxTimer = (maximumTimer * 1000) * 60;
     this.tickInMinutes = 2;
     this.counter = {};
+    this.eventCount = 0;
   }
 
   loadEventListeners() {
@@ -68,7 +69,7 @@ class DiscordBot extends BaseHelper {
       this.bot.guilds.cache.forEach(async (guild) => {
         this.Game.loadGuildConfig(guild.id);
         guild.members.cache
-          .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
+          .filter(this.guildMemberIsOnline)
           .map(member => Object.assign({}, {
             name: member.nickname ? member.nickname : member.displayName,
             discordId: member.id,
@@ -94,9 +95,9 @@ class DiscordBot extends BaseHelper {
       if (message.content.startsWith('!cs') || message.content.startsWith('!castspell')) {
         await Antispam.logAuthor(message.author.id);
         await Antispam.logMessage(message.author.id, message.content);
-        const skip = await Antispam.checkMessageInterval(message);
+        const skip = Antispam.checkMessageInterval(message);
         if (skip) {
-          // infoLog.info(`Spam detected by ${message.author.username}.`);
+          infoLog.info(`Spam detected by ${message.author.username}.`);
           return;
         }
       }
@@ -108,7 +109,7 @@ class DiscordBot extends BaseHelper {
       await this.Game.loadGuildConfig(guild.id);
       await this.discord.manageGuildChannels(guild);
       guild.members.cache
-        .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
+        .filter(this.guildMemberIsOnline)
         .map(member => Object.assign({}, {
           name: member.nickname ? member.nickname : member.displayName,
           discordId: member.id,
@@ -169,7 +170,7 @@ class DiscordBot extends BaseHelper {
         return;
       }
 
-      const welcomeChannel = await member.guild.channels.cache.find(channel => channel.name === 'newcomers' && channel.type === 'text');
+      const welcomeChannel = member.guild.channels.cache.find(channel => channel.name === 'newcomers' && channel.type === 'text');
       if (welcomeChannel) {
         // Test for url in name
         if (/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(member.displayName)) {
@@ -221,6 +222,7 @@ class DiscordBot extends BaseHelper {
                   return;
                 }
                 const eventResult = await this.Game.activateEvent(guild.id, player, guildOnlineMembers);
+                this.eventCount++;
                 delete player.timer;
                 return this.discord.sendMessage(guild, eventResult);
               }, playerTimer);
@@ -231,6 +233,7 @@ class DiscordBot extends BaseHelper {
               const playerTimer = this.randomBetween(guildMinTimer, guildMaxTimer);
               player.timer = setTimeout(async () => {
                 const eventResult = await this.Game.activateEvent(guild.id, player, enumHelper.mockPlayers);
+                this.eventCount++;
                 delete player.timer;
                 return this.discord.sendMessage(guild, eventResult);
               }, playerTimer);
@@ -238,21 +241,16 @@ class DiscordBot extends BaseHelper {
           });
         }
       });
-      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length + ' mock'} idlers in ${this.bot.guilds.cache.size} guilds`, { type: 'WATCHING' });
+      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length} mock idlers in ${this.bot.guilds.cache.size} guilds`, { type: 'WATCHING' });
     }, 60000 * interval);
   }
 
   async processDetails() {
-    // let memoryUsage = util.inspect(process.memoryUsage());
-    // memoryUsage = await JSON.parse(memoryUsage.replace('rss', '"rss"').replace('heapTotal', '"heapTotal"').replace('heapUsed', '"heapUsed"').replace('external', '"external"'));
-    // const currentRSS = Number(memoryUsage.rss / 1048576).toFixed(2);
-    // const currentTotal = Number(memoryUsage.heapTotal / 1048576).toFixed(2);
-    // const currentUsed = Number(memoryUsage.heapUsed / 1048576).toFixed(2);
-
     console.log('------------');
-    // console.log(`\n\n${new Date()}\nHeap Usage:\n  RSS: ${currentRSS}MB\n  HeapTotal: ${currentTotal}MB\n  HeapUsed: ${currentUsed}MB`);
     console.log(`Current Up Time: ${this.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
+    console.log(`Events per ${internal} minute(s): ${this.eventCount}`);
     console.log('------------');
+    this.eventCount = 0;
   }
 
   // CRONS
@@ -314,14 +312,14 @@ class DiscordBot extends BaseHelper {
       }
 
       const guildConfig = await this.Game.dbClass().loadGame(guild.id);
-      const randomWinner = await this.randomBetween(0, guildLotteryPlayers.length - 1);
+      const randomWinner = this.randomBetween(0, guildLotteryPlayers.length - 1);
       const winner = guildLotteryPlayers[randomWinner];
       const eventMsg = this.setImportantMessage(`Out of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
       const eventLog = `Congratulations! Out of ${guildLotteryPlayers.length} contestants, you just won ${guildConfig.dailyLottery.prizePool} gold from the daily lottery!`;
-      const newPrizePool = await this.randomBetween(1500, 10000);
+      const newPrizePool = this.randomBetween(1500, 10000);
 
       if (guild.id === guildID) {
-        const lotteryChannel = await guild.channels.cache.get(enumHelper.channels.lottery);
+        const lotteryChannel = guild.channels.cache.get(enumHelper.channels.lottery);
         if (lotteryChannel) {
           let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
           lotteryMessages = await lotteryMessages.sort((message1, message2) => message1.createdTimestamp - message2.createdTimestamp);
@@ -361,16 +359,16 @@ class DiscordBot extends BaseHelper {
   updateLeaderboards() {
     const types = enumHelper.leaderboardStats;
     this.bot.guilds.cache.each(async (guild) => {
-      const botGuildMember = await guild.members.cache.get(this.bot.user.id);
+      const botGuildMember = guild.members.cache.get(this.bot.user.id);
       if (!botGuildMember.permissions.has([
         'VIEW_CHANNEL',
         'MANAGE_CHANNELS'
       ])) {
         return;
       }
-      const leaderboardChannel = await guild.channels.cache.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
-      if (!leaderboardChannel || leaderboardChannel && !leaderboardChannel.manageable) {
-        return
+      const leaderboardChannel = guild.channels.cache.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
+      if (!leaderboardChannel || (leaderboardChannel && !leaderboardChannel.manageable)) {
+        return;
       }
 
       for (let i = 0; i < types.length; i++) {
@@ -389,7 +387,7 @@ class DiscordBot extends BaseHelper {
             return player2[Object.keys(types[i])[0]] - player1[Object.keys(types[i])[0]];
           })
           .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(types[i])[0].includes('.') ? `${Object.keys(types[i])[0].split('.')[0]}: ${player[Object.keys(types[i])[0].split('.')[0]][Object.keys(types[i])[0].split('.')[1]]}` : `${Object.keys(types[i])[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(types[i])[0]]}`}`)
-          .join('\n')}`
+          .join('\n')}`;
 
         const msgCount = await leaderboardChannel.messages.fetch({ limit: 10 });
         const subjectTitle = this.formatLeaderboards(Object.keys(types[i])[0]);
@@ -402,10 +400,10 @@ ${rankString}\`\`\``;
         }
 
         if (!msg.includes(msgCount.array()[i].toString()) && msgCount.array()[i].author.id === this.bot.user.id) {
-          msgCount.array()[i].edit(msg)
+          msgCount.array()[i].edit(msg);
         }
       }
-    })
+    });
   }
 
   blizzardRandom() {

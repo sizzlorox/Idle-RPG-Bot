@@ -397,9 +397,9 @@ class Helper {
           items: []
         };
 
-        const breakChance = await this.randomBetween(0, 99);
+        const breakChance = this.randomBetween(0, 99);
         if (breakChance < 15) {
-          const randomEquip = await this.randomBetween(0, 2);
+          const randomEquip = this.randomBetween(0, 2);
           switch (randomEquip) {
             case 0:
               if (playerObj.equipment.helmet.name !== enumHelper.equipment.empty.helmet.name) {
@@ -739,14 +739,14 @@ class Helper {
   }
 
   async randomCampEventMessage(selectedPlayer) {
-    const randomEventInt = await this.randomBetween(0, messages.event.camp.length - 1);
+    const randomEventInt = this.randomBetween(0, messages.event.camp.length - 1);
     const { eventMsg, eventLog } = messages.event.camp[randomEventInt];
 
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer);
   }
 
   async randomItemEventMessage(selectedPlayer, item) {
-    const randomEventInt = await this.randomBetween(0, messages.event.item.length - 1);
+    const randomEventInt = this.randomBetween(0, messages.event.item.length - 1);
     const { eventMsg, eventLog } = messages.event.item[randomEventInt];
 
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, item);
@@ -754,13 +754,13 @@ class Helper {
 
   async randomGambleEventMessage(selectedPlayer, luckGambleGold, isWin) {
     if (isWin) {
-      const randomEventInt = await this.randomBetween(0, messages.event.gamble.win.length - 1);
+      const randomEventInt = this.randomBetween(0, messages.event.gamble.win.length - 1);
       const { eventMsg, eventLog } = messages.event.gamble.win[randomEventInt];
 
       return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
     }
 
-    const randomEventInt = await this.randomBetween(0, messages.event.gamble.lose.length - 1);
+    const randomEventInt = this.randomBetween(0, messages.event.gamble.lose.length - 1);
     const { eventMsg, eventLog } = messages.event.gamble.lose[randomEventInt];
 
     return this.generateMessageWithNames(eventMsg, eventLog, selectedPlayer, undefined, luckGambleGold);
