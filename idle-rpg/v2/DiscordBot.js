@@ -246,9 +246,10 @@ class DiscordBot extends BaseHelper {
   }
 
   async processDetails() {
+    const interval = process.env.NODE_ENV.includes('production') ? this.tickInMinutes : 1;
     console.log('------------');
     console.log(`Current Up Time: ${this.secondsToTimeFormat(Math.floor(process.uptime()))}\n\n`);
-    console.log(`Events per ${internal} minute(s): ${this.eventCount}`);
+    console.log(`Events per ${interval} minute(s): ${this.eventCount}`);
     console.log('------------');
     this.eventCount = 0;
   }
