@@ -14,6 +14,10 @@ const { errorLog } = require('./idle-rpg/utils/logger');
 
 app.use(require('./web/routes'));
 
+app.listen(process.env.PORT, () => {
+  console.log('API Server up on port: ', process.env.PORT);
+});
+
 process.on('unhandledRejection', (err) => {
   console.log(err);
   errorLog.error({ err });
