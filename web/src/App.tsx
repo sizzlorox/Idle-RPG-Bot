@@ -51,8 +51,8 @@ function Leaderboards() {
 
 
 function sortByPosition(a: number[], b: number[]){
-  if (a[0] === b[0]) return a[1] - b[1];
-  return a[0] - b[0];
+  if (a[0] === b[0]) return a[0] - b[0];
+  return a[1] - b[1];
 }
 
 
@@ -95,7 +95,7 @@ function Map() {
   const [mapData, setMapData] = useState<any>();
 
   useEffect(() => {
-    fetch('/map')
+    fetch('https://irpg-discord-bot.herokuapp.com/map')
       .then(res => res.json())
       .then(data => setMapData(
         Object.values(data.maps)

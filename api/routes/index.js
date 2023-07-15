@@ -29,6 +29,8 @@ router.get('/map', async (req, res) => {
       maps[player.map.id].players.push(player.name);
     });
     cache.set('mapResult', maps);
+  } else {
+    maps = cache.get('mapResult');
   }
   console.log('Fetched players');
 
