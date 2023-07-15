@@ -70,13 +70,13 @@ ${mobListResult.join('\n')}`;
 
   if (updatedPlayer.health <= 0) {
     battleResult = battleResult.replace(`  You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.`, '');
-    const killerMob = results.defender.map((mob) => {
-      if (mob.dmgDealt > 0) {
-        return mob.name;
+    const killerMob = results.defender.reduce((list, mob) => {
+      if (!mob.dmgDealt > 0) {
+        return list;
       }
 
-      return '';
-    }).join(', ').replace(/,$/g, '');
+      return list.concat(mob.name);
+    }, []).join(', ');
     eventMsg = eventMsg.concat(`| ${killerMob} just killed ${Helper.generatePlayerName(updatedPlayer, true)}!\n`);
     eventLog = eventLog.concat(`${killerMob} just killed you!\n`);
   }
