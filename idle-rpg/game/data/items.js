@@ -368,7 +368,7 @@ const items = {
       sling = {
         name: 'Sling',
         position: 'weapon',
-        attackType: 'melee',
+        attackType: 'range',
         power: 2,
         gold: 5
       },
