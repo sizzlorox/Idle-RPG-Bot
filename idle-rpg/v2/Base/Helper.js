@@ -6,14 +6,6 @@ const messages = require('../../game/data/messages');
 const RNG = seedrandom();
 
 class Helper {
-
-  /*
-    BOT HELPERS
-  */
-  guildMemberIsOnline(member) {
-    return !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id);
-  }
-
   /*
     GAME HELPERS
   */

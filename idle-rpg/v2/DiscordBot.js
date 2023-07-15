@@ -15,7 +15,6 @@ const { minimalTimer, maximumTimer, botLoginToken, guildID } = require('../../se
 
 // UTILS
 const { errorLog, welcomeLog, infoLog } = require('../utils/logger');
-const internal = require('stream');
 
 /*
 
@@ -69,7 +68,7 @@ class DiscordBot extends BaseHelper {
       this.bot.guilds.cache.forEach(async (guild) => {
         this.Game.loadGuildConfig(guild.id);
         guild.members.cache
-          .filter(this.guildMemberIsOnline)
+          .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
           .map(member => Object.assign({}, {
             name: member.nickname ? member.nickname : member.displayName,
             discordId: member.id,
@@ -109,7 +108,7 @@ class DiscordBot extends BaseHelper {
       await this.Game.loadGuildConfig(guild.id);
       await this.discord.manageGuildChannels(guild);
       guild.members.cache
-        .filter(this.guildMemberIsOnline)
+        .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
         .map(member => Object.assign({}, {
           name: member.nickname ? member.nickname : member.displayName,
           discordId: member.id,
