@@ -17,11 +17,11 @@ router.get('/map', async (req, res) => {
 
     return list.concat(player.discordId);
   }, []);
-  let players = [];
+  let maps = {};
   if (!cache.has('mapResult')) {
     console.log('Fetching players for map...');
-    players = await DiscordBot.Game.Database.loadOnlinePlayerMaps(onlinePlayersDiscordIdList);
-    const maps = DiscordBot.Game.Map.maps.reduce((hashMap, map) => {
+    const players = await DiscordBot.Game.Database.loadOnlinePlayerMaps(onlinePlayersDiscordIdList);
+    maps = DiscordBot.Game.Map.maps.reduce((hashMap, map) => {
       hashMap[map.id] = { ...map, players: [] };
       return hashMap;
     }, {});
