@@ -1,8 +1,3 @@
-.container {
-  height: 100vh;
-  overflow: hidden;
-}
-
 .header {
   background-color: #3D4148;
   padding: 16px;
@@ -30,7 +25,7 @@
   background-color: #282c34;
   padding: 16px;
   overflow: auto;
-  height: 100vh;
+  height: 100%;
 
   display: flex;
   flex-direction: column;
@@ -39,29 +34,15 @@
   color: white;
 
   .map {
-    .table-cell {
-      border: 1px solid white;
-      padding: 8px;
-
-      min-width: calc(100% / 6);
-      min-height: calc(100% / 6);
-      max-width: calc(100% / 6);
-      max-height: calc(100% / 6);
-
-      .map-name {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-
-        font-size: 1.5rem;
-        color: white;
-      }
-      .map-user-list {
-        max-width: 100%;
-        max-height: 100%;
-        overflow: auto;
-        font-size: 1rem;
+    .p-datatable {
+      margin-bottom: 16px;
+    }
+    .p-datatable-tbody {
+      > tr {
+        > td {
+          padding: unset;
+          height: 100%;
+        }
       }
     }
   }

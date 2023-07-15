@@ -5,6 +5,11 @@ const mapSize = maps[maps.length - 1].coords;
 
 class Map extends BaseHelper {
 
+  constructor() {
+    super();
+    this.maps = maps;
+  }
+
   async moveToRandomMap(updatedPlayer) {
     const movement = this.randomBetween(0, 3);
 
@@ -96,28 +101,28 @@ class Map extends BaseHelper {
   }
 
   getMapByCoords(coords) {
-    return maps.find(map => map.coords[0] === coords[0] && map.coords[1] === coords[1]);
+    return this.maps.find(map => map.coords[0] === coords[0] && map.coords[1] === coords[1]);
   }
 
   getMapByIndex(index) {
-    return maps[index];
+    return this.maps[index];
   }
 
   getTowns() {
-    return maps.filter(area => area.type.name === 'Town').map(area => area.name);
+    return this.maps.filter(area => area.type.name === 'Town').map(area => area.name);
   }
 
   getRandomTown() {
-    const towns = maps.filter(area => area.type.name === 'Town');
+    const towns = this.maps.filter(area => area.type.name === 'Town');
     return towns[this.randomBetween(0, towns.length - 1)];
   }
 
   getMapByName(name) {
-    return maps.find(map => map.name === name);
+    return this.maps.find(map => map.name === name);
   }
 
   getMapsByType(type) {
-    return maps.filter(area => area.biome === type).map(area => area.name);
+    return this.maps.filter(area => area.biome === type).map(area => area.name);
   }
 
 }
