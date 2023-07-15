@@ -6,6 +6,7 @@
   "scripts": {
     "start:windows": "SET NODE_ENV=production && node app.js",
     "start": "NODE_ENV=production node app.js",
+    "heroku-postbuild": "cd web && npm ci && npm run build",
     "test:windows": "SET NODE_ENV=development && node app.js",
     "test": "NODE_ENV=development node app.js"
   },
