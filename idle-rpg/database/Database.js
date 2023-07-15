@@ -216,8 +216,6 @@ class Database {
         discordId: 1,
         name: 1,
         map: 1,
-        pastEvents: 0,
-        pastPvpEvents: 0
       })
       .in(discordIds));
   }
