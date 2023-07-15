@@ -37,6 +37,9 @@
     .p-datatable {
       margin-bottom: 16px;
     }
+    .p-datatable-thead {
+      display: none;
+    }
     .p-datatable-tbody {
       > tr {
         > td {

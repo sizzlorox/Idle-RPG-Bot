@@ -30,9 +30,9 @@ router.get('/map', async (req, res) => {
     });
     cache.set('mapResult', maps);
   } else {
+    console.log('Fetched cached players');
     maps = cache.get('mapResult');
   }
-  console.log('Fetched players');
 
   res.status(200).send({
     maps,

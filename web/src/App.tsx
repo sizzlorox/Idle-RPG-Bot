@@ -95,20 +95,28 @@ function Map() {
   const [mapData, setMapData] = useState<any>();
 
   useEffect(() => {
-    fetch('https://irpg-discord-bot.herokuapp.com/map')
-      .then(res => res.json())
-      .then(data => setMapData(
-        Object.values(data.maps)
-          .sort((a: any, b: any) => sortByPosition(a.coords, b.coords))
-          .reduce((acc: any, obj: any, index) => {
-            const groupIndex = Math.floor(index / 6);
-            if (!acc[groupIndex]) {
-              acc[groupIndex] = {};
-            }
-            Object.assign(acc[groupIndex], { [`x${(index % 6) + 1}`]: { name: obj.name, biome: obj.biome, players: obj.players } });
-            return acc;
-          }, [])
-      ));
+    const fetchData = async () => {
+      fetch('/map')
+        .then(res => res.json())
+        .then(data => setMapData(
+          Object.values(data.maps)
+            .sort((a: any, b: any) => sortByPosition(a.coords, b.coords))
+            .reduce((acc: any, obj: any, index) => {
+              const groupIndex = Math.floor(index / 6);
+              if (!acc[groupIndex]) {
+                acc[groupIndex] = {};
+              }
+              Object.assign(acc[groupIndex], { [`x${(index % 6) + 1}`]: { name: obj.name, biome: obj.biome, players: obj.players } });
+              return acc;
+            }, [])
+        ));
+    }
+    fetchData();
+    // 2 minutes
+    const pollingUpdateInterval = setInterval(fetchData, 2 * 60 * 1000);
+    return () => {
+      clearInterval(pollingUpdateInterval);
+    }
   }, []);
 
   return (
