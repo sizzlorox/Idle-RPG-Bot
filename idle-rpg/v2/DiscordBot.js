@@ -240,7 +240,7 @@ class DiscordBot extends BaseHelper {
           });
         }
       });
-      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length} mock idlers in ${this.bot.guilds.cache.size} guilds`, { type: 'WATCHING' });
+      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length} idlers in ${this.bot.guilds.cache.size} guilds`, { type: 'WATCHING' });
     }, 60000 * interval);
   }
 
