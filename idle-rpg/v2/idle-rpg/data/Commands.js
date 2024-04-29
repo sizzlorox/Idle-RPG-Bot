@@ -336,7 +336,7 @@ ${rankString}\`\`\``);
 
     bountyPlacer.gold.current -= Number(amount);
     bountyRecipient.currentBounty += Number(amount);
-    const actionsChannel = await Bot.guilds.cache.get(gubountyPlacer.guildId).channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text');
+    const actionsChannel = await Bot.guilds.cache.get(bountyPlacer.guildId).channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text');
     await this.Database.savePlayer(bountyPlacer);
     await this.Database.savePlayer(bountyRecipient);
     await actionsChannel.send(this.setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
