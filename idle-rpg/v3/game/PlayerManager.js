@@ -29,8 +29,8 @@ class PlayerManager {
   }
 
   checkHealth(playerObj, attackerObj, eventMsg, eventLog, otherPlayerPmMsg) {
-    const updatedPlayer = Object.assign({}, playerObj);
-    const updatedAttacker = Object.assign({}, attackerObj);
+    const updatedPlayer = playerObj;
+    const updatedAttacker = attackerObj;
     try {
       if (updatedPlayer.health <= 0) {
         const expLoss = Math.ceil(updatedPlayer.experience.current / 8);
@@ -107,7 +107,7 @@ class PlayerManager {
   }
 
   async checkExperience(playerObj, eventMsg, eventLog) {
-    const updatedPlayer = Object.assign({}, playerObj);
+    const updatedPlayer = playerObj;
     try {
       if (updatedPlayer.experience.current >= updatedPlayer.level * 15) {
         updatedPlayer.level++;

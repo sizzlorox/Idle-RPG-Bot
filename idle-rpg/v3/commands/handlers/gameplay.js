@@ -21,8 +21,9 @@ module.exports = [
       const player = await game.db.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
       if (!player) return author.send('You have not been born yet!');
 
-      const actionsChannel = bot.guilds.cache.get(player.guildId) && bot.guilds.cache.get(player.guildId).channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText);
-      const guildConfig = await game.db.loadGame(player.guildId);
+      const playerGuild = bot.guilds.cache.get(player.guildId);
+      const actionsChannel = playerGuild && playerGuild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText);
+      const guildConfig = game.guildConfigs.get(player.guildId) || await game.db.loadGame(player.guildId);
 
       switch (spell) {
         case 'bless': {
@@ -90,13 +91,14 @@ module.exports = [
       player.gold.current -= 100;
 
       const playerGuildId = player.guildId;
-      const guildConfig = await game.db.loadGame(playerGuildId);
+      const guildConfig = game.guildConfigs.get(playerGuildId) || await game.db.loadGame(playerGuildId);
       guildConfig.dailyLottery.prizePool += 100;
       await game.db.updateGame(playerGuildId, guildConfig);
       game.guildConfigs.set(playerGuildId, guildConfig);
       await game.db.savePlayer(player);
 
-      const lotteryChannel = bot.guilds.cache.get(playerGuildId) && bot.guilds.cache.get(playerGuildId).channels.cache.get(enumHelper.channels.lottery);
+      const lotteryGuild = bot.guilds.cache.get(playerGuildId);
+      const lotteryChannel = lotteryGuild && lotteryGuild.channels.cache.get(enumHelper.channels.lottery);
       if (lotteryChannel) {
         let lotteryMessages = await lotteryChannel.messages.fetch({ limit: 10 });
         lotteryMessages = lotteryMessages.sort((m1, m2) => m1.createdTimestamp - m2.createdTimestamp);
@@ -106,8 +108,9 @@ module.exports = [
           await lotteryChannel.send('Contestants:');
           await lotteryChannel.send(`${player.name}`);
         } else {
-          await [...lotteryMessages.values()][1].edit(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
-          await [...lotteryMessages.values()][2].edit([...lotteryMessages.values()][2].content.concat(`\n${player.name}`));
+          const msgs = [...lotteryMessages.values()];
+          await msgs[1].edit(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
+          await msgs[2].edit(msgs[2].content.concat(`\n${player.name}`));
         }
       }
       return author.send('You have joined todays daily lottery! Good luck!');

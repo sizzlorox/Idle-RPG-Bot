@@ -7,6 +7,8 @@ const { calculateItemRating } = require('../utils/battleHelpers');
 const { generatePlayerName, generateGenderString } = require('../utils/formatters');
 const BattleSimulator = require('./BattleSimulator');
 
+const STEAL_ITEM_SLOTS = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
+
 class BattleEngine {
 
   constructor({ db, map, inventory, itemGen, player }) {
@@ -19,7 +21,7 @@ class BattleEngine {
   }
 
   async playerVsMob(playerObj, mobToBattle, multiplier) {
-    let updatedPlayer = Object.assign({}, playerObj);
+    let updatedPlayer = playerObj;
     const eventMsg = [];
     const eventLog = [];
     try {
@@ -236,7 +238,7 @@ class BattleEngine {
   }
 
   async playerVsPlayer(playerObj, playerToBattle, multiplier) {
-    const updatedPlayer = Object.assign({}, playerObj);
+    const updatedPlayer = playerObj;
     let result;
     const eventMsg = [];
     const eventLog = [];
@@ -344,43 +346,42 @@ class BattleEngine {
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
 
       if (luckStealChance > (90 - canSteal)) {
-        const luckItem = randomBetween(0, 2);
-        const itemKeys = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
-        if (![enumHelper.equipment.empty.armor.name, enumHelper.equipment.empty.weapon.name].includes(victimPlayer.equipment[itemKeys[luckItem]].name)) {
+        const itemSlot = STEAL_ITEM_SLOTS[randomBetween(0, 2)];
+        const victimEquip = victimPlayer.equipment[itemSlot];
+        if (![enumHelper.equipment.empty.armor.name, enumHelper.equipment.empty.weapon.name].includes(victimEquip.name)) {
           let stolenEquip;
-          if (victimPlayer.equipment[itemKeys[luckItem]].previousOwners.length > 0) {
-            const lastOwnerInList = victimPlayer.equipment[itemKeys[luckItem]].previousOwners[victimPlayer.equipment[itemKeys[luckItem]].previousOwners.length - 1];
-            const removePreviousOwnerName = victimPlayer.equipment[itemKeys[luckItem]].name.replace(`${lastOwnerInList}`, `${victimPlayer.name}`);
-            stolenEquip = victimPlayer.equipment[itemKeys[luckItem]];
-            stolenEquip.name = removePreviousOwnerName;
+          if (victimEquip.previousOwners.length > 0) {
+            const lastOwnerInList = victimEquip.previousOwners[victimEquip.previousOwners.length - 1];
+            stolenEquip = victimEquip;
+            stolenEquip.name = victimEquip.name.replace(`${lastOwnerInList}`, `${victimPlayer.name}`);
           } else {
-            stolenEquip = victimPlayer.equipment[itemKeys[luckItem]];
-            stolenEquip.name = `${victimPlayer.name}'s ${victimPlayer.equipment[itemKeys[luckItem]].name}`;
+            stolenEquip = victimEquip;
+            stolenEquip.name = `${victimPlayer.name}'s ${victimEquip.name}`;
           }
           eventMsg.push(setImportantMessage(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} just stole ${stolenEquip.name}!`));
-          eventLog.push(`Stole ${victimPlayer.equipment[itemKeys[luckItem]].name}`);
-          otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${victimPlayer.equipment[itemKeys[luckItem]].name} from you`);
+          eventLog.push(`Stole ${victimEquip.name}`);
+          otherPlayerLog.push(`${stealingPlayer.name}${stealingPlayer.titles.current !== 'None' ? ` the ${stealingPlayer.titles.current}` : ''} stole ${victimEquip.name} from you`);
           victimPlayer.stolen++;
           stealingPlayer.stole++;
-          if (victimPlayer.equipment[itemKeys[luckItem]].name !== enumHelper.equipment.empty[itemKeys[luckItem]].name) {
-            const oldItemRating = calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemKeys[luckItem]]);
-            const newItemRating = calculateItemRating(victimPlayer, victimPlayer.equipment[itemKeys[luckItem]]);
+          if (victimEquip.name !== enumHelper.equipment.empty[itemSlot].name) {
+            const oldItemRating = calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemSlot]);
+            const newItemRating = calculateItemRating(victimPlayer, victimEquip);
             if (oldItemRating < newItemRating) {
-              stealingPlayer = this.player.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, stolenEquip);
-              if (victimPlayer.equipment[itemKeys[luckItem]].previousOwners.length > 0) {
-                stealingPlayer.equipment[itemKeys[luckItem]].previousOwners = victimPlayer.equipment[itemKeys[luckItem]].previousOwners;
-                stealingPlayer.equipment[itemKeys[luckItem]].previousOwners.push(victimPlayer.name);
+              stealingPlayer = this.player.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemSlot].position, stolenEquip);
+              if (victimEquip.previousOwners.length > 0) {
+                stealingPlayer.equipment[itemSlot].previousOwners = victimEquip.previousOwners;
+                stealingPlayer.equipment[itemSlot].previousOwners.push(victimPlayer.name);
               } else {
-                stealingPlayer.equipment[itemKeys[luckItem]].previousOwners = [`${victimPlayer.name}`];
+                stealingPlayer.equipment[itemSlot].previousOwners = [`${victimPlayer.name}`];
               }
             } else {
               stealingPlayer = this.inventory.addEquipmentIntoInventory(stealingPlayer, stolenEquip);
             }
-            if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find(equip => equip.position === enumHelper.equipment.types[itemKeys[luckItem]].position) !== undefined) {
-              const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types[itemKeys[luckItem]].position).sort((item1, item2) => item2.power - item1.power)[0];
-              victimPlayer = this.player.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, equipFromInventory);
+            if (victimPlayer.inventory.equipment.length > 0 && victimPlayer.inventory.equipment.find(equip => equip.position === enumHelper.equipment.types[itemSlot].position) !== undefined) {
+              const equipFromInventory = victimPlayer.inventory.equipment.filter(equipment => equipment.position === enumHelper.equipment.types[itemSlot].position).sort((item1, item2) => item2.power - item1.power)[0];
+              victimPlayer = this.player.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemSlot].position, equipFromInventory);
             } else {
-              victimPlayer = this.player.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemKeys[luckItem]].position, enumHelper.equipment.empty[itemKeys[luckItem]]);
+              victimPlayer = this.player.setPlayerEquipment(victimPlayer, enumHelper.equipment.types[itemSlot].position, enumHelper.equipment.empty[itemSlot]);
             }
           }
         }
@@ -406,7 +407,7 @@ class BattleEngine {
   }
 
   async dropItem(playerObj, mob, eventMsg, eventLog) {
-    let updatedPlayer = Object.assign({}, playerObj);
+    let updatedPlayer = playerObj;
     try {
       const dropitemChance = randomBetween(0, 99);
       if (dropitemChance <= 15 + (updatedPlayer.stats.luk / 4)) {
