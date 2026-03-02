@@ -34,29 +34,45 @@ module.exports = [
       const actionChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText);
       const movementChannel = guild.channels.cache.find(channel => channel.name === 'movement' && channel.type === ChannelType.GuildText);
 
+      // Check permissions and fetch leaderboard messages before touching any data
+      let leaderboardMsgs = null;
+      const botMember = guild.members.me;
+
       if (announcementChannel) {
-        if (leaderboardChannel) {
-          const fetched = await leaderboardChannel.messages.fetch({ limit: 10 });
-          if (fetched.size > 0) {
-            const msgs = [...fetched.values()].sort((a, b) => a.createdTimestamp - b.createdTimestamp);
-            const combined = msgs.map(m => m.content).join('\n') + '\nServer has been reset! Good luck to all Idlers!';
-            await Promise.all(msgs.map(m => m.delete()));
-            for (const chunk of chunkMessage(combined)) {
-              await announcementChannel.send(chunk);
-            }
-          } else {
-            await announcementChannel.send('Server has been reset! Good luck to all Idlers!');
-          }
-        } else {
-          await announcementChannel.send('Server has been reset! Good luck to all Idlers!');
+        const canSend = announcementChannel.permissionsFor(botMember).has('SendMessages');
+        if (!canSend) {
+          return author.send(`Cannot proceed: missing SendMessages permission in #${announcementChannel.name}. Reset aborted to avoid data loss.`);
         }
       }
 
+      if (leaderboardChannel) {
+        const canRead = leaderboardChannel.permissionsFor(botMember).has(['ViewChannel', 'ReadMessageHistory']);
+        const canDelete = leaderboardChannel.permissionsFor(botMember).has('ManageMessages');
+        if (!canRead || !canDelete) {
+          return author.send(`Cannot proceed: missing ${!canRead ? 'ReadMessageHistory' : 'ManageMessages'} permission in #${leaderboardChannel.name}. Reset aborted to avoid data loss.`);
+        }
+        const fetched = await leaderboardChannel.messages.fetch({ limit: 10 });
+        if (fetched.size > 0) {
+          leaderboardMsgs = [...fetched.values()].sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+        }
+      }
+
+      // All pre-checks passed — now reset data
       await game.db.resetAllPlayersInGuild(targetGuildId);
       await game.db.resetAllLogs(targetGuildId);
       await game.db.updateGame(targetGuildId, defaultConfig);
       await game.db.removeLotteryPlayers(targetGuildId);
       game.guildConfigs.set(targetGuildId, defaultConfig);
+
+      // Post announcement now that reset is committed
+      if (announcementChannel) {
+        const resetNotice = '\nServer has been reset! Good luck to all Idlers!';
+        const combined = leaderboardMsgs ? leaderboardMsgs.map(m => m.content).join('\n') + resetNotice : resetNotice.trim();
+        if (leaderboardMsgs) await Promise.all(leaderboardMsgs.map(m => m.delete()));
+        for (const chunk of chunkMessage(combined)) {
+          await announcementChannel.send(chunk);
+        }
+      }
 
       if (actionChannel) await actionChannel.send('```RESET -----------------------------------```');
       if (movementChannel) await movementChannel.send('```RESET -----------------------------------```');
