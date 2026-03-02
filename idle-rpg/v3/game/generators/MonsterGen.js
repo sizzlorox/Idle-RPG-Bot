@@ -23,6 +23,7 @@ class MonsterGen {
       && mobType.spawnableBiomes.includes(selectedPlayer.map.biome.name));
 
     const isLowLevel = selectedPlayer.level <= 5;
+    const statScale = isLowLevel ? 0.5 : 1;
     const playerBalance = isLowLevel ? 0 : (selectedPlayer.equipment.weapon.power + selectedPlayer.equipment.armor.power + selectedPlayer.equipment.helmet.power) / 2.5;
     const mobAmountChance = randomBetween(0, 99);
     const mobAmount = mobAmountChance >= 75 ? randomBetween(1, Math.floor((selectedPlayer.level * Math.log(1.2)) / 2) + 1) : 1;
@@ -37,10 +38,10 @@ class MonsterGen {
         health: rarity.health + type.health,
         maxHealth: rarity.health + type.health,
         stats: {
-          str: isLowLevel ? ((rarity.stats.str * type.stats.str) + (selectedPlayer.stats.str / 1.2)) / 2 : (rarity.stats.str * type.stats.str) + (selectedPlayer.stats.str / 1.2),
-          dex: isLowLevel ? ((rarity.stats.dex * type.stats.dex) + (selectedPlayer.stats.dex / 1.2)) / 2 : (rarity.stats.dex * type.stats.dex) + (selectedPlayer.stats.dex / 1.2),
-          end: isLowLevel ? ((rarity.stats.end * type.stats.end) + (selectedPlayer.stats.end / 1.2)) / 2 : (rarity.stats.end * type.stats.end) + (selectedPlayer.stats.end / 1.2),
-          int: isLowLevel ? ((rarity.stats.int * type.stats.int) + (selectedPlayer.stats.int / 1.2)) / 2 : (rarity.stats.int * type.stats.int) + (selectedPlayer.stats.int / 1.2),
+          str: ((rarity.stats.str * type.stats.str) + (selectedPlayer.stats.str / 1.2)) * statScale,
+          dex: ((rarity.stats.dex * type.stats.dex) + (selectedPlayer.stats.dex / 1.2)) * statScale,
+          end: ((rarity.stats.end * type.stats.end) + (selectedPlayer.stats.end / 1.2)) * statScale,
+          int: ((rarity.stats.int * type.stats.int) + (selectedPlayer.stats.int / 1.2)) * statScale,
           luk: rarity.stats.luk * type.stats.luk
         },
         dmgDealt: 0,

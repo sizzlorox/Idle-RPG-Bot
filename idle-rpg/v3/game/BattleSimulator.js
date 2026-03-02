@@ -46,49 +46,41 @@ class BattleSimulator {
 
   battleTurn(attacker, defender, battleStats) {
     const initiative = this.initialAttack(attacker, defender);
+    const attackerWeaponType = attacker.equipment.weapon.attackType;
+    const defenderWeaponType = defender.equipment.weapon.attackType;
+    const attackerAP = battleStats.attacker.attackPower;
+    const defenderAP = battleStats.defender.attackPower;
+    const attackerPhysDef = battleStats.attacker.defensePower.physicalDefensePower;
+    const attackerMagDef = battleStats.attacker.defensePower.magicDefensePower;
+    const defenderPhysDef = battleStats.defender.defensePower.physicalDefensePower;
+    const defenderMagDef = battleStats.defender.defensePower.magicDefensePower;
     let attackerDamage;
     let defenderDamage;
 
     if (initiative.name === attacker.name) {
       printBattleDebug('\nBattle Initiative is Attacker');
-      if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-        attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.physicalDefensePower / 100));
-      } else {
-        attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.magicDefensePower / 100));
-      }
+      attackerDamage = Math.round(attackerAP - ((attackerWeaponType === 'melee' || attackerWeaponType === 'range') ? defenderPhysDef : defenderMagDef) / 100);
       if (attackerDamage < 0) attackerDamage = 0;
       defender.health -= attackerDamage;
       if (this.isMonster(defender)) defender.dmgReceived += attackerDamage;
       printBattleDebug(`Attacker Damage: ${attackerDamage}`);
       if (defender.health <= 0) return { attacker, defender, attackerDamage, defenderDamage };
 
-      if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-        defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.physicalDefensePower / 100));
-      } else {
-        defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.magicDefensePower / 100));
-      }
+      defenderDamage = Math.round(defenderAP - ((defenderWeaponType === 'melee' || defenderWeaponType === 'range') ? attackerPhysDef : attackerMagDef) / 100);
       if (defenderDamage < 0) defenderDamage = 0;
       if (this.isMonster(defender)) defender.dmgDealt += defenderDamage;
       attacker.health -= defenderDamage;
       printBattleDebug(`Defender Damage: ${defenderDamage}`);
     } else if (initiative.name === defender.name) {
       printBattleDebug('\nBattle Initiative is Defender');
-      if (defender.equipment.weapon.attackType === 'melee' || defender.equipment.weapon.attackType === 'range') {
-        defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.physicalDefensePower / 100));
-      } else {
-        defenderDamage = Math.round(battleStats.defender.attackPower - (battleStats.attacker.defensePower.magicDefensePower / 100));
-      }
+      defenderDamage = Math.round(defenderAP - ((defenderWeaponType === 'melee' || defenderWeaponType === 'range') ? attackerPhysDef : attackerMagDef) / 100);
       if (defenderDamage < 0) defenderDamage = 0;
       if (this.isMonster(defender)) defender.dmgDealt += defenderDamage;
       attacker.health -= defenderDamage;
       printBattleDebug(`Defender Damage: ${defenderDamage}`);
       if (attacker.health <= 0) return { attacker, defender, attackerDamage, defenderDamage };
 
-      if (attacker.equipment.weapon.attackType === 'melee' || attacker.equipment.weapon.attackType === 'range') {
-        attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.physicalDefensePower / 100));
-      } else {
-        attackerDamage = Math.round(battleStats.attacker.attackPower - (battleStats.defender.defensePower.magicDefensePower / 100));
-      }
+      attackerDamage = Math.round(attackerAP - ((attackerWeaponType === 'melee' || attackerWeaponType === 'range') ? defenderPhysDef : defenderMagDef) / 100);
       if (attackerDamage < 0) attackerDamage = 0;
       defender.health -= attackerDamage;
       if (this.isMonster(defender)) defender.dmgReceived += attackerDamage;
@@ -147,7 +139,7 @@ class BattleSimulator {
         const healAmount = Math.ceil(potion.power * (player.level / 2));
         player.health += healAmount;
         if (player.health > enumHelper.maxHealth(player.level)) player.health = enumHelper.maxHealth(player.level);
-        player.inventory.items = player.inventory.items.splice(player.inventory.items.indexOf(potion), 1);
+        player.inventory.items.splice(player.inventory.items.indexOf(potion), 1);
         if (isAttacker) {
           if (defenderDamage > healAmount) { defenderDamage -= healAmount; if (this.isMonster(defender)) defender.dmgDealt -= healAmount; }
         } else {

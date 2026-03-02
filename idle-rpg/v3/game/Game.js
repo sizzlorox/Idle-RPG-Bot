@@ -2,6 +2,7 @@ const { newQuest } = require('../../database/schemas/quest');
 const titles = require('../../v2/idle-rpg/data/titles');
 const { roamingNpcs } = require('../../utils/enumHelper');
 const roamingNpcIds = new Set(roamingNpcs.map(npc => npc.discordId));
+const titleKeys = Object.keys(titles);
 const Database = require('../../database/Database');
 const { errorLog } = require('../../utils/logger');
 const { generatePlayerName } = require('../utils/formatters');
@@ -86,7 +87,7 @@ class Game {
 
   async setPlayerTitles(eventResults) {
     if (roamingNpcIds.has(eventResults.updatedPlayer.discordId)) return eventResults;
-    Object.keys(titles).forEach((title) => {
+    titleKeys.forEach((title) => {
       eventResults.updatedPlayer = this.player.manageTitles(eventResults, title);
     });
     return eventResults;

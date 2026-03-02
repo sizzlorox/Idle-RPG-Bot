@@ -16,13 +16,15 @@ async function updateLeaderboards(bot, game) {
     for (let i = 0; i < types.length; i++) {
       const top10 = await game.db.loadTop10(types[i], guild.id, bot.user.id);
       const fieldKey = Object.keys(types[i])[0];
-      const rankString = `${top10.filter(player => fieldKey.includes('.') ? player[fieldKey.split('.')[0]][fieldKey.split('.')[1]] : player[fieldKey] > 0)
+      const isNested = fieldKey.includes('.');
+      const fieldParts = isNested ? fieldKey.split('.') : null;
+      const rankString = `${top10.filter(player => isNested ? player[fieldParts[0]][fieldParts[1]] : player[fieldKey] > 0)
         .sort((p1, p2) => {
           if (fieldKey === 'level') return p2.experience.current - p1.experience.current && p2.level - p1.level;
-          if (fieldKey.includes('.')) { const keys = fieldKey.split('.'); return p2[keys[0]][keys[1]] - p1[keys[0]][keys[1]]; }
+          if (isNested) return p2[fieldParts[0]][fieldParts[1]] - p1[fieldParts[0]][fieldParts[1]];
           return p2[fieldKey] - p1[fieldKey];
         })
-        .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${fieldKey.includes('.') ? `${fieldKey.split('.')[0]}: ${player[fieldKey.split('.')[0]][fieldKey.split('.')[1]]}` : `${fieldKey.replace('currentBounty', 'Bounty')}: ${player[fieldKey]}`}`)
+        .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${isNested ? `${fieldParts[0]}: ${player[fieldParts[0]][fieldParts[1]]}` : `${fieldKey.replace('currentBounty', 'Bounty')}: ${player[fieldKey]}`}`)
         .join('\n')}`;
 
       const subjectTitle = formatLeaderboards(fieldKey);
@@ -33,7 +35,7 @@ async function updateLeaderboards(bot, game) {
         continue;
       }
       if (!msg.includes(msgs[i].toString()) && msgs[i].author.id === bot.user.id) {
-        msgs[i].edit(msg);
+        await msgs[i].edit(msg);
       }
     }
   }
