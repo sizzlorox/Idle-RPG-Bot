@@ -24,6 +24,7 @@ class DiscordBot {
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.DirectMessages,
       ]
     });
     this.game = new Game();
