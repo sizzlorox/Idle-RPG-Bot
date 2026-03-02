@@ -91,7 +91,7 @@ class EventEngine {
 
   async luckEvent(loadedPlayer, events, globalMultiplier) {
     const updatedPlayer = Object.assign({}, loadedPlayer);
-    const { isBlizzardActive } = events;
+    const { isBlizzardActive } = events || {};
     try {
       const luckDice = randomBetween(0, 99);
       if (luckDice <= 3 + (updatedPlayer.stats.luk / 4)) return this.luck.godsEvent(updatedPlayer);
