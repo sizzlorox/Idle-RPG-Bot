@@ -43,7 +43,8 @@ class EventEngine {
     let updatedPlayer = Object.assign({}, loadedPlayer);
     try {
       const luckDice = randomBetween(0, 99);
-      if (this.map.getTowns().includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
+      const towns = this.map.getTowns();
+      if (towns.includes(updatedPlayer.map.name) && luckDice <= 30 + (updatedPlayer.stats.luk / 4)) {
         const eventMsg = [];
         const eventLog = [];
         const townSellResults = await this.townEvent.sell(updatedPlayer);
@@ -63,7 +64,7 @@ class EventEngine {
           : { updatedPlayer };
       }
 
-      if (!this.map.getTowns().includes(updatedPlayer.map.name)) {
+      if (!towns.includes(updatedPlayer.map.name)) {
         if (luckDice >= (95 - (updatedPlayer.stats.luk / 4)) && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
           if (onlinePlayers.length <= 1) {
             const mobToBattle = this.monsterGen.generateMonster(updatedPlayer);

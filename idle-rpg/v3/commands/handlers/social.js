@@ -1,5 +1,21 @@
 const enumHelper = require('../../../utils/enumHelper');
 const { ChannelType } = require('discord.js');
+const { setImportantMessage } = require('../../utils/messageHelpers');
+const maps = require('../../../game/data/maps');
+const pkg = require('../../../../package.json');
+
+const typeMap = {
+  gold: { 'gold.current': -1 },
+  level: { level: -1 },
+  spells: { spellCast: -1 },
+  stolen: { stolen: -1 },
+  stole: { stole: -1 },
+  gambles: { gambles: -1 },
+  events: { events: -1 },
+  bounty: { currentBounty: -1 },
+  'kills.player': { 'kills.player': -1 },
+  'deaths.mob': { 'deaths.mob': -1 }
+};
 
 module.exports = [
   {
@@ -49,28 +65,19 @@ module.exports = [
     handler: async ({ game, bot, message, guildId, author }) => {
       const args = message.content.split(' ');
       const typeArg = args[1] ? args[1].toLowerCase() : 'level';
-      const typeMap = {
-        gold: { 'gold.current': -1 },
-        level: { level: -1 },
-        spells: { spellCast: -1 },
-        stolen: { stolen: -1 },
-        stole: { stole: -1 },
-        gambles: { gambles: -1 },
-        events: { events: -1 },
-        bounty: { currentBounty: -1 },
-        'kills.player': { 'kills.player': -1 },
-        'deaths.mob': { 'deaths.mob': -1 }
-      };
       const type = typeMap[typeArg] || typeMap['level'];
+      const fieldKey = Object.keys(type)[0];
+      const isNested = fieldKey.includes('.');
+      const fieldKeys = isNested ? fieldKey.split('.') : null;
       const loadedTop10 = await game.db.loadTop10(type, guildId, bot.user.id);
       const rankString = loadedTop10
-        .filter(player => Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] > 0)
+        .filter(player => isNested ? player[fieldKeys[0]][fieldKeys[1]] : player[fieldKey] > 0)
         .sort((p1, p2) => {
-          if (Object.keys(type)[0] === 'level') return p2.experience.current - p1.experience.current && p2.level - p1.level;
-          if (Object.keys(type)[0].includes('.')) { const keys = Object.keys(type)[0].split('.'); return p2[keys[0]][keys[1]] - p1[keys[0]][keys[1]]; }
-          return p2[Object.keys(type)[0]] - p1[Object.keys(type)[0]];
+          if (fieldKey === 'level') return p2.experience.current - p1.experience.current && p2.level - p1.level;
+          if (isNested) return p2[fieldKeys[0]][fieldKeys[1]] - p1[fieldKeys[0]][fieldKeys[1]];
+          return p2[fieldKey] - p1[fieldKey];
         })
-        .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${Object.keys(type)[0].includes('.') ? `${Object.keys(type)[0].split('.')[0]}: ${player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]]}` : `${Object.keys(type)[0].replace('currentBounty', 'Bounty')}: ${player[Object.keys(type)[0]]}`}`)
+        .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${isNested ? `${fieldKeys[0]}: ${player[fieldKeys[0]][fieldKeys[1]]}` : `${fieldKey.replace('currentBounty', 'Bounty')}: ${player[fieldKey]}`}`)
         .join('\n');
       return author.send(`\`\`\`Top 10 ${typeArg}:\n${rankString}\`\`\``);
     }
@@ -82,16 +89,6 @@ module.exports = [
     handler: async ({ game, bot, message, guildId, author }) => {
       const args = message.content.split(' ');
       const typeArg = args[1] ? args[1].toLowerCase() : 'level';
-      const typeMap = {
-        gold: { 'gold.current': -1 },
-        level: { level: -1 },
-        spells: { spellCast: -1 },
-        stolen: { stolen: -1 },
-        stole: { stole: -1 },
-        gambles: { gambles: -1 },
-        events: { events: -1 },
-        bounty: { currentBounty: -1 }
-      };
       const type = typeMap[typeArg] || typeMap['level'];
       const player = await game.db.loadPlayer(author.id, { pastEvents: 0, pastPvpEvents: 0 });
       if (!player) return author.send('You have not been born yet!');
@@ -116,7 +113,6 @@ module.exports = [
     operatorOnly: false,
     channelOnly: true,
     handler: async ({ game, bot, message, guildId, author }) => {
-      const { ChannelType } = require('discord.js');
       const args = message.content.split(' ');
       const mentionedUser = message.mentions.users.first();
       const amount = parseInt(args[args.length - 1]);
@@ -133,7 +129,6 @@ module.exports = [
       await game.db.savePlayer(bountyPlacer);
       await game.db.savePlayer(bountyRecipient);
       if (actionsChannel) {
-        const { setImportantMessage } = require('../../utils/messageHelpers');
         await actionsChannel.send(setImportantMessage(`${bountyPlacer.name} just put a bounty of ${amount} gold on ${bountyRecipient.name}'s head!`));
       }
       return author.send(`Bounty of ${amount} placed on ${bountyRecipient.name}'s head!`);
@@ -144,7 +139,6 @@ module.exports = [
     operatorOnly: false,
     channelOnly: false,
     handler: async ({ game, bot, message, guildId, author }) => {
-      const pkg = require('../../../../package.json');
       return author.send(`Idle-RPG Bot v${pkg.version || '3.0.0'}`);
     }
   },
@@ -194,7 +188,6 @@ module.exports = [
     operatorOnly: false,
     channelOnly: false,
     handler: async ({ game, bot, message, guildId, author }) => {
-      const maps = require('../../../game/data/maps');
       const args = message.content.split(/ (.+)/);
       if (!args[1]) {
         return author.send('You must enter a map name to retrieve its lore. Usage: `!lore <Map Name>`');

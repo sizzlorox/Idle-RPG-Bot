@@ -199,7 +199,7 @@ class BattleEngine {
   }
 
   async findPlayerToBattle(playerObj, onlinePlayers) {
-    const updatedPlayer = Object.assign({}, playerObj);
+    const updatedPlayer = playerObj;
     const mappedPlayers = await this.db.getSameMapPlayers(updatedPlayer.guildId, updatedPlayer.map.name);
     if (updatedPlayer.equipment.weapon.name !== enumHelper.equipment.empty.weapon.name) {
       const onlineSet = new Set(onlinePlayers.map(p => p.discordId));

@@ -150,7 +150,7 @@ class PlayerManager {
   }
 
   setPlayerEquipment(playerObj, equipment, item) {
-    const updatedPlayer = Object.assign({}, playerObj);
+    const updatedPlayer = playerObj;
     updatedPlayer.equipment[equipment].name = item.name;
     if (equipment !== enumHelper.equipment.types.relic.position) {
       updatedPlayer.equipment[equipment].power = item.power;

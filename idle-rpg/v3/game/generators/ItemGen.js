@@ -2,6 +2,8 @@ const items = require('../../../game/data/items');
 const enumHelper = require('../../../utils/enumHelper');
 const { randomBetween } = require('../../utils/helpers');
 
+const snowflakeTemplate = items.type[3].find(item => item.name === 'Snowflake');
+
 class ItemGen {
 
   async generateItem(updatedPlayer, mob) {
@@ -73,7 +75,7 @@ class ItemGen {
   }
 
   generateSnowflake(updatedPlayer) {
-    const snowFlake = items.type[3].find(item => item.name === 'Snowflake');
+    const snowFlake = snowflakeTemplate;
     const randomRarityChance = Math.round(randomBetween(0, 99) - (updatedPlayer.level / 6));
     const itemRarityList = items.rarity.filter(itemRarity => itemRarity.rarity >= randomRarityChance);
     const randomRarityIndex = randomBetween(0, itemRarityList.length - 1);
