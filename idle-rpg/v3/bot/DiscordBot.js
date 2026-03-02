@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, ActivityType, ChannelType } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, ActivityType, ChannelType } = require('discord.js');
 const fs = require('fs');
 
 const Game = require('../game/Game');
@@ -25,7 +25,8 @@ class DiscordBot {
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildPresences,
         GatewayIntentBits.DirectMessages,
-      ]
+      ],
+      partials: [Partials.Channel],
     });
     this.game = new Game();
     this.commandHandler = new CommandHandler({ game: this.game, bot: this.bot });
