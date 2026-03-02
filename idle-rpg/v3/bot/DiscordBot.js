@@ -69,7 +69,7 @@ class DiscordBot {
     });
 
     this.bot.on('messageCreate', async (message) => {
-      console.log('[DEBUG] messageCreate', message.author.username, message.channel.type, message.channel?.parent?.name, message.content?.substring(0, 50));
+      console.log('[DEBUG] messageCreate', message.author.username, message.channel.type, message.channel?.parent?.name, JSON.stringify(message.content?.substring(0, 50)));
       if (message.author.bot) return;
 
       if (message.guild && message.guild.id === guildID && message.content.includes('┻━┻')) {

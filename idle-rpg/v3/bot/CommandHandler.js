@@ -35,6 +35,7 @@ class CommandHandler {
         }
       }
 
+      console.log('[DEBUG] parseUserCommand', message.author.username, 'guildId:', guildId, 'prefix:', guildPrefix, 'content:', JSON.stringify(message.content?.substring(0, 30)));
       if (!message.content.startsWith(guildPrefix)) return;
 
       // Normalize command prefix
