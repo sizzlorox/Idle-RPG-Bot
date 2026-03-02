@@ -27,20 +27,21 @@ class CommandHandler {
         commandChannelId = commandsChannel ? commandsChannel.id : null;
       }
 
-      // Get the guild command prefix
-      if (guildId) {
-        const guildConfig = this.game.guildConfigs.get(guildId);
-        if (guildConfig && guildConfig.commandPrefix) {
-          guildPrefix = guildConfig.commandPrefix;
+      // Operators always use '!' prefix when DMing
+      if (!isDM || !botOperators.includes(message.author.id)) {
+        if (guildId) {
+          const guildConfig = this.game.guildConfigs.get(guildId);
+          if (guildConfig && guildConfig.commandPrefix) {
+            guildPrefix = guildConfig.commandPrefix;
+          }
         }
       }
 
-      console.log('[DEBUG] parseUserCommand', message.author.username, 'guildId:', guildId, 'prefix:', guildPrefix, 'content:', JSON.stringify(message.content?.substring(0, 30)));
       if (!message.content.startsWith(guildPrefix)) return;
 
       // Normalize command prefix
       const normalizedContent = guildPrefix === '!irpg'
-        ? '!' + message.content.replace('!irpg ', '').split(/ (.+)/)[1]
+        ? message.content.replace('!irpg ', '!')
         : message.content.replace(guildPrefix, '!');
 
       const commandAlias = normalizedContent.split(' ')[0].toLowerCase();
