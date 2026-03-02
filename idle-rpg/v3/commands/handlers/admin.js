@@ -2,6 +2,20 @@ const enumHelper = require('../../../utils/enumHelper');
 const { ChannelType } = require('discord.js');
 const { setImportantMessage } = require('../../utils/messageHelpers');
 
+const DISCORD_MAX_LENGTH = 2000;
+
+function chunkMessage(text, maxLen = DISCORD_MAX_LENGTH) {
+  const chunks = [];
+  while (text.length > maxLen) {
+    let splitAt = text.lastIndexOf('\n', maxLen - 1);
+    if (splitAt <= 0) splitAt = maxLen;
+    chunks.push(text.slice(0, splitAt));
+    text = text.slice(splitAt).trimStart();
+  }
+  if (text.length > 0) chunks.push(text);
+  return chunks;
+}
+
 module.exports = [
   {
     aliases: ['!reset'],
@@ -14,14 +28,36 @@ module.exports = [
       if (!guild) return author.send('No guild with that id');
 
       const defaultConfig = { multiplier: 1, spells: { activeBless: 0 }, dailyLottery: { prizePool: 1500 } };
+
+      const leaderboardChannel = guild.channels.cache.find(channel => channel.name === 'leaderboards' && channel.type === ChannelType.GuildText);
+      const announcementChannel = guild.channels.cache.find(channel => channel.name === 'announcements' && (channel.type === ChannelType.GuildText || channel.type === ChannelType.GuildAnnouncement));
+      const actionChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText);
+      const movementChannel = guild.channels.cache.find(channel => channel.name === 'movement' && channel.type === ChannelType.GuildText);
+
+      if (announcementChannel) {
+        if (leaderboardChannel) {
+          const fetched = await leaderboardChannel.messages.fetch({ limit: 10 });
+          if (fetched.size > 0) {
+            const msgs = [...fetched.values()].sort((a, b) => a.createdTimestamp - b.createdTimestamp);
+            const combined = msgs.map(m => m.content).join('\n') + '\nServer has been reset! Good luck to all Idlers!';
+            await Promise.all(msgs.map(m => m.delete()));
+            for (const chunk of chunkMessage(combined)) {
+              await announcementChannel.send(chunk);
+            }
+          } else {
+            await announcementChannel.send('Server has been reset! Good luck to all Idlers!');
+          }
+        } else {
+          await announcementChannel.send('Server has been reset! Good luck to all Idlers!');
+        }
+      }
+
       await game.db.resetAllPlayersInGuild(targetGuildId);
       await game.db.resetAllLogs(targetGuildId);
       await game.db.updateGame(targetGuildId, defaultConfig);
       await game.db.removeLotteryPlayers(targetGuildId);
       game.guildConfigs.set(targetGuildId, defaultConfig);
 
-      const actionChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText);
-      const movementChannel = guild.channels.cache.find(channel => channel.name === 'movement' && channel.type === ChannelType.GuildText);
       if (actionChannel) await actionChannel.send('```RESET -----------------------------------```');
       if (movementChannel) await movementChannel.send('```RESET -----------------------------------```');
       return author.send('Reset complete...');

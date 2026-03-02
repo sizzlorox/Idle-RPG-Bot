@@ -71,7 +71,7 @@ class BattleEngine {
 
       if (updatedPlayer.health <= 0) {
         updatedPlayer.battles.lost++;
-        await this.player.logEvent(updatedPlayer, eventLog[0] || '', enumHelper.logTypes.action);
+        await this.player.logEvent(updatedPlayer, eventLog.filter(Boolean).join('\n'), enumHelper.logTypes.action);
         return { result: enumHelper.battle.outcomes.lost, updatedPlayer, updatedMob: results.defender, msg: eventMsg, pm: eventLog };
       }
 
@@ -80,7 +80,7 @@ class BattleEngine {
         updatedPlayer.experience.total += expGain;
         updatedPlayer.gold.current += goldGain + questGoldGain;
         updatedPlayer.gold.total += goldGain + questGoldGain;
-        await this.player.logEvent(updatedPlayer, eventLog[0] || '', enumHelper.logTypes.action);
+        await this.player.logEvent(updatedPlayer, eventLog.filter(Boolean).join('\n'), enumHelper.logTypes.action);
         return { result: enumHelper.battle.outcomes.fled, updatedPlayer, updatedMob: results.defender, msg: eventMsg, pm: eventLog };
       }
 
@@ -90,11 +90,11 @@ class BattleEngine {
       updatedPlayer.gold.total += goldGain + questGoldGain;
       updatedPlayer.kills.mob++;
       updatedPlayer.battles.won++;
-      await this.player.logEvent(updatedPlayer, eventLog[0] || '', enumHelper.logTypes.action);
       if (isQuestCompleted) {
         eventMsg.push(`${generatePlayerName(updatedPlayer, true)} finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
         eventLog.push(`Finished a quest and gained an extra ${questExpGain} exp and ${questGoldGain} gold!`);
       }
+      await this.player.logEvent(updatedPlayer, eventLog.filter(Boolean).join('\n'), enumHelper.logTypes.action);
       return { result: enumHelper.battle.outcomes.win, updatedPlayer, updatedMob: results.defender, msg: eventMsg, pm: eventLog };
     } catch (err) {
       errorLog.error(err);
