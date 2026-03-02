@@ -1,3 +1,4 @@
+const { ChannelType, PermissionFlagsBits } = require('discord.js');
 const { infoLog, actionLog, moveLog } = require('../../utils/logger');
 const enumHelper = require('../../utils/enumHelper');
 
@@ -15,22 +16,23 @@ class Discord {
   }
 
   async manageGuildChannels(guild) {
-    const botGuildMember = await guild.members.cache.get(this.bot.user.id);
-    if (!botGuildMember.permissions.has('MANAGE_CHANNELS')) {
+    const botGuildMember = await guild.members.fetch(this.bot.user.id);
+    if (!botGuildMember) return;
+    if (!botGuildMember.permissions.has(PermissionFlagsBits.ManageChannels)) {
       console.log(`Idle RPG does not have permission to manage channels in guild: ${guild.name} (${guild.id})`);
       return;
     }
-    let categoryChannel = await guild.channels.cache.find(channel => channel.type === 'category' && channel.name.toLowerCase() === 'idle-rpg');
-    const hasLeaderboardsChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'leaderboards' && channel.type === 'text' && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
-    const hasCommandsChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'commands' && channel.type === 'text' && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
-    const hasFAQChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'faq' && channel.type === 'text' && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
-    const hasActionsChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'actions' && channel.type === 'text' && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
-    const hasMovementChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'movement' && channel.type === 'text' && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
+    let categoryChannel = await guild.channels.cache.find(channel => channel.type === ChannelType.GuildCategory && channel.name.toLowerCase() === 'idle-rpg');
+    const hasLeaderboardsChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'leaderboards' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
+    const hasCommandsChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'commands' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
+    const hasFAQChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'faq' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
+    const hasActionsChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'actions' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
+    const hasMovementChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'movement' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
     if (!categoryChannel) {
       console.log(`Creating Idle-RPG Category Channel for Guild: ${guild.name}`);
       infoLog.info(`Creating Idle-RPG Category Channel for Guild: ${guild.name}`);
       try {
-        await guild.channels.create('Idle-RPG', [{ type: 'category' }]);
+        await guild.channels.create({ name: 'Idle-RPG', type: ChannelType.GuildCategory });
         // It's being created as a text channel for some reason, lets just set it as a parent of our other channels
         categoryChannel = await guild.channels.cache.find(channel => channel.name.toLowerCase() === 'idle-rpg');
       } catch (err) {
@@ -40,19 +42,21 @@ class Discord {
     if (!hasLeaderboardsChannel && categoryChannel) {
       console.log(`Creating Idle-RPG Leaderboards Channel for Guild: ${guild.name}`);
       try {
-        const leaderboardsChannel = await guild.channels.create('leaderboards', [{
-          id: guild.id,
-          type: 'text',
-          deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
-          allow: [],
+        const leaderboardsChannel = await guild.channels.create({
+          name: 'leaderboards',
+          type: ChannelType.GuildText,
+          permissionOverwrites: [{
+            id: guild.id,
+            deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone, PermissionFlagsBits.AddReactions],
+            allow: [],
+          },
+          {
+            id: this.bot.user.id,
+            deny: [PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone, PermissionFlagsBits.AddReactions],
+            allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ManageMessages],
+          }],
           reason: 'Creating Idle-RPG leaderboards channel',
-        },
-        {
-          id: this.bot.user.id,
-          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
-          allow: ['SEND_MESSAGES', 'MANAGE_MESSAGES'],
-          reason: 'Creating Idle-RPG leaderboards channel',
-        }]);
+        });
         await leaderboardsChannel.setParent(categoryChannel);
       } catch (err) {
         console.log(err);
@@ -62,13 +66,16 @@ class Discord {
       console.log(`Creating Idle-RPG Commands Channel for Guild: ${guild.name}`);
       infoLog.info(`Creating Idle-RPG Commands Channel for Guild: ${guild.name}`);
       try {
-        const commandsChannel = await guild.channels.create('commands', [{
-          id: guild.id,
-          type: 'text',
-          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
-          allow: ['SEND_MESSAGES', 'ADD_REACTIONS'],
+        const commandsChannel = await guild.channels.create({
+          name: 'commands',
+          type: ChannelType.GuildText,
+          permissionOverwrites: [{
+            id: guild.id,
+            deny: [PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone],
+            allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.AddReactions],
+          }],
           reason: 'Creating Idle-RPG commands channel',
-        }]);
+        });
         await commandsChannel.setParent(categoryChannel);
         await commandsChannel.setTopic('In order to easier check other players stats/equip, a command channel was created. You can check others with @mentions.', 'Setting up Idle-RPG Channels');
       } catch (err) {
@@ -79,19 +86,21 @@ class Discord {
       console.log(`Creating Idle-RPG FAQ Channel for Guild: ${guild.name}`);
       infoLog.info(`Creating Idle-RPG FAQ Channel for Guild: ${guild.name}`);
       try {
-        const faqChannel = await guild.channels.create('faq', [{
-          id: guild.id,
-          type: 'text',
-          deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
-          allow: [],
+        const faqChannel = await guild.channels.create({
+          name: 'faq',
+          type: ChannelType.GuildText,
+          permissionOverwrites: [{
+            id: guild.id,
+            deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone, PermissionFlagsBits.AddReactions],
+            allow: [],
+          },
+          {
+            id: this.bot.user.id,
+            deny: [PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone],
+            allow: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.ManageMessages],
+          }],
           reason: 'Creating Idle-RPG FAQ channel',
-        },
-        {
-          id: this.bot.user.id,
-          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
-          allow: ['SEND_MESSAGES', 'MANAGE_MESSAGES'],
-          reason: 'Creating Idle-RPG FAQ channel',
-        }]);
+        });
         await faqChannel.setParent(categoryChannel);
         await faqChannel.setTopic('Frequently asked questions', 'Setting up Idle-RPG Channels');
         // TODO move FAQ message somewhere else so I dont have to look everywhere to update these messages
@@ -138,16 +147,21 @@ There's a command to get the invite link !invite`);
       console.log(`Creating Idle-RPG Action Channel for Guild: ${guild.name}`);
       infoLog.info(`Creating Idle-RPG Action Channel for Guild: ${guild.name}`);
       try {
-        const actionChannel = await guild.channels.create('actions', 'text', [{
-          id: guild.id,
-          deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
-          allow: ['ADD_REACTIONS']
-        },
-        {
-          id: this.bot.user.id,
-          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
-          allow: ['SEND_MESSAGES']
-        }], 'Creating channels for Idle-RPG-Bot');
+        const actionChannel = await guild.channels.create({
+          name: 'actions',
+          type: ChannelType.GuildText,
+          permissionOverwrites: [{
+            id: guild.id,
+            deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone],
+            allow: [PermissionFlagsBits.AddReactions]
+          },
+          {
+            id: this.bot.user.id,
+            deny: [PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone, PermissionFlagsBits.AddReactions],
+            allow: [PermissionFlagsBits.SendMessages]
+          }],
+          reason: 'Creating channels for Idle-RPG-Bot',
+        });
         await actionChannel.setParent(categoryChannel);
         await actionChannel.setTopic('Muting this channel is recommended in order to not get spammed.', 'Setting up Idle-RPG Channels');
       } catch (err) {
@@ -158,16 +172,21 @@ There's a command to get the invite link !invite`);
       console.log(`Creating Idle-RPG Movement Channel for Guild: ${guild.name}`);
       infoLog.info(`Creating Idle-RPG Movement Channel for Guild: ${guild.name}`);
       try {
-        const movementChannel = await guild.channels.create('movement', 'text', [{
-          id: guild.id,
-          deny: ['SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE'],
-          allow: ['ADD_REACTIONS']
-        },
-        {
-          id: this.bot.user.id,
-          deny: ['SEND_TTS_MESSAGES', 'ATTACH_FILES', 'MENTION_EVERYONE', 'ADD_REACTIONS'],
-          allow: ['SEND_MESSAGES']
-        }], 'Creating channels for Idle-RPG-Bot');
+        const movementChannel = await guild.channels.create({
+          name: 'movement',
+          type: ChannelType.GuildText,
+          permissionOverwrites: [{
+            id: guild.id,
+            deny: [PermissionFlagsBits.SendMessages, PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone],
+            allow: [PermissionFlagsBits.AddReactions]
+          },
+          {
+            id: this.bot.user.id,
+            deny: [PermissionFlagsBits.SendTTSMessages, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.MentionEveryone, PermissionFlagsBits.AddReactions],
+            allow: [PermissionFlagsBits.SendMessages]
+          }],
+          reason: 'Creating channels for Idle-RPG-Bot',
+        });
         await movementChannel.setParent(categoryChannel);
         await movementChannel.setTopic('Muting this channel is recommended in order to not get spammed.', 'Setting up Idle-RPG Channels');
       } catch (err) {
@@ -178,7 +197,7 @@ There's a command to get the invite link !invite`);
 
   getOnlinePlayers(guild) {
     return guild.members.cache
-      .filter(member => !member.presence.status.includes('offline') && !member.user.bot && member.id !== this.bot.user.id)
+      .filter(member => !(member.presence?.status ?? 'offline').includes('offline') && !member.user.bot && member.id !== this.bot.user.id)
       .map(member => Object.assign({}, {
         discordId: member.id,
         name: member.nickname ? member.nickname : member.displayName,
@@ -188,7 +207,7 @@ There's a command to get the invite link !invite`);
 
   getOfflinePlayers(guild) {
     return guild.members.cache
-      .filter(member => member.presence.status.includes('offline') && !member.user.bot && member.id !== this.bot.user.id)
+      .filter(member => (member.presence?.status ?? 'offline').includes('offline') && !member.user.bot && member.id !== this.bot.user.id)
       .map(member => Object.assign({}, {
         discordId: member.id,
         name: member.nickname ? member.nickname : member.displayName,
@@ -206,7 +225,7 @@ There's a command to get the invite link !invite`);
           name: member.nickname ? member.nickname : member.displayName,
           guildId: guild.id
         });
-        if (member.presence.status.includes('offline')) {
+        if ((member.presence?.status ?? 'offline').includes('offline')) {
           guildOfflineMembers.push(player);
         } else {
           guildOnlineMembers.push(player);
@@ -233,15 +252,15 @@ There's a command to get the invite link !invite`);
           break;
       }
       // TODO add check to parent once you find out why its still null
-      const channelToSend = await guild.channels.cache.find(channel => channel.name === result.type && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
+      const channelToSend = await guild.channels.cache.find(channel => channel.name === result.type && channel.type === ChannelType.GuildText /*&& channel.parent.name === 'Idle-RPG'*/);
       if (channelToSend) {
-        await channelToSend.send(message, { split: true });
+        await channelToSend.send(message);
       }
       if (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.on
         || (result.updatedPlayer.isPrivateMessage === enumHelper.pmMode.filtered
           && result.type === 'actions')) {
         const guildMember = await guild.members.cache.get(result.updatedPlayer.discordId);
-        await guildMember.send(privateMessage, { split: true });
+        await guildMember.user.send(privateMessage);
       }
       // Usually used for PVP messages to message player that got attacked that is not owner of event
       if (result.attackerObj
@@ -249,7 +268,7 @@ There's a command to get the invite link !invite`);
         && result.otherPlayerPmMsg) {
         const otherPlayerPrivateMessage = result.otherPlayerPmMsg.join('\n');
         const guildMember = await guild.members.cache.get(result.attackerObj.discordId);
-        await guildMember.send(otherPlayerPrivateMessage, { split: true });
+        await guildMember.user.send(otherPlayerPrivateMessage);
       }
     } catch (err) {
       infoLog.info(err);

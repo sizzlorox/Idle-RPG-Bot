@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-mongoose.Promise = require('bluebird');
 const { mongoDBUri } = require('../../settings');
 const Map = require('../game/utils/Map');
 const enumHelper = require('../utils/enumHelper');
@@ -16,14 +15,6 @@ const Player = mongoose.model('Player', playerSchema);
 const ActionLog = mongoose.model('ActionLog', actionLogSchema);
 const MoveLog = mongoose.model('MoveLog', moveLogSchema);
 const PvpLog = mongoose.model('PvpLog', pvpLogSchema);
-
-// mongoose.connection.on('open', () => {
-//   console.log('\nDATABASE: Connected!');
-// });
-
-// mongoose.connection.on('close', () => {
-//   console.log('DATABASE: Disconnected!\n');
-// });
 
 process.on('close', () => {
   console.log('Database disconnecting on app termination');
@@ -42,7 +33,7 @@ process.on('SIGINT', () => {
 
 function connect() {
   if (mongoose.connection.readyState === 0) {
-    mongoose.connect(mongoDBUri, { useMongoClient: true });
+    mongoose.connect(mongoDBUri);
   }
 }
 
@@ -65,13 +56,11 @@ class Database {
   }
 
   // GAME SETTINGS
-  loadGame(guildId) {
-    return new Promise((resolve, reject) => Game.find({ guildId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      if (!result || !result.length) {
-        return Game.create({
+  async loadGame(guildId) {
+    try {
+      let result = await Game.findOne({ guildId });
+      if (!result) {
+        result = await Game.create({
           guildId,
           multiplier: 1,
           spells: {
@@ -80,38 +69,29 @@ class Database {
           dailyLottery: {
             prizePool: 1500
           }
-        }, (error, newGame) => {
-          if (error) {
-            return reject(error);
-          }
-
-          return resolve(newGame);
         });
       }
-
-      return resolve(result[0]);
-    }));
+      return result;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  updateGame(guildId, newConfig) {
-    return new Promise((resolve, reject) => Game.update({ guildId }, newConfig, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+  async updateGame(guildId, newConfig) {
+    try {
+      return await Game.updateOne({ guildId }, newConfig);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   // PLAYER
-  createNewPlayer(discordId, guildId, name) {
-    return new Promise((resolve, reject) => Player.create(newPlayerObj(discordId, guildId, name), (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+  async createNewPlayer(discordId, guildId, name) {
+    try {
+      return await Player.create(newPlayerObj(discordId, guildId, name));
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   async loadActionLog(discordId) {
@@ -127,114 +107,138 @@ class Database {
     }
   }
 
-  saveActionLog(discordId, updatedActionLog) {
-    return new Promise((resolve, reject) => ActionLog.updateOne({ playerId: discordId }, updatedActionLog, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+  async saveActionLog(discordId, updatedActionLog) {
+    try {
+      return await ActionLog.updateOne({ playerId: discordId }, updatedActionLog);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  loadPvpLog(discordId) {
-    return new Promise((resolve, reject) => PvpLog.findOne({ playerId: discordId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
+  async appendActionLog(discordId, msg) {
+    try {
+      const event = msg.includes('`') ? msg.replace(/`/g, '') : msg;
+      return await ActionLog.findOneAndUpdate(
+        { playerId: discordId },
+        { $push: { log: { $each: [{ event, timeStamp: Date.now() }], $slice: -25 } } },
+        { upsert: true }
+      );
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
+  async loadPvpLog(discordId) {
+    try {
+      let result = await PvpLog.findOne({ playerId: discordId });
       if (!result) {
-        return PvpLog.create({ playerId: discordId });
+        result = await PvpLog.create({ playerId: discordId });
       }
-
-      return resolve(result);
-    }));
+      return result;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  savePvpLog(discordId, updatedPvpLog) {
-    return new Promise((resolve, reject) => PvpLog.updateOne({ playerId: discordId }, updatedPvpLog, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+  async savePvpLog(discordId, updatedPvpLog) {
+    try {
+      return await PvpLog.updateOne({ playerId: discordId }, updatedPvpLog);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  loadMoveLog(discordId) {
-    return new Promise((resolve, reject) => MoveLog.findOne({ playerId: discordId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
+  async appendPvpLog(discordId, msg) {
+    try {
+      const event = msg.includes('`') ? msg.replace(/`/g, '') : msg;
+      return await PvpLog.findOneAndUpdate(
+        { playerId: discordId },
+        { $push: { log: { $each: [{ event, timeStamp: Date.now() }], $slice: -25 } } },
+        { upsert: true }
+      );
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
+  async loadMoveLog(discordId) {
+    try {
+      let result = await MoveLog.findOne({ playerId: discordId });
       if (!result) {
-        return MoveLog.create({ playerId: discordId });
+        result = await MoveLog.create({ playerId: discordId });
       }
-
-      return resolve(result);
-    }));
+      return result;
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  saveMoveLog(discordId, updatedMoveLog) {
-    return new Promise((resolve, reject) => MoveLog.updateOne({ playerId: discordId }, updatedMoveLog, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+  async saveMoveLog(discordId, updatedMoveLog) {
+    try {
+      return await MoveLog.updateOne({ playerId: discordId }, updatedMoveLog);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  loadOnlinePlayers(discordId) {
-    return new Promise((resolve, reject) => Player.find({}, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    })
-      .where('discordId')
-      .select({
-        pastEvents: 0,
-        pastPvpEvents: 0
-      })
-      .in(discordId));
+  async appendMoveLog(discordId, msg) {
+    try {
+      const event = msg.includes('`') ? msg.replace(/`/g, '') : msg;
+      return await MoveLog.findOneAndUpdate(
+        { playerId: discordId },
+        { $push: { log: { $each: [{ event, timeStamp: Date.now() }], $slice: -25 } } },
+        { upsert: true }
+      );
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  loadOnlinePlayerMaps(discordIds) {
+  async loadOnlinePlayers(discordId) {
+    try {
+      return await Player.find({})
+        .where('discordId')
+        .select({
+          pastEvents: 0,
+          pastPvpEvents: 0
+        })
+        .in(discordId);
+    } catch (err) {
+      errorLog.error(err);
+    }
+  }
+
+  async loadOnlinePlayerMaps(discordIds) {
     const removeNpcs = enumHelper.mockPlayers.map(npc => npc.name);
-
-    return new Promise((resolve, reject) => Player.find({
-      name: { $nin: removeNpcs, $exists: true }
-    }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    })
-      .where('discordId')
-      .select({
-        discordId: 1,
-        name: 1,
-        map: 1,
+    try {
+      return await Player.find({
+        name: { $nin: removeNpcs, $exists: true }
       })
-      .in(discordIds));
+        .where('discordId')
+        .select({
+          discordId: 1,
+          name: 1,
+          map: 1,
+        })
+        .in(discordIds);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  removeLotteryPlayers(guildId) {
+  async removeLotteryPlayers(guildId) {
     const query = {
       'lottery.joined': true,
       guildId
     };
-    return new Promise((resolve, reject) => Player.update(query, { lottery: { joined: false } }, { multi: true }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+    try {
+      return await Player.updateMany(query, { lottery: { joined: false } });
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  loadLotteryPlayers(guildId, selectFields = {
+  async loadLotteryPlayers(guildId, selectFields = {
     pastEvents: 0,
     pastPvpEvents: 0
   }) {
@@ -242,18 +246,14 @@ class Database {
       guildId,
       'lottery.joined': true
     };
-
-    return new Promise((resolve, reject) => Player.find(query, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    })
-      .select(selectFields));
+    try {
+      return await Player.find(query).select(selectFields);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  loadTop10(type, guildId, botID) {
+  async loadTop10(type, guildId, botID) {
     const select = {
       name: 1
     };
@@ -271,46 +271,33 @@ class Database {
       guildId
     };
 
-    return new Promise((resolve, reject) => Player.find(query, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    })
-      .select(select)
-      .sort(type)
-      .limit(10));
+    try {
+      return await Player.find(query)
+        .select(select)
+        .sort(type)
+        .limit(10);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  loadCurrentRank(player, type) {
-    const select = {
-      name: 1
-    };
+  async loadCurrentRank(player, type) {
     const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.name);
     enumHelper.mockPlayers.map(npc => npc.name).forEach(npc => removeNpcs.push(npc));
 
-    select[Object.keys(type)[0]] = 1;
-    select.discordId = 1;
+    const fieldKey = Object.keys(type)[0];
+    const playerValue = fieldKey.includes('.')
+      ? player[fieldKey.split('.')[0]][fieldKey.split('.')[1]]
+      : player[fieldKey];
 
-    if (Object.keys(type)[0] === 'level') {
-      select['experience.current'] = 1;
-      type['experience.current'] = -1;
+    const query = { name: { $nin: removeNpcs, $exists: true } };
+    query[fieldKey] = { $gt: playerValue };
+
+    try {
+      return await Player.countDocuments(query);
+    } catch (err) {
+      errorLog.error(err);
     }
-    const query = {
-      name: { $nin: removeNpcs, $exists: true }
-    };
-    query[Object.keys(type)[0]] = { $gte: Object.keys(type)[0].includes('.') ? player[Object.keys(type)[0].split('.')[0]][Object.keys(type)[0].split('.')[1]] : player[Object.keys(type)[0]] };
-
-    return new Promise((resolve, reject) => Player.find(query, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    })
-      .select(select)
-      .sort(type));
   }
 
   async loadPlayer(discordId, selectFields = {}) {
@@ -337,19 +324,16 @@ class Database {
     }
   }
 
-  // TODO: Change to use Base DB commands Update(Query, Value);
-  setPlayerGuildId(guildId, player) {
+  async setPlayerGuildId(guildId, player) {
     if (!player) {
       return;
     }
 
-    return new Promise((resolve, reject) => Player.update({ discordId: player.discordId }, { guildId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+    try {
+      return await Player.updateOne({ discordId: player.discordId }, { guildId });
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   async getPlayerGuildId(player) {
@@ -364,116 +348,82 @@ class Database {
     }
   }
 
-  savePlayer(player) {
+  async savePlayer(player) {
     if (!player) {
       return;
     }
     player.updated_at = Date.now();
 
-    return new Promise((resolve, reject) => Player.findOneAndUpdate({ discordId: player.discordId }, player, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+    try {
+      return await Player.findOneAndUpdate({ discordId: player.discordId }, player);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  getSameMapPlayers(guildId, playerMap, selectFields = {}) {
+  async getSameMapPlayers(guildId, playerMap, selectFields = {}) {
     if (!playerMap) {
       return;
     }
 
-    return new Promise((resolve, reject) => Player.find({ 'map.name': playerMap, guildId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    })
-      .select(selectFields));
+    try {
+      return await Player.find({ 'map.name': playerMap, guildId }).select(selectFields);
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  deletePlayer(playerId) {
-    return new Promise((resolve, reject) => Player.remove({ discordId: playerId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+  async deletePlayer(playerId) {
+    try {
+      return await Player.deleteOne({ discordId: playerId });
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  resetSinglePlayer(playerId) {
-    return new Promise((resolve, reject) => Player.update({ discordId: playerId },
-      {
-        $set: resetObj
-      },
-      (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-
-        return resolve(result);
-      })
-    );
+  async resetSinglePlayer(playerId) {
+    const resetObj = resetPlayerObj;
+    try {
+      return await Player.updateOne({ discordId: playerId }, { $set: resetObj });
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  resetAllPlayersInGuild(guildId) {
+  async resetAllPlayersInGuild(guildId) {
     const resetObj = resetPlayerObj;
     resetObj.map = this.MapClass.getRandomTown();
 
-    return new Promise((resolve, reject) => Player.update({ guildId },
-      {
-        $set: resetObj
-      },
-      {
-        multi: true
-      }, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-
-        return resolve(result);
-      }));
+    try {
+      return await Player.updateMany({ guildId }, { $set: resetObj });
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  resetPersonalMultipliers() {
-    return new Promise((resolve, reject) => Player.update({},
-      {
-        $set: {
-          personalMultiplier: 0
-        }
-      },
-      {
-        multi: true
-      }, (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-
-        return resolve(result);
-      }));
+  async resetPersonalMultipliers() {
+    try {
+      return await Player.updateMany({}, { $set: { personalMultiplier: 0 } });
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  resetAllLogs(guildId) {
-    return new Promise((resolve, reject) => MoveLog.update({ guildId }, {}, { mulit: true }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(ActionLog.update({ guildId }, {}, { multi: true }));
-    }));
+  async resetAllLogs(guildId) {
+    try {
+      await MoveLog.updateMany({ guildId }, {});
+      return await ActionLog.updateMany({ guildId }, {});
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
-  deleteAllPlayersInGuild(guildId) {
-    return new Promise((resolve, reject) => Player.remove({ guildId }, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve(result);
-    }));
+  async deleteAllPlayersInGuild(guildId) {
+    try {
+      return await Player.deleteMany({ guildId });
+    } catch (err) {
+      errorLog.error(err);
+    }
   }
 
   async getStolenEquip(player) {

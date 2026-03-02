@@ -4,7 +4,7 @@ const path = require('path');
 
 const cache = new NodeCache({ stdTTL: 100, checkperiod: 120 });
 const router = express.Router();
-const DiscordBot = require('../../idle-rpg/v2/DiscordBot');
+const DiscordBot = require('../../idle-rpg/v3/bot/DiscordBot');
 
 router.use((req, res, next) => {
   console.log(Date.now());
@@ -12,7 +12,7 @@ router.use((req, res, next) => {
 });
 
 router.get('/map', async (req, res) => {
-  const onlinePlayersDiscordIdList = DiscordBot.onlinePlayers.array().reduce((list, player) => {
+  const onlinePlayersDiscordIdList = DiscordBot.presenceTracker.getAll().reduce((list, player) => {
     if (player.guildId !== '390509935097675777') return list;
 
     return list.concat(player.discordId);
@@ -20,8 +20,8 @@ router.get('/map', async (req, res) => {
   let maps = {};
   if (!cache.has('mapResult')) {
     console.log('Fetching players for map...');
-    const players = await DiscordBot.Game.Database.loadOnlinePlayerMaps(onlinePlayersDiscordIdList);
-    maps = DiscordBot.Game.Map.maps.reduce((hashMap, map) => {
+    const players = await DiscordBot.game.db.loadOnlinePlayerMaps(onlinePlayersDiscordIdList);
+    maps = DiscordBot.game.map.maps.reduce((hashMap, map) => {
       hashMap[map.id] = { ...map, players: [] };
       return hashMap;
     }, {});

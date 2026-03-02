@@ -2,7 +2,7 @@
 const BaseHelper = require('./Base/Helper');
 const BaseDiscord = require('./Base/Discord');
 
-const DiscordJS = require('discord.js');
+const { Client, Collection, GatewayIntentBits, ActivityType, ChannelType, PermissionFlagsBits } = require('discord.js');
 const fs = require('fs');
 
 // DATA
@@ -26,16 +26,14 @@ class DiscordBot extends BaseHelper {
 
   constructor() {
     super();
-    this.bot = new DiscordJS.Client({
-      apiRequestMethod: 'sequential',
-      messageCacheMaxSize: 200,
-      messageCacheLifetime: 0,
-      messageSweepInterval: 0,
-      fetchAllMembers: false,
-      disableEveryone: false,
-      sync: false,
-      restWsBridgeTimeout: 5000,
-      restTimeOffset: 500
+    this.bot = new Client({
+      intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildPresences,
+      ]
     });
     this.discord = new BaseDiscord(this.bot);
     this.Game = new Game();
@@ -44,7 +42,7 @@ class DiscordBot extends BaseHelper {
       Game: this.Game,
       Bot: this.bot
     });
-    this.onlinePlayers = new DiscordJS.Collection();
+    this.onlinePlayers = new Collection();
     this.loadEventListeners();
     this.bot.login(botLoginToken);
     this.minTimer = (minimalTimer * 1000) * 60;
@@ -56,29 +54,31 @@ class DiscordBot extends BaseHelper {
 
   loadEventListeners() {
     this.bot.on('error', err => errorLog.error(err));
-    this.bot.once('ready', () => {
-      if (!this.bot.user.avatarURL) { // avatarURL == null if not set
+    this.bot.once('clientReady', async () => {
+      if (!this.bot.user.avatarURL()) { // avatarURL() == null if not set
         this.bot.user.setAvatar(fs.readFileSync('./idle-rpg/res/hal.jpg'));
       }
-      this.bot.user.setStatus('idle');
+      this.bot.user.setPresence({ status: 'idle' });
       this.discord.loadGuilds();
       this.loadHeartBeat();
       this.Crons.loadCrons();
 
-      this.bot.guilds.cache.forEach(async (guild) => {
+      for (const guild of this.bot.guilds.cache.values()) {
         this.Game.loadGuildConfig(guild.id);
+        await guild.members.fetch();
         guild.members.cache
-          .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
+          .filter(member => !member.user.bot && (member.presence?.status ?? 'offline') !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
           .map(member => Object.assign({}, {
             name: member.nickname ? member.nickname : member.displayName,
             discordId: member.id,
             guildId: guild.id,
           }))
           .forEach(member => this.onlinePlayers.set(member.discordId + member.guildId, member));
-      }, console.log('Reset all personal multipliers'));
+      }
+      console.log('Reset all personal multipliers');
     });
 
-    this.bot.on('message', async (message) => {
+    this.bot.on('messageCreate', async (message) => {
       if (message.author.bot) { // Don't listen to bots. Even Idle-RPG himself.
         return;
       }
@@ -107,8 +107,9 @@ class DiscordBot extends BaseHelper {
     this.bot.on('guildCreate', async (guild) => {
       await this.Game.loadGuildConfig(guild.id);
       await this.discord.manageGuildChannels(guild);
+      await guild.members.fetch();
       guild.members.cache
-        .filter(member => !member.user.bot && member.presence.status !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
+        .filter(member => !member.user.bot && (member.presence?.status ?? 'offline') !== 'offline' && this.Game.dbClass().shouldBeInList(member.id, member.guild.id))
         .map(member => Object.assign({}, {
           name: member.nickname ? member.nickname : member.displayName,
           discordId: member.id,
@@ -130,7 +131,7 @@ class DiscordBot extends BaseHelper {
     this.bot.on('presenceUpdate', async (oldM, newM) => {
       const newMember = newM && newM.member;
       if (!newMember.user.bot) {
-        if (newM.status !== 'offline') {
+        if ((newM?.status ?? 'offline') !== 'offline') {
           if (await this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
             if (!this.onlinePlayers.has(newMember.id + newMember.guild.id)) {
               this.onlinePlayers.set(newMember.id + newMember.guild.id, {
@@ -142,7 +143,7 @@ class DiscordBot extends BaseHelper {
           }
         }
 
-        if (newM.status === 'offline') {
+        if ((newM?.status ?? 'offline') === 'offline') {
           if (await this.Game.dbClass().shouldBeInList(newMember.id, newMember.guild.id)) {
             if (this.onlinePlayers.has(newMember.id + newMember.guild.id)) {
               this.onlinePlayers.delete(newMember.id + newMember.guild.id);
@@ -153,7 +154,7 @@ class DiscordBot extends BaseHelper {
     });
 
     this.bot.on('guildMemberAdd', async (member) => {
-      if (member.presence.status !== 'offline') {
+      if ((member.presence?.status ?? 'offline') !== 'offline') {
         if (await this.Game.dbClass().shouldBeInList(member.id + member.guild.id, member.guild.id)) {
           if (!this.onlinePlayers.has(member.id + member.guild.id)) {
             this.onlinePlayers.set(member.id + member.guild.id, {
@@ -169,13 +170,13 @@ class DiscordBot extends BaseHelper {
         return;
       }
 
-      const welcomeChannel = member.guild.channels.cache.find(channel => channel.name === 'newcomers' && channel.type === 'text');
+      const welcomeChannel = member.guild.channels.cache.find(channel => channel.name === 'newcomers' && channel.type === ChannelType.GuildText);
       if (welcomeChannel) {
         // Test for url in name
         if (/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi.test(member.displayName)) {
           return;
         }
-        welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.cache.find(channel => channel.name === 'faq' && channel.type === 'text').id}> or PM me !help.`);
+        welcomeChannel.send(`Welcome ${member}! This server has an Idle-RPG bot! If you have any questions check the <#${member.guild.channels.cache.find(channel => channel.name === 'faq' && channel.type === ChannelType.GuildText).id}> or PM me !help.`);
         welcomeLog.info(member);
       }
     });
@@ -199,16 +200,16 @@ class DiscordBot extends BaseHelper {
         let guildMaxTimer = this.maxTimer;
         if (process.env.NODE_ENV.includes('production')) {
           const guildOnlineMembers = guild.members.cache
-            .filter(member => !member.user.bot && member.presence.status !== 'offline')
+            .filter(member => !member.user.bot && (member.presence?.status ?? 'offline') !== 'offline')
             .map(member => Object.assign({}, {
               name: member.nickname ? member.nickname : member.displayName,
               discordId: member.id,
               guildId: guild.id,
             }));
 
-          if (guildOnlineMembers.size >= 50) {
-            guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
-            guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.size / 50))) * 1000) * 60;
+          if (guildOnlineMembers.length >= 50) {
+            guildMinTimer = ((Number(minimalTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
+            guildMaxTimer = ((Number(maximumTimer) + (Math.floor(guildOnlineMembers.length / 50))) * 1000) * 60;
           }
           guild.members.cache.map(member => this.onlinePlayers.get(member.id + member.guild.id))
             .filter(member => member && !member.timer && guild.id === member.guildId)
@@ -240,7 +241,7 @@ class DiscordBot extends BaseHelper {
           });
         }
       });
-      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length} idlers in ${this.bot.guilds.cache.size} guilds`, { type: 'WATCHING' });
+      this.bot.user.setActivity(`${process.env.NODE_ENV.includes('production') ? this.onlinePlayers.size : enumHelper.mockPlayers.length} idlers in ${this.bot.guilds.cache.size} guilds`, { type: ActivityType.Watching });
     }, 60000 * interval);
   }
 
@@ -256,14 +257,14 @@ class DiscordBot extends BaseHelper {
   // CRONS
   powerHourBegin() {
     this.bot.guilds.cache.forEach((guild) => {
-      const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+      const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText && channel.parent.name === 'Idle-RPG');
       if (actionsChannel) {
         actionsChannel.send(this.setImportantMessage('Dark clouds are gathering in the sky. Something is about to happen...'));
       }
     });
     setTimeout(() => {
       this.bot.guilds.cache.forEach((guild) => {
-        const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+        const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText && channel.parent.name === 'Idle-RPG');
         if (actionsChannel) {
           actionsChannel.send(this.setImportantMessage('You suddenly feel energy building up within the sky, the clouds get darker, you hear monsters screeching nearby! Power Hour has begun!'));
           const guildConfig = this.Game.dbClass().loadGame(guild.id);
@@ -275,7 +276,7 @@ class DiscordBot extends BaseHelper {
 
     setTimeout(() => {
       this.bot.guilds.cache.forEach((guild) => {
-        const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text' && channel.parent.name === 'Idle-RPG');
+        const actionsChannel = guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText && channel.parent.name === 'Idle-RPG');
 
         if (actionsChannel) {
           actionsChannel.send(this.setImportantMessage('The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!'));
@@ -328,9 +329,9 @@ class DiscordBot extends BaseHelper {
             await lotteryChannel.send(`Current lottery prize pool: ${newPrizePool}`);
             await lotteryChannel.send('Contestants:');
           } else {
-            await lotteryMessages.array()[0].edit(`Idle-RPG Lottery - You must pay 100 gold to enter! PM me \`!lottery\` to join!\nOut of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the previous daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
-            await lotteryMessages.array()[1].edit(`Current lottery prize pool: ${newPrizePool}`);
-            await lotteryMessages.array()[2].edit('Contestants:');
+            await [...lotteryMessages.values()][0].edit(`Idle-RPG Lottery - You must pay 100 gold to enter! PM me \`!lottery\` to join!\nOut of ${guildLotteryPlayers.length} contestants, ${winner.name} has won the previous daily lottery of ${guildConfig.dailyLottery.prizePool} gold!`);
+            await [...lotteryMessages.values()][1].edit(`Current lottery prize pool: ${newPrizePool}`);
+            await [...lotteryMessages.values()][2].edit('Contestants:');
           }
         }
       }
@@ -341,14 +342,14 @@ class DiscordBot extends BaseHelper {
       guildLotteryPlayers.forEach((player) => {
         const discordUser = guild.members.cache.get(player.discordId);
         if (player.discordId !== winner.discordId && discordUser) {
-          discordUser.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${guildConfig.dailyLottery.prizePool} out of ${guildLotteryPlayers.length} people.`);
+          discordUser.user.send(`Thank you for participating in the lottery! Unfortunately ${winner.name} has won the prize of ${guildConfig.dailyLottery.prizePool} out of ${guildLotteryPlayers.length} people.`);
         } else if (discordUser) {
-          discordUser.send(`Thank you for participating in the lottery! You have won the prize of ${guildConfig.dailyLottery.prizePool} out of ${guildLotteryPlayers.length} people.`);
+          discordUser.user.send(`Thank you for participating in the lottery! You have won the prize of ${guildConfig.dailyLottery.prizePool} out of ${guildLotteryPlayers.length} people.`);
         }
       });
 
       guildConfig.dailyLottery.prizePool = newPrizePool;
-      guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === 'text').send(eventMsg);
+      guild.channels.cache.find(channel => channel.name === 'actions' && channel.type === ChannelType.GuildText).send(eventMsg);
       await this.Game.dbClass().updateGame(guild.id, guildConfig);
       await this.logEvent(winner, this.Game.dbClass(), eventLog, enumHelper.logTypes.action);
       await this.Game.dbClass().savePlayer(winner);
@@ -358,15 +359,15 @@ class DiscordBot extends BaseHelper {
 
   updateLeaderboards() {
     const types = enumHelper.leaderboardStats;
-    this.bot.guilds.cache.each(async (guild) => {
+    this.bot.guilds.cache.forEach(async (guild) => {
       const botGuildMember = guild.members.cache.get(this.bot.user.id);
-      if (!botGuildMember.permissions.has([
-        'VIEW_CHANNEL',
-        'MANAGE_CHANNELS'
+      if (!botGuildMember || !botGuildMember.permissions.has([
+        PermissionFlagsBits.ViewChannel,
+        PermissionFlagsBits.ManageChannels
       ])) {
         return;
       }
-      const leaderboardChannel = guild.channels.cache.find(channel => channel && channel.name === 'leaderboards' && channel.type === 'text' /*&& channel.parent.name === 'Idle-RPG'*/);
+      const leaderboardChannel = guild.channels.cache.find(channel => channel && channel.name === 'leaderboards' && channel.type === ChannelType.GuildText /*&& channel.parent.name === 'Idle-RPG'*/);
       if (!leaderboardChannel || (leaderboardChannel && !leaderboardChannel.manageable)) {
         return;
       }
@@ -399,8 +400,8 @@ ${rankString}\`\`\``;
           continue;
         }
 
-        if (!msg.includes(msgCount.array()[i].toString()) && msgCount.array()[i].author.id === this.bot.user.id) {
-          msgCount.array()[i].edit(msg);
+        if (!msg.includes([...msgCount.values()][i].toString()) && [...msgCount.values()][i].author.id === this.bot.user.id) {
+          [...msgCount.values()][i].edit(msg);
         }
       }
     });
@@ -411,14 +412,14 @@ ${rankString}\`\`\``;
       const blizzardDice = this.randomBetween(0, 99);
       const guildConfig = await this.Game.dbClass().loadGame(guild.id);
       if (blizzardDice <= 15 && !guildConfig.events.isBlizzardActive) {
-        let actionChannel = guild.channels.cache.find(channel => channel && channel.name === 'actions' && channel.type === 'text');
+        let actionChannel = guild.channels.cache.find(channel => channel && channel.name === 'actions' && channel.type === ChannelType.GuildText);
         if (actionChannel) {
           actionChannel.send('```css A blizzard has just begun!```');
         }
         guildConfig.events.isBlizzardActive = true;
         await this.Game.dbClass().updateGame(guild.id, guildConfig);
         setTimeout(() => {
-          actionChannel = guild.channels.cache.find(channel => channel && channel.name === 'actions' && channel.type === 'text');
+          actionChannel = guild.channels.cache.find(channel => channel && channel.name === 'actions' && channel.type === ChannelType.GuildText);
           if (actionChannel) {
             actionChannel.send('```css The blizzard has ended!```');
           }
