@@ -1,6 +1,7 @@
 const enumHelper = require('../../../utils/enumHelper');
 const { ChannelType } = require('discord.js');
 const { setImportantMessage } = require('../../utils/messageHelpers');
+const { formatLeaderboards } = require('../../utils/formatters');
 const maps = require('../../../game/data/maps');
 const pkg = require('../../../../package.json');
 
@@ -70,16 +71,19 @@ module.exports = [
       const isNested = fieldKey.includes('.');
       const fieldKeys = isNested ? fieldKey.split('.') : null;
       const loadedTop10 = await game.db.loadTop10(type, guildId, bot.user.id);
+      if (!loadedTop10) return author.send('Could not load leaderboard data.');
+      const subjectTitle = formatLeaderboards(fieldKey);
       const rankString = loadedTop10
-        .filter(player => isNested ? player[fieldKeys[0]][fieldKeys[1]] : player[fieldKey] > 0)
-        .sort((p1, p2) => {
-          if (fieldKey === 'level') return p2.experience.current - p1.experience.current && p2.level - p1.level;
-          if (isNested) return p2[fieldKeys[0]][fieldKeys[1]] - p1[fieldKeys[0]][fieldKeys[1]];
-          return p2[fieldKey] - p1[fieldKey];
+        .filter(player => {
+          const val = isNested ? player[fieldKeys[0]][fieldKeys[1]] : player[fieldKey];
+          return val > 0;
         })
-        .map((player, rank) => `Rank ${rank + 1}: ${player.name} - ${isNested ? `${fieldKeys[0]}: ${player[fieldKeys[0]][fieldKeys[1]]}` : `${fieldKey.replace('currentBounty', 'Bounty')}: ${player[fieldKey]}`}`)
+        .map((player, rank) => {
+          const val = isNested ? player[fieldKeys[0]][fieldKeys[1]] : player[fieldKey];
+          return `Rank ${rank + 1}: ${player.name} - ${subjectTitle}: ${val}`;
+        })
         .join('\n');
-      return author.send(`\`\`\`Top 10 ${typeArg}:\n${rankString}\`\`\``);
+      return author.send(`\`\`\`Top 10 ${subjectTitle}:\n${rankString}\`\`\``);
     }
   },
   {

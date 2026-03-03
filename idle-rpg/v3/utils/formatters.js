@@ -188,13 +188,18 @@ function generateLog(log, count) {
 
 function formatLeaderboards(subjectKey) {
   if (subjectKey.includes('.')) {
-    if (subjectKey.includes('deaths.mob')) return subjectKey.replace('deaths.mob', 'Killed by mob');
-    if (subjectKey.includes('deaths.player')) return subjectKey.replace('deaths.player', 'Killed by player');
-    if (subjectKey.includes('kills.player')) return subjectKey.replace('kills.player', 'Player kills');
-    if (subjectKey.includes('quest.completed')) return subjectKey.replace('quest.completed', 'Completed Quests');
+    if (subjectKey.includes('deaths.mob')) return 'Killed by Mob';
+    if (subjectKey.includes('deaths.player')) return 'Killed by Player';
+    if (subjectKey.includes('kills.player')) return 'Player Kills';
+    if (subjectKey.includes('quest.completed')) return 'Quests Completed';
+    if (subjectKey.includes('gold.current')) return 'Gold';
     return subjectKey.split('.')[0];
   }
-  return subjectKey.replace('currentBounty', 'Bounty').replace('spellCast', 'Spells Cast');
+  if (subjectKey === 'level') return 'Level';
+  if (subjectKey === 'events') return 'Events Attended';
+  if (subjectKey === 'spellCast') return 'Spells Cast';
+  if (subjectKey === 'currentBounty') return 'Bounty';
+  return subjectKey;
 }
 
 module.exports = {

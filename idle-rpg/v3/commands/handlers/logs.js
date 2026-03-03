@@ -7,13 +7,14 @@ module.exports = [
     channelOnly: true,
     handler: async ({ game, bot, message, guildId, author }) => {
       const args = message.content.split(' ');
-      const amount = parseInt(args[1]) || 5;
+      const amount = Math.min(parseInt(args[1]) || 5, 25);
       const playerLog = await game.db.loadActionLog(author.id);
       if (!playerLog || !playerLog.log || playerLog.log.length === 0) {
         return author.send('You have no events logged yet.');
       }
       const logString = generateLog(playerLog.log, amount);
-      return author.send(`\`\`\`${logString}\`\`\``);
+      const response = `\`\`\`${logString}\`\`\``;
+      return author.send(response.length > 1950 ? response.slice(0, 1947) + '...' : response);
     }
   },
   {
@@ -22,13 +23,14 @@ module.exports = [
     channelOnly: true,
     handler: async ({ game, bot, message, guildId, author }) => {
       const args = message.content.split(' ');
-      const amount = parseInt(args[1]) || 5;
+      const amount = Math.min(parseInt(args[1]) || 5, 25);
       const playerLog = await game.db.loadPvpLog(author.id);
       if (!playerLog || !playerLog.log || playerLog.log.length === 0) {
         return author.send('You have no PvP events logged yet.');
       }
       const logString = generateLog(playerLog.log, amount);
-      return author.send(`\`\`\`${logString}\`\`\``);
+      const response = `\`\`\`${logString}\`\`\``;
+      return author.send(response.length > 1950 ? response.slice(0, 1947) + '...' : response);
     }
   },
   {
@@ -37,13 +39,14 @@ module.exports = [
     channelOnly: true,
     handler: async ({ game, bot, message, guildId, author }) => {
       const args = message.content.split(' ');
-      const amount = parseInt(args[1]) || 5;
+      const amount = Math.min(parseInt(args[1]) || 5, 25);
       const playerLog = await game.db.loadMoveLog(author.id);
       if (!playerLog || !playerLog.log || playerLog.log.length === 0) {
         return author.send('You have no movement events logged yet.');
       }
       const logString = generateLog(playerLog.log, amount);
-      return author.send(`\`\`\`${logString}\`\`\``);
+      const response = `\`\`\`${logString}\`\`\``;
+      return author.send(response.length > 1950 ? response.slice(0, 1947) + '...' : response);
     }
   },
   {

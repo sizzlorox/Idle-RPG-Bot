@@ -260,11 +260,13 @@ class Database {
     const removeNpcs = enumHelper.roamingNpcs.map(npc => npc.discordId).concat(botID);
     enumHelper.mockPlayers.map(npc => npc.name).forEach(npc => removeNpcs.push(npc));
 
-    select[Object.keys(type)[0]] = 1;
+    const fieldKey = Object.keys(type)[0];
+    select[fieldKey] = 1;
 
-    if (Object.keys(type)[0] === 'level') {
+    let sortType = type;
+    if (fieldKey === 'level') {
       select['experience.current'] = 1;
-      type['experience.current'] = -1;
+      sortType = { ...type, 'experience.current': -1 };
     }
     const query = {
       discordId: { $nin: removeNpcs, $exists: true },
@@ -274,7 +276,7 @@ class Database {
     try {
       return await Player.find(query)
         .select(select)
-        .sort(type)
+        .sort(sortType)
         .limit(10);
     } catch (err) {
       errorLog.error(err);
