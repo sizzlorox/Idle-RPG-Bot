@@ -1,5 +1,22 @@
-# Node things
-node_modules/
+# Dependencies (all levels)
+**/node_modules/
 
-# General
+# Web build output - generated in builder stage
+web/build/
+
+# Environment and secrets
 .env
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# Logs
+logs/
+*.log
+
+# Dev/local files
+docker-compose.yaml
+.vscode/
+*.md
