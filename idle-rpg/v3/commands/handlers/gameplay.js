@@ -110,7 +110,8 @@ module.exports = [
         } else {
           const msgs = [...lotteryMessages.values()];
           await msgs[1].edit(`Current lottery prize pool: ${guildConfig.dailyLottery.prizePool}`);
-          await msgs[2].edit(msgs[2].content.concat(`\n${player.name}`));
+          const updatedContestants = msgs[2].content.concat(`\n${player.name}`);
+          if (updatedContestants.length <= 2000) await msgs[2].edit(updatedContestants);
         }
       }
       return author.send('You have joined todays daily lottery! Good luck!');
