@@ -17,7 +17,7 @@ class EventEngine {
     this.player = player;
     this.battle = battle;
     this.townEvent = new AttackEvent({ db, itemGen, inventory, player });
-    this.luck = new LuckEvent({ db, spellGen, itemGen, inventory, player });
+    this.luck = new LuckEvent({ db, map, spellGen, itemGen, inventory, player });
   }
 
   async moveEvent(playerObj) {
