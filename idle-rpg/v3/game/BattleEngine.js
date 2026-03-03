@@ -9,6 +9,7 @@ const BattleSimulator = require('./BattleSimulator');
 
 const STEAL_ITEM_SLOTS = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
 const RARE_MOB_NAMES = new Set(['Dragon', 'Sphinx', 'Cave Troll', 'Basilisk', 'Golem', 'Chaotic Triceratops']);
+const LEGENDARY_RARITY_NAMES = new Set(['Legendary', 'Mythical', 'Ancient', 'Godly']);
 
 class BattleEngine {
 
@@ -452,7 +453,7 @@ class BattleEngine {
         } else {
           eventMsg.push(`**${generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${deadMob.name}!\`**`);
         }
-        if (item.power >= 5) {
+        if (LEGENDARY_RARITY_NAMES.has(item.name.split(' ')[0])) {
           eventMsg.unshift(setImportantMessage(`${generatePlayerName(updatedPlayer, true)} just found a legendary ${item.name}!`));
         }
         eventLog.push(`Received ${item.name} from ${mob[0].name}`);
