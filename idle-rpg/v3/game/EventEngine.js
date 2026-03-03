@@ -25,12 +25,37 @@ class EventEngine {
     const eventMsg = [];
     const eventLog = [];
     try {
-      const mapObj = await this.map.moveToRandomMap(updatedPlayer);
+      let mapObj;
+      let isQuestMovement = false;
+
+      const questMobName = updatedPlayer.quest && updatedPlayer.quest.questMob && updatedPlayer.quest.questMob.name !== 'None'
+        ? updatedPlayer.quest.questMob.name
+        : null;
+
+      if (questMobName) {
+        const mobBiomes = this.map._mobBiomes.get(questMobName);
+        const alreadyInBiome = mobBiomes && mobBiomes.has(updatedPlayer.map.biome.name);
+        if (!alreadyInBiome) {
+          const nearestMap = this.map.findNearestMapForMob(updatedPlayer.map.coords, questMobName);
+          if (nearestMap) {
+            mapObj = this.map.moveTowardCoords(updatedPlayer, nearestMap.coords);
+            if (mapObj) isQuestMovement = true;
+          }
+        }
+      }
+
+      if (!mapObj) mapObj = await this.map.moveToRandomMap(updatedPlayer);
       if (mapObj.map.name === updatedPlayer.previousMap) return { updatedPlayer };
+
       updatedPlayer.previousMap = updatedPlayer.map.name;
       updatedPlayer.map = mapObj.map;
       updatedPlayer.travelled++;
-      eventMsg.push(`${generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`);
+
+      const moveMsg = isQuestMovement
+        ? `${generatePlayerName(updatedPlayer)} is hunting \`${questMobName}\` and heads \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\`, arriving in \`${mapObj.map.name}\`.`
+        : `${generatePlayerName(updatedPlayer)} decided to head \`${mapObj.direction}\` from \`${updatedPlayer.previousMap}\` and arrived in \`${mapObj.map.name}\`.`;
+
+      eventMsg.push(moveMsg);
       eventLog.push(`Travelled ${mapObj.direction} from ${updatedPlayer.previousMap} and arrived in ${mapObj.map.name}`);
       await this.player.logEvent(updatedPlayer, eventLog[0], enumHelper.logTypes.move);
       return { type: 'movement', updatedPlayer, msg: eventMsg, pm: eventLog };
