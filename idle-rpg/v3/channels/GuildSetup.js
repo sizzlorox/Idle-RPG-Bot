@@ -7,11 +7,11 @@ class GuildSetup {
     this.bot = bot;
   }
 
-  loadGuilds() {
+  async loadGuilds() {
     console.log('Idle RPG is loading guilds');
-    this.bot.guilds.cache.forEach(async (guild) => {
-      this.manageGuildChannels(guild);
-    });
+    for (const guild of this.bot.guilds.cache.values()) {
+      await this.manageGuildChannels(guild);
+    }
   }
 
   async manageGuildChannels(guild) {
@@ -21,12 +21,25 @@ class GuildSetup {
       console.log(`Idle RPG does not have permission to manage channels in guild: ${guild.name} (${guild.id})`);
       return;
     }
-    let categoryChannel = guild.channels.cache.find(channel => channel.type === ChannelType.GuildCategory && channel.name.toLowerCase() === 'idle-rpg');
-    const hasLeaderboardsChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'leaderboards' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
-    const hasCommandsChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'commands' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
-    const hasFAQChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'faq' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
-    const hasActionsChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'actions' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
-    const hasMovementChannel = guild.channels.cache.find(channel => channel.name.toLowerCase() === 'movement' && channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg');
+    let categoryChannel = null;
+    let hasLeaderboardsChannel = null;
+    let hasCommandsChannel = null;
+    let hasFAQChannel = null;
+    let hasActionsChannel = null;
+    let hasMovementChannel = null;
+    for (const channel of guild.channels.cache.values()) {
+      if (channel.type === ChannelType.GuildCategory && channel.name.toLowerCase() === 'idle-rpg') {
+        categoryChannel = channel;
+      } else if (channel.type === ChannelType.GuildText && channel.parent && channel.parent.name.toLowerCase() === 'idle-rpg') {
+        switch (channel.name.toLowerCase()) {
+          case 'leaderboards': hasLeaderboardsChannel = channel; break;
+          case 'commands': hasCommandsChannel = channel; break;
+          case 'faq': hasFAQChannel = channel; break;
+          case 'actions': hasActionsChannel = channel; break;
+          case 'movement': hasMovementChannel = channel; break;
+        }
+      }
+    }
 
     if (!categoryChannel) {
       console.log(`Creating Idle-RPG Category Channel for Guild: ${guild.name}`);

@@ -121,33 +121,31 @@ function generateEquipmentsString(player) {
 }
 
 function generateInventoryEquipmentString(player) {
-  let equipString = '';
-  player.inventory.equipment.forEach((equip, index, array) => {
+  const parts = [];
+  player.inventory.equipment.forEach((equip) => {
     switch (equip.position) {
       case enumHelper.equipment.types.helmet.position:
-        equipString = equipString.concat(`${equip.name}:
+        parts.push(`${equip.name}:
             Defense: ${equip.power}
           ${generatePreviousOwnerString(equip)}`);
         break;
       case enumHelper.equipment.types.armor.position:
-        equipString = equipString.concat(`${equip.name}:
+        parts.push(`${equip.name}:
             Defense: ${equip.power}
           ${generatePreviousOwnerString(equip)}`);
         break;
-      case enumHelper.equipment.types.weapon.position:
+      case enumHelper.equipment.types.weapon.position: {
         const weaponRating = calculateItemRating(player, equip);
-        equipString = equipString.concat(`${equip.name}:
+        parts.push(`${equip.name}:
             BaseAttackPower: ${equip.power}
             AttackPower: ${Number(weaponRating)}
             AttackType: ${equip.attackType}
           ${generatePreviousOwnerString(equip)}`);
         break;
-    }
-    if (index !== array.length - 1) {
-      equipString = equipString.concat('\n          ');
+      }
     }
   });
-  return equipString;
+  return parts.join('\n          ');
 }
 
 function generateInventoryString(player) {
@@ -161,12 +159,12 @@ function generateInventoryString(player) {
 }
 
 function generateSpellBookString(player) {
-  let spellBookString = '\`\`\`Here\'s your spellbook!\n';
+  const lines = ['```Here\'s your spellbook!'];
   player.spells.forEach((spell) => {
-    spellBookString += `    ${spell.name} - ${spell.description}\n`;
+    lines.push(`    ${spell.name} - ${spell.description}`);
   });
-  spellBookString += '\`\`\`';
-  return spellBookString;
+  lines.push('```');
+  return lines.join('\n');
 }
 
 function generateLog(log, count) {

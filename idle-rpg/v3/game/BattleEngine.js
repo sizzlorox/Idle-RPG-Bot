@@ -109,9 +109,9 @@ class BattleEngine {
     let isQuestCompleted = false;
     const eventMsg = [`[\`${results.attacker.map.name}\`] `];
     const eventLog = [];
-    let mobCountString = '';
-    let mobKillCountString = '';
-    let mobFleeCountString = '';
+    const mobCountParts = [];
+    const mobKillParts = [];
+    const mobFleeParts = [];
     let expGain = 0;
     let goldGain = 0;
     let questExpGain = 0;
@@ -160,25 +160,28 @@ class BattleEngine {
     let battleResult = `\`\`\`Battle Results:\n  You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.\n${mobListResult.join('\n')}\`\`\``;
     if (updatedPlayer.health <= 0) {
       battleResult = battleResult.replace(`  You have ${updatedPlayer.health} / ${playerMaxHealth} HP left.`, '');
-      const killerMob = results.defender.reduce((list, mob) => (!mob.dmgDealt > 0 ? list : list.concat(mob.name)), []).join(', ');
+      const killerMob = results.defender.filter(mob => mob.dmgDealt > 0).map(mob => mob.name).join(', ');
       eventMsg.push(`| ${killerMob} just killed ${generatePlayerName(updatedPlayer, true)}!`);
       eventLog.push(`${killerMob} just killed you!`);
     }
 
     const eventMsgResults = `↳ ${capitalizeFirstLetter(generateGenderString(updatedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${updatedPlayer.health}/${playerMaxHealth}]`;
 
-    mobListInfo.mobs.forEach((mobInfo, i) => {
+    mobListInfo.mobs.forEach((mobInfo) => {
       const totalCount = mobInfo.event.killed + mobInfo.event.fled + mobInfo.event.survived;
-      mobCountString = i > 0 ? mobCountString.concat(`, ${totalCount}x \`${mobInfo.mob}\``) : mobCountString.concat(`${totalCount}x \`${mobInfo.mob}\``);
+      mobCountParts.push(`${totalCount}x \`${mobInfo.mob}\``);
       if (mobInfo.event.killed > 0) {
-        mobKillCountString = mobKillCountString !== '' ? mobKillCountString.concat(`, ${mobInfo.event.killed}x \`${mobInfo.mob}\``) : mobKillCountString.concat(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
+        mobKillParts.push(`${mobInfo.event.killed}x \`${mobInfo.mob}\``);
       }
       if (mobInfo.event.fled > 0 && mobInfo.event.killed === 0) {
-        mobFleeCountString = mobKillCountString !== '' ? mobFleeCountString.concat(`, ${mobInfo.event.fled}x \`${mobInfo.mob}\``) : mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
+        mobFleeParts.push(mobKillParts.length > 0 ? `, ${mobInfo.event.fled}x \`${mobInfo.mob}\`` : `${mobInfo.event.fled}x \`${mobInfo.mob}\``);
       } else if (mobInfo.event.fled > 0) {
-        mobFleeCountString = mobFleeCountString.concat(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
+        mobFleeParts.push(`${mobInfo.event.fled}x \`${mobInfo.mob}\``);
       }
     });
+    const mobCountString = mobCountParts.join(', ');
+    const mobKillCountString = mobKillParts.join(', ');
+    const mobFleeCountString = mobFleeParts.join('');
 
     if (mobFleeCountString) {
       eventMsg.push(results.attackerDamage > results.defenderDamage
