@@ -136,7 +136,8 @@ class BattleEngine {
         mobListInfo.mobs[infoList].event.killed++;
         const mobTypeName = [...RARE_MOB_NAMES].find(rare => mob.name.includes(rare));
         if (mobTypeName) {
-          eventMsg.push(setImportantMessage(`${generatePlayerName(updatedPlayer, true)} just slew a ${mob.name}!`));
+          const playerNameStr = updatedPlayer.titles.current !== 'None' ? `${updatedPlayer.name} the ${updatedPlayer.titles.current}` : updatedPlayer.name;
+          eventMsg.push(setImportantMessage(`${playerNameStr} just slew a ${mob.name}!`));
         }
       } else if (mob.health > 0 && updatedPlayer.health > 0) {
         mobListInfo.mobs[infoList].event.fled++;
@@ -454,7 +455,8 @@ class BattleEngine {
           eventMsg.push(`**${generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${deadMob.name}!\`**`);
         }
         if (LEGENDARY_RARITY_NAMES.has(item.name.split(' ')[0])) {
-          eventMsg.unshift(setImportantMessage(`${generatePlayerName(updatedPlayer, true)} just found a legendary ${item.name}!`));
+          const playerNameStr = updatedPlayer.titles.current !== 'None' ? `${updatedPlayer.name} the ${updatedPlayer.titles.current}` : updatedPlayer.name;
+          eventMsg.unshift(setImportantMessage(`${playerNameStr} just found a legendary ${item.name}!`));
         }
         eventLog.push(`Received ${item.name} from ${mob[0].name}`);
         await this.player.logEvent(updatedPlayer, eventLog[eventLog.length - 1], enumHelper.logTypes.action);
