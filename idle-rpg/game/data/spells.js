@@ -35,6 +35,22 @@ const spells = {
       chance: 50,
       rarity: 100
     },
+    lightning_bolt = {
+      name: 'Lightning Bolt',
+      description: 'Calls down lightning on the target',
+      type: 'target',
+      power: 1,
+      chance: 60,
+      rarity: 50
+    },
+    shield = {
+      name: 'Shield',
+      description: 'Raises a magic barrier, absorbing incoming damage',
+      type: 'self',
+      power: 1,
+      chance: 40,
+      rarity: 40
+    },
   ]
 };
 module.exports = spells;

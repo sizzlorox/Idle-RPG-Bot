@@ -26,13 +26,14 @@ function calculateItemRating(player, item) {
     if (item.position !== enumHelper.equipment.types.weapon.position) {
       return item.power;
     }
+    const luk = sumPlayerTotalLuck(player);
     switch (item.attackType) {
       case 'melee':
-        return Math.ceil((sumPlayerTotalStrength(player) + item.power) + sumPlayerTotalDexterity(player));
+        return Math.ceil(item.power + sumPlayerTotalStrength(player) + luk * 0.5);
       case 'range':
-        return Math.ceil((sumPlayerTotalDexterity(player) + item.power) + sumPlayerTotalDexterity(player));
+        return Math.ceil(item.power + sumPlayerTotalDexterity(player) + luk * 0.5);
       case 'magic':
-        return Math.ceil((sumPlayerTotalIntelligence(player) + item.power) + sumPlayerTotalDexterity(player));
+        return Math.ceil(item.power + sumPlayerTotalIntelligence(player) + luk * 0.5);
     }
   }
   return Math.ceil(item.str + item.dex + item.end + item.int + item.luk);

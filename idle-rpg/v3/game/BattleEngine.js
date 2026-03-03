@@ -125,7 +125,7 @@ class BattleEngine {
         mobListInfo.mobs.push({ mob: mob.name, totalCount: 0, event: { killed: 0, fled: 0, survived: 0 } });
         infoList = mobListInfo.mobs.length - 1;
       }
-      expGain += Math.ceil(((mob.experience) + (mob.dmgDealt / 4)) / 6) * multiplier;
+      expGain += Math.ceil(((mob.experience) + (mob.dmgDealt / 4)) / 3) * multiplier;
 
       if (mob.health <= 0) {
         goldGain += Math.floor(mob.gold * multiplier);
@@ -165,7 +165,12 @@ class BattleEngine {
       eventLog.push(`${killerMob} just killed you!`);
     }
 
-    const eventMsgResults = `↳ ${capitalizeFirstLetter(generateGenderString(updatedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${updatedPlayer.health}/${playerMaxHealth}]`;
+    const battleEvents = results.battleEvents || { crits: 0, dodges: 0 };
+    const critDodgeParts = [];
+    if (battleEvents.crits > 0) critDodgeParts.push(`[CRIT x${battleEvents.crits}]`);
+    if (battleEvents.dodges > 0) critDodgeParts.push(`[DODGE x${battleEvents.dodges}]`);
+    const critDodgeInfo = critDodgeParts.length > 0 ? ` ${critDodgeParts.join(', ')}` : '';
+    const eventMsgResults = `↳ ${capitalizeFirstLetter(generateGenderString(updatedPlayer, 'he'))} dealt \`${results.attackerDamage}\` dmg, received \`${results.defenderDamage}\` dmg and gained \`${expGain}\` exp${goldGain === 0 ? '' : ` and \`${goldGain}\` gold`}! [HP:${updatedPlayer.health}/${playerMaxHealth}]${critDodgeInfo}`;
 
     mobListInfo.mobs.forEach((mobInfo) => {
       const totalCount = mobInfo.event.killed + mobInfo.event.fled + mobInfo.event.survived;
@@ -256,7 +261,7 @@ class BattleEngine {
       if (attacker.health <= 0 && defender.health > 0) {
         battleResultLog = battleResultLog.replace(`  ${attacker.name} has ${attacker.health}/${playerMaxHealth} HP left.`, '');
         eventMsg.push(`[\`${attacker.map.name}\`] ${generatePlayerName(defender, true)} just killed ${generatePlayerName(attacker, true)} with ${generateGenderString(defender, 'his')} \`${defender.equipment.weapon.name}\`!\n↳ ${generatePlayerName(attacker, true)} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [${generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
-        const expGain = Math.floor(attackerDamage / 8);
+        const expGain = Math.floor(attackerDamage / 4) + Math.floor(attacker.level / 2);
         eventLog.push(`Died to ${defender.name} in ${attacker.map.name}.`);
         const otherPlayerLog = `Killed ${attacker.name} in ${attacker.map.name}. [${expGain} exp]`;
         eventLog.push('```'.concat(battleResultLog).concat('```'));
@@ -271,7 +276,7 @@ class BattleEngine {
         result = enumHelper.battle.outcomes.lost;
       } else if (defender.health <= 0 && attacker.health > 0) {
         battleResultLog = battleResultLog.replace(`  ${defender.name} has ${defender.health}/${defenderMaxHealth} HP left.`, '');
-        const expGain = Math.floor(defenderDamage / 8);
+        const expGain = Math.floor(defenderDamage / 4) + Math.floor(defender.level / 2);
         eventMsg.push(`[\`${attacker.map.name}\`] ${generatePlayerName(attacker, true)} just killed \`${defender.name}\` with ${generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\`!\n↳ ${capitalizeFirstLetter(generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
         eventLog.push(`Killed ${defender.name} in ${attacker.map.name}. [${expGain} exp]`);
         const otherPlayerLog = `Died to ${attacker.name} in ${attacker.map.name}.`;
@@ -289,8 +294,8 @@ class BattleEngine {
         eventMsg.push(attackerDamage > defenderDamage
           ? `[\`${attacker.map.name}\`] ${generatePlayerName(attacker, true)} attacked ${generatePlayerName(defender, true)} with ${generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${generateGenderString(defender, 'he')} managed to get away!\n↳ ${capitalizeFirstLetter(generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`
           : `[\`${attacker.map.name}\`] ${generatePlayerName(attacker, true)} attacked ${generatePlayerName(defender, true)} with ${generateGenderString(attacker, 'his')} \`${attacker.equipment.weapon.name}\` but ${generatePlayerName(defender, true)} was too strong!\n↳ ${capitalizeFirstLetter(generateGenderString(attacker, 'he'))} dealt \`${attackerDamage}\` dmg, received \`${defenderDamage}\` dmg! [HP:${attacker.health}/${playerMaxHealth}]-[${generatePlayerName(defender, true)} HP:${defender.health}/${defenderMaxHealth}]`);
-        const expGainAttacker = Math.floor(defenderDamage / 8);
-        const expGainDefender = Math.floor(attackerDamage / 8);
+        const expGainAttacker = Math.floor(defenderDamage / 4) + Math.floor(defender.level / 2);
+        const expGainDefender = Math.floor(attackerDamage / 4) + Math.floor(attacker.level / 2);
         eventLog.push(`Attacked ${defender.name} in ${attacker.map.name} with ${attacker.equipment.weapon.name} and dealt ${attackerDamage} damage! [${expGainAttacker} exp]`);
         const otherPlayerLog = `Attacked by ${attacker.name} in ${attacker.map.name} with ${attacker.equipment.weapon.name} and received ${attackerDamage} damage! [${expGainDefender} exp]`;
         eventLog.push('```'.concat(battleResultLog).concat('```'));
@@ -347,8 +352,12 @@ class BattleEngine {
       const luckStealChance = randomBetween(0, 99);
       const chance = Math.floor((victimPlayer.currentBounty * Math.log(1.2)) / 100);
       const canSteal = !Number.isFinite(chance) ? 0 : chance;
+      const stealerLuk = stealingPlayer.stats.luk + stealingPlayer.equipment.relic.luk;
+      const lukBonus = Math.floor(stealerLuk * 0.5);
+      // Base 10% steal chance; LUK and bounty lower the threshold (cap: 30% max)
+      const stealThreshold = Math.max(70, 90 - canSteal - lukBonus);
 
-      if (luckStealChance > (90 - canSteal)) {
+      if (luckStealChance > stealThreshold) {
         const itemSlot = STEAL_ITEM_SLOTS[randomBetween(0, 2)];
         const victimEquip = victimPlayer.equipment[itemSlot];
         if (![enumHelper.equipment.empty.armor.name, enumHelper.equipment.empty.weapon.name].includes(victimEquip.name)) {
@@ -368,7 +377,7 @@ class BattleEngine {
           stealingPlayer.stole++;
           if (victimEquip.name !== enumHelper.equipment.empty[itemSlot].name) {
             const oldItemRating = calculateItemRating(stealingPlayer, stealingPlayer.equipment[itemSlot]);
-            const newItemRating = calculateItemRating(victimPlayer, victimEquip);
+            const newItemRating = calculateItemRating(stealingPlayer, victimEquip);
             if (oldItemRating < newItemRating) {
               stealingPlayer = this.player.setPlayerEquipment(stealingPlayer, enumHelper.equipment.types[itemSlot].position, stolenEquip);
               if (victimEquip.previousOwners.length > 0) {
@@ -390,7 +399,7 @@ class BattleEngine {
         }
         return { stealingPlayer, victimPlayer, msg: eventMsg, pm: eventLog, otherPlayerPmMsg: otherPlayerLog };
       } else if (victimPlayer.gold.current > victimPlayer.gold.current / 6) {
-        const goldStolen = Math.round(victimPlayer.gold.current / 6);
+        const goldStolen = Math.round(victimPlayer.gold.current / 4);
         if (goldStolen !== 0) {
           stealingPlayer.gold.current += goldStolen;
           stealingPlayer.gold.total += goldStolen;
