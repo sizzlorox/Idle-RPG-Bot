@@ -7,6 +7,7 @@ const Database = require('../../database/Database');
 const { errorLog } = require('../../utils/logger');
 const { generatePlayerName } = require('../utils/formatters');
 
+const { initHolidays } = require('../crons/tasks/holidayManager');
 const MapNavigator = require('./generators/MapNavigator');
 const MonsterGen = require('./generators/MonsterGen');
 const ItemGen = require('./generators/ItemGen');
@@ -46,6 +47,7 @@ class Game {
     this.guildConfigs = new Map();
     this.canJoinLottery = true;
     this.db.resetPersonalMultipliers();
+    initHolidays(this);
   }
 
   async activateEvent(guildId, player, onlinePlayers) {

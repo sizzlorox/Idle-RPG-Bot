@@ -222,9 +222,10 @@ class BattleSimulator {
 
   inventoryTurn(attacker, defender, battleStats, attackerDamage, defenderDamage, initiative, roundCrits, roundDodges) {
     const applyPotion = (player, isAttacker) => {
-      const potions = player.inventory.items.filter(item => item.name.includes('Health Potion'));
-      if (player.inventory.items.length > 0 && potions.length > 0) {
-        const potion = potions[randomBetween(0, potions.length - 1)];
+      if (player.inventory.items.length === 0) return;
+      const healthPotions = player.inventory.items.filter(item => item.name.includes('Health Potion'));
+      if (healthPotions.length > 0 && player.health < enumHelper.maxHealth(player.level)) {
+        const potion = healthPotions[randomBetween(0, healthPotions.length - 1)];
         const healAmount = Math.ceil(potion.power * (player.level / 2));
         player.health += healAmount;
         if (player.health > enumHelper.maxHealth(player.level)) player.health = enumHelper.maxHealth(player.level);
@@ -234,6 +235,14 @@ class BattleSimulator {
         } else {
           if (attackerDamage > healAmount) { attackerDamage -= healAmount; if (this.isMonster(defender)) defender.dmgReceived -= healAmount; }
         }
+      }
+      const manaPotions = player.inventory.items.filter(item => item.name.includes('Mana Potion'));
+      if (manaPotions.length > 0 && player.spells.length > 0 && player.mana < enumHelper.maxMana(player.level)) {
+        const potion = manaPotions[randomBetween(0, manaPotions.length - 1)];
+        const manaAmount = Math.ceil(potion.power * player.level);
+        player.mana += manaAmount;
+        if (player.mana > enumHelper.maxMana(player.level)) player.mana = enumHelper.maxMana(player.level);
+        player.inventory.items.splice(player.inventory.items.indexOf(potion), 1);
       }
     };
     if (initiative.name === attacker.name) {

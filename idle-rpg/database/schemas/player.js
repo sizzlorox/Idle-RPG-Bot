@@ -116,6 +116,10 @@ const playerSchema = mongoose.Schema({
       power: Number,
       position: String,
       gold: Number,
+      enchant: {
+        stat: { type: String, default: '' },
+        bonus: { type: Number, default: 0 }
+      },
       previousOwners: {
         type: Array,
         default: []
@@ -126,6 +130,10 @@ const playerSchema = mongoose.Schema({
       power: Number,
       position: String,
       gold: Number,
+      enchant: {
+        stat: { type: String, default: '' },
+        bonus: { type: Number, default: 0 }
+      },
       previousOwners: {
         type: Array,
         default: []
@@ -137,6 +145,10 @@ const playerSchema = mongoose.Schema({
       position: String,
       attackType: String,
       gold: Number,
+      enchant: {
+        stat: { type: String, default: '' },
+        bonus: { type: Number, default: 0 }
+      },
       previousOwners: {
         type: Array,
         default: []

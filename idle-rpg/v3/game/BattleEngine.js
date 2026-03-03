@@ -21,19 +21,19 @@ class BattleEngine {
     this.simulator = new BattleSimulator();
   }
 
-  async playerVsMob(playerObj, mobToBattle, multiplier, isBloodMoonActive) {
+  async playerVsMob(playerObj, mobToBattle, multiplier, guildEvents) {
     let updatedPlayer = playerObj;
     const eventMsg = [];
     const eventLog = [];
     try {
       const simulatedBattle = await this.simulator.simulateBattle(updatedPlayer, mobToBattle);
-      const battleResults = await this.playerVsMobResults(simulatedBattle, multiplier, isBloodMoonActive);
+      const battleResults = await this.playerVsMobResults(simulatedBattle, multiplier, guildEvents);
       eventMsg.push(...battleResults.msg);
       eventLog.push(...battleResults.pm);
       updatedPlayer = battleResults.updatedPlayer;
       switch (battleResults.result) {
         case enumHelper.battle.outcomes.win: {
-          const dropItemResults = await this.dropItem(updatedPlayer, battleResults.updatedMob, eventMsg, eventLog);
+          const dropItemResults = await this.dropItem(updatedPlayer, battleResults.updatedMob, eventMsg, eventLog, guildEvents);
           const checkedWinResults = await this.player.checkExperience(dropItemResults.updatedPlayer, eventMsg, eventLog);
           return { type: 'actions', updatedPlayer: checkedWinResults.updatedPlayer, msg: eventMsg, pm: eventLog };
         }
@@ -66,9 +66,10 @@ class BattleEngine {
     }
   }
 
-  async playerVsMobResults(results, multiplier, isBloodMoonActive) {
+  async playerVsMobResults(results, multiplier, guildEvents) {
     try {
       const playerMaxHealth = 100 + (results.attacker.level * 5);
+      const isBloodMoonActive = guildEvents && guildEvents.isBloodMoonActive;
       const effectiveMultiplier = isBloodMoonActive ? multiplier * 1.5 : multiplier;
       const formatResult = this._pveMessageFormat(results, results.attacker, playerMaxHealth, effectiveMultiplier);
       const { updatedPlayer, expGain, goldGain, questExpGain, questGoldGain, eventMsg, eventLog, isQuestCompleted } = formatResult;
@@ -424,13 +425,17 @@ class BattleEngine {
     }
   }
 
-  async dropItem(playerObj, mob, eventMsg, eventLog) {
+  async dropItem(playerObj, mob, eventMsg, eventLog, guildEvents) {
     let updatedPlayer = playerObj;
     try {
       const dropitemChance = randomBetween(0, 99);
       if (dropitemChance <= 15 + (updatedPlayer.stats.luk / 4)) {
         const deadMob = mob.find(obj => obj.health <= 0);
-        const item = await this.itemGen.generateItem(updatedPlayer, deadMob);
+        // 2% chance to drop an invasion relic if invasion is active
+        const isInvasionActive = guildEvents && guildEvents.isInvasionActive && guildEvents.invasionMobType;
+        const item = (isInvasionActive && randomBetween(0, 99) < 2)
+          ? this.itemGen.generateInvasionRelic(updatedPlayer, guildEvents.invasionMobType)
+          : await this.itemGen.generateItem(updatedPlayer, deadMob);
         if (item.position !== enumHelper.inventory.position) {
           const oldItemRating = calculateItemRating(updatedPlayer, updatedPlayer.equipment[item.position]);
           const newItemRating = calculateItemRating(updatedPlayer, item);

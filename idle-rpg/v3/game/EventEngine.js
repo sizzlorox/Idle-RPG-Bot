@@ -66,7 +66,6 @@ class EventEngine {
 
   async attackEvent(loadedPlayer, onlinePlayers, globalMultiplier, guildEvents) {
     let updatedPlayer = Object.assign({}, loadedPlayer);
-    const isBloodMoonActive = guildEvents && guildEvents.isBloodMoonActive;
     try {
       const luckDice = randomBetween(0, 99);
       const towns = this.map.getTowns();
@@ -94,18 +93,18 @@ class EventEngine {
         if (luckDice >= (95 - (updatedPlayer.stats.luk / 4)) && updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
           if (onlinePlayers.length <= 1) {
             const mobToBattle = this.monsterGen.generateMonster(updatedPlayer, guildEvents);
-            return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, isBloodMoonActive);
+            return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, guildEvents);
           }
           const { randomPlayer } = await this.battle.findPlayerToBattle(updatedPlayer, onlinePlayers);
           if (!randomPlayer) {
             const mobToBattle = this.monsterGen.generateMonster(updatedPlayer, guildEvents);
-            return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, isBloodMoonActive);
+            return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, guildEvents);
           }
           return this.battle.playerVsPlayer(updatedPlayer, randomPlayer, globalMultiplier + updatedPlayer.personalMultiplier);
         }
         if (updatedPlayer.health > (100 + (updatedPlayer.level * 5)) / 4) {
           const mobToBattle = this.monsterGen.generateMonster(updatedPlayer, guildEvents);
-          return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, isBloodMoonActive);
+          return this.battle.playerVsMob(updatedPlayer, mobToBattle, globalMultiplier + updatedPlayer.personalMultiplier, guildEvents);
         }
         return this.battle.camp(updatedPlayer);
       }

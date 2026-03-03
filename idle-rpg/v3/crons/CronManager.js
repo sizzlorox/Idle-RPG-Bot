@@ -7,6 +7,7 @@ const { blizzardRandom } = require('./tasks/blizzard');
 const { invasionRandom } = require('./tasks/invasion');
 const { bloodMoonRandom } = require('./tasks/bloodMoon');
 const { weatherEventRandom } = require('./tasks/weatherEvent');
+const { checkHolidays } = require('./tasks/holidayManager');
 
 class CronManager {
 
@@ -62,6 +63,12 @@ class CronManager {
     new CronJob({
       cronTime: '00 00 */4 * * *',
       onTick: () => { cronLog.info('CronJob weatherEventRandomTime ran'); weatherEventRandom(this.bot, this.game); },
+      start: false, timeZone: this.timeZone, runOnInit: false
+    }).start();
+
+    new CronJob({
+      cronTime: '00 00 0 * * *',
+      onTick: () => { cronLog.info('CronJob checkHolidays ran'); checkHolidays(this.bot, this.game); },
       start: false, timeZone: this.timeZone, runOnInit: false
     }).start();
 

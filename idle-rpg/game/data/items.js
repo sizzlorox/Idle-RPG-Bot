@@ -567,6 +567,13 @@ const items = {
         power: 0.25,
         gold: 15,
         rarity: 75
+      },
+      manaPotion = {
+        name: 'Mana Potion',
+        position: 'inventory',
+        power: 0.5,
+        gold: 20,
+        rarity: 50
       }
     ]
   ]

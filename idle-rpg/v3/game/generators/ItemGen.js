@@ -4,6 +4,14 @@ const { randomBetween } = require('../../utils/helpers');
 
 const snowflakeTemplate = items.type[3].find(item => item.name === 'Snowflake');
 
+const ENCHANT_SUFFIXES = [
+  { name: 'of Might', stat: 'str' },
+  { name: 'of Swiftness', stat: 'dex' },
+  { name: 'of Fortitude', stat: 'end' },
+  { name: 'of Wisdom', stat: 'int' },
+  { name: 'of Fortune', stat: 'luk' }
+];
+
 class ItemGen {
 
   async generateItem(updatedPlayer, mob) {
@@ -14,6 +22,7 @@ class ItemGen {
 
     const randomRarityIndex = randomBetween(0, itemRarityList.length - 1);
     const randomMaterialIndex = randomBetween(0, itemMaterialList.length - 1);
+    const levelBonus = Math.floor(updatedPlayer.level / 10);
 
     const mobName = mob ? mob.name.replace(' ', '_').split('_')[1] : undefined;
     let itemType;
@@ -61,17 +70,47 @@ class ItemGen {
         gold: Number((itemRarityList[randomRarityIndex].gold * itemMaterialList[randomMaterialIndex].gold * itemType.gold).toFixed()) * itemType.power
       };
     } else {
+      const basePower = itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power + levelBonus;
       itemObj = {
         name: `${itemRarityList[randomRarityIndex].name} ${itemMaterialList[randomMaterialIndex].name} ${itemType.name}`,
         position: itemType.position,
         holiday: itemType.holiday,
-        power: itemRarityList[randomRarityIndex].power + itemMaterialList[randomMaterialIndex].power + itemType.power,
+        power: basePower,
         attackType: itemType.attackType,
         gold: Number((itemRarityList[randomRarityIndex].gold * itemMaterialList[randomMaterialIndex].gold * itemType.gold).toFixed()) * itemType.power
       };
+      // 40% chance to add an enchant suffix
+      if (randomBetween(0, 99) < 40) {
+        const suffix = ENCHANT_SUFFIXES[randomBetween(0, ENCHANT_SUFFIXES.length - 1)];
+        const bonus = Math.max(1, Math.round(itemRarityList[randomRarityIndex].power * 0.75));
+        itemObj.name += ` ${suffix.name}`;
+        itemObj.enchant = { stat: suffix.stat, bonus };
+      }
     }
 
     return itemObj;
+  }
+
+  generateInvasionRelic(updatedPlayer, invasionMobType) {
+    const randomRarityChance = Math.round(randomBetween(0, 99) - (updatedPlayer.level / 6));
+    const itemRarityList = items.rarity.filter(r => r.rarity >= randomRarityChance);
+    const randomRarityIndex = randomBetween(0, itemRarityList.length - 1);
+    const rarity = itemRarityList[randomRarityIndex];
+    const base = Math.ceil(rarity.power);
+    const jitter = () => Math.max(0, base + randomBetween(-1, 1));
+    const str = jitter();
+    const dex = jitter();
+    const end = jitter();
+    const int = jitter();
+    const luk = jitter();
+    const rating = str + dex + end + int + luk;
+    return {
+      name: `${rarity.name} War Relic of the ${invasionMobType}`,
+      position: 'relic',
+      str, dex, end, int, luk,
+      rating,
+      gold: Number((rarity.gold * 3).toFixed()) * Math.max(1, rating)
+    };
   }
 
   generateSnowflake(updatedPlayer) {
@@ -84,7 +123,7 @@ class ItemGen {
     const itemDex = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.dex) / 4);
     const itemEnd = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.end) / 4);
     const itemInt = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.int) / 4);
-    const itemLuk = Math.round((randomRarityIndex + snowFlake.stats.luk) / 5);
+    const itemLuk = Math.round((itemRarityList[randomRarityIndex].power + snowFlake.stats.luk) / 5);
     const itemRating = Math.round(itemStr + itemDex + itemEnd + itemInt + itemLuk);
 
     return {
