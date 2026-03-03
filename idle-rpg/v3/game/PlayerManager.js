@@ -116,6 +116,10 @@ class PlayerManager {
         updatedPlayer.mana = 50 + (updatedPlayer.level * 5);
         eventMsg.push(`\`\`\`css\n${updatedPlayer.name}${updatedPlayer.titles.current !== 'None' ? ` the ${updatedPlayer.titles.current}` : ''} is now level ${updatedPlayer.level}!\`\`\``);
         eventLog.push(`Leveled up to level ${updatedPlayer.level}`);
+        const MILESTONES = new Set([10, 20, 30, 50]);
+        if (MILESTONES.has(updatedPlayer.level)) {
+          eventMsg.push(setImportantMessage(`${updatedPlayer.name} has reached level ${updatedPlayer.level}!`));
+        }
         for (let i = 0; i < 4; i++) {
           const randomStat = randomBetween(0, 3);
           switch (randomStat) {

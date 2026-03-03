@@ -8,6 +8,7 @@ const { generatePlayerName, generateGenderString } = require('../utils/formatter
 const BattleSimulator = require('./BattleSimulator');
 
 const STEAL_ITEM_SLOTS = [enumHelper.equipment.types.helmet.position, enumHelper.equipment.types.armor.position, enumHelper.equipment.types.weapon.position];
+const RARE_MOB_NAMES = new Set(['Dragon', 'Sphinx', 'Cave Troll', 'Basilisk', 'Golem', 'Chaotic Triceratops']);
 
 class BattleEngine {
 
@@ -20,13 +21,13 @@ class BattleEngine {
     this.simulator = new BattleSimulator();
   }
 
-  async playerVsMob(playerObj, mobToBattle, multiplier) {
+  async playerVsMob(playerObj, mobToBattle, multiplier, isBloodMoonActive) {
     let updatedPlayer = playerObj;
     const eventMsg = [];
     const eventLog = [];
     try {
       const simulatedBattle = await this.simulator.simulateBattle(updatedPlayer, mobToBattle);
-      const battleResults = await this.playerVsMobResults(simulatedBattle, multiplier);
+      const battleResults = await this.playerVsMobResults(simulatedBattle, multiplier, isBloodMoonActive);
       eventMsg.push(...battleResults.msg);
       eventLog.push(...battleResults.pm);
       updatedPlayer = battleResults.updatedPlayer;
@@ -65,10 +66,11 @@ class BattleEngine {
     }
   }
 
-  async playerVsMobResults(results, multiplier) {
+  async playerVsMobResults(results, multiplier, isBloodMoonActive) {
     try {
       const playerMaxHealth = 100 + (results.attacker.level * 5);
-      const formatResult = this._pveMessageFormat(results, results.attacker, playerMaxHealth, multiplier);
+      const effectiveMultiplier = isBloodMoonActive ? multiplier * 1.5 : multiplier;
+      const formatResult = this._pveMessageFormat(results, results.attacker, playerMaxHealth, effectiveMultiplier);
       const { updatedPlayer, expGain, goldGain, questExpGain, questGoldGain, eventMsg, eventLog, isQuestCompleted } = formatResult;
 
       if (updatedPlayer.health <= 0) {
@@ -130,6 +132,10 @@ class BattleEngine {
       if (mob.health <= 0) {
         goldGain += Math.floor(mob.gold * multiplier);
         mobListInfo.mobs[infoList].event.killed++;
+        const mobTypeName = [...RARE_MOB_NAMES].find(rare => mob.name.includes(rare));
+        if (mobTypeName) {
+          eventMsg.push(setImportantMessage(`${generatePlayerName(updatedPlayer, true)} just slew a ${mob.name}!`));
+        }
       } else if (mob.health > 0 && updatedPlayer.health > 0) {
         mobListInfo.mobs[infoList].event.fled++;
         mob.health > updatedPlayer.health ? updatedPlayer.fled.you++ : updatedPlayer.fled.mob++;
@@ -440,6 +446,9 @@ class BattleEngine {
           eventMsg.push(`${generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${deadMob.name}!\``);
         } else {
           eventMsg.push(`**${generatePlayerName(updatedPlayer, true)} received \`${item.name}\` from \`${deadMob.name}!\`**`);
+        }
+        if (item.power >= 5) {
+          eventMsg.unshift(setImportantMessage(`${generatePlayerName(updatedPlayer, true)} just found a legendary ${item.name}!`));
         }
         eventLog.push(`Received ${item.name} from ${mob[0].name}`);
         await this.player.logEvent(updatedPlayer, eventLog[eventLog.length - 1], enumHelper.logTypes.action);

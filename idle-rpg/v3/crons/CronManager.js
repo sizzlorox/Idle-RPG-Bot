@@ -4,6 +4,9 @@ const { powerHourBegin } = require('./tasks/powerHour');
 const { dailyLottery } = require('./tasks/lottery');
 const { updateLeaderboards } = require('./tasks/leaderboards');
 const { blizzardRandom } = require('./tasks/blizzard');
+const { invasionRandom } = require('./tasks/invasion');
+const { bloodMoonRandom } = require('./tasks/bloodMoon');
+const { weatherEventRandom } = require('./tasks/weatherEvent');
 
 class CronManager {
 
@@ -41,6 +44,24 @@ class CronManager {
     new CronJob({
       cronTime: '00 00 9 * * 0-6',
       onTick: () => { cronLog.info('CronJob blizzardRandomTime ran'); blizzardRandom(this.bot, this.game); },
+      start: false, timeZone: this.timeZone, runOnInit: false
+    }).start();
+
+    new CronJob({
+      cronTime: '00 00 13 * * 0-6',
+      onTick: () => { cronLog.info('CronJob invasionRandomTime ran'); invasionRandom(this.bot, this.game); },
+      start: false, timeZone: this.timeZone, runOnInit: false
+    }).start();
+
+    new CronJob({
+      cronTime: '00 00 21 * * 0-6',
+      onTick: () => { cronLog.info('CronJob bloodMoonRandomTime ran'); bloodMoonRandom(this.bot, this.game); },
+      start: false, timeZone: this.timeZone, runOnInit: false
+    }).start();
+
+    new CronJob({
+      cronTime: '00 00 */4 * * *',
+      onTick: () => { cronLog.info('CronJob weatherEventRandomTime ran'); weatherEventRandom(this.bot, this.game); },
       start: false, timeZone: this.timeZone, runOnInit: false
     }).start();
 

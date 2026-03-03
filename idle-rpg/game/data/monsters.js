@@ -5,7 +5,7 @@ const monsters = {
     starving = {
       name: 'Starving',
       power: 0.5,
-      health: 5,
+      health: 3,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -20,7 +20,7 @@ const monsters = {
     normal = {
       name: 'Normal',
       power: 1,
-      health: 10,
+      health: 5,
       stats: {
         str: 1,
         dex: 1,
@@ -35,7 +35,7 @@ const monsters = {
     veteran = {
       name: 'Veteran',
       power: 1.25,
-      health: 15,
+      health: 8,
       stats: {
         str: 1.25,
         dex: 1.25,
@@ -50,7 +50,7 @@ const monsters = {
     elite = {
       name: 'Elite',
       power: 1.5,
-      health: 20,
+      health: 10,
       stats: {
         str: 1.5,
         dex: 1.5,
@@ -65,7 +65,7 @@ const monsters = {
     champion = {
       name: 'Champion',
       power: 1.75,
-      health: 25,
+      health: 13,
       stats: {
         str: 1.75,
         dex: 1.75,
@@ -80,7 +80,7 @@ const monsters = {
     legendary = {
       name: 'Legendary',
       power: 2,
-      health: 30,
+      health: 15,
       stats: {
         str: 2,
         dex: 2,
@@ -95,7 +95,7 @@ const monsters = {
     omega = {
       name: 'Omega',
       power: 2.25,
-      health: 40,
+      health: 20,
       stats: {
         str: 2.25,
         dex: 2.25,
@@ -110,7 +110,7 @@ const monsters = {
     undead = {
       name: 'Undead',
       power: 2.5,
-      health: 25,
+      health: 13,
       stats: {
         str: 2.5,
         dex: 2.5,
@@ -125,7 +125,7 @@ const monsters = {
     deadly = {
       name: 'Deadly',
       power: 2.75,
-      health: 35,
+      health: 18,
       stats: {
         str: 2.75,
         dex: 2.75,
@@ -140,7 +140,7 @@ const monsters = {
     berserk = {
       name: 'Berserk',
       power: 3,
-      health: 45,
+      health: 23,
       stats: {
         str: 3,
         dex: 3,
@@ -155,7 +155,7 @@ const monsters = {
     corrupted = {
       name: 'Corrupted',
       power: 3.25,
-      health: 30,
+      health: 15,
       stats: {
         str: 3.25,
         dex: 3.25,
@@ -187,7 +187,7 @@ const monsters = {
         map.biomes.desert
       ],
       power: 1,
-      health: 7,
+      health: 4,
       stats: {
         str: 0.5,
         dex: 0.5,
@@ -223,7 +223,7 @@ const monsters = {
         map.biomes.swamp
       ],
       power: 1.25,
-      health: 9,
+      health: 5,
       stats: {
         str: 1,
         dex: 0.25,
@@ -260,7 +260,7 @@ const monsters = {
         map.biomes.haunted
       ],
       power: 1.25,
-      health: 45,
+      health: 23,
       stats: {
         str: 1,
         dex: 0.25,
@@ -299,7 +299,7 @@ const monsters = {
         map.biomes.moors
       ],
       power: 1.5,
-      health: 35,
+      health: 18,
       stats: {
         str: 1.25,
         dex: 0.5,
@@ -334,7 +334,7 @@ const monsters = {
         map.biomes.forest
       ],
       power: 1.5,
-      health: 35,
+      health: 18,
       stats: {
         str: 1.25,
         dex: 1,
@@ -373,7 +373,7 @@ const monsters = {
         map.biomes.moors
       ],
       power: 1.75,
-      health: 50,
+      health: 25,
       stats: {
         str: 1.25,
         dex: 0.5,
@@ -413,7 +413,7 @@ const monsters = {
         map.biomes.moors
       ],
       power: 1.75,
-      health: 75,
+      health: 38,
       stats: {
         str: 1.25,
         dex: 2,
@@ -448,7 +448,7 @@ const monsters = {
         map.biomes.haunted
       ],
       power: 1.5,
-      health: 65,
+      health: 33,
       stats: {
         str: 1.25,
         dex: 0.5,
@@ -488,7 +488,7 @@ const monsters = {
         map.biomes.haunted
       ],
       power: 1.75,
-      health: 100,
+      health: 50,
       stats: {
         str: 1.25,
         dex: 2,
@@ -524,7 +524,7 @@ const monsters = {
         map.biomes.caves
       ],
       power: 2,
-      health: 85,
+      health: 43,
       stats: {
         str: 1.25,
         dex: 2.5,
@@ -560,7 +560,7 @@ const monsters = {
         map.biomes.mountains
       ],
       power: 2,
-      health: 160,
+      health: 80,
       stats: {
         str: 1.5,
         dex: 2,
@@ -599,7 +599,7 @@ const monsters = {
         map.biomes.caves
       ],
       power: 2.25,
-      health: 175,
+      health: 88,
       stats: {
         str: 1.75,
         dex: 1.5,
@@ -635,7 +635,7 @@ const monsters = {
         map.biomes.plateau
       ],
       power: 2,
-      health: 120,
+      health: 60,
       stats: {
         str: 1.75,
         dex: 2.25,
@@ -673,7 +673,7 @@ const monsters = {
         map.biomes.moors
       ],
       power: 2.5,
-      health: 125,
+      health: 63,
       stats: {
         str: 2.5,
         dex: 0.5,
@@ -708,7 +708,7 @@ const monsters = {
         map.biomes.forest
       ],
       power: 2,
-      health: 90,
+      health: 45,
       stats: {
         str: 1.75,
         dex: 3,
@@ -744,7 +744,7 @@ const monsters = {
         map.biomes.mountains
       ],
       power: 2,
-      health: 115,
+      health: 58,
       stats: {
         str: 3,
         dex: 2,
@@ -779,7 +779,7 @@ const monsters = {
         map.biomes.caves
       ],
       power: 2.25,
-      health: 190,
+      health: 95,
       stats: {
         str: 2.5,
         dex: 1.5,
@@ -814,7 +814,7 @@ const monsters = {
         map.biomes.forest
       ],
       power: 0.90,
-      health: 45,
+      health: 23,
       stats: {
         str: 1,
         dex: 1.85,
@@ -849,7 +849,7 @@ const monsters = {
         map.biomes.haunted
       ],
       power: 1.2,
-      health: 95,
+      health: 48,
       stats: {
         str: 1,
         dex: 1.75,
@@ -884,7 +884,7 @@ const monsters = {
         map.biomes.mountains
       ],
       power: 3,
-      health: 145,
+      health: 73,
       stats: {
         str: 2.75,
         dex: 1.75,
@@ -921,7 +921,7 @@ const monsters = {
         map.biomes.mountains
       ],
       power: 1.75,
-      health: 150,
+      health: 75,
       stats: {
         str: 1.75,
         dex: 1.75,
@@ -961,7 +961,7 @@ const monsters = {
         map.biomes.forest
       ],
       power: 0.75,
-      health: 45,
+      health: 23,
       stats: {
         str: 0.75,
         dex: 0.75,
@@ -997,7 +997,7 @@ const monsters = {
         map.biomes.desert
       ],
       power: 1,
-      health: 75,
+      health: 38,
       stats: {
         str: 0.85,
         dex: 2,
@@ -1032,7 +1032,7 @@ const monsters = {
         map.biomes.forest
       ],
       power: 0.2,
-      health: 50,
+      health: 25,
       stats: {
         str: 1,
         dex: 2,
@@ -1070,7 +1070,7 @@ const monsters = {
         map.biomes.desert
       ],
       power: 2,
-      health: 200,
+      health: 100,
       stats: {
         str: 1.75,
         dex: 0.2,
@@ -1105,7 +1105,7 @@ const monsters = {
         map.biomes.plains
       ],
       power: 1,
-      health: 135,
+      health: 68,
       stats: {
         str: 1,
         dex: 1,
@@ -1141,7 +1141,7 @@ const monsters = {
         map.biomes.plains
       ],
       power: 1,
-      health: 160,
+      health: 80,
       stats: {
         str: 1.65,
         dex: 0.5,
@@ -1176,7 +1176,7 @@ const monsters = {
         map.biomes.haunted
       ],
       power: 2,
-      health: 185,
+      health: 93,
       stats: {
         str: 1.5,
         dex: 1.2,
@@ -1214,7 +1214,7 @@ const monsters = {
         map.biomes.desert
       ],
       power: 1,
-      health: 150,
+      health: 75,
       stats: {
         str: 1,
         dex: 1.2,
@@ -1249,7 +1249,7 @@ const monsters = {
         map.biomes.desert
       ],
       power: 1.45,
-      health: 210,
+      health: 105,
       stats: {
         str: 1.95,
         dex: 2,
@@ -1286,7 +1286,7 @@ const monsters = {
         map.biomes.plateau
       ],
       power: 1,
-      health: 110,
+      health: 55,
       stats: {
         str: 2.15,
         dex: 0.5,
@@ -1321,7 +1321,7 @@ const monsters = {
         map.biomes.forest
       ],
       power: 1,
-      health: 75,
+      health: 38,
       stats: {
         str: 0.75,
         dex: 2.15,
@@ -1359,7 +1359,7 @@ const monsters = {
         map.biomes.grassland
       ],
       power: 1,
-      health: 235,
+      health: 118,
       stats: {
         str: 2.15,
         dex: 0.5,
@@ -1398,7 +1398,7 @@ const monsters = {
         map.biomes.moors
       ],
       power: 1.3,
-      health: 120,
+      health: 60,
       stats: {
         str: 1,
         dex: 1.15,
@@ -1437,7 +1437,7 @@ const monsters = {
         map.biomes.moors
       ],
       power: 2,
-      health: 135,
+      health: 68,
       stats: {
         str: 1,
         dex: 1.15,
@@ -1473,7 +1473,7 @@ const monsters = {
         map.biomes.desert
       ],
       power: 2,
-      health: 175,
+      health: 88,
       stats: {
         str: 1,
         dex: 1.15,
@@ -1509,7 +1509,7 @@ const monsters = {
         map.biomes.swamp
       ],
       power: 1,
-      health: 125,
+      health: 63,
       stats: {
         str: 1,
         dex: 1.15,
@@ -1544,7 +1544,7 @@ const monsters = {
         map.biomes.caves
       ],
       power: 3,
-      health: 225,
+      health: 113,
       stats: {
         str: 3,
         dex: 0.5,
@@ -1579,7 +1579,7 @@ const monsters = {
         map.biomes.caves
       ],
       power: 3,
-      health: 225,
+      health: 113,
       stats: {
         str: 3,
         dex: 0.5,

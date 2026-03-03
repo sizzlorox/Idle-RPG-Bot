@@ -12,7 +12,7 @@ class MonsterGen {
     return monsterTypeList[randomTypeIndex].name;
   }
 
-  generateMonster(selectedPlayer) {
+  generateMonster(selectedPlayer, guildEvents) {
     const randomRarityChance = Math.round(randomBetween(0, 99));
     const randomTypeChance = Math.round(randomBetween(0, 99));
     const randomMonsterType = ((randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2)) > 100 ? 100 : (randomTypeChance + randomRarityChance) - (selectedPlayer.level / 2);
@@ -21,6 +21,11 @@ class MonsterGen {
     const monsterTypeList = monsters.type.filter(mobType => mobType.rarity >= randomMonsterType
       && mobType.isSpawnable
       && mobType.spawnableBiomes.includes(selectedPlayer.map.biome.name));
+
+    if (guildEvents && guildEvents.isInvasionActive && guildEvents.invasionMobType) {
+      const invasionMob = monsterTypeList.find(t => t.name === guildEvents.invasionMobType);
+      if (invasionMob) monsterTypeList.push(invasionMob);
+    }
 
     const isLowLevel = selectedPlayer.level <= 5;
     const statScale = isLowLevel ? 0.5 : 1;

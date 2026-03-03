@@ -70,12 +70,23 @@ class Game {
       const loadedGuildConfig = this.guildConfigs.get(guildId) || await this.db.loadGame(guildId);
       this.player.passiveRegen(loadedPlayer, ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.end / 8), ((5 * loadedPlayer.level) / 4) + (loadedPlayer.stats.int / 8));
 
+      const guildEvents = loadedGuildConfig.events || {};
+      const weather = guildEvents.weather || {};
+      const WEATHER_MULTIPLIERS = {
+        sandstorm: 0.8, heatwave: 0.8,
+        'warm sunshine': 1.2, rain: 1.1,
+      };
+      const weatherMult = (weather.biome === loadedPlayer.map.biome.name && weather.type)
+        ? (WEATHER_MULTIPLIERS[weather.type] ?? 1.0)
+        : 1.0;
+      const effectiveMultiplier = loadedGuildConfig.multiplier * weatherMult;
+
       const randomEvent = Math.floor(Math.random() * 3);
       let eventResults;
       switch (randomEvent) {
         case 0: eventResults = await this.events.moveEvent(loadedPlayer); break;
-        case 1: eventResults = await this.events.attackEvent(loadedPlayer, onlinePlayers, loadedGuildConfig.multiplier); break;
-        case 2: eventResults = await this.events.luckEvent(loadedPlayer, loadedGuildConfig.events, loadedGuildConfig.multiplier); break;
+        case 1: eventResults = await this.events.attackEvent(loadedPlayer, onlinePlayers, effectiveMultiplier, guildEvents); break;
+        case 2: eventResults = await this.events.luckEvent(loadedPlayer, guildEvents, effectiveMultiplier); break;
       }
 
       eventResults = await this.setPlayerTitles(eventResults);
@@ -106,7 +117,7 @@ class Game {
       loadedConfig.spells.activeBless = 0;
       await this.db.updateGame(guildId, loadedConfig);
     }
-    console.log(`\n    Config loaded for guild ${guildId}\n    Multiplier:${loadedConfig.multiplier}\n    Active Bless:${loadedConfig.spells.activeBless}\n    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n    Command Prefix:${loadedConfig.commandPrefix}\n    Blizzard:${loadedConfig.events.isBlizzardActive}\n`);
+    console.log(`\n    Config loaded for guild ${guildId}\n    Multiplier:${loadedConfig.multiplier}\n    Active Bless:${loadedConfig.spells.activeBless}\n    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n    Command Prefix:${loadedConfig.commandPrefix}\n    Blizzard:${loadedConfig.events.isBlizzardActive}\n    Invasion:${loadedConfig.events.isInvasionActive} (${loadedConfig.events.invasionMobType})\n    Blood Moon:${loadedConfig.events.isBloodMoonActive}\n    Weather:${loadedConfig.events.weather ? loadedConfig.events.weather.type : 'none'} in ${loadedConfig.events.weather ? loadedConfig.events.weather.biome : ''}\n`);
     this.guildConfigs.set(guildId, loadedConfig);
     if (loadedConfig.events.isBlizzardActive) {
       setTimeout(() => {
@@ -114,6 +125,28 @@ class Game {
         this.db.updateGame(guildId, loadedConfig);
         this.guildConfigs.set(guildId, loadedConfig);
       }, Math.floor(Math.random() * (72000000 - 7200000)) + 7200000);
+    }
+    if (loadedConfig.events.isInvasionActive) {
+      setTimeout(() => {
+        loadedConfig.events.isInvasionActive = false;
+        loadedConfig.events.invasionMobType = '';
+        this.db.updateGame(guildId, loadedConfig);
+        this.guildConfigs.set(guildId, loadedConfig);
+      }, Math.floor(Math.random() * (28800000 - 10800000)) + 10800000);
+    }
+    if (loadedConfig.events.isBloodMoonActive) {
+      setTimeout(() => {
+        loadedConfig.events.isBloodMoonActive = false;
+        this.db.updateGame(guildId, loadedConfig);
+        this.guildConfigs.set(guildId, loadedConfig);
+      }, Math.floor(Math.random() * (21600000 - 7200000)) + 7200000);
+    }
+    if (loadedConfig.events.weather && loadedConfig.events.weather.type) {
+      setTimeout(() => {
+        loadedConfig.events.weather = { biome: '', type: '' };
+        this.db.updateGame(guildId, loadedConfig);
+        this.guildConfigs.set(guildId, loadedConfig);
+      }, Math.floor(Math.random() * (21600000 - 7200000)) + 7200000);
     }
     for (let i = 0; i < loadedConfig.spells.activeBless; i++) {
       setTimeout(async () => {

@@ -26,6 +26,22 @@ const gameSchema = mongoose.Schema({
     isBlizzardActive: {
       type: Boolean,
       default: false
+    },
+    isInvasionActive: {
+      type: Boolean,
+      default: false
+    },
+    invasionMobType: {
+      type: String,
+      default: ''
+    },
+    isBloodMoonActive: {
+      type: Boolean,
+      default: false
+    },
+    weather: {
+      biome: { type: String, default: '' },
+      type: { type: String, default: '' }
     }
   },
   dailyLottery: {

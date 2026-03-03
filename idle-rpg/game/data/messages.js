@@ -37,6 +37,62 @@ const messages = {
     {
       eventMsg: '[\`$$\`] ## just noticed its time for second breakfast and a break.',
       eventLog: 'Noticed it was time for second breakfast and a break'
+    },
+    {
+      eventMsg: '[\`$$\`] ## stumbled upon ancient ruins near $$ and rested in their shadow.',
+      eventLog: 'Rested in the shadow of ancient ruins near $$'
+    },
+    {
+      eventMsg: '[\`$$\`] ## sat by a stream in $$ and listened to the water while catching ^^ breath.',
+      eventLog: 'Sat by a stream in $$ to rest'
+    },
+    {
+      eventMsg: '[\`$$\`] ## found a quiet clearing in $$ and spent time sharpening ^^ weapons.',
+      eventLog: 'Sharpened your weapons in a quiet clearing in $$'
+    },
+    {
+      eventMsg: '[\`$$\`] ## was startled by rustling in the bushes near $$, but relaxed once it passed.',
+      eventLog: 'Was startled by rustling near $$ but it was nothing'
+    },
+    {
+      eventMsg: '[\`$$\`] ## spent the rest period in $$ watching the clouds and gathering ^^ thoughts.',
+      eventLog: 'Watched the clouds drift over $$ while resting'
+    },
+    {
+      eventMsg: '[\`$$\`] ## patched up ^^ worn armor with scraps found near $$.',
+      eventLog: 'Patched up your armor with scraps found near $$'
+    },
+    {
+      eventMsg: '[\`$$\`] ## lit a small fire near $$ and cooked a simple meal from foraged scraps.',
+      eventLog: 'Cooked a simple meal over a small fire near $$'
+    },
+    {
+      eventMsg: '[\`$$\`] ## sat on a mossy log in $$ and polished ^^ equipment until it gleamed.',
+      eventLog: 'Polished your equipment on a mossy log in $$'
+    },
+    {
+      eventMsg: '[\`$$\`] ## meditated under a twisted tree near $$ to clear ^^ mind.',
+      eventLog: 'Meditated under a twisted tree near $$'
+    },
+    {
+      eventMsg: '[\`$$\`] ## took shelter under an overhang near $$ as the wind picked up overhead.',
+      eventLog: 'Sheltered under an overhang near $$ from the wind'
+    },
+    {
+      eventMsg: '[\`$$\`] ## rested against a warm stone in $$ and dozed off briefly.',
+      eventLog: 'Dozed off briefly against a warm stone in $$'
+    },
+    {
+      eventMsg: '[\`$$\`] ## traded a nod with a passing traveller near $$ before both went their separate ways.',
+      eventLog: 'Exchanged a nod with a passing traveller near $$'
+    },
+    {
+      eventMsg: '[\`$$\`] ## watched a hawk circle overhead near $$ while stretching out tired limbs.',
+      eventLog: 'Watched a hawk circle overhead near $$ while resting'
+    },
+    {
+      eventMsg: '[\`$$\`] ## dug a shallow fire pit near $$, warmed up, then covered the tracks carefully.',
+      eventLog: 'Warmed up by a fire pit near $$ before moving on'
     }
     ],
 
