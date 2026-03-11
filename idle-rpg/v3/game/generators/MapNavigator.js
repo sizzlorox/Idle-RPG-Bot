@@ -145,6 +145,25 @@ class MapNavigator {
 
     const map = this.getMapByCoords(newCoords);
     if (!map) return null;
+
+    // If the new map is the same as the previous map, try to move in a different direction
+    if (player.previousMap && map.name === player.previousMap) {
+      let altCoords, altDirection;
+      if (preferHorizontal && dy !== 0) {
+        altCoords = [px, py + (dy > 0 ? 1 : -1)];
+        altDirection = dy > 0 ? 'South' : 'North';
+      } else if (!preferHorizontal && dx !== 0) {
+        altCoords = [px + (dx > 0 ? 1 : -1), py];
+        altDirection = dx > 0 ? 'East' : 'West';
+      }
+      if (altCoords) {
+        const altMap = this.getMapByCoords(altCoords);
+        if (altMap) return { map: altMap, direction: altDirection, previousLocation: player.map.name };
+      }
+      // return null to default to moving to a random map
+      return null;
+    }
+
     return { map, direction, previousLocation: player.map.name };
   }
 
