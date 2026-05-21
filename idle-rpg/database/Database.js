@@ -140,11 +140,11 @@ class Database {
               multiplier: {
                 $max: [1, { $subtract: [currentMultiplier, expiredCount] }],
               },
-            },
-            'spells.bless': {
-              $filter: {
-                input: '$spells.bless',
-                cond: { $gt: ['$$this.expiresAt', Date.now()] },
+              'spells.bless': {
+                $filter: {
+                  input: '$spells.bless',
+                  cond: { $gt: ['$$this.expiresAt', Date.now()] },
+                },
               },
             },
           },
