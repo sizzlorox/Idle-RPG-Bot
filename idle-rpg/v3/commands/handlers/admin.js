@@ -85,7 +85,6 @@ module.exports = [
       await game.db.resetAllLogs(targetGuildId);
       await game.db.updateGame(targetGuildId, defaultConfig);
       await game.db.removeLotteryPlayers(targetGuildId);
-      game.guildConfigs.set(targetGuildId, defaultConfig);
 
       // Post announcement now that reset is committed
       if (announcementChannel) {
@@ -179,7 +178,6 @@ module.exports = [
       const loadedConfig = await game.db.loadGame(guildId);
       loadedConfig.commandPrefix = value;
       await game.db.updateGame(guildId, loadedConfig);
-      game.guildConfigs.set(guildId, loadedConfig);
       return author.send(`Changed server command prefix to ${value}.`);
     },
   },

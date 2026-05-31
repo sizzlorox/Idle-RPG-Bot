@@ -13,7 +13,7 @@ async function dailyLottery(bot, game) {
       const guildLotteryPlayers = await game.db.loadLotteryPlayers(guild.id);
       if (!guildLotteryPlayers || guildLotteryPlayers.length <= 1) continue;
 
-      const guildConfig = game.guildConfigs.get(guild.id) || (await game.db.loadGame(guild.id));
+      const guildConfig = await game.db.loadGame(guild.id);
       const randomWinner = randomBetween(0, guildLotteryPlayers.length - 1);
       const winner = guildLotteryPlayers[randomWinner];
       const { prizePool } = guildConfig.dailyLottery;
@@ -72,7 +72,6 @@ async function dailyLottery(bot, game) {
       );
       if (actionsChannel) actionsChannel.send(eventMsg);
       await game.db.updateGame(guild.id, guildConfig);
-      game.guildConfigs.set(guild.id, guildConfig);
       await game.player.logEvent(winner, eventLog, enumHelper.logTypes.action);
       await game.db.savePlayer(winner);
       await game.db.removeLotteryPlayers(guild.id);

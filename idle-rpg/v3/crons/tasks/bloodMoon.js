@@ -4,7 +4,7 @@ const { randomBetween } = require('../../utils/helpers');
 async function bloodMoonRandom(bot, game) {
   for (const guild of bot.guilds.cache.values()) {
     const bloodMoonDice = randomBetween(0, 99);
-    const guildConfig = game.guildConfigs.get(guild.id) || (await game.db.loadGame(guild.id));
+    const guildConfig = await game.db.loadGame(guild.id);
     if (
       bloodMoonDice <= 14 &&
       !guildConfig.events.isBloodMoonActive &&
@@ -20,7 +20,6 @@ async function bloodMoonRandom(bot, game) {
         );
       guildConfig.events.isBloodMoonActive = true;
       await game.db.updateGame(guild.id, guildConfig);
-      game.guildConfigs.set(guild.id, guildConfig);
       setTimeout(
         async () => {
           if (actionChannel)
@@ -29,7 +28,6 @@ async function bloodMoonRandom(bot, game) {
             );
           guildConfig.events.isBloodMoonActive = false;
           await game.db.updateGame(guild.id, guildConfig);
-          game.guildConfigs.set(guild.id, guildConfig);
         },
         randomBetween(7200000, 21600000),
       );

@@ -110,11 +110,9 @@ module.exports = [
       player.gold.current -= 100;
 
       const playerGuildId = player.guildId;
-      const guildConfig =
-        game.guildConfigs.get(playerGuildId) || (await game.db.loadGame(playerGuildId));
+      const guildConfig = await game.db.loadGame(playerGuildId);
       guildConfig.dailyLottery.prizePool += 100;
       await game.db.updateGame(playerGuildId, guildConfig);
-      game.guildConfigs.set(playerGuildId, guildConfig);
       await game.db.savePlayer(player);
 
       const lotteryGuild = bot.guilds.cache.get(playerGuildId);
@@ -174,8 +172,7 @@ module.exports = [
     handler: async ({ game, bot, message, guildId, author }) => {
       const player = await game.db.loadPlayer(author.id, { guildId: -1 });
       if (!player) return author.send('You have not been born yet!');
-      const config =
-        game.guildConfigs.get(player.guildId) || (await game.db.loadGame(player.guildId));
+      const config = await game.db.loadGame(player.guildId);
       return author.send(
         `Current Multiplier: ${config.multiplier}x\nActive Bless: ${config.spells.bless.reduce((prev, curr) => prev + curr.count, 0)}x`,
       );

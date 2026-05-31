@@ -32,7 +32,7 @@ class CommandHandler {
       // Operators always use '!' prefix when DMing
       if (!isDM || !botOperators.includes(message.author.id)) {
         if (guildId) {
-          const guildConfig = this.game.guildConfigs.get(guildId);
+          const guildConfig = await this.game.db.loadGame(guildId);
           if (guildConfig && guildConfig.commandPrefix) {
             guildPrefix = guildConfig.commandPrefix;
           }

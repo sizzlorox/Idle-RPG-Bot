@@ -20,7 +20,7 @@ const SPAWNABLE_BIOMES = Object.keys(BIOME_WEATHER);
 async function weatherEventRandom(bot, game) {
   for (const guild of bot.guilds.cache.values()) {
     const weatherDice = randomBetween(0, 99);
-    const guildConfig = game.guildConfigs.get(guild.id) || (await game.db.loadGame(guild.id));
+    const guildConfig = await game.db.loadGame(guild.id);
     if (weatherDice <= 39) {
       const biome = SPAWNABLE_BIOMES[randomBetween(0, SPAWNABLE_BIOMES.length - 1)];
       const weatherOptions = BIOME_WEATHER[biome];
@@ -35,7 +35,6 @@ async function weatherEventRandom(bot, game) {
         );
       guildConfig.events.weather = { biome, type: weatherType };
       await game.db.updateGame(guild.id, guildConfig);
-      game.guildConfigs.set(guild.id, guildConfig);
       setTimeout(
         async () => {
           if (actionChannel)
@@ -44,7 +43,6 @@ async function weatherEventRandom(bot, game) {
             );
           guildConfig.events.weather = { biome: '', type: '' };
           await game.db.updateGame(guild.id, guildConfig);
-          game.guildConfigs.set(guild.id, guildConfig);
         },
         randomBetween(7200000, 21600000),
       );

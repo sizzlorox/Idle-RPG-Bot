@@ -43,7 +43,6 @@ class Game {
       player: this.player,
       battle: this.battle,
     });
-    this.guildConfigs = new Map();
     this.canJoinLottery = true;
     this.db.resetPersonalMultipliers();
     initHolidays(this);
@@ -74,7 +73,7 @@ class Game {
         loadedPlayer.quest = newQuest;
       }
 
-      const loadedGuildConfig = this.guildConfigs.get(guildId) || (await this.db.loadGame(guildId));
+      const loadedGuildConfig = await this.db.loadGame(guildId);
       this.player.passiveRegen(
         loadedPlayer,
         (5 * loadedPlayer.level) / 4 + loadedPlayer.stats.end / 8,
@@ -144,7 +143,6 @@ class Game {
     console.log(
       `\n    Config loaded for guild ${guildId}\n    Multiplier:${loadedConfig.multiplier}\n    Active Bless:${loadedConfig.spells.bless.reduce((prev, curr) => prev + curr.count, 0)}\n    Prize Pool:${loadedConfig.dailyLottery.prizePool}\n    Command Prefix:${loadedConfig.commandPrefix}\n    Blizzard:${loadedConfig.events.blizzard.isActive}\n    Invasion:${loadedConfig.events.isInvasionActive} (${loadedConfig.events.invasionMobType})\n    Blood Moon:${loadedConfig.events.blizzard.isActive}\n    Weather:${loadedConfig.events.weather ? loadedConfig.events.weather.type : 'none'} in ${loadedConfig.events.weather ? loadedConfig.events.weather.biome : ''}\n`,
     );
-    this.guildConfigs.set(guildId, loadedConfig);
     // TODO: Refactor
     if (loadedConfig.events.isInvasionActive) {
       setTimeout(
@@ -152,7 +150,6 @@ class Game {
           loadedConfig.events.isInvasionActive = false;
           loadedConfig.events.invasionMobType = '';
           this.db.updateGame(guildId, loadedConfig);
-          this.guildConfigs.set(guildId, loadedConfig);
         },
         Math.floor(Math.random() * (28800000 - 10800000)) + 10800000,
       );
@@ -163,7 +160,6 @@ class Game {
         () => {
           loadedConfig.events.isBloodMoonActive = false;
           this.db.updateGame(guildId, loadedConfig);
-          this.guildConfigs.set(guildId, loadedConfig);
         },
         Math.floor(Math.random() * (21600000 - 7200000)) + 7200000,
       );
@@ -174,7 +170,6 @@ class Game {
         () => {
           loadedConfig.events.weather = { biome: '', type: '' };
           this.db.updateGame(guildId, loadedConfig);
-          this.guildConfigs.set(guildId, loadedConfig);
         },
         Math.floor(Math.random() * (21600000 - 7200000)) + 7200000,
       );

@@ -5,7 +5,7 @@ async function blizzardRandom(bot, game) {
   await Promise.all(
     Array.from(bot.guilds.cache.values()).map(async (guild) => {
       const blizzardDice = randomBetween(0, 99);
-      const guildConfig = game.guildConfigs.get(guild.id) || (await game.db.loadGame(guild.id));
+      const guildConfig = await game.db.loadGame(guild.id);
       if (blizzardDice > 15) {
         return;
       }
@@ -22,7 +22,6 @@ async function blizzardRandom(bot, game) {
         expiresAt: randomBetween(7200000, 72000000),
       };
       await game.db.updateGame(guild.id, guildConfig);
-      game.guildConfigs.set(guild.id, guildConfig);
     }),
   );
 }
@@ -30,7 +29,7 @@ async function blizzardRandom(bot, game) {
 async function expireBlizzard(bot, game) {
   await Promise.all(
     Array.from(bot.guilds.cache.values()).map(async (guild) => {
-      const guildConfig = game.guildConfigs.get(guild.id) || (await game.db.loadGame(guild.id));
+      const guildConfig = await game.db.loadGame(guild.id);
       if (!guildConfig.events.blizzard.isActive) {
         return;
       }
@@ -44,7 +43,6 @@ async function expireBlizzard(bot, game) {
         expiresAt: 0,
       };
       await game.db.updateGame(guild.id, guildConfig);
-      game.guildConfigs.set(guild.id, guildConfig);
     }),
   );
 }
