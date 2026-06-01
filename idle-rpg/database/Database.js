@@ -119,10 +119,9 @@ class Database {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
+      const now = Date.now();
       const gameConfig = await Game.findOne({ guildId }).session(session);
-      const expiredBlesses = (gameConfig.spells.bless || []).filter(
-        (b) => b.expiresAt <= Date.now(),
-      );
+      const expiredBlesses = (gameConfig.spells.bless || []).filter((b) => b.expiresAt <= now);
       console.log('Expired blesses:', expiredBlesses);
       if (expiredBlesses.length === 0) {
         await session.commitTransaction();
@@ -133,17 +132,17 @@ class Database {
       const newMultiplier = Math.max(1, currentMultiplier - expiredCount);
 
       const updated = await Game.findOneAndUpdate(
-        { guildId, 'spells.bless.expiresAt': { $lte: Date.now() } },
+        { guildId, 'spells.bless.expiresAt': { $lte: now } },
         [
           {
             $set: {
               multiplier: {
-                $max: [1, { $subtract: [currentMultiplier, expiredCount] }],
+                $max: [1, { $subtract: ['$multiplier', expiredCount] }],
               },
               'spells.bless': {
                 $filter: {
-                  input: '$spells.bless',
-                  cond: { $gt: ['$$this.expiresAt', Date.now()] },
+                  input: { $ifNull: ['$spells.bless', []] },
+                  cond: { $gt: ['$$this.expiresAt', now] },
                 },
               },
             },
