@@ -16,7 +16,7 @@
   "author": "Sunny Huang",
   "license": "ISC",
   "dependencies": {
-    "@sentry/node": "^10.47.0",
+    "@sentry/node": "^10.58.0",
     "bunyan": "^1.8.12",
     "bunyan-rotating-file-stream": "^1.6.3",
     "cors": "^2.8.5",
