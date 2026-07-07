@@ -40,6 +40,16 @@ const gameSchema = mongoose.Schema({
         default: 0,
       },
     },
+    powerHour: {
+      isActive: {
+        type: Boolean,
+        default: false,
+      },
+      expiresAt: {
+        type: Number,
+        default: 0,
+      },
+    },
 
     // TODO: Refactor to follow blizzard
     isInvasionActive: {

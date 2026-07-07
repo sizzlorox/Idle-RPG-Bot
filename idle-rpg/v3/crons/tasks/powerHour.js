@@ -44,27 +44,36 @@ async function powerHourBegin(bot, game) {
     ]);
   }, 1800000);
 
-  setTimeout(async () => {
-    await Promise.all([
-      ...Array.from(bot.guilds.cache.values()).map(async (guild) => {
-        const actionsChannel = guild.channels.cache.find(
-          (channel) =>
-            channel.name === 'actions' &&
-            channel.type === ChannelType.GuildText &&
-            channel.parent &&
-            channel.parent.name === 'Idle-RPG',
-        );
-        if (actionsChannel) {
-          actionsChannel.send(
-            setImportantMessage(
-              'The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!',
-            ),
-          );
-        }
-      }),
-      game.db.endPowerHour(),
-    ]);
-  }, 5400000);
 }
 
-module.exports = { powerHourBegin };
+// Ends power hour via a cron (runOnInit) instead of an in-memory timeout, so a Heroku
+// restart during power hour cannot lose the decrement and leak the multiplier.
+async function expirePowerHour(bot, game) {
+  await Promise.all(
+    Array.from(bot.guilds.cache.values()).map(async (guild) => {
+      const guildConfig = await game.db.loadGame(guild.id);
+      const powerHour = guildConfig.events && guildConfig.events.powerHour;
+      if (!powerHour || !powerHour.isActive || powerHour.expiresAt > Date.now()) {
+        return;
+      }
+      const ended = await game.db.endPowerHour(guild.id);
+      if (!ended) return;
+      const actionsChannel = guild.channels.cache.find(
+        (channel) =>
+          channel.name === 'actions' &&
+          channel.type === ChannelType.GuildText &&
+          channel.parent &&
+          channel.parent.name === 'Idle-RPG',
+      );
+      if (actionsChannel) {
+        actionsChannel.send(
+          setImportantMessage(
+            'The clouds are disappearing, soothing wind brushes upon your face. Power Hour has ended!',
+          ),
+        );
+      }
+    }),
+  );
+}
+
+module.exports = { powerHourBegin, expirePowerHour };

@@ -1,6 +1,6 @@
 const { CronJob } = require('cron');
 const { cronLog } = require('../../utils/logger');
-const { powerHourBegin } = require('./tasks/powerHour');
+const { powerHourBegin, expirePowerHour } = require('./tasks/powerHour');
 const { dailyLottery } = require('./tasks/lottery');
 const { updateLeaderboards } = require('./tasks/leaderboards');
 const { blizzardRandom } = require('./tasks/blizzard');
@@ -150,6 +150,18 @@ class CronManager {
       onTick: () => {
         cronLog.info('CronJob expireBlizzard ran');
         expireBlizzard(this.bot, this.game);
+      },
+      start: false,
+      timeZone: this.timeZone,
+      runOnInit: true,
+    }).start();
+
+    // Power Hour
+    new CronJob({
+      cronTime: '*/1 * * * *',
+      onTick: () => {
+        cronLog.info('CronJob expirePowerHour ran');
+        expirePowerHour(this.bot, this.game);
       },
       start: false,
       timeZone: this.timeZone,

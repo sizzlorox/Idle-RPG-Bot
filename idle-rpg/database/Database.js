@@ -161,34 +161,39 @@ class Database {
   }
 
   async beginPowerHour() {
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try {
-      const updated = await Game.updateMany({}, { $inc: { multiplier: 1 } }).session(session);
-      await session.commitTransaction();
+      const now = Date.now();
+      const updated = await Game.updateMany(
+        { 'events.powerHour.isActive': { $ne: true } },
+        {
+          $inc: { multiplier: 1 },
+          $set: { 'events.powerHour': { isActive: true, expiresAt: now + 3600000 } },
+        },
+      );
       infoLog.info(`Power Hour started, updated ${updated.nModified} guilds`);
     } catch (err) {
       errorLog.error(err);
-      await session.abortTransaction();
-    } finally {
-      session.endSession();
     }
   }
 
-  async endPowerHour() {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+  // Guarded + idempotent: the isActive filter guarantees the -1 is applied at most
+  // once, so a Heroku restart replaying this (via the expire cron) cannot double-decrement.
+  async endPowerHour(guildId) {
     try {
-      const updated = await Game.updateMany({}, [
-        { $set: { multiplier: { $max: [1, { $subtract: ['$multiplier', 1] }] } } },
-      ]).session(session);
-      await session.commitTransaction();
-      infoLog.info(`Power Hour ended, updated ${updated.nModified} guilds`);
+      return await Game.findOneAndUpdate(
+        { guildId, 'events.powerHour.isActive': true },
+        [
+          {
+            $set: {
+              multiplier: { $max: [1, { $subtract: ['$multiplier', 1] }] },
+              'events.powerHour': { isActive: false, expiresAt: 0 },
+            },
+          },
+        ],
+        { new: true },
+      );
     } catch (err) {
       errorLog.error(err);
-      await session.abortTransaction();
-    } finally {
-      session.endSession();
     }
   }
 
